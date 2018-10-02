@@ -1,0 +1,21 @@
+name: osnap
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - jupyterlab
+  - geopandas
+  - hdbscan
+  - matplotlib
+  - notebook
+  - networkx
+  - pysal
+  - scikit-learn
+  - pip
+  - pip:
+    - libpysal
+    - mapclassify
+    - region
+    - spenc
+    - giddy
+    - xlrd
