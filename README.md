@@ -1,1 +1,1 @@
-# osnap
+# Open Source Neighborhood Analysis Package

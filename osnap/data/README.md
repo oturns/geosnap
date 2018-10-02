@@ -1,18 +1,3 @@
-<<<<<<< HEAD
-### LTDB Data
-LTDB data was processed using [this script](https://github.com/knaaptime/tstracts/blob/master/tstracts.py)
-and can be downloaded [here](https://drive.google.com/file/d/1ODa45XkYeQ3Luz6OYswezDhZf4sqz6K_/view?usp=sharing)
-
-The two files, `tstracts.feather` and `us_geo.h5` should be extracted to the 
-root of `data/`
-
-### Geolytics (NCDB) Data
-Currently a raw extract from the Geolytics database and has not yet been 
-processed. It can be downloaded [here](https://drive.google.com/file/d/1QornB-VPWGwqiEmM4_np_hrJ4IbY31UW/view?usp=sharing)
-
-
-### NHGIS Data
-=======
 # Data Layer
 
 ## Importing Data from External Databases
@@ -82,4 +67,3 @@ Can be downloaded [here](https://drive.google.com/file/d/1QornB-VPWGwqiEmM4_np_h
         * Since geolytics does not provide variables relevant to *Median value of owner-occupied housing units* (variable **MDVALHSy**) for 1970 and 1980. The current csv files 1970 and 1980 are missing this variable.
 
 ## Census and ACS data (original)
->>>>>>> 45167492053e22a3f9e79e63a4c7bba318f8067a
