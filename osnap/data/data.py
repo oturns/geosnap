@@ -5,12 +5,10 @@ Data reader for longitudinal databases LTDB, geolytics NCDB and NHGIS
 import os
 import numpy as np
 import pandas as pd
-import warnings
 import geopandas as gpd
-import glob
 import zipfile
-from shapely.geometry import Point, LineString, MultiLineString
-
+from warnings import warn
+from gdal import osr, ogr
 
 # LTDB importer
 
@@ -284,99 +282,200 @@ def _adjust_inflation(df, columns, base_year):
     return df
 
 
-def legacy_to_shapefile(path, year):
+def tiger_to_tract(infile):
 
-    if year == 2000:
-        ext = "*.RT"
-    elif year == 1990:
-        ext = "*.F5"
+    # Modified from original at
+    # https://svn.osgeo.org/gdal/tags/1.4.3/gdal/pymod/samples/tigerpoly.py
 
-    # split the point
-    def splitPoint(point):
-        value = []
-        value.append(float(point[:9]) / 1000000)
-        value.append(float(point[9:]) / 1000000)
-        return value
+    class Module:
+        def __init__(self):
+            self.lines = {}
+            self.poly_line_links = {}
 
-    # read data from RT2 file and store in dictionary. RT2 file stored the turning point of the lines in RT1
-    # key: numbers start with 7;
-    # value: geo location
-    def readRT2toDic(path):
-        fn = glob.glob(os.path.join(path, ext + "2"))[0]
-        f = open(fn, "r")
-        RT2_dic = {}
-        for line in f:
-            line = line.strip()
-            columns = line.split()
-            tps = []
-            for index, col in enumerate(columns):
-                if index == 1:
-                    key = col
-                elif index > 2:
-                    turningPoint = col[:18]
-                    value = splitPoint(turningPoint)  # split the turning point
-                    tps.append(value)
-            RT2_dic[key] = tps
-            return RT2_dic
+    outfile = 'poly.shp'
 
-    # read data from RT1 file and store in an array. RT1 file stores the types, starting coordination, and ending coordination of lines
+    # Open the datasource to operate on.
 
-    def readRT1toArray(path):
+    ds = ogr.Open(infile, update=0)
+    poly_layer = ds.GetLayerByName('Polygon')
 
-        # load RT2 to dictionary
-        RT2_dic = readRT2toDic(path)
-        fn = glob.glob(os.path.join(path, ext + "1"))[0]
-        # fn = '*'+ext+'1'
-        f = open(fn, "r")
-        feature_info = []
-        fips_codes = []
-        for line in f:
-            line = line.strip()
-            columns = line.split()
-            linetype = line[55:58]
-            fips = line[130:150]
-            startPoint = columns[-2]
-            endPoint = columns[-1]
-            ref = columns[1]  # number starts with 7
+    # Create output file for the composed polygons.
 
-            # if road name starts with 'A'
-            # if linetype[0] == "A":
-            temp = []
-            # add start point
-            a = splitPoint(startPoint)
-            temp.append(a)
+    nad83 = osr.SpatialReference()
+    nad83.SetFromUserInput('NAD83')
 
-            # add turning points if turning points exist
-            if ref in RT2_dic:
-                tps = RT2_dic[ref]
-                temp += tps
+    shp_driver = ogr.GetDriverByName('ESRI Shapefile')
+    shp_driver.DeleteDataSource(outfile)
 
-            # add end point
-            b = splitPoint(endPoint)
-            temp.append(b)
+    shp_ds = shp_driver.CreateDataSource(outfile)
 
-            feature_info.append(temp)
+    shp_layer = shp_ds.CreateLayer('out', geom_type=ogr.wkbPolygon, srs=nad83)
 
-            fips_codes.append(fips)
+    src_defn = poly_layer.GetLayerDefn()
+    poly_field_count = src_defn.GetFieldCount()
 
-            # feats = {"geometry": feature_info, "fips": fips_codes}
+    for fld_index in range(poly_field_count):
+        src_fd = src_defn.GetFieldDefn(fld_index)
 
-            # gdf = gpd.GeoDataFrame(feats)
-        return feature_info, fips_codes
+        fd = ogr.FieldDefn(src_fd.GetName(), src_fd.GetType())
+        fd.SetWidth(src_fd.GetWidth())
+        fd.SetPrecision(src_fd.GetPrecision())
+        shp_layer.CreateField(fd)
 
-    # A list of features and coordinate pairs
-    # A list that will hold each of the Polyline objects
-    features, fips_codes = readRT1toArray(path)
-    polys = []
-    lines = []
-    for feature in features:
-        lines.append(LineString(feature))
-    #     polys.append(MultiLineString(lines))
+    # Read all features in the line layer, holding just the geometry in a hash
+    # for fast lookup by TLID.
 
-    feats = {"geometry": lines, "fips": fips_codes}
+    line_layer = ds.GetLayerByName('CompleteChain')
+    line_count = 0
 
-    gdf = gpd.GeoDataFrame(feats)
-    # gs = gpd.GeoSeries(lines)
-    # Persist a copy of the Polyline objects using CopyFeatures
+    modules_hash = {}
+
+    feat = line_layer.GetNextFeature()
+    geom_id_field = feat.GetFieldIndex('TLID')
+    tile_ref_field = feat.GetFieldIndex('MODULE')
+    while feat is not None:
+        geom_id = feat.GetField(geom_id_field)
+        tile_ref = feat.GetField(tile_ref_field)
+
+        try:
+            module = modules_hash[tile_ref]
+        except:
+            module = Module()
+            modules_hash[tile_ref] = module
+
+        module.lines[geom_id] = feat.GetGeometryRef().Clone()
+        line_count = line_count + 1
+
+        feat.Destroy()
+
+        feat = line_layer.GetNextFeature()
+
+    # Read all polygon/chain links and build a hash keyed by POLY_ID listing
+    # the chains (by TLID) attached to it.
+
+    link_layer = ds.GetLayerByName('PolyChainLink')
+
+    feat = link_layer.GetNextFeature()
+    geom_id_field = feat.GetFieldIndex('TLID')
+    tile_ref_field = feat.GetFieldIndex('MODULE')
+    lpoly_field = feat.GetFieldIndex('POLYIDL')
+    rpoly_field = feat.GetFieldIndex('POLYIDR')
+
+    link_count = 0
+
+    while feat is not None:
+        module = modules_hash[feat.GetField(tile_ref_field)]
+
+        tlid = feat.GetField(geom_id_field)
+
+        lpoly_id = feat.GetField(lpoly_field)
+        rpoly_id = feat.GetField(rpoly_field)
+
+        if lpoly_id == rpoly_id:
+            feat.Destroy()
+            feat = link_layer.GetNextFeature()
+            continue
+
+        try:
+            module.poly_line_links[lpoly_id].append(tlid)
+        except:
+            module.poly_line_links[lpoly_id] = [tlid]
+
+        try:
+            module.poly_line_links[rpoly_id].append(tlid)
+        except:
+            module.poly_line_links[rpoly_id] = [tlid]
+
+        link_count = link_count + 1
+
+        feat.Destroy()
+
+        feat = link_layer.GetNextFeature()
+
+    # Process all polygon features.
+
+    feat = poly_layer.GetNextFeature()
+    tile_ref_field = feat.GetFieldIndex('MODULE')
+    polyid_field = feat.GetFieldIndex('POLYID')
+
+    poly_count = 0
+    degenerate_count = 0
+
+    while feat is not None:
+        module = modules_hash[feat.GetField(tile_ref_field)]
+        polyid = feat.GetField(polyid_field)
+
+        tlid_list = module.poly_line_links[polyid]
+
+        link_coll = ogr.Geometry(type=ogr.wkbGeometryCollection)
+        for tlid in tlid_list:
+            geom = module.lines[tlid]
+            link_coll.AddGeometry(geom)
+
+        try:
+            poly = ogr.BuildPolygonFromEdges(link_coll)
+
+            if poly.GetGeometryRef(0).GetPointCount() < 4:
+                degenerate_count = degenerate_count + 1
+                poly.Destroy()
+                feat.Destroy()
+                feat = poly_layer.GetNextFeature()
+                continue
+
+            # print poly.ExportToWkt()
+            # feat.SetGeometryDirectly( poly )
+
+            feat2 = ogr.Feature(feature_def=shp_layer.GetLayerDefn())
+
+            for fld_index in range(poly_field_count):
+                feat2.SetField(fld_index, feat.GetField(fld_index))
+
+            feat2.SetGeometryDirectly(poly)
+
+            shp_layer.CreateFeature(feat2)
+            feat2.Destroy()
+
+            poly_count = poly_count + 1
+        except:
+            warn('BuildPolygonFromEdges failed.')
+
+        feat.Destroy()
+
+        feat = poly_layer.GetNextFeature()
+
+    if degenerate_count:
+        warn('Discarded %d degenerate polygons.' % degenerate_count)
+
+    print('Built %d polygons.' % poly_count)
+
+    # Cleanup
+
+    shp_ds.Destroy()
+    ds.Destroy()
+
+    # build a fully-qualified fips code and dissolve on it to create tract geographies
+    gdf = gpd.read_file(outfile)
+
+    if "CTBNA90" in gdf.columns:
+
+        gdf = gdf.rename(columns={"CTBNA90": 'TRACT'})
+
+    gdf['STATE'] = gdf['STATE'].astype(str).str.rjust(2, "0")
+
+    gdf['COUNTY'] = gdf['COUNTY'].astype(str).str.rjust(3, "0")
+
+    gdf['TRACT'] = gdf['TRACT'].astype(str).str.rjust(4, "0")
+
+    gdf['fips'] = gdf.STATE + gdf.COUNTY + gdf.TRACT + '00'
+
+    gdf = gdf.dropna(subset=['fips'])
+
+    gdf.geometry = gdf.buffer(0)
+
+    gdf = gdf.dissolve(by='fips')
+
+    gdf.reset_index(inplace=True)
+
+    gdf.to_file(outfile)
 
     return gdf

@@ -25,31 +25,25 @@ from .cluster import (
     ward_spatial,
 )
 
-store = pd.HDFStore("oslnap/data/us_geo.h5", "r")
+_store = pd.HDFStore("oslnap/data/us_geo.h5", "r")
 
-states = store["states"]
-states = gpd.GeoDataFrame(states)
-states[~states.geoid.isin(["60", "66", "69", "72", "78"])]
-states.crs = {"init": "epsg:4326"}
-states = states.set_index("geoid")
+_states = _store["states"]
+_states = gpd.GeoDataFrame(_states)
+_states[~_states.geoid.isin(["60", "66", "69", "72", "78"])]
+_states.crs = {"init": "epsg:4326"}
+_states = _states.set_index("geoid")
 
-counties = store["counties"]
-counties = gpd.GeoDataFrame(counties)
-counties.crs = {"init": "epsg:4326"}
-counties = counties.set_index("geoid")
+_counties = _store["counties"]
+_counties = gpd.GeoDataFrame(_counties)
+_counties.crs = {"init": "epsg:4326"}
+_counties = _counties.set_index("geoid")
 
-tracts = store["tracts"]
-tracts = gpd.GeoDataFrame(tracts)
-tracts.crs = {"init": "epsg:4326"}
-tracts = tracts.set_index("geoid")
+_tracts = _store["tracts"]
+_tracts = gpd.GeoDataFrame(_tracts)
+_tracts.crs = {"init": "epsg:4326"}
+_tracts = _tracts.set_index("geoid")
 
-data = pd.HDFStore("oslnap/data/data.h5", "r")
-if dataset.isin(["ltdb", "ncdb", "nhgis"]):
-    df = data[dataset]
-elif dataset == "external":
-    df = dataset
-else:
-    raise ValueError("dataset must be one of 'ltdb', 'ncdb', 'nhgis', 'external'")
+_data = pd.HDFStore("oslnap/data/data.h5", "r")
 
 
 class Metro(object):
@@ -59,21 +53,28 @@ class Metro(object):
     region
     """
 
-    def __init__(self, name, boundary):
+    def __init__(self, name, dataset, boundary):
 
         self.name = name
         self.boundary = boundary
-        self.tracts = tracts[
-            tracts.set_geometry("point").within(self.boundary.unary_union)
+        self.tracts = _tracts[
+            _tracts.set_geometry("point").within(self.boundary.unary_union)
         ]
         self.tracts = ox.project_gdf(self.tracts)
         self.counties = ox.project_gdf(
-            counties[counties.index.isin(np.unique(self.tracts.index.str[0:5]))]
+            _counties[_counties.index.isin(np.unique(self.tracts.index.str[0:5]))]
         )
         self.states = ox.project_gdf(
-            states[states.index.isin(np.unique(self.tracts.index.str[0:2]))]
+            _states[_states.index.isin(np.unique(self.tracts.index.str[0:2]))]
         )
-        self.data = df[df.index.isin(self.tracts.index)]
+        if dataset.isin(["ltdb", "ncdb", "nhgis"]):
+            _df = _data[dataset]
+        elif dataset == "external":
+            _df = dataset
+        else:
+            raise ValueError("dataset must be one of 'ltdb', 'ncdb', 'nhgis', 'external'")
+
+        self.data = _df[_df.index.isin(self.tracts.index)]
 
     def plot(self, column=None, year=2015, ax=None, plot_counties=True, **kwargs):
         """
