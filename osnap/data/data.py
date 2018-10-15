@@ -1,4 +1,4 @@
-"""'
+"""
 Data reader for longitudinal databases LTDB, geolytics NCDB and NHGIS
 """
 
@@ -7,8 +7,31 @@ import numpy as np
 import pandas as pd
 import geopandas as gpd
 import zipfile
-from warnings import warn
-from gdal import osr, ogr
+import matplotlib.pyplot as plt
+import osmnx as ox
+
+# Variables
+
+_package_directory = os.path.dirname(os.path.abspath(__file__))
+_variables = pd.read_csv(os.path.join(_package_directory, "variables.csv"))
+_geo_store = pd.HDFStore(os.path.join(_package_directory, "us_geo.h5", "r"))
+_store = pd.HDFStore(os.path.join(_package_directory, "data.h5"), "a")
+
+_states = _geo_store["states"]
+_states = gpd.GeoDataFrame(_states)
+_states[~_states.geoid.isin(["60", "66", "69", "72", "78"])]
+_states.crs = {"init": "epsg:4326"}
+_states = _states.set_index("geoid")
+
+_counties = _geo_store["counties"]
+_counties = gpd.GeoDataFrame(_counties)
+_counties.crs = {"init": "epsg:4326"}
+_counties = _counties.set_index("geoid")
+
+_tracts = _geo_store["tracts"]
+_tracts = gpd.GeoDataFrame(_tracts)
+_tracts.crs = {"init": "epsg:4326"}
+_tracts = _tracts.set_index("geoid")
 
 # LTDB importer
 
@@ -134,7 +157,7 @@ def read_ltdb(sample, fullcount):
 
     df = df.set_index("geoid")
 
-    store = pd.HDFStore(os.path.join(package_directory, "data.h5"), "w")
+    store = pd.HDFStore(os.path.join(_package_directory, "data.h5"), "w")
     store["ltdb"] = df
 
     store.close()
@@ -157,7 +180,7 @@ def read_ncdb(filepath):
 
     """
 
-    ncdb_vars = variables["ncdb"].dropna()[1:].values
+    ncdb_vars = _variables["ncdb"].dropna()[1:].values
 
     df = pd.read_csv(
         filepath,
@@ -206,9 +229,10 @@ def read_ncdb(filepath):
         1: 2010,
         2: 2010
     })
+
     df = df.groupby(["GEO2010", "year"]).first()
 
-    mapper = dict(zip(variables.ncdb, variables.ltdb))
+    mapper = dict(zip(_variables.ncdb, _variables.ltdb))
 
     df.reset_index(inplace=True)
 
@@ -216,21 +240,93 @@ def read_ncdb(filepath):
 
     df = df.set_index("geoid")
 
-    store = pd.HDFStore(os.path.join(package_directory, "data.h5"), "w")
-    store["ncdb"] = df
-
-    store.close()
+    _store["ncdb"] = df
 
     return df
 
 
 # TODO NHGIS reader
 
+
+class Dataset(object):
+    """
+    Container for storing neighborhood data and analytics for a study
+    region
+    """
+
+    def __init__(self, name, source, states, counties, boundary=None,
+                 **kwargs):
+
+        # If a boundary is passed, use it to clip out the appropriate tracts
+        self.name = name
+        if boundary:
+
+            self.boundary = boundary
+            self.tracts = _tracts[_tracts.set_geometry("point").within(
+                self.boundary.unary_union)]
+            self.tracts = ox.project_gdf(self.tracts)
+            self.counties = ox.project_gdf(_counties[_counties.index.isin(
+                np.unique(self.tracts.index.str[0:5]))])
+            self.states = ox.project_gdf(_states[_states.index.isin(
+                np.unique(self.tracts.index.str[0:2]))])
+
+        # If county and state lists are passed, first filter tracts by state, then by county
+        else:
+            self.states = ox.project_gdf(_states[_states.index.isin(
+                np.unique(list().append(states)))])
+            self.counties = ox.project_gdf(_counties[_counties.index.isin(
+                np.unique(list().append(counties)))])
+
+            self.tracts = _tracts[_tracts.index.str[0:2].isin(np.unique(self.states.index]))
+            self.tracts = _tracts[_tracts.index.str[2:5].isin(np.unique(self.counties.index]))
+
+        if source.isin(["ltdb", "ncdb", "nhgis"]):
+            _df = _store[source]
+        elif source == "external":
+            _df = data
+        else:
+            raise ValueError(
+                "source must be one of 'ltdb', 'ncdb', 'nhgis', 'external'")
+
+        self.data = _df[_df.index.isin(self.tracts.index)]
+
+    def plot(self,
+             column=None,
+             year=2015,
+             ax=None,
+             plot_counties=True,
+             **kwargs):
+        """
+        convenience function for plotting tracts in the metro area
+        """
+        if ax is not None:
+            ax = ax
+        else:
+            fig, ax = plt.subplots(figsize=(15, 15))
+            colname = column.replace("_", " ")
+            colname = colname.title()
+            plt.title(
+                self.name + ": " + colname + ", " + str(year), fontsize=20)
+            plt.axis("off")
+
+        ax.set_aspect("equal")
+        plotme = self.tracts.join(
+            self.data[self.data.year == year], how="left")
+        plotme = plotme.dropna(subset=[column])
+        plotme.plot(column=column, alpha=0.8, ax=ax, **kwargs)
+
+        if plot_counties is True:
+            self.counties.plot(
+                edgecolor="#5c5353",
+                linewidth=0.8,
+                facecolor="none",
+                ax=ax,
+                **kwargs)
+
+        return ax
+
+
 # Utilities
-
-package_directory = os.path.dirname(os.path.abspath(__file__))
-
-variables = pd.read_csv(os.path.join(package_directory, "variables.csv"))
 
 
 def _adjust_inflation(df, columns, base_year):
