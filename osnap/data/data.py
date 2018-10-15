@@ -15,7 +15,7 @@ import osmnx as ox
 _package_directory = os.path.dirname(os.path.abspath(__file__))
 _variables = pd.read_csv(os.path.join(_package_directory, "variables.csv"))
 _geo_store = pd.HDFStore(os.path.join(_package_directory, "us_geo.h5"), "r")
-_store = pd.HDFStore(os.path.join(_package_directory, "data.h5"), "a")
+_store = pd.HDFStore(os.path.join(_package_directory, "data.h5"), "w")
 
 _states = _geo_store["states"]
 _states = gpd.GeoDataFrame(_states)
@@ -162,12 +162,9 @@ def read_ltdb(sample, fullcount):
     df = pd.concat(
         [ltdb_1970, ltdb_1980, ltdb_1990, ltdb_2000, ltdb_2010], sort=True)
 
-    #df = df.set_index("geoid")
+    df = df.round(0)
 
-    #store = pd.HDFStore(os.path.join(_package_directory, "data.h5"), "w")
     _store["ltdb"] = df
-
-    #store.close()
 
     return df
 
@@ -247,6 +244,8 @@ def read_ncdb(filepath):
 
     df = df.set_index("geoid")
 
+    df = df.round(0)
+
     _store["ncdb"] = df
 
     return df
@@ -264,39 +263,42 @@ class Dataset(object):
     def __init__(self,
                  name,
                  source,
-                 states,
+                 states=None,
                  counties=None,
                  boundary=None,
                  **kwargs):
 
         # If a boundary is passed, use it to clip out the appropriate tracts
         self.name = name
-        if boundary:
+        if boundary is not None:
 
             self.boundary = boundary
             self.tracts = _tracts[_tracts.set_geometry("point").within(
                 self.boundary.unary_union)]
             self.tracts = ox.project_gdf(self.tracts)
             self.counties = ox.project_gdf(_counties[_counties.index.isin(
-                np.unique(self.tracts.index.str[0:5]))])
+                self.tracts.index.str[0:5])])
             self.states = ox.project_gdf(_states[_states.index.isin(
-                np.unique(self.tracts.index.str[0:2]))])
+                self.tracts.index.str[0:2])])
 
         # If county and state lists are passed, first filter tracts by state, then by county
         else:
             assert states
-            self.states = ox.project_gdf(_states[_states.index.isin(
-                np.unique(list().append(states)))])
-            if counties is None: self.counties = np.unique(_counties.index)
-            self.counties = ox.project_gdf(_counties[_counties.index.isin(
-                np.unique(list().append(counties)))])
+            statelist = []
+            statelist.append(states)
+            self.states = _states[_states.index.isin(statelist)]
+            if counties is None: counties = _counties.index.tolist()
+            countylist = []
+            countylist.append(counties)
+            self.counties = _counties[_counties.index.isin(countylist)]
 
-            self.tracts = ox.project_gdf(_tracts[_tracts.index.str[0:2].isin(
-                np.unique(self.states.index))])
-            self.tracts = self.tracts[self.tracts.index.str[2:5].isin(
-                np.unique(self.counties.index))]
+            self.tracts = _tracts[_tracts.index.str[0:2].isin(
+                self.states.index.tolist())]
+            self.tracts = ox.project_gdf(
+                self.tracts[self.tracts.index.str[2:5].isin(
+                    self.counties.index.tolist())])
 
-        if source.isin(["ltdb", "ncdb", "nhgis"]):
+        if source in ["ltdb", "ncdb", "nhgis"]:
             _df = _store[source]
         elif source == "external":
             _df = data
