@@ -14,7 +14,7 @@ import osmnx as ox
 
 _package_directory = os.path.dirname(os.path.abspath(__file__))
 _variables = pd.read_csv(os.path.join(_package_directory, "variables.csv"))
-_geo_store = pd.HDFStore(os.path.join(_package_directory, "us_geo.h5", "r"))
+_geo_store = pd.HDFStore(os.path.join(_package_directory, "us_geo.h5"), "r")
 _store = pd.HDFStore(os.path.join(_package_directory, "data.h5"), "a")
 
 _states = _geo_store["states"]
@@ -91,7 +91,10 @@ def read_ltdb(sample, fullcount):
         df["year"] = year
 
         inflate_cols = ["mhmval", "mrent", "hinc"]
-        df = _adjust_inflation(df, inflate_cols, year)
+        try:
+            df = _adjust_inflation(df, inflate_cols, year)
+        except:
+            pass
 
         return df
 
@@ -99,53 +102,57 @@ def read_ltdb(sample, fullcount):
     # year population, housing units & occupied housing units appear in both
     # "sample" and "fullcount" files-- currently drop sample and keep fullcount
 
-    sample70 = (_ltdb_reader(
+    sample70 = _ltdb_reader(
         sample_zip,
         "ltdb_std_1970_sample.csv",
         dropcols=["POP70SP1", "HU70SP", "OHU70SP"],
         year=1970,
-    ), )
+    )
 
-    fullcount70 = (_ltdb_reader(
-        fullcount_zip, "LTDB_Std_1970_fullcount.csv", year=1970), )
+    fullcount70 = _ltdb_reader(
+        fullcount_zip, "LTDB_Std_1970_fullcount.csv", year=1970)
 
-    sample80 = (_ltdb_reader(
+    sample80 = _ltdb_reader(
         sample_zip,
         "ltdb_std_1980_sample.csv",
         dropcols=["pop80sf3", "pop80sf4", "hu80sp", "ohu80sp"],
         year=1980,
-    ), )
+    )
 
-    fullcount80 = (_ltdb_reader(
-        fullcount_zip, "LTDB_Std_1980_fullcount.csv", year=1980), )
+    fullcount80 = _ltdb_reader(
+        fullcount_zip, "LTDB_Std_1980_fullcount.csv", year=1980)
 
-    sample90 = (_ltdb_reader(
+    sample90 = _ltdb_reader(
         sample_zip,
         "ltdb_std_1990_sample.csv",
         dropcols=["POP90SF3", "POP90SF4", "HU90SP", "OHU90SP"],
         year=1990,
-    ), )
+    )
 
-    fullcount90 = (_ltdb_reader(
-        fullcount_zip, "LTDB_Std_1990_fullcount.csv", year=1990), )
+    fullcount90 = _ltdb_reader(
+        fullcount_zip, "LTDB_Std_1990_fullcount.csv", year=1990)
 
-    sample00 = (_ltdb_reader(
+    sample00 = _ltdb_reader(
         sample_zip,
         "ltdb_std_2000_sample.csv",
         dropcols=["POP00SF3", "HU00SP", "OHU00SP"],
         year=2000,
-    ), )
+    )
 
-    fullcount00 = (_ltdb_reader(
-        fullcount_zip, "LTDB_Std_2000_fullcount.csv", year=2000), )
+    fullcount00 = _ltdb_reader(
+        fullcount_zip, "LTDB_Std_2000_fullcount.csv", year=2000)
 
     sample10 = _ltdb_reader(sample_zip, "ltdb_std_2010_sample.csv", year=2010)
 
     # join the sample and fullcount variables into a single df for the year
-    ltdb_1970 = sample70.join(fullcount70.iloc[:, 7:], how="left")
-    ltdb_1980 = sample80.join(fullcount80.iloc[:, 7:], how="left")
-    ltdb_1990 = sample90.join(fullcount90.iloc[:, 7:], how="left")
-    ltdb_2000 = sample00.join(fullcount00.iloc[:, 7:], how="left")
+    ltdb_1970 = sample70.drop(columns=['year']).join(
+        fullcount70.iloc[:, 7:], how="left")
+    ltdb_1980 = sample80.drop(columns=['year']).join(
+        fullcount80.iloc[:, 7:], how="left")
+    ltdb_1990 = sample90.drop(columns=['year']).join(
+        fullcount90.iloc[:, 7:], how="left")
+    ltdb_2000 = sample00.drop(columns=['year']).join(
+        fullcount00.iloc[:, 7:], how="left")
     ltdb_2010 = sample10
 
     # the 2010 file doesnt have CBSA info, so grab it from the 2000 df
@@ -155,12 +162,12 @@ def read_ltdb(sample, fullcount):
     df = pd.concat(
         [ltdb_1970, ltdb_1980, ltdb_1990, ltdb_2000, ltdb_2010], sort=True)
 
-    df = df.set_index("geoid")
+    #df = df.set_index("geoid")
 
-    store = pd.HDFStore(os.path.join(_package_directory, "data.h5"), "w")
-    store["ltdb"] = df
+    #store = pd.HDFStore(os.path.join(_package_directory, "data.h5"), "w")
+    _store["ltdb"] = df
 
-    store.close()
+    #store.close()
 
     return df
 
@@ -254,7 +261,12 @@ class Dataset(object):
     region
     """
 
-    def __init__(self, name, source, states, counties, boundary=None,
+    def __init__(self,
+                 name,
+                 source,
+                 states,
+                 counties=None,
+                 boundary=None,
                  **kwargs):
 
         # If a boundary is passed, use it to clip out the appropriate tracts
@@ -272,13 +284,17 @@ class Dataset(object):
 
         # If county and state lists are passed, first filter tracts by state, then by county
         else:
+            assert states
             self.states = ox.project_gdf(_states[_states.index.isin(
                 np.unique(list().append(states)))])
+            if counties is None: self.counties = np.unique(_counties.index)
             self.counties = ox.project_gdf(_counties[_counties.index.isin(
                 np.unique(list().append(counties)))])
 
-            self.tracts = _tracts[_tracts.index.str[0:2].isin(np.unique(self.states.index]))
-            self.tracts = _tracts[_tracts.index.str[2:5].isin(np.unique(self.counties.index]))
+            self.tracts = ox.project_gdf(_tracts[_tracts.index.str[0:2].isin(
+                np.unique(self.states.index))])
+            self.tracts = self.tracts[self.tracts.index.str[2:5].isin(
+                np.unique(self.counties.index))]
 
         if source.isin(["ltdb", "ncdb", "nhgis"]):
             _df = _store[source]
