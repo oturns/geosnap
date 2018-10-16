@@ -4,31 +4,13 @@ import os
 
 filepath = os.path.dirname(__file__)
 variable_file = os.path.join(filepath, 'variables.csv')
-variables = pandas.read_csv(variables)
+variables = pandas.read_csv(variable_file)
 
 c2000sf1 = cenpy.base.Connection('2000sf1')
 c2000sf3 = cenpy.base.Connection('2000sf3')
 
 by_form = variables.groupby('census_2000_form')
 column_relations = by_form.census_2000_table_column.agg(list)
-
-sf1cols = process_columns(column_relations.loc['SF1'])
-sf3cols = process_columns(column_relations.loc['SF3'])
-
-
-san_diego_sf1 = c2000sf1.query(['NAME']+sf1cols, geo_unit='tract',
-                               geo_filter=dict(state='06', county='073'))
-san_diego_sf3 = c2000sf3.query(['NAME']+sf3cols, geo_unit='tract',
-                               geo_filter=dict(state='06', county='073'))
-
-san_diego_sf1_processed = [san_diego_sf1[sf1cols]
-                           .astype(float)
-                           .eval(normalize_relation(rel))
-                           for rel in column_relations.loc['SF1']]
-san_diego_sf3_processed = [san_diego_sf3[sf3cols]
-                           .astype(float)
-                           .eval(normalize_relation(rel))
-                           for rel in column_relations.loc['SF3']]
 
 # What is left:
 # 0. concatenate san_diego_sf1_processed/san_diego_sf3_processed along axis=1
@@ -60,8 +42,10 @@ def process_columns(input_columns):
             start = int(start[-3:])
             stop = int(stop)
             # and expand the range
-            cols = [stem+str(col).rjust(3, '0')
-                    for col in range(start, stop+1)]
+            cols = [
+                stem + str(col).rjust(3, '0')
+                for col in range(start, stop + 1)
+            ]
             outcols.extend(cols)
         else:
             outcols.append(col)
@@ -76,15 +60,37 @@ def normalize_relation(relation):
         else:
             relation = parts[0]
     else:
-        relation = '+'.join([normalize_relation(rel.strip())
-                             for rel in parts])
+        relation = '+'.join([normalize_relation(rel.strip()) for rel in parts])
     if ":" in relation:
         start, stop = relation.split(':')
         stem = start[:-3]
         start = int(start[-3:])
         stop = int(stop)
         # and expand the range
-        cols = [stem+str(col).rjust(3, '0')
-                for col in range(start, stop+1)]
+        cols = [
+            stem + str(col).rjust(3, '0') for col in range(start, stop + 1)
+        ]
         return '+'.join(cols)
     return relation
+
+
+sf1cols = process_columns(column_relations.loc['SF1'])
+sf3cols = process_columns(column_relations.loc['SF3'])
+
+san_diego_sf1 = c2000sf1.query(
+    ['NAME'] + sf1cols,
+    geo_unit='tract',
+    geo_filter=dict(state='06', county='073'))
+san_diego_sf3 = c2000sf3.query(
+    ['NAME'] + sf3cols,
+    geo_unit='tract',
+    geo_filter=dict(state='06', county='073'))
+
+san_diego_sf1_processed = [
+    san_diego_sf1[sf1cols].astype(float).eval(normalize_relation(rel))
+    for rel in column_relations.loc['SF1']
+]
+san_diego_sf3_processed = [
+    san_diego_sf3[sf3cols].astype(float).eval(normalize_relation(rel))
+    for rel in column_relations.loc['SF3']
+]

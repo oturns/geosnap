@@ -162,8 +162,6 @@ def read_ltdb(sample, fullcount):
     df = pd.concat(
         [ltdb_1970, ltdb_1980, ltdb_1990, ltdb_2000, ltdb_2010], sort=True)
 
-    df = df.round(0)
-
     renamer = dict(
         zip(_variables['ltdb'].tolist(), _variables['variable'].tolist()))
 
@@ -171,6 +169,8 @@ def read_ltdb(sample, fullcount):
 
     for row in _variables['formula'].dropna().tolist():
         df.eval(row, inplace=True)
+
+    df = df.round(0)
 
     _store["ltdb"] = df
 
