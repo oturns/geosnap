@@ -164,6 +164,14 @@ def read_ltdb(sample, fullcount):
 
     df = df.round(0)
 
+    renamer = dict(
+        zip(_variables['ltdb'].tolist(), _variables['variable'].tolist()))
+
+    df.rename(renamer, axis="columns", inplace=True)
+
+    for row in _variables['formula'].dropna().tolist():
+        df.eval(row, inplace=True)
+
     _store["ltdb"] = df
 
     return df
@@ -236,13 +244,16 @@ def read_ncdb(filepath):
 
     df = df.groupby(["GEO2010", "year"]).first()
 
-    mapper = dict(zip(_variables.ncdb, _variables.ltdb))
+    mapper = dict(zip(_variables.ncdb, _variables.variable))
 
     df.reset_index(inplace=True)
 
     df = df.rename(mapper, axis="columns")
 
     df = df.set_index("geoid")
+
+    for row in _variables['formula'].dropna().tolist():
+        df.eval(row, inplace=True)
 
     df = df.round(0)
 

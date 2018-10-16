@@ -64,11 +64,11 @@ p_owner_occupied_units,n_occupied_housing_units / n_total_housing_units,p_owner_
 p_housing_units_multiunit_structures,n_housing_units_multiunit_structures / n_housing_units_multiunit_structures_denom,p_housing_units_multiunit_structures=n_housing_units_multiunit_structures / n_housing_units_multiunit_structures_denom,pmulti,,,,,percentage of housing units in multi-unit structures,"Housing, Age, & Marital Status",
 p_structures_30_old,n_structures_30_old / n_housing_units_multiunit_structures_denom,p_structures_30_old=n_structures_30_old / n_housing_units_multiunit_structures_denom,p30old,,,,,percentage of structures built more than 30 years ago,"Housing, Age, & Marital Status",
 p_household_recent_move,n_household_recent_move / n_total_households,p_household_recent_move=n_household_recent_move / n_total_households,p10yrs,,,,,percentage of household heads moved into unit less than 10 years ago,"Housing, Age, & Marital Status",
-p_persons_under_18,n_persons_under_18 / n_total_population,p_persons_under_18=n_persons_under_18 / n_total_population,p18und,CHILD,,,,percentage of persons age 17 years and under,"Housing, Age, & Marital Status",
-p_persons_over_60,n_persons_over_60 / n_total_population,p_persons_over_60=n_persons_over_60 / n_total_population,p60up,,,,,percentage of persons age 60 years and over,"Housing, Age, & Marital Status",
-p_persons_over_75,n_persons_over_75 / n_total_population,p_persons_over_75=n_persons_over_75 / n_total_population,p75up,,,,,percentage of persons age 75 years and over,"Housing, Age, & Marital Status",
-p_married,n_married / n_total_population,p_married=n_married / n_total_population,pmar,,,,,percent currently married (excluding separated),"Housing, Age, & Marital Status",
-p_widowed_divorced,n_widowed_divorced / n_total_population,p_widowed_divorced=n_widowed_divorced / n_total_population,pwds,,,,,"percent widowed, divorced, and separated","Housing, Age, & Marital Status",should denom be families or individuals?
+p_persons_under_18,n_persons_under_18 / n_total_pop,p_persons_under_18=n_persons_under_18 / n_total_pop,p18und,CHILD,,,,percentage of persons age 17 years and under,"Housing, Age, & Marital Status",
+p_persons_over_60,n_persons_over_60 / n_total_pop,p_persons_over_60=n_persons_over_60 / n_total_pop,p60up,,,,,percentage of persons age 60 years and over,"Housing, Age, & Marital Status",
+p_persons_over_75,n_persons_over_75 / n_total_pop,p_persons_over_75=n_persons_over_75 / n_total_pop,p75up,,,,,percentage of persons age 75 years and over,"Housing, Age, & Marital Status",
+p_married,n_married / n_total_pop,p_married=n_married / n_total_pop,pmar,,,,,percent currently married (excluding separated),"Housing, Age, & Marital Status",
+p_widowed_divorced,n_widowed_divorced / n_total_pop,p_widowed_divorced=n_widowed_divorced / n_total_pop,pwds,,,,,"percent widowed, divorced, and separated","Housing, Age, & Marital Status",should denom be families or individuals?
 p_female_headed_families,n_female_headed_families / n_total_families,p_female_headed_families=n_female_headed_families / n_total_families,pfhh,,,,,percentage of female-headed families with children,"Housing, Age, & Marital Status",should denom be families or individuals?
 n_white_persons,,,white,NSHRWHT,,NA,P003003,persons of white race,Race & Age,"[ljw] inferring here, documentation suggests this is only available for 1970, but white alone (regardless of hispanic) gives this count? [ek] I think the question about hispanic ethnicity was added in 1980, so this is the best they can do to measdure the 'white alone' construct in 1970 "
 n_nonhisp_white_persons,,,nhwht,NSHRNHW,B03002_003E,SF1,P004005,"persons of white race, not Hispanic origin",Race & Age,"[ljw] I read this as P004005 (not hispanic white alone), not P003003 (white alone)"
@@ -82,6 +82,7 @@ n_chinese_persons,,,china,,,SF1,PCT007005+PCT007015,persons of Chinese race,Race
 n_filipino_persons,,,filip,,,SF1,PCT007006,persons of Filipino race,Race & Age,
 n_japanese_persons,,,japan,,,SF1,PCT007009,persons of Japanese race,Race & Age,
 n_korean_persons,,,korea,,,SF1,PCT007010,persons of Korean race,Race & Age,
+n_asian_persons,,,asian,,,,,,,
 n_vietnamese_persons,,,viet,,,SF1,PCT007017,persons of Vietnamese race,Race & Age,
 n_white_age_distribution,,,agewht,,,SF1,PCT012I001,white population with known age distribution,Race & Age,
 n_white_under_15,,,a15wht,,,SF1,PCT012I003:018+PCT012I108:122,0-15 years old of white race,Race & Age,
@@ -107,7 +108,7 @@ p_white_persons,,,pwhite,,,,,percentage of persons of white race,Race & Age,
 p_black_persons,,,pnhwht,SHRNHW,,,,"percentage of persons of white race, not Hispanic origin",Race & Age,
 p_nonhisp_white_persons,n_nonhisp_white_persons / n_total_pop,p_nonhisp_white_persons=n_nonhisp_white_persons / n_total_pop,pblack,,,,,percentage of persons of black race,Race & Age,
 p_nonhisp_black_persons,n_nonhisp_black_persons / n_total_pop,p_nonhisp_black_persons=n_nonhisp_black_persons / n_total_pop,pnhblk,SHRNHB,,,,"percentage of persons of black race, not Hispanic origin",Race & Age,
-p_hisp_persons,n_hisp_persons / n_total_pop,p_hisp_persons=n_hisp_persons / n_total_pop,phisp,SHRHSP,,,,percentage of persons of Hispanic origin,Race & Age,
+p_hispanic_persons,n_hispanic_persons / n_total_pop,p_hispanic_persons=n_hispanic_persons / n_total_pop,phisp,SHRHSP,,,,percentage of persons of Hispanic origin,Race & Age,
 p_native_persons,n_native_persons / n_total_pop,p_native_persons=n_native_persons / n_total_pop,pntv,SHRNHI,,,,percentage of persons of Native American race,Race & Age,
 p_asian_persons,n_asian_persons / n_total_pop,p_asian_persons=n_asian_persons / n_total_pop,pasian,SHRNHR,,,,percentage of persons of Asian race (and Pacific Islander),Race & Age,
 p_hawaiian_persons,n_hawaiian_persons / n_total_pop,p_hawaiian_persons=n_hawaiian_persons / n_total_pop,phaw,SHRNHH,,,,percentage of persons of Hawaiian race,Race & Age,
@@ -154,7 +155,7 @@ n_black_households,,,hhb,,B19001B_001E,SF3,P146B001,total black households in sa
 median_income_hispanichh,,,hinch,,B19013I_001E,SF3,P152H001,Median household income for Hispanics,Socioeconomic Status,
 n_hispanic_households,,,hhh,,B19001I_001E,SF3,P146H001,total Hispanic households in sample-based data,Socioeconomic Status,
 median_income_asianhh,,,hinca,,,SF3,P152D001,Median household income for Asians and Pacific Islanders,Socioeconomic Status,"unclear how to calculate, since this is only provided as asian or as PI for 2000. Column recorded is asian only"
-n_asian_households,,B19001D_001E + B19001E_001E,hha,,,SF3,P152D001 + P152E001,total Asian/Pacific Islander households in sample-based data,Socioeconomic Status,"unclear how to calculate, since this is only provided as asian or as PI for 2000. Column recorded is asian + pacific islander"
+n_asian_households,B19001D_001E + B19001E_001E,,hha,,,SF3,P152D001 + P152E001,total Asian/Pacific Islander households in sample-based data,Socioeconomic Status,"unclear how to calculate, since this is only provided as asian or as PI for 2000. Column recorded is asian + pacific islander"
 per_capita_income,,,incpc,,B19301_001E,SF3,P082001,Per capita income,Socioeconomic Status,
 n_poverty_determined_persons,,,dpov,DPOVRAT,B17001_001E,SF3,P087001,persons for whom poverty status is determined,Socioeconomic Status,denominator for calculating poverty rate
 n_poverty_persons,,,npov,NPOVRAT,B17001_002E,SF3,P087002,persons in poverty,Socioeconomic Status,numerator for calculating poverty rate
@@ -180,8 +181,8 @@ p_female_labor_force,,,pflabf,,,,,percentage of females in labor force,Socioecon
 p_employed_professional,n_employed_professional / n_employed_over_16,p_employed_professional=n_employed_professional / n_employed_over_16,pprof,,,,,percentage of professional employees (by occupations),Socioeconomic Status,
 p_employed_manufacturing,n_employed_manufacturing / n_employed_over_16,p_employed_manufacturing=n_employed_manufacturing / n_employed_over_16,pmanuf,,,,,percentage of manufacturing employees (by industries),Socioeconomic Status,
 p_employed_self_employed,n_employed_self_employed / n_employed_over_16,p_employed_self_employed=n_employed_self_employed / n_employed_over_16,psemp,,,,,percentage of self-employed,Socioeconomic Status,
-p_veterans,n_veterans / n_total_population,p_veterans=n_veterans / n_total_population,pvet,,,,,percentage of veterans,Socioeconomic Status,
-p_disabled,n_disabled / n_total_population,p_disabled=n_disabled / n_total_population,pdis,,,,,percent with disability,Socioeconomic Status,
+p_veterans,n_veterans / n_total_pop,p_veterans=n_veterans / n_total_pop,pvet,,,,,percentage of veterans,Socioeconomic Status,
+p_disabled,n_disabled / n_total_pop,p_disabled=n_disabled / n_total_pop,pdis,,,,,percent with disability,Socioeconomic Status,
 p_poverty_rate,n_poverty_persons / n_poverty_determined_persons,p_poverty_rate=n_poverty_persons / n_poverty_determined_persons,ppov,POVRAT,,,,percent poor,Socioeconomic Status,
 p_poverty_rate_over_65,n_poverty_over_65 / n_poverty_determined_persons,p_poverty_rate_over_65=n_poverty_over_65 / n_poverty_determined_persons,p65pov,ELDPOO,,,,percentage of 65 years and older in poverty,Socioeconomic Status,
 p_poverty_rate_children,n_poverty_families_children / n_poverty_determined_families,p_poverty_rate_children=n_poverty_families_children / n_poverty_determined_families,pfmpov,,,,,percentage of families with children in poverty,Socioeconomic Status,
