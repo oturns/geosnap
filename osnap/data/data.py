@@ -342,7 +342,7 @@ class Dataset(object):
             raise ValueError(
                 "source must be one of 'ltdb', 'ncdb', 'nhgis', 'external'")
 
-        self.data = _df[_df.index.isin(self.tracts.index)]
+        self.data = _df[_df.index.isin(self.tracts.geoid)]
 
     def plot(self,
              column=None,
