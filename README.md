@@ -3,21 +3,22 @@
 <img src="osnap/doc/osnap.png" alt="osnap" width="500"/>
 
 
-## olsnap modules
+## osnap modules
 
 - osnap.data Data handling
 - osnap.analytics Analytics for neighborhood analysis
-- osnap.visualization  Visualization of neighborhood dynamics
+- osnap.harmonize Statistical interpolation methods for harmonizing boundaries over time
+- osnap.visualization Visualization of neighborhood dynamics
 
 
 ## Development
 
-osnap development is hosted on [github]('https://github.com/spatialucr/oslnap')
+osnap development is hosted on [github]('https://github.com/spatialucr/osnap')
 
 
 ## Bug reports
 
-To search for or report bugs, please see oslnap's [issues]('http://github.com/spatialucr/oslnap-prototype/issues')
+To search for or report bugs, please see osnap's [issues]('http://github.com/spatialucr/osnap/issues')
 
 
 ## License information
