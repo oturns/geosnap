@@ -1,16 +1,38 @@
-"""'
+"""
 Data reader for longitudinal databases LTDB, geolytics NCDB and NHGIS
 """
 
 import os
 import numpy as np
 import pandas as pd
-import warnings
 import geopandas as gpd
-import glob
 import zipfile
-from shapely.geometry import Point, LineString, MultiLineString
+import matplotlib.pyplot as plt
+import osmnx as ox
 
+# Variables
+
+_package_directory = os.path.dirname(os.path.abspath(__file__))
+_variables = pd.read_csv(os.path.join(_package_directory, "variables.csv"))
+_geo_store = pd.HDFStore(os.path.join(_package_directory, "us_geo.h5"), "r")
+_store = pd.HDFStore(os.path.join(_package_directory, "data.h5"), "a")
+
+_states = _geo_store["states"]
+_states = gpd.GeoDataFrame(_states)
+_states[~_states.geoid.isin(["60", "66", "69", "72", "78"])]
+_states.crs = {"init": "epsg:4326"}
+#_states = _states.set_index("geoid")
+
+_counties = _geo_store["counties"]
+_counties = gpd.GeoDataFrame(_counties)
+_counties.crs = {"init": "epsg:4326"}
+#_counties = _counties.set_index("geoid")
+
+_tracts = _geo_store["tracts"]
+_tracts = gpd.GeoDataFrame(_tracts)
+_tracts.crs = {"init": "epsg:4326"}
+
+#_tracts = _tracts.set_index("geoid")
 
 # LTDB importer
 
@@ -42,7 +64,10 @@ def read_ltdb(sample, fullcount):
         df = pd.read_csv(
             path.open(file),
             na_values=["", " ", 99999, -999],
-            converters={0: str, "placefp10": str},
+            converters={
+                0: str,
+                "placefp10": str
+            },
             low_memory=False,
             encoding="latin1",
         )
@@ -67,7 +92,10 @@ def read_ltdb(sample, fullcount):
         df["year"] = year
 
         inflate_cols = ["mhmval", "mrent", "hinc"]
-        df = _adjust_inflation(df, inflate_cols, year)
+        try:
+            df = _adjust_inflation(df, inflate_cols, year)
+        except:
+            pass
 
         return df
 
@@ -75,79 +103,82 @@ def read_ltdb(sample, fullcount):
     # year population, housing units & occupied housing units appear in both
     # "sample" and "fullcount" files-- currently drop sample and keep fullcount
 
-    sample70 = (
-        _ltdb_reader(
-            sample_zip,
-            "ltdb_std_1970_sample.csv",
-            dropcols=["POP70SP1", "HU70SP", "OHU70SP"],
-            year=1970,
-        ),
+    sample70 = _ltdb_reader(
+        sample_zip,
+        "ltdb_std_all_sample/ltdb_std_1970_sample.csv",
+        dropcols=["POP70SP1", "HU70SP", "OHU70SP"],
+        year=1970,
     )
 
-    fullcount70 = (
-        _ltdb_reader(fullcount_zip, "LTDB_Std_1970_fullcount.csv", year=1970),
+    fullcount70 = _ltdb_reader(
+        fullcount_zip, "LTDB_Std_1970_fullcount.csv", year=1970)
+
+    sample80 = _ltdb_reader(
+        sample_zip,
+        "ltdb_std_all_sample/ltdb_std_1980_sample.csv",
+        dropcols=["pop80sf3", "pop80sf4", "hu80sp", "ohu80sp"],
+        year=1980,
     )
 
-    sample80 = (
-        _ltdb_reader(
-            sample_zip,
-            "ltdb_std_1980_sample.csv",
-            dropcols=["pop80sf3", "pop80sf4", "hu80sp", "ohu80sp"],
-            year=1980,
-        ),
+    fullcount80 = _ltdb_reader(
+        fullcount_zip, "LTDB_Std_1980_fullcount.csv", year=1980)
+
+    sample90 = _ltdb_reader(
+        sample_zip,
+        "ltdb_std_all_sample/ltdb_std_1990_sample.csv",
+        dropcols=["POP90SF3", "POP90SF4", "HU90SP", "OHU90SP"],
+        year=1990,
     )
 
-    fullcount80 = (
-        _ltdb_reader(fullcount_zip, "LTDB_Std_1980_fullcount.csv", year=1980),
+    fullcount90 = _ltdb_reader(
+        fullcount_zip, "LTDB_Std_1990_fullcount.csv", year=1990)
+
+    sample00 = _ltdb_reader(
+        sample_zip,
+        "ltdb_std_all_sample/ltdb_std_2000_sample.csv",
+        dropcols=["POP00SF3", "HU00SP", "OHU00SP"],
+        year=2000,
     )
 
-    sample90 = (
-        _ltdb_reader(
-            sample_zip,
-            "ltdb_std_1990_sample.csv",
-            dropcols=["POP90SF3", "POP90SF4", "HU90SP", "OHU90SP"],
-            year=1990,
-        ),
-    )
+    fullcount00 = _ltdb_reader(
+        fullcount_zip, "LTDB_Std_2000_fullcount.csv", year=2000)
 
-    fullcount90 = (
-        _ltdb_reader(fullcount_zip, "LTDB_Std_1990_fullcount.csv", year=1990),
-    )
-
-    sample00 = (
-        _ltdb_reader(
-            sample_zip,
-            "ltdb_std_2000_sample.csv",
-            dropcols=["POP00SF3", "HU00SP", "OHU00SP"],
-            year=2000,
-        ),
-    )
-
-    fullcount00 = (
-        _ltdb_reader(fullcount_zip, "LTDB_Std_2000_fullcount.csv", year=2000),
-    )
-
-    sample10 = _ltdb_reader(sample_zip, "ltdb_std_2010_sample.csv", year=2010)
+    sample10 = _ltdb_reader(
+        sample_zip, "ltdb_std_all_sample/ltdb_std_2010_sample.csv", year=2010)
 
     # join the sample and fullcount variables into a single df for the year
-    ltdb_1970 = sample70.join(fullcount70.iloc[:, 7:], how="left")
-    ltdb_1980 = sample80.join(fullcount80.iloc[:, 7:], how="left")
-    ltdb_1990 = sample90.join(fullcount90.iloc[:, 7:], how="left")
-    ltdb_2000 = sample00.join(fullcount00.iloc[:, 7:], how="left")
+    ltdb_1970 = sample70.drop(columns=['year']).join(
+        fullcount70.iloc[:, 7:], how="left")
+    ltdb_1980 = sample80.drop(columns=['year']).join(
+        fullcount80.iloc[:, 7:], how="left")
+    ltdb_1990 = sample90.drop(columns=['year']).join(
+        fullcount90.iloc[:, 7:], how="left")
+    ltdb_2000 = sample00.drop(columns=['year']).join(
+        fullcount00.iloc[:, 7:], how="left")
     ltdb_2010 = sample10
 
-    # the 2010 file doesnt have CBSA info, so grab it from the 2000 df
-    ltdb_2010["cbsa"] = np.nan
-    ltdb_2010.update(other=ltdb_2000["cbsa"], overwrite=True)
+    df = pd.concat(
+        [ltdb_1970, ltdb_1980, ltdb_1990, ltdb_2000, ltdb_2010], sort=True)
 
-    df = pd.concat([ltdb_1970, ltdb_1980, ltdb_1990, ltdb_2000, ltdb_2010], sort=True)
+    renamer = dict(
+        zip(_variables['ltdb'].tolist(), _variables['variable'].tolist()))
 
-    df = df.set_index("geoid")
+    df.rename(renamer, axis="columns", inplace=True)
 
-    store = pd.HDFStore(os.path.join(package_directory, "data.h5"), "w")
-    store["ltdb"] = df
+    # compute additional variables from lookup table
+    for row in _variables['formula'].dropna().tolist():
+        df.eval(row, inplace=True)
 
-    store.close()
+    # downcast numeric types to save memory
+    df_float = df.select_dtypes(include=['float'])
+    converted_float = df_float.apply(pd.to_numeric, downcast='float')
+
+    df = df.round(0)
+
+    keeps = df.columns[df.columns.isin(_variables['variable'].tolist())]
+    df = df[keeps]
+
+    _store["ltdb"] = df
 
     return df
 
@@ -167,12 +198,12 @@ def read_ncdb(filepath):
 
     """
 
-    ncdb_vars = variables["ncdb"].dropna()[1:].values
+    ncdb_vars = _variables["ncdb"].dropna()[1:].values
 
     df = pd.read_csv(
         filepath,
-        low_memory=False,
         na_values=["", " ", 99999, -999],
+        engine='c',
         converters={
             "GEO2010": str,
             "COUNTY": str,
@@ -205,15 +236,21 @@ def read_ncdb(filepath):
     df.rename(dict(zip(orig, fixed)), axis="columns", inplace=True)
 
     df = pd.wide_to_long(
-        df, stubnames=ncdb_vars, i="GEO2010", j="year", suffix="(7|8|9|0|1|2)"
-    ).reset_index()
+        df, stubnames=ncdb_vars, i="GEO2010", j="year",
+        suffix="(7|8|9|0|1|2)").reset_index()
 
-    df["year"] = df["year"].replace(
-        {7: 1970, 8: 1980, 9: 1990, 0: 2000, 1: 2010, 2: 2010}
-    )
+    df["year"] = df["year"].replace({
+        7: 1970,
+        8: 1980,
+        9: 1990,
+        0: 2000,
+        1: 2010,
+        2: 2010
+    })
+
     df = df.groupby(["GEO2010", "year"]).first()
 
-    mapper = dict(zip(variables.ncdb, variables.ltdb))
+    mapper = dict(zip(_variables.ncdb, _variables.variable))
 
     df.reset_index(inplace=True)
 
@@ -221,10 +258,21 @@ def read_ncdb(filepath):
 
     df = df.set_index("geoid")
 
-    store = pd.HDFStore(os.path.join(package_directory, "data.h5"), "w")
-    store["ncdb"] = df
+    for row in _variables['formula'].dropna().tolist():
+        df.eval(row, inplace=True)
 
-    store.close()
+    df = df[[_variables.variable.tolist().append('year')]]
+
+    # downcast numeric types to save memory
+    df_float = df.select_dtypes(include=['float'])
+    converted_float = df_float.apply(pd.to_numeric, downcast='float')
+
+    df = df.round(0)
+
+    keeps = df.columns[df.columns.isin(_variables['variable'].tolist())]
+    df = df[keeps]
+
+    _store["ncdb"] = df
 
     return df
 
@@ -232,11 +280,107 @@ def read_ncdb(filepath):
 # TODO NHGIS reader
 
 
+class Dataset(object):
+    """
+    Container for storing neighborhood data and analytics for a study
+    region
+    """
+
+    def __init__(self,
+                 name,
+                 source,
+                 states=None,
+                 counties=None,
+                 boundary=None,
+                 **kwargs):
+
+        # If a boundary is passed, use it to clip out the appropriate tracts
+        self.name = name
+        if boundary is not None:
+
+            self.boundary = boundary
+            self.tracts = _tracts[_tracts.set_geometry("point").within(
+                self.boundary.unary_union)]
+            self.tracts = ox.project_gdf(self.tracts)
+            self.counties = ox.project_gdf(_counties[_counties.geoid.isin(
+                self.tracts.geoid.str[0:5])])
+            self.states = ox.project_gdf(_states[_states.geoid.isin(
+                self.tracts.geoid.str[0:2])])
+
+        # If county and state lists are passed, first filter tracts by state, then by county
+        else:
+            assert states
+            statelist = []
+            if isinstance(states, (list, )):
+                statelist.extend(states)
+            else:
+                statelist.append(states)
+            countylist = []
+            if isinstance(counties, (list, )): countylist.extend(counties)
+            else: countylist.append(counties)
+            geo_filter = {'state': statelist, 'county': countylist}
+            fips = []
+            for state in geo_filter['state']:
+                if counties is not None:
+                    for county in geo_filter['county']:
+                        fips.append(state + county)
+                else:
+                    fips.append(state)
+            self.fips = fips
+            self.states = _states[_states.index.isin(statelist)]
+            self.counties = _counties[_counties.geoid.isin(countylist)]
+            if counties is not None:
+                self.tracts = _tracts[_tracts.geoid.str[:5].isin(fips)]
+            else:
+                self.tracts = _tracts[_tracts.geoid.str[:2].isin(fips)]
+
+        if source in ["ltdb", "ncdb", "nhgis"]:
+            _df = _store[source]
+        elif source == "external":
+            _df = data
+        else:
+            raise ValueError(
+                "source must be one of 'ltdb', 'ncdb', 'nhgis', 'external'")
+
+        self.data = _df[_df.index.isin(self.tracts.geoid)]
+
+    def plot(self,
+             column=None,
+             year=2015,
+             ax=None,
+             plot_counties=True,
+             **kwargs):
+        """
+        convenience function for plotting tracts in the metro area
+        """
+        if ax is not None:
+            ax = ax
+        else:
+            fig, ax = plt.subplots(figsize=(15, 15))
+            colname = column.replace("_", " ")
+            colname = colname.title()
+            plt.title(
+                self.name + ": " + colname + ", " + str(year), fontsize=20)
+            plt.axis("off")
+
+        ax.set_aspect("equal")
+        plotme = self.tracts.join(
+            self.data[self.data.year == year], how="left")
+        plotme = plotme.dropna(subset=[column])
+        plotme.plot(column=column, alpha=0.8, ax=ax, **kwargs)
+
+        if plot_counties is True:
+            self.counties.plot(
+                edgecolor="#5c5353",
+                linewidth=0.8,
+                facecolor="none",
+                ax=ax,
+                **kwargs)
+
+        return ax
+
+
 # Utilities
-
-package_directory = os.path.dirname(os.path.abspath(__file__))
-
-variables = pd.read_csv(os.path.join(package_directory, "variables.csv"))
 
 
 def _adjust_inflation(df, columns, base_year):
@@ -263,8 +407,7 @@ def _adjust_inflation(df, columns, base_year):
     # adjust for inflation
     # get inflation adjustment table from BLS
     inflation = pd.read_excel(
-        "https://www.bls.gov/cpi/research-series/allitems.xlsx", skiprows=6
-    )
+        "https://www.bls.gov/cpi/research-series/allitems.xlsx", skiprows=6)
     inflation.columns = inflation.columns.str.lower()
     inflation.columns = inflation.columns.str.strip(".")
     inflation = inflation.dropna(subset=["year"])
@@ -275,108 +418,11 @@ def _adjust_inflation(df, columns, base_year):
         2000: inflation[inflation.year == 2000]["avg"].values[0],
         1990: inflation[inflation.year == 1990]["avg"].values[0],
         1980: inflation[inflation.year == 1980]["avg"].values[0],
-        1970: 63.9,  # https://www2.census.gov/programs-surveys/demo/tables/p60/249/CPI-U-RS-Index-2013.pdf
+        1970:
+        63.9,  # https://www2.census.gov/programs-surveys/demo/tables/p60/249/CPI-U-RS-Index-2013.pdf
     }
 
     df = df.copy()
     df[columns].apply(lambda x: x * (inflator[2015] / inflator[base_year]))
 
     return df
-
-
-def legacy_to_shapefile(path, year):
-
-    if year == 2000:
-        ext = "*.RT"
-    elif year == 1990:
-        ext = "*.F5"
-
-    # split the point
-    def splitPoint(point):
-        value = []
-        value.append(float(point[:9]) / 1000000)
-        value.append(float(point[9:]) / 1000000)
-        return value
-
-    # read data from RT2 file and store in dictionary. RT2 file stored the turning point of the lines in RT1
-    # key: numbers start with 7;
-    # value: geo location
-    def readRT2toDic(path):
-        fn = glob.glob(os.path.join(path, ext + "2"))[0]
-        f = open(fn, "r")
-        RT2_dic = {}
-        for line in f:
-            line = line.strip()
-            columns = line.split()
-            tps = []
-            for index, col in enumerate(columns):
-                if index == 1:
-                    key = col
-                elif index > 2:
-                    turningPoint = col[:18]
-                    value = splitPoint(turningPoint)  # split the turning point
-                    tps.append(value)
-            RT2_dic[key] = tps
-            return RT2_dic
-
-    # read data from RT1 file and store in an array. RT1 file stores the types, starting coordination, and ending coordination of lines
-
-    def readRT1toArray(path):
-
-        # load RT2 to dictionary
-        RT2_dic = readRT2toDic(path)
-        fn = glob.glob(os.path.join(path, ext + "1"))[0]
-        # fn = '*'+ext+'1'
-        f = open(fn, "r")
-        feature_info = []
-        fips_codes = []
-        for line in f:
-            line = line.strip()
-            columns = line.split()
-            linetype = line[55:58]
-            fips = line[130:150]
-            startPoint = columns[-2]
-            endPoint = columns[-1]
-            ref = columns[1]  # number starts with 7
-
-            # if road name starts with 'A'
-            # if linetype[0] == "A":
-            temp = []
-            # add start point
-            a = splitPoint(startPoint)
-            temp.append(a)
-
-            # add turning points if turning points exist
-            if ref in RT2_dic:
-                tps = RT2_dic[ref]
-                temp += tps
-
-            # add end point
-            b = splitPoint(endPoint)
-            temp.append(b)
-
-            feature_info.append(temp)
-
-            fips_codes.append(fips)
-
-            # feats = {"geometry": feature_info, "fips": fips_codes}
-
-            # gdf = gpd.GeoDataFrame(feats)
-        return feature_info, fips_codes
-
-    # A list of features and coordinate pairs
-    # A list that will hold each of the Polyline objects
-    features, fips_codes = readRT1toArray(path)
-    polys = []
-    lines = []
-    for feature in features:
-        lines.append(LineString(feature))
-    #     polys.append(MultiLineString(lines))
-
-    feats = {"geometry": lines, "fips": fips_codes}
-
-    gdf = gpd.GeoDataFrame(feats)
-    # gs = gpd.GeoSeries(lines)
-    # Persist a copy of the Polyline objects using CopyFeatures
-
-    return gdf
