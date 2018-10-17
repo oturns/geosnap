@@ -13,12 +13,12 @@
 
 ## Development
 
-osnap development is hosted on [github]('https://github.com/spatialucr/osnap')
+osnap development is hosted on [github](https://github.com/spatialucr/osnap)
 
 
 ## Bug reports
 
-To search for or report bugs, please see osnap's [issues]('http://github.com/spatialucr/osnap/issues')
+To search for or report bugs, please see osnap's [issues](http://github.com/spatialucr/osnap/issues)
 
 
 ## License information
