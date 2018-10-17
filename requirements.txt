@@ -1,0 +1,10 @@
+cython
+geopandas
+hdbscan
+libpysal
+matplotlib
+region
+networkx
+scikit-learn>=0.17
+spenc
+xlrd
