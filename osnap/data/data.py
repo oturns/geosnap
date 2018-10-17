@@ -15,23 +15,24 @@ import osmnx as ox
 _package_directory = os.path.dirname(os.path.abspath(__file__))
 _variables = pd.read_csv(os.path.join(_package_directory, "variables.csv"))
 _geo_store = pd.HDFStore(os.path.join(_package_directory, "us_geo.h5"), "r")
-_store = pd.HDFStore(os.path.join(_package_directory, "data.h5"), "w")
+_store = pd.HDFStore(os.path.join(_package_directory, "data.h5"), "a")
 
 _states = _geo_store["states"]
 _states = gpd.GeoDataFrame(_states)
 _states[~_states.geoid.isin(["60", "66", "69", "72", "78"])]
 _states.crs = {"init": "epsg:4326"}
-_states = _states.set_index("geoid")
+#_states = _states.set_index("geoid")
 
 _counties = _geo_store["counties"]
 _counties = gpd.GeoDataFrame(_counties)
 _counties.crs = {"init": "epsg:4326"}
-_counties = _counties.set_index("geoid")
+#_counties = _counties.set_index("geoid")
 
 _tracts = _geo_store["tracts"]
 _tracts = gpd.GeoDataFrame(_tracts)
 _tracts.crs = {"init": "epsg:4326"}
-_tracts = _tracts.set_index("geoid")
+
+#_tracts = _tracts.set_index("geoid")
 
 # LTDB importer
 
@@ -104,7 +105,7 @@ def read_ltdb(sample, fullcount):
 
     sample70 = _ltdb_reader(
         sample_zip,
-        "ltdb_std_1970_sample.csv",
+        "ltdb_std_all_sample/ltdb_std_1970_sample.csv",
         dropcols=["POP70SP1", "HU70SP", "OHU70SP"],
         year=1970,
     )
@@ -114,7 +115,7 @@ def read_ltdb(sample, fullcount):
 
     sample80 = _ltdb_reader(
         sample_zip,
-        "ltdb_std_1980_sample.csv",
+        "ltdb_std_all_sample/ltdb_std_1980_sample.csv",
         dropcols=["pop80sf3", "pop80sf4", "hu80sp", "ohu80sp"],
         year=1980,
     )
@@ -124,7 +125,7 @@ def read_ltdb(sample, fullcount):
 
     sample90 = _ltdb_reader(
         sample_zip,
-        "ltdb_std_1990_sample.csv",
+        "ltdb_std_all_sample/ltdb_std_1990_sample.csv",
         dropcols=["POP90SF3", "POP90SF4", "HU90SP", "OHU90SP"],
         year=1990,
     )
@@ -134,7 +135,7 @@ def read_ltdb(sample, fullcount):
 
     sample00 = _ltdb_reader(
         sample_zip,
-        "ltdb_std_2000_sample.csv",
+        "ltdb_std_all_sample/ltdb_std_2000_sample.csv",
         dropcols=["POP00SF3", "HU00SP", "OHU00SP"],
         year=2000,
     )
@@ -142,7 +143,8 @@ def read_ltdb(sample, fullcount):
     fullcount00 = _ltdb_reader(
         fullcount_zip, "LTDB_Std_2000_fullcount.csv", year=2000)
 
-    sample10 = _ltdb_reader(sample_zip, "ltdb_std_2010_sample.csv", year=2010)
+    sample10 = _ltdb_reader(
+        sample_zip, "ltdb_std_all_sample/ltdb_std_2010_sample.csv", year=2010)
 
     # join the sample and fullcount variables into a single df for the year
     ltdb_1970 = sample70.drop(columns=['year']).join(
@@ -200,8 +202,8 @@ def read_ncdb(filepath):
 
     df = pd.read_csv(
         filepath,
-        low_memory=False,
         na_values=["", " ", 99999, -999],
+        engine='c',
         converters={
             "GEO2010": str,
             "COUNTY": str,
@@ -300,27 +302,37 @@ class Dataset(object):
             self.tracts = _tracts[_tracts.set_geometry("point").within(
                 self.boundary.unary_union)]
             self.tracts = ox.project_gdf(self.tracts)
-            self.counties = ox.project_gdf(_counties[_counties.index.isin(
-                self.tracts.index.str[0:5])])
-            self.states = ox.project_gdf(_states[_states.index.isin(
-                self.tracts.index.str[0:2])])
+            self.counties = ox.project_gdf(_counties[_counties.geoid.isin(
+                self.tracts.geoid.str[0:5])])
+            self.states = ox.project_gdf(_states[_states.geoid.isin(
+                self.tracts.geoid.str[0:2])])
 
         # If county and state lists are passed, first filter tracts by state, then by county
         else:
             assert states
             statelist = []
-            statelist.append(states)
-            self.states = _states[_states.index.isin(statelist)]
-            if counties is None: counties = _counties.index.tolist()
+            if isinstance(states, (list, )):
+                statelist.extend(states)
+            else:
+                statelist.append(states)
             countylist = []
-            countylist.append(counties)
-            self.counties = _counties[_counties.index.isin(countylist)]
-
-            self.tracts = _tracts[_tracts.index.str[0:2].isin(
-                self.states.index.tolist())]
-            self.tracts = ox.project_gdf(
-                self.tracts[self.tracts.index.str[2:5].isin(
-                    self.counties.index.tolist())])
+            if isinstance(counties, (list, )): countylist.extend(counties)
+            else: countylist.append(counties)
+            geo_filter = {'state': statelist, 'county': countylist}
+            fips = []
+            for state in geo_filter['state']:
+                if counties is not None:
+                    for county in geo_filter['county']:
+                        fips.append(state + county)
+                else:
+                    fips.append(state)
+            self.fips = fips
+            self.states = _states[_states.index.isin(statelist)]
+            self.counties = _counties[_counties.geoid.isin(countylist)]
+            if counties is not None:
+                self.tracts = _tracts[_tracts.geoid.str[:5].isin(fips)]
+            else:
+                self.tracts = _tracts[_tracts.geoid.str[:2].isin(fips)]
 
         if source in ["ltdb", "ncdb", "nhgis"]:
             _df = _store[source]
