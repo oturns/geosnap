@@ -155,10 +155,6 @@ def read_ltdb(sample, fullcount):
         fullcount00.iloc[:, 7:], how="left")
     ltdb_2010 = sample10
 
-    # the 2010 file doesnt have CBSA info, so grab it from the 2000 df
-    ltdb_2010["cbsa"] = np.nan
-    ltdb_2010.update(other=ltdb_2000["cbsa"], overwrite=True)
-
     df = pd.concat(
         [ltdb_1970, ltdb_1980, ltdb_1990, ltdb_2000, ltdb_2010], sort=True)
 
@@ -167,10 +163,18 @@ def read_ltdb(sample, fullcount):
 
     df.rename(renamer, axis="columns", inplace=True)
 
+    # compute additional variables from lookup table
     for row in _variables['formula'].dropna().tolist():
         df.eval(row, inplace=True)
 
+    # downcast numeric types to save memory
+    df_float = df.select_dtypes(include=['float'])
+    converted_float = df_float.apply(pd.to_numeric, downcast='float')
+
     df = df.round(0)
+
+    keeps = df.columns[df.columns.isin(_variables['variable'].tolist())]
+    df = df[keeps]
 
     _store["ltdb"] = df
 
@@ -255,7 +259,16 @@ def read_ncdb(filepath):
     for row in _variables['formula'].dropna().tolist():
         df.eval(row, inplace=True)
 
+    df = df[[_variables.variable.tolist().append('year')]]
+
+    # downcast numeric types to save memory
+    df_float = df.select_dtypes(include=['float'])
+    converted_float = df_float.apply(pd.to_numeric, downcast='float')
+
     df = df.round(0)
+
+    keeps = df.columns[df.columns.isin(_variables['variable'].tolist())]
+    df = df[keeps]
 
     _store["ncdb"] = df
 
