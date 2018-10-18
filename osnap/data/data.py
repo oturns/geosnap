@@ -309,13 +309,16 @@ class Dataset(object):
         if boundary is not None:
 
             self.boundary = boundary
-            self.tracts = _tracts[_tracts.set_geometry("point").within(
+            self.tracts = _tracts.to_crs(boundary.crs)
+            self.tracts = self.tracts[self.tracts.set_geometry("point").within(
                 self.boundary.unary_union)]
-            self.tracts = ox.project_gdf(self.tracts)
-            self.counties = ox.project_gdf(_counties[_counties.geoid.isin(
-                self.tracts.geoid.str[0:5])])
-            self.states = ox.project_gdf(_states[_states.geoid.isin(
-                self.tracts.geoid.str[0:2])])
+            self.tracts = self.tracts.to_crs(boundary.crs)
+            self.counties = _counties[_counties.geoid.isin(
+                self.tracts.geoid.str[0:5])]
+            self.counties = self.counties.to_crs(boundary.crs)
+            self.states = _states[_states.geoid.isin(
+                self.tracts.geoid.str[0:2])]
+            self.states = self.states.to_crs(boundary.crs)
 
         # If county and state lists are passed, use them to filter based on geoid
         else:
