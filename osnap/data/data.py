@@ -15,8 +15,6 @@ from shapely.wkt import loads
 
 _package_directory = os.path.dirname(os.path.abspath(__file__))
 _variables = pd.read_csv(os.path.join(_package_directory, "variables.csv"))
-#_geo_store = pd.HDFStore(os.path.join(_package_directory, "us_geo.h5"), "r")
-_store = pd.HDFStore(os.path.join(_package_directory, "data.h5"), "a")
 
 _states = pd.read_parquet(
     os.path.join(_package_directory, 'states.parquet.gzip'))
@@ -189,7 +187,9 @@ def read_ltdb(sample, fullcount):
     keeps = df.columns[df.columns.isin(_variables['variable'].tolist())]
     df = df[keeps]
 
-    _store["ltdb"] = df
+    df.to_parquet(
+        os.path.join(_package_directory, "ltdb.parquet.gzip"),
+        compression='gzip')
 
     return df
 
@@ -283,7 +283,9 @@ def read_ncdb(filepath):
     keeps = df.columns[df.columns.isin(_variables['variable'].tolist())]
     df = df[keeps]
 
-    _store["ncdb"] = df
+    df.to_parquet(
+        os.path.join(_package_directory, "ncdb.parquet.gzip"),
+        compression='gzip')
 
     return df
 
@@ -337,7 +339,6 @@ class Dataset(object):
                         fips.append(state + county)
                 else:
                     fips.append(state)
-            self.fips = fips
             self.states = _states[_states.index.isin(statelist)]
             self.counties = _counties[_counties.geoid.isin(countylist)]
             if counties is not None:
@@ -345,8 +346,12 @@ class Dataset(object):
             else:
                 self.tracts = _tracts[_tracts.geoid.str[:2].isin(fips)]
 
-        if source in ["ltdb", "ncdb", "nhgis"]:
-            _df = _store[source]
+        if source == "ltdb":
+            _df = pd.read_parquet(
+                os.path.join(_package_directory, "ltdb.parquet.gzip"))
+        elif source == "ncdb":
+            _df = pd.read_parquet(
+                os.path.join(_package_directory, "ncdb.parquet.gzip"))
         elif source == "external":
             _df = data
         else:
