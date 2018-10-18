@@ -1,10 +1,10 @@
-# Data Layer
+# osnap.data
 
-## Importing Data from External Databases
+OSNAP's `data` module can ingest data from existing longitudinal databases like the Geolytics [Neighborhood Change Database](http://geolytics.com/USCensus,Neighborhood-Change-Database-1970-2000,Products.asp) and Brown University's [Longtitudinal Tract Database](https://s4.ad.brown.edu/projects/diversity/researcher/bridging.htm), and it can download original survey and geospatial data directly from the US Census.
 
-OSLNAP provides import functions for popular databases that provide harmonized
-Census boundaries. **You must provide your own copy of the external database**.
-The importers can be accessed via the `data` module
+To facilitate multiple analyses, OSNAP provides functions to cache longitudinal databases to disk. Once they are registered with OSNAP, these databases can be queried rapidly to create datasets for analyzing neighborhood dynamics at any scale.
+
+## Importing External Databases
 
 ### Longitudinal Tract Database (LTDB)
 
@@ -13,7 +13,7 @@ The [Longitudinal Tract Database
 freely available dataset developed by researchers at Brown University that
 provides census data harmonized to 2010 boundaries.
 
-To import LTDB into OSLNAP, proceed with the following:
+To import LTDB data into osnap, proceed with the following:
 
 - Download the raw data from the LTDB [downloads
   page](https://s4.ad.brown.edu/projects/diversity/Researcher/LTBDDload/Default.aspx).
@@ -25,45 +25,56 @@ To import LTDB into OSLNAP, proceed with the following:
     - Click the button "Download Standard Data Files"
     - Repeat the process, this time selecting "sample" in the **select file
       type** menu and "All years" in the **select a year**
-- in your file browser, navigate to the two zip archives you just downloaded. By
-  default they are called `LTDB_Std_All_Sample.zip` and
-  `LTDB_Std_All_fullcount.zip`. Extract both of these zip archives into a single
-  directory containing all CSV files:
+- Note the location of the two zip archives you just downloaded. By default they are called `LTDB_Std_All_Sample.zip` and
+  `LTDB_Std_All_fullcount.zip`. 
 
-[placeholder image]
-
-Finally, to load the data into oslnap, call the `import_ltdb` function and pass the path of the directory containing the LTDB CSV files
+Finally, to load the data into osnap, call the `read_ltdb` function and pass the paths of the two zip archives you downloaded from the LTDB project page:
 
 ```
-from oslnap.data import import_ltdb
-import_ltdb("~/ltdb_data")
+from oslnap.data import read_ltdb
+
+# if the archives were in my downloads folder, the paths 
+# might be something like this
+sample = "~/downloads/LTDB_Std_All_Sample.zip"
+full = "~/downlodas/LTDB_Std_All_fullcount.zip"
+
+read_ltdb(sample=sample, fullcount=full)
 
 ```
-    
+
+The reader will extract the necessary data from the archives, calculate some additional variables, and store the database as an apache parquet file. It will also return a pandas DataFrame if you want to get started right way or if you want inspect the variables.
+
+
+### Neighborhood Change Database
 
 
 
+## Creating Datasets for Analysis
 
-### Geolytics Neighborhood Change Database (NCDB)
+To perform neighborhood analyses, osnap provides the `Dataset` class which stores information about the spatial boundaries and social composition of a study area. 
 
-#### Datasets from Geolytics NCDB
+Creating a set of neighborhoods is as simple as instantiating the Dataset class with a location filter and a source database. The location filter can be either a `geopandas.GeoDataFrame` that defines the total extent of a boundary area (such as an MSA), or a list of state and county FIPS codes.
 
-Can be downloaded [here](https://drive.google.com/file/d/1QornB-VPWGwqiEmM4_np_hrJ4IbY31UW/view?usp=sharing)
+To use a boundary 
 
-#### Metadata and data dictionary
+```
+import geopandas
+import osnap
 
-* Metadata purchased from Geolytics can be downloaded [here](https://drive.google.com/file/d/1QornB-VPWGwqiEmM4_np_hrJ4IbY31UW/view?usp=sharing)
-* Data dictionary downloaded from Geolytics website can be found [here](geolytics/materials/user-guide/Appendix-E.pdf)
+# read in a geodataframe of the Chicago MSA
+chi_msa = geopandas.read_file('data/chicago_msa.shp')
 
+chicago = Dataset(name='Chicago MSA', source='ltdb', boundary=chi_msa)
 
-#### Data processing
-* 14 variables for sensitivity analysis
-    * Python code for processing Geolytics NCDB data and extract 14 variables: [geolytics/geolytics_processing_14.py](geolytics/geolytics_processing_14.py)
-    * The extracted datasets (one csv file per year) are living [here](https://drive.google.com/drive/folders/1_ieUSrHUErrG7RuTUMVF_7MUnlO4iBol?usp=sharing)
-    and should be ready for further analysis.
-        * There are two csv data files per year. The only difference lies in the variable names:
-            * files with names starting with "geolytics" (for example "geolytics_14_1970") use geolytics variable names
-            * files with names starting with "newName" (for example "newName_geolytics_14_1970") use ["new" names](https://docs.google.com/spreadsheets/u/1/d/1ywu3sNY1gBGPyu_2XWL7ps1b9VCOR7z5Ba9stachQbs/edit?ouid=102330163499148373088&usp=sheets_home&ths=true)
-        * Since geolytics does not provide variables relevant to *Median value of owner-occupied housing units* (variable **MDVALHSy**) for 1970 and 1980. The current csv files 1970 and 1980 are missing this variable.
+```
 
-## Census and ACS data (original)
+To use a list of FIPS
+
+```
+import osnap
+
+# Maryland's fips code is 24, Baltimore City is 510 and Baltimore County is 005
+
+baltimore = Dataset(name='Baltimore', source='ltdb', states='24', counties = ['005', '510'])
+
+```

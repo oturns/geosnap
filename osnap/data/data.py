@@ -23,7 +23,6 @@ _states = _states[['geoid', 'geometry']]
 _states = gpd.GeoDataFrame(_states)
 _states[~_states.geoid.isin(["60", "66", "69", "72", "78"])]
 _states.crs = {"init": "epsg:4326"}
-#_states = _states.set_index("geoid")
 
 _counties = pd.read_parquet(
     os.path.join(_package_directory, 'counties.parquet.gzip'))
@@ -31,7 +30,6 @@ _counties['geometry'] = _counties.wkt.apply(lambda x: loads(x))
 _counties = _counties[['geoid', 'geometry']]
 _counties = gpd.GeoDataFrame(_counties)
 _counties.crs = {"init": "epsg:4326"}
-#_counties = _counties.set_index("geoid")
 
 _tracts = pd.read_parquet(
     os.path.join(_package_directory, 'tracts.parquet.gzip'))
@@ -40,8 +38,6 @@ _tracts['point'] = _tracts.wkt_point.apply(lambda x: loads(x))
 _tracts = _tracts[['geoid', 'geometry', 'point']]
 _tracts = gpd.GeoDataFrame(_tracts)
 _tracts.crs = {"init": "epsg:4326"}
-
-#_tracts = _tracts.set_index("geoid")
 
 # LTDB importer
 
@@ -320,7 +316,7 @@ class Dataset(object):
             self.states = ox.project_gdf(_states[_states.geoid.isin(
                 self.tracts.geoid.str[0:2])])
 
-        # If county and state lists are passed, first filter tracts by state, then by county
+        # If county and state lists are passed, use them to filter based on geoid
         else:
             assert states
             statelist = []
