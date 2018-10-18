@@ -180,7 +180,8 @@ def read_ltdb(sample, fullcount):
 
     df = df.round(0)
 
-    keeps = df.columns[df.columns.isin(_variables['variable'].tolist())]
+    keeps = df.columns[df.columns.isin(_variables['variable'].tolist() +
+                                       ['year'])]
     df = df[keeps]
 
     df.to_parquet(

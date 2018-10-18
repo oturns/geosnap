@@ -4,9 +4,9 @@ Tools for the spatial analysis of neighborhood change
 
 import numpy as np
 import pandas as pd
-from libpysal import attach_islands
-from libpysal.weights.Contiguity import Queen, Rook
-from libpysal.weights.Distance import KNN
+from libpysal.weights import attach_islands
+from libpysal.weights.contiguity import Queen, Rook
+from libpysal.weights.distance import KNN
 
 from .cluster import (
     affinity_propagation,
@@ -47,14 +47,14 @@ def cluster(dataset,
     -------
     DataFrame
     """
-
+    assert columns, "You must provide a subset of columns as input"
+    assert method, "You must choose a clustering algorithm to use"
     data = dataset.data.copy()
     allcols = columns + ["year"]
     data = data[allcols]
     data.dropna(inplace=True)
     data[columns] = data.groupby("year")[columns].apply(
         lambda x: (x - x.mean()) / x.std(ddof=0))
-    data
     # option to autoscale the data w/ mix-max or zscore?
     specification = {
         "ward": ward,
