@@ -366,6 +366,7 @@ class Dataset(object):
         """
         convenience function for plotting tracts in the metro area
         """
+        assert column, "You must choose a column to plot"
         if ax is not None:
             ax = ax
         else:
@@ -377,8 +378,10 @@ class Dataset(object):
             plt.axis("off")
 
         ax.set_aspect("equal")
-        plotme = self.tracts.join(
-            self.data[self.data.year == year], how="left")
+        plotme = self.tracts.merge(
+            self.data[self.data.year == year],
+            left_on="geoid",
+            right_index=True)
         plotme = plotme.dropna(subset=[column])
         plotme.plot(column=column, alpha=0.8, ax=ax, **kwargs)
 

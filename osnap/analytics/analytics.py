@@ -87,6 +87,7 @@ def cluster(dataset,
     dataset.data = dataset.data.merge(clusters, on="joinkey", how="left")
     dataset.data["geoid"] = geoid
     dataset.data.set_index("geoid", inplace=True)
+    return dataset
 
 
 def cluster_spatial(dataset,
@@ -119,6 +120,8 @@ def cluster_spatial(dataset,
     DataFrame
 
     """
+    assert columns, "You must provide a subset of columns as input"
+    assert method, "You must choose a clustering algorithm to use"
 
     if threshold_variable == "count":
         allcols = columns + ["year"]
@@ -146,15 +149,13 @@ def cluster_spatial(dataset,
 
     def _build_data(data, tracts, year, weights_type):
         df = data.loc[data.year == year].copy()
-        tracts = tracts.copy()[tracts.index.isin(df.index)]
+        tracts = tracts.copy()[tracts.geoid.isin(df.index)]
         weights = {"queen": Queen, "rook": Rook}
-        w = weights[weights_type].from_dataframe(
-            tracts.reset_index(), idVariable="geoid")
+        w = weights[weights_type].from_dataframe(tracts, idVariable="geoid")
         # drop islands from dataset and rebuild weights
         df.drop(index=w.islands, inplace=True)
         tracts.drop(index=w.islands, inplace=True)
-        w = weights[weights_type].from_dataframe(
-            tracts.reset_index(), idVariable="geoid")
+        w = weights[weights_type].from_dataframe(tracts, idVariable="geoid")
         knnw = KNN.from_dataframe(tracts, k=1)
 
         return df, w, knnw

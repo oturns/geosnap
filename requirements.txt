@@ -8,3 +8,5 @@ networkx
 scikit-learn>=0.17
 spenc
 xlrd
+giddy
+pyarrow
