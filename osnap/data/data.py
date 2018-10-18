@@ -9,26 +9,37 @@ import geopandas as gpd
 import zipfile
 import matplotlib.pyplot as plt
 import osmnx as ox
+from shapely.wkt import loads
 
 # Variables
 
 _package_directory = os.path.dirname(os.path.abspath(__file__))
 _variables = pd.read_csv(os.path.join(_package_directory, "variables.csv"))
-_geo_store = pd.HDFStore(os.path.join(_package_directory, "us_geo.h5"), "r")
+#_geo_store = pd.HDFStore(os.path.join(_package_directory, "us_geo.h5"), "r")
 _store = pd.HDFStore(os.path.join(_package_directory, "data.h5"), "a")
 
-_states = _geo_store["states"]
+_states = pd.read_parquet(
+    os.path.join(_package_directory, 'states.parquet.gzip'))
+_states['geometry'] = _states.wkt.apply(lambda x: loads(x))
+_states = _states[['geoid', 'geometry']]
 _states = gpd.GeoDataFrame(_states)
 _states[~_states.geoid.isin(["60", "66", "69", "72", "78"])]
 _states.crs = {"init": "epsg:4326"}
 #_states = _states.set_index("geoid")
 
-_counties = _geo_store["counties"]
+_counties = pd.read_parquet(
+    os.path.join(_package_directory, 'counties.parquet.gzip'))
+_counties['geometry'] = _counties.wkt.apply(lambda x: loads(x))
+_counties = _counties[['geoid', 'geometry']]
 _counties = gpd.GeoDataFrame(_counties)
 _counties.crs = {"init": "epsg:4326"}
 #_counties = _counties.set_index("geoid")
 
-_tracts = _geo_store["tracts"]
+_tracts = pd.read_parquet(
+    os.path.join(_package_directory, 'tracts.parquet.gzip'))
+_tracts['geometry'] = _tracts.wkt.apply(lambda x: loads(x))
+_tracts['point'] = _tracts.wkt_point.apply(lambda x: loads(x))
+_tracts = _tracts[['geoid', 'geometry', 'point']]
 _tracts = gpd.GeoDataFrame(_tracts)
 _tracts.crs = {"init": "epsg:4326"}
 
