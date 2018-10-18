@@ -31,7 +31,7 @@ To import LTDB data into osnap, proceed with the following:
 Finally, to load the data into osnap, call the `read_ltdb` function and pass the paths of the two zip archives you downloaded from the LTDB project page:
 
 ```
-from oslnap.data import read_ltdb
+from osnap.data import read_ltdb
 
 # if the archives were in my downloads folder, the paths 
 # might be something like this
