@@ -61,10 +61,10 @@ To use a boundary
 import geopandas
 import osnap
 
-# read in a geodataframe of the Chicago MSA
-chi_msa = geopandas.read_file('data/chicago_msa.shp')
+# read in a geodataframe of Virginia
+va = gpd.read_file(lps.examples.get_path('virginia.shp'))
 
-chicago = Dataset(name='Chicago MSA', source='ltdb', boundary=chi_msa)
+virginia = Dataset(name='Virginia', source='ltdb', boundary=va)
 
 ```
 

@@ -339,11 +339,12 @@ class Dataset(object):
                         fips.append(state + county)
                 else:
                     fips.append(state)
-            self.states = _states[_states.index.isin(statelist)]
-            self.counties = _counties[_counties.geoid.isin(countylist)]
+            self.states = _states[_states.geoid.isin(statelist)]
             if counties is not None:
+                self.counties = _counties[_counties.geoid.str[:5].isin(fips)]
                 self.tracts = _tracts[_tracts.geoid.str[:5].isin(fips)]
             else:
+                self.counties = _counties[_counties.geoid.str[:2].isin(fips)]
                 self.tracts = _tracts[_tracts.geoid.str[:2].isin(fips)]
 
         if source == "ltdb":
@@ -362,7 +363,7 @@ class Dataset(object):
 
     def plot(self,
              column=None,
-             year=2015,
+             year=2010,
              ax=None,
              plot_counties=True,
              **kwargs):
