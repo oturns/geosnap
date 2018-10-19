@@ -8,17 +8,8 @@ from libpysal.weights import attach_islands
 from libpysal.weights.contiguity import Queen, Rook
 from libpysal.weights.distance import KNN
 
-from .cluster import (
-    affinity_propagation,
-    gaussian_mixture,
-    kmeans,
-    max_p,
-    skater,
-    spectral,
-    spenc,
-    ward,
-    ward_spatial,
-)
+from .cluster import (affinity_propagation, gaussian_mixture, kmeans, max_p,
+                      skater, spectral, spenc, ward, ward_spatial)
 
 
 def cluster(dataset,

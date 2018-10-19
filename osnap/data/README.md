@@ -60,10 +60,12 @@ To use a boundary
 ```
 import geopandas
 import osnap
+import libpysal
 
 # read in a geodataframe of Virginia
-va = gpd.read_file(lps.examples.get_path('virginia.shp'))
+va = gpd.read_file(libpysal.examples.get_path('virginia.shp'))
 
+# instiantiate a dataset with the virginia boundary
 virginia = Dataset(name='Virginia', source='ltdb', boundary=va)
 
 ```

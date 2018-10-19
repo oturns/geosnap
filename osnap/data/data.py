@@ -3,13 +3,15 @@ Data reader for longitudinal databases LTDB, geolytics NCDB and NHGIS
 """
 
 import os
+import zipfile
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import geopandas as gpd
-import zipfile
-import matplotlib.pyplot as plt
-import osmnx as ox
 from shapely.wkt import loads
+
+import geopandas as gpd
+import osmnx as ox
 
 # Variables
 
@@ -38,6 +40,12 @@ _tracts['point'] = _tracts.wkt_point.apply(lambda x: loads(x))
 _tracts = _tracts[['geoid', 'geometry', 'point']]
 _tracts = gpd.GeoDataFrame(_tracts)
 _tracts.crs = {"init": "epsg:4326"}
+
+metros = pd.read_parquet(os.path.join(_package_directory, 'msas.parquet.gzip'))
+metros['geometry'] = metros.wkt.apply(lambda x: loads(x))
+metros.drop(columns=['wkt'], inplace=True)
+metros = gpd.GeoDataFrame(metros)
+metros.crs = {"init": "epsg:4326"}
 
 # LTDB importer
 
