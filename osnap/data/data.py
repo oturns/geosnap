@@ -182,10 +182,6 @@ def read_ltdb(sample, fullcount):
     for row in _variables['formula'].dropna().tolist():
         df.eval(row, inplace=True)
 
-    # downcast numeric types to save memory
-    df_float = df.select_dtypes(include=['float'])
-    converted_float = df_float.apply(pd.to_numeric, downcast='float')
-
     df = df.round(0)
 
     keeps = df.columns[df.columns.isin(_variables['variable'].tolist() +
@@ -216,10 +212,15 @@ def read_ncdb(filepath):
 
     ncdb_vars = _variables["ncdb"].dropna()[1:].values
 
+    names = []
+    for name in ncdb_vars:
+        for suffix in ['7', '8', '9', '0', '1', '2']:
+            names.append(name + suffix)
+    names.append('GEO2010')
     df = pd.read_csv(
         filepath,
-        na_values=["", " ", 99999, -999],
         engine='c',
+        na_values=["", " ", 99999, -999],
         converters={
             "GEO2010": str,
             "COUNTY": str,
@@ -249,7 +250,10 @@ def read_ncdb(filepath):
         elif col.endswith("1A"):
             orig.append(col)
 
-    df.rename(dict(zip(orig, fixed)), axis="columns", inplace=True)
+    renamer = dict(zip(orig, fixed))
+    df.rename(renamer, axis="columns", inplace=True)
+
+    df = df[df.columns[df.columns.isin(names)]]
 
     df = pd.wide_to_long(
         df, stubnames=ncdb_vars, i="GEO2010", j="year",
@@ -263,7 +267,6 @@ def read_ncdb(filepath):
         1: 2010,
         2: 2010
     })
-
     df = df.groupby(["GEO2010", "year"]).first()
 
     mapper = dict(zip(_variables.ncdb, _variables.variable))
@@ -275,17 +278,16 @@ def read_ncdb(filepath):
     df = df.set_index("geoid")
 
     for row in _variables['formula'].dropna().tolist():
-        df.eval(row, inplace=True)
-
-    df = df[[_variables.variable.tolist().append('year')]]
-
-    # downcast numeric types to save memory
-    df_float = df.select_dtypes(include=['float'])
-    converted_float = df_float.apply(pd.to_numeric, downcast='float')
+        try:
+            df.eval(row, inplace=True)
+        except:
+            pass
 
     df = df.round(0)
 
-    keeps = df.columns[df.columns.isin(_variables['variable'].tolist())]
+    keeps = df.columns[df.columns.isin(_variables['variable'].tolist() +
+                                       ['year'])]
+
     df = df[keeps]
 
     df.to_parquet(
