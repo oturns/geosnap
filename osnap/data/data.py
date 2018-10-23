@@ -409,6 +409,42 @@ class Dataset(object):
 
         return ax
 
+    def to_crs(self, crs=None, epsg=None, inplace=False):
+        """Transform geometries to a new coordinate reference system.
+            Transform all geometries in a GeoSeries to a different coordinate
+            reference system.  The ``crs`` attribute on the current GeoSeries must
+            be set.  Either ``crs`` in string or dictionary form or an EPSG code
+            may be specified for output.
+            This method will transform all points in all objects.  It has no notion
+            or projecting entire geometries.  All segments joining points are
+            assumed to be lines in the current projection, not geodesics.  Objects
+            crossing the dateline (or other projection boundary) will have
+            undesirable behavior.
+            Parameters
+            ----------
+            crs : dict or str
+                Output projection parameters as string or in dictionary form.
+            epsg : int
+                EPSG code specifying output projection.
+            inplace : bool, optional, default: False
+                Whether to return a new GeoDataFrame or do the transformation in
+                place.
+            """
+        if inplace:
+            self.tracts = self.tracts
+            self.counties = self.counties
+            self.states = self.states
+        else:
+            self.tracts = self.tracts.copy()
+            self.counties = self.counties.copy()
+            self.states = self.states.copy()
+
+        self.tracts = self.tracts.to_crs(crs=crs, epsg=epsg)
+        self.states = self.states.to_crs(crs=crs, epsg=epsg)
+        self.counties = self.counties.to_crs(crs=crs, epsg=epsg)
+        if not inplace:
+            return self
+
 
 # Utilities
 
