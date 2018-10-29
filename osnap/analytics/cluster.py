@@ -70,8 +70,12 @@ def kmeans(X, n_clusters=5, seed=None, **kwargs):
     return model
 
 
-def affinity_propagation(X, damping=0.8, preference=-1000, verbose=False,
-                         max_iter=500, **kwargs):
+def affinity_propagation(X,
+                         damping=0.8,
+                         preference=-1000,
+                         verbose=False,
+                         max_iter=500,
+                         **kwargs):
     """Clustering with Affinity Propagation
 
 
@@ -100,8 +104,8 @@ def affinity_propagation(X, damping=0.8, preference=-1000, verbose=False,
     model: sklearn AffinityPropagation instance
 
     """
-    model = AffinityPropagation(preference=preference, damping=damping,
-                                verbose=verbose)
+    model = AffinityPropagation(
+        preference=preference, damping=damping, verbose=verbose)
     model.fit(X)
     return model
 
@@ -134,14 +138,19 @@ def spectral(X, n_clusters=5, n_jobs=-1, affinity='rbf', **kwargs):
 
     """
 
-    model = SpectralClustering(n_clusters=n_clusters, n_jobs=n_jobs,
-                               affinity=affinity)
+    model = SpectralClustering(
+        n_clusters=n_clusters, n_jobs=n_jobs, affinity=affinity)
     model.fit(X)
     return model
 
 
-def gaussian_mixture(X, n_clusters=5, covariance_type="full", best_model=False,
-                     max_clusters=10, random_state=None, **kwargs):
+def gaussian_mixture(X,
+                     n_clusters=5,
+                     covariance_type="full",
+                     best_model=False,
+                     max_clusters=10,
+                     random_state=None,
+                     **kwargs):
     """Clustering with Gaussian Mixture Model
 
 
@@ -185,15 +194,16 @@ you should set the `random_state` parameter")
         # https://plot.ly/scikit-learn/plot-gmm-selection/
         lowest_bic = np.infty
         bic = []
-        max = max_clusters + 1
-        n_components_range = range(1, max)
+        maxn = max_clusters + 1
+        n_components_range = range(1, maxn)
         cv_types = ['spherical', 'tied', 'diag', 'full']
         for cv_type in cv_types:
             for n_components in n_components_range:
                 # Fit a Gaussian mixture with EM
-                gmm = GaussianMixture(n_components=n_components,
-                                      random_state=random_state,
-                                      covariance_type=cv_type)
+                gmm = GaussianMixture(
+                    n_components=n_components,
+                    random_state=random_state,
+                    covariance_type=cv_type)
                 gmm.fit(X)
                 bic.append(gmm.bic(X))
                 if bic[-1] < lowest_bic:
@@ -204,9 +214,10 @@ you should set the `random_state` parameter")
         model = best_gmm
 
     else:
-        model = GaussianMixture(n_components=n_clusters,
-                                random_state=random_state,
-                                covariance_type=covariance_type)
+        model = GaussianMixture(
+            n_components=n_clusters,
+            random_state=random_state,
+            covariance_type=covariance_type)
     model.fit(X)
     model.labels_ = model.predict(X)
     return model
@@ -236,6 +247,7 @@ def hdbscan(X, min_cluster_size=5, gen_min_span_tree=True, **kwargs):
     model.fit(X)
     return model
 
+
 # Spatially Explicit/Encouraged Methods
 
 
@@ -261,9 +273,8 @@ def ward_spatial(X, w, n_clusters=5, **kwargs):
 
     """
 
-    model = AgglomerativeClustering(n_clusters=n_clusters,
-                                    connectivity=w.sparse,
-                                    linkage='ward')
+    model = AgglomerativeClustering(
+        n_clusters=n_clusters, connectivity=w.sparse, linkage='ward')
     model.fit(X)
     return model
 
@@ -293,15 +304,19 @@ def spenc(X, w, n_clusters=5, gamma=1, **kwargs):
     model: spenc SPENC instance
 
     """
-    model = SPENC(n_clusters=n_clusters,
-                  gamma=gamma)
+    model = SPENC(n_clusters=n_clusters, gamma=gamma)
 
     model.fit(X, w.sparse)
     return model
 
 
-def skater(X, w, n_clusters=5, floor=-np.inf, trace=False,
-           islands='increase', **kwargs):
+def skater(X,
+           w,
+           n_clusters=5,
+           floor=-np.inf,
+           trace=False,
+           islands='increase',
+           **kwargs):
     """SKATER spatial clustering algorithm.
 
     Parameters

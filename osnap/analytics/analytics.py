@@ -2,23 +2,15 @@
 Tools for the spatial analysis of neighborhood change
 """
 
+import copy
 import numpy as np
 import pandas as pd
-from libpysal import attach_islands
-from libpysal.weights.Contiguity import Queen, Rook
-from libpysal.weights.Distance import KNN
+from libpysal.weights import attach_islands
+from libpysal.weights.contiguity import Queen, Rook
+from libpysal.weights.distance import KNN
 
-from .cluster import (
-    affinity_propagation,
-    gaussian_mixture,
-    kmeans,
-    max_p,
-    skater,
-    spectral,
-    spenc,
-    ward,
-    ward_spatial,
-)
+from .cluster import (affinity_propagation, gaussian_mixture, kmeans, max_p,
+                      skater, spectral, spenc, ward, ward_spatial)
 
 
 def cluster(dataset,
@@ -47,14 +39,15 @@ def cluster(dataset,
     -------
     DataFrame
     """
-
+    assert columns, "You must provide a subset of columns as input"
+    assert method, "You must choose a clustering algorithm to use"
+    dataset = copy.deepcopy(dataset)
     data = dataset.data.copy()
     allcols = columns + ["year"]
     data = data[allcols]
     data.dropna(inplace=True)
     data[columns] = data.groupby("year")[columns].apply(
         lambda x: (x - x.mean()) / x.std(ddof=0))
-    data
     # option to autoscale the data w/ mix-max or zscore?
     specification = {
         "ward": ward,
@@ -87,6 +80,7 @@ def cluster(dataset,
     dataset.data = dataset.data.merge(clusters, on="joinkey", how="left")
     dataset.data["geoid"] = geoid
     dataset.data.set_index("geoid", inplace=True)
+    return dataset
 
 
 def cluster_spatial(dataset,
@@ -95,7 +89,7 @@ def cluster_spatial(dataset,
                     method=None,
                     best_model=False,
                     columns=None,
-                    threshold_variable=None,
+                    threshold_variable='count',
                     threshold=10,
                     **kwargs):
     """
@@ -119,6 +113,9 @@ def cluster_spatial(dataset,
     DataFrame
 
     """
+    assert columns, "You must provide a subset of columns as input"
+    assert method, "You must choose a clustering algorithm to use"
+    dataset = copy.deepcopy(dataset)
 
     if threshold_variable == "count":
         allcols = columns + ["year"]
@@ -146,20 +143,14 @@ def cluster_spatial(dataset,
 
     def _build_data(data, tracts, year, weights_type):
         df = data.loc[data.year == year].copy()
-        tracts = tracts.copy()[tracts.index.isin(df.index)]
+        tracts = tracts.copy()[tracts.geoid.isin(df.index)]
         weights = {"queen": Queen, "rook": Rook}
-        w = weights[weights_type].from_dataframe(
-            tracts.reset_index(), idVariable="geoid")
-        # drop islands from dataset and rebuild weights
-        df.drop(index=w.islands, inplace=True)
-        tracts.drop(index=w.islands, inplace=True)
-        w = weights[weights_type].from_dataframe(
-            tracts.reset_index(), idVariable="geoid")
+        w = weights[weights_type].from_dataframe(tracts, idVariable="geoid")
         knnw = KNN.from_dataframe(tracts, k=1)
 
         return df, w, knnw
 
-    years = [1980, 1990, 2000, 2010, 2015]
+    years = [1980, 1990, 2000, 2010]
     annual = []
     for year in years:
         df, w, knnw = _build_data(data, tracts, year, weights_type)
@@ -182,7 +173,10 @@ def cluster_spatial(dataset,
         elif threshold_variable is not None:
             threshold_var = threshold_var[threshold.index.isin(
                 val[0].index)].values
-            val[1] = attach_islands(val[1], val[2])
+            try:
+                val[1] = attach_islands(val[1], val[2])
+            except:
+                pass
         else:
             threshold_var = None
         model = specification[method](
@@ -212,3 +206,5 @@ def cluster_spatial(dataset,
     dataset.data = dataset.data.merge(clusters, on="joinkey", how="left")
     dataset.data["geoid"] = geoid
     dataset.data.set_index("geoid", inplace=True)
+
+    return dataset

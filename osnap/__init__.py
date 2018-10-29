@@ -2,5 +2,4 @@
 
 from . import analytics
 from . import data
-
-
+from .data import metros

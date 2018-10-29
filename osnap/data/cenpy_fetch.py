@@ -12,14 +12,39 @@ c2000sf3 = cenpy.base.Connection('2000sf3')
 by_form = variables.groupby('census_2000_form')
 column_relations = by_form.census_2000_table_column.agg(list)
 
-# What is left:
-# 0. concatenate san_diego_sf1_processed/san_diego_sf3_processed along axis=1
-# 1. pull the applicable ltdb names from `variables`
-#    and make them the column names of the right
-#    elements of `san_diego_sf*`
-# 2. Concatenate the `*_processed` dataframes alongside the metadata columns
-#    [col for col in san_diego_sf1.columns if col not in sf1cols]
-# 3. merge this new concatenated data together between sf1 and sf3.
+
+def fetch(unit='tract', filter=None):
+    """
+    use Cenpy to collect the necessary variables from the Census API
+    """
+
+    sf1cols = process_columns(column_relations.loc['SF1'])
+    sf3cols = process_columns(column_relations.loc['SF3'])
+
+    evalcols = [
+        normalize_relation(rel) for rel in column_relations.loc['SF1']
+    ] + [normalize_relation(rel) for rel in column_relations.loc['SF3']]
+
+    varnames = variables.dropna(
+        subset=['census_2000_table_column'])['variable']
+    evals = [parts[0] + "=" + parts[1] for parts in zip(varnames, evalcols)]
+
+    _sf1 = c2000sf1.query(['NAME'] + sf1cols, geo_unit=unit, geo_filter=filter)
+    _sf3 = c2000sf3.query(['NAME'] + sf3cols, geo_unit=unit, geo_filter=filter)
+
+    df = pandas.concat([_sf1, _sf3], axis=1)
+    # compute additional variables from lookup table
+    for row in evals:
+        df.eval(row, inplace=True)
+
+    # _sf1_processed = [
+    #     _sf1[sf1cols].astype(float).eval(normalize_relation(rel))
+    #     for rel in column_relations.loc['SF1']
+    # ]
+    # _sf3_processed = [
+    #     _sf3[sf3cols].astype(float).eval(normalize_relation(rel))
+    #     for rel in column_relations.loc['SF3']
+    # ]
 
 
 def process_columns(input_columns):
@@ -74,23 +99,13 @@ def normalize_relation(relation):
     return relation
 
 
-sf1cols = process_columns(column_relations.loc['SF1'])
-sf3cols = process_columns(column_relations.loc['SF3'])
+## sd example: dict(state='06', county='073')
 
-san_diego_sf1 = c2000sf1.query(
-    ['NAME'] + sf1cols,
-    geo_unit='tract',
-    geo_filter=dict(state='06', county='073'))
-san_diego_sf3 = c2000sf3.query(
-    ['NAME'] + sf3cols,
-    geo_unit='tract',
-    geo_filter=dict(state='06', county='073'))
-
-san_diego_sf1_processed = [
-    san_diego_sf1[sf1cols].astype(float).eval(normalize_relation(rel))
-    for rel in column_relations.loc['SF1']
-]
-san_diego_sf3_processed = [
-    san_diego_sf3[sf3cols].astype(float).eval(normalize_relation(rel))
-    for rel in column_relations.loc['SF3']
-]
+# What is left:
+# 0. concatenate san_diego_sf1_processed/san_diego_sf3_processed along axis=1
+# 1. pull the applicable ltdb names from `variables`
+#    and make them the column names of the right
+#    elements of `san_diego_sf*`
+# 2. Concatenate the `*_processed` dataframes alongside the metadata columns
+#    [col for col in san_diego_sf1.columns if col not in sf1cols]
+# 3. merge this new concatenated data together between sf1 and sf3.

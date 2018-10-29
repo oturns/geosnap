@@ -3,36 +3,47 @@ Data reader for longitudinal databases LTDB, geolytics NCDB and NHGIS
 """
 
 import os
-import numpy as np
-import pandas as pd
-import geopandas as gpd
 import zipfile
+
 import matplotlib.pyplot as plt
-import osmnx as ox
+import pandas as pd
+from shapely.wkt import loads
+
+import geopandas as gpd
 
 # Variables
 
 _package_directory = os.path.dirname(os.path.abspath(__file__))
 _variables = pd.read_csv(os.path.join(_package_directory, "variables.csv"))
-_geo_store = pd.HDFStore(os.path.join(_package_directory, "us_geo.h5"), "r")
-_store = pd.HDFStore(os.path.join(_package_directory, "data.h5"), "a")
 
-_states = _geo_store["states"]
+_states = pd.read_parquet(
+    os.path.join(_package_directory, 'states.parquet.gzip'))
+_states['geometry'] = _states.wkt.apply(lambda x: loads(x))
+_states = _states[['geoid', 'geometry']]
 _states = gpd.GeoDataFrame(_states)
 _states[~_states.geoid.isin(["60", "66", "69", "72", "78"])]
 _states.crs = {"init": "epsg:4326"}
-#_states = _states.set_index("geoid")
 
-_counties = _geo_store["counties"]
+_counties = pd.read_parquet(
+    os.path.join(_package_directory, 'counties.parquet.gzip'))
+_counties['geometry'] = _counties.wkt.apply(lambda x: loads(x))
+_counties = _counties[['geoid', 'geometry']]
 _counties = gpd.GeoDataFrame(_counties)
 _counties.crs = {"init": "epsg:4326"}
-#_counties = _counties.set_index("geoid")
 
-_tracts = _geo_store["tracts"]
+_tracts = pd.read_parquet(
+    os.path.join(_package_directory, 'tracts.parquet.gzip'))
+_tracts['geometry'] = _tracts.wkt.apply(lambda x: loads(x))
+_tracts['point'] = _tracts.wkt_point.apply(lambda x: loads(x))
+_tracts = _tracts[['geoid', 'geometry', 'point']]
 _tracts = gpd.GeoDataFrame(_tracts)
 _tracts.crs = {"init": "epsg:4326"}
 
-#_tracts = _tracts.set_index("geoid")
+metros = pd.read_parquet(os.path.join(_package_directory, 'msas.parquet.gzip'))
+metros['geometry'] = metros.wkt.apply(lambda x: loads(x))
+metros.drop(columns=['wkt'], inplace=True)
+metros = gpd.GeoDataFrame(metros)
+metros.crs = {"init": "epsg:4326"}
 
 # LTDB importer
 
@@ -169,16 +180,15 @@ def read_ltdb(sample, fullcount):
     for row in _variables['formula'].dropna().tolist():
         df.eval(row, inplace=True)
 
-    # downcast numeric types to save memory
-    df_float = df.select_dtypes(include=['float'])
-    converted_float = df_float.apply(pd.to_numeric, downcast='float')
-
     df = df.round(0)
 
-    keeps = df.columns[df.columns.isin(_variables['variable'].tolist())]
+    keeps = df.columns[df.columns.isin(_variables['variable'].tolist() +
+                                       ['year'])]
     df = df[keeps]
 
-    _store["ltdb"] = df
+    df.to_parquet(
+        os.path.join(_package_directory, "ltdb.parquet.gzip"),
+        compression='gzip')
 
     return df
 
@@ -200,10 +210,15 @@ def read_ncdb(filepath):
 
     ncdb_vars = _variables["ncdb"].dropna()[1:].values
 
+    names = []
+    for name in ncdb_vars:
+        for suffix in ['7', '8', '9', '0', '1', '2']:
+            names.append(name + suffix)
+    names.append('GEO2010')
     df = pd.read_csv(
         filepath,
-        na_values=["", " ", 99999, -999],
         engine='c',
+        na_values=["", " ", 99999, -999],
         converters={
             "GEO2010": str,
             "COUNTY": str,
@@ -233,7 +248,10 @@ def read_ncdb(filepath):
         elif col.endswith("1A"):
             orig.append(col)
 
-    df.rename(dict(zip(orig, fixed)), axis="columns", inplace=True)
+    renamer = dict(zip(orig, fixed))
+    df.rename(renamer, axis="columns", inplace=True)
+
+    df = df[df.columns[df.columns.isin(names)]]
 
     df = pd.wide_to_long(
         df, stubnames=ncdb_vars, i="GEO2010", j="year",
@@ -247,7 +265,6 @@ def read_ncdb(filepath):
         1: 2010,
         2: 2010
     })
-
     df = df.groupby(["GEO2010", "year"]).first()
 
     mapper = dict(zip(_variables.ncdb, _variables.variable))
@@ -259,20 +276,23 @@ def read_ncdb(filepath):
     df = df.set_index("geoid")
 
     for row in _variables['formula'].dropna().tolist():
-        df.eval(row, inplace=True)
-
-    df = df[[_variables.variable.tolist().append('year')]]
-
-    # downcast numeric types to save memory
-    df_float = df.select_dtypes(include=['float'])
-    converted_float = df_float.apply(pd.to_numeric, downcast='float')
+        try:
+            df.eval(row, inplace=True)
+        except:
+            pass
 
     df = df.round(0)
 
-    keeps = df.columns[df.columns.isin(_variables['variable'].tolist())]
+    keeps = df.columns[df.columns.isin(_variables['variable'].tolist() +
+                                       ['year'])]
+
     df = df[keeps]
 
-    _store["ncdb"] = df
+    df = df.loc[df.n_total_pop != 0]
+
+    df.to_parquet(
+        os.path.join(_package_directory, "ncdb.parquet.gzip"),
+        compression='gzip')
 
     return df
 
@@ -281,9 +301,39 @@ def read_ncdb(filepath):
 
 
 class Dataset(object):
-    """
-    Container for storing neighborhood data and analytics for a study
-    region
+    """Container for storing neighborhood data for a study region
+
+    Parameters
+    ----------
+    name : str
+        name or title of dataset.
+    source : str
+        database from which to query attribute data. must of one of ['ltdb', 'ncdb', 'census', 'external'].
+    states : list-like
+        list of two-digit State FIPS codes that define a study region. These will be used to select tracts or blocks that fall within the region.
+    counties : list-like
+                list of three-digit County FIPS codes that define a study region. These will be used to select tracts or blocks that fall within the region.
+    add_indices : list-like
+        list of additional indices that should be included in the region. This is likely a list of additional tracts that are relevant to the study area but do not fall inside the passed boundary
+    boundary : GeoDataFrame
+        A GeoDataFrame that defines the extent of the boundary in question.
+         If a boundary is passed, it will be used to clip the tracts or blocks that fall within it and the 
+         state and county lists will be ignored
+
+    Attributes
+    ----------
+    data : Pandas DataFrame
+        long-form dataframe containing attribute variables for each unit of analysis.
+    name : str
+        name or title of dataset
+    boundary : GeoDataFrame
+        outer boundary of the study area
+    tracts
+        GeoDataFrame containing tract boundaries
+    counties
+        GeoDataFrame containing County boundaries
+    states
+        GeoDataFrame containing State boundaries
     """
 
     def __init__(self,
@@ -291,6 +341,7 @@ class Dataset(object):
                  source,
                  states=None,
                  counties=None,
+                 add_indices=None,
                  boundary=None,
                  **kwargs):
 
@@ -299,15 +350,18 @@ class Dataset(object):
         if boundary is not None:
 
             self.boundary = boundary
-            self.tracts = _tracts[_tracts.set_geometry("point").within(
+            self.tracts = _tracts.to_crs(boundary.crs)
+            self.tracts = self.tracts[self.tracts.set_geometry("point").within(
                 self.boundary.unary_union)]
-            self.tracts = ox.project_gdf(self.tracts)
-            self.counties = ox.project_gdf(_counties[_counties.geoid.isin(
-                self.tracts.geoid.str[0:5])])
-            self.states = ox.project_gdf(_states[_states.geoid.isin(
-                self.tracts.geoid.str[0:2])])
+            self.tracts = self.tracts.to_crs(boundary.crs)
+            self.counties = _counties[_counties.geoid.isin(
+                self.tracts.geoid.str[0:5])]
+            self.counties = self.counties.to_crs(boundary.crs)
+            self.states = _states[_states.geoid.isin(
+                self.tracts.geoid.str[0:2])]
+            self.states = self.states.to_crs(boundary.crs)
 
-        # If county and state lists are passed, first filter tracts by state, then by county
+        # If county and state lists are passed, use them to filter based on geoid
         else:
             assert states
             statelist = []
@@ -326,33 +380,42 @@ class Dataset(object):
                         fips.append(state + county)
                 else:
                     fips.append(state)
-            self.fips = fips
-            self.states = _states[_states.index.isin(statelist)]
-            self.counties = _counties[_counties.geoid.isin(countylist)]
+            self.states = _states[_states.geoid.isin(statelist)]
             if counties is not None:
+                self.counties = _counties[_counties.geoid.str[:5].isin(fips)]
                 self.tracts = _tracts[_tracts.geoid.str[:5].isin(fips)]
             else:
+                self.counties = _counties[_counties.geoid.str[:2].isin(fips)]
                 self.tracts = _tracts[_tracts.geoid.str[:2].isin(fips)]
 
-        if source in ["ltdb", "ncdb", "nhgis"]:
-            _df = _store[source]
+        if source == "ltdb":
+            _df = pd.read_parquet(
+                os.path.join(_package_directory, "ltdb.parquet.gzip"))
+        elif source == "ncdb":
+            _df = pd.read_parquet(
+                os.path.join(_package_directory, "ncdb.parquet.gzip"))
         elif source == "external":
             _df = data
         else:
             raise ValueError(
-                "source must be one of 'ltdb', 'ncdb', 'nhgis', 'external'")
+                "source must be one of 'ltdb', 'ncdb', 'census', 'external'")
 
         self.data = _df[_df.index.isin(self.tracts.geoid)]
+        if add_indices:
+            self.data = self.data.append(_df[_df.index.isin(add_indices)])
+            self.tracts = self.tracts.append(
+                _tracts[_tracts.geoid.isin(add_indices)])
 
     def plot(self,
              column=None,
-             year=2015,
+             year=2010,
              ax=None,
              plot_counties=True,
              **kwargs):
         """
         convenience function for plotting tracts in the metro area
         """
+        assert column, "You must choose a column to plot"
         if ax is not None:
             ax = ax
         else:
@@ -364,8 +427,10 @@ class Dataset(object):
             plt.axis("off")
 
         ax.set_aspect("equal")
-        plotme = self.tracts.join(
-            self.data[self.data.year == year], how="left")
+        plotme = self.tracts.merge(
+            self.data[self.data.year == year],
+            left_on="geoid",
+            right_index=True)
         plotme = plotme.dropna(subset=[column])
         plotme.plot(column=column, alpha=0.8, ax=ax, **kwargs)
 
@@ -378,6 +443,34 @@ class Dataset(object):
                 **kwargs)
 
         return ax
+
+    def to_crs(self, crs=None, epsg=None, inplace=False):
+        """Transform all geometries in the study are to a new coordinate reference system.
+
+            Parameters
+            ----------
+            crs : dict or str
+                Output projection parameters as string or in dictionary form.
+            epsg : int
+                EPSG code specifying output projection.
+            inplace : bool, optional, default: False
+                Whether to return a new GeoDataFrame or do the transformation in
+                place.
+            """
+        if inplace:
+            self.tracts = self.tracts
+            self.counties = self.counties
+            self.states = self.states
+        else:
+            self.tracts = self.tracts.copy()
+            self.counties = self.counties.copy()
+            self.states = self.states.copy()
+
+        self.tracts = self.tracts.to_crs(crs=crs, epsg=epsg)
+        self.states = self.states.to_crs(crs=crs, epsg=epsg)
+        self.counties = self.counties.to_crs(crs=crs, epsg=epsg)
+        if not inplace:
+            return self
 
 
 # Utilities
