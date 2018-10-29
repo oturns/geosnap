@@ -89,7 +89,7 @@ def cluster_spatial(dataset,
                     method=None,
                     best_model=False,
                     columns=None,
-                    threshold_variable=None,
+                    threshold_variable='count',
                     threshold=10,
                     **kwargs):
     """
@@ -173,16 +173,19 @@ def cluster_spatial(dataset,
         elif threshold_variable is not None:
             threshold_var = threshold_var[threshold.index.isin(
                 val[0].index)].values
-            val[1] = attach_islands(val[1], val[2])
+            try:
+                val[1] = attach_islands(val[1], val[2])
+            except:
+                pass
         else:
             threshold_var = None
-            model = specification[method](
-                val[0].drop(columns="year"),
-                w=val[1],
-                n_clusters=n_clusters,
-                threshold_variable=threshold_var,
-                threshold=threshold,
-                **kwargs)
+        model = specification[method](
+            val[0].drop(columns="year"),
+            w=val[1],
+            n_clusters=n_clusters,
+            threshold_variable=threshold_var,
+            threshold=threshold,
+            **kwargs)
         labels = model.labels_.astype(str)
         labels = pd.DataFrame({
             method: labels,

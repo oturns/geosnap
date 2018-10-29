@@ -301,9 +301,39 @@ def read_ncdb(filepath):
 
 
 class Dataset(object):
-    """
-    Container for storing neighborhood data and analytics for a study
-    region
+    """Container for storing neighborhood data for a study region
+
+    Parameters
+    ----------
+    name : str
+        name or title of dataset.
+    source : str
+        database from which to query attribute data. must of one of ['ltdb', 'ncdb', 'census', 'external'].
+    states : list-like
+        list of two-digit State FIPS codes that define a study region. These will be used to select tracts or blocks that fall within the region.
+    counties : list-like
+                list of three-digit County FIPS codes that define a study region. These will be used to select tracts or blocks that fall within the region.
+    add_indices : list-like
+        list of additional indices that should be included in the region. This is likely a list of additional tracts that are relevant to the study area but do not fall inside the passed boundary
+    boundary : GeoDataFrame
+        A GeoDataFrame that defines the extent of the boundary in question.
+         If a boundary is passed, it will be used to clip the tracts or blocks that fall within it and the 
+         state and county lists will be ignored
+
+    Attributes
+    ----------
+    data : Pandas DataFrame
+        long-form dataframe containing attribute variables for each unit of analysis.
+    name : str
+        name or title of dataset
+    boundary : GeoDataFrame
+        outer boundary of the study area
+    tracts
+        GeoDataFrame containing tract boundaries
+    counties
+        GeoDataFrame containing County boundaries
+    states
+        GeoDataFrame containing State boundaries
     """
 
     def __init__(self,
@@ -311,6 +341,7 @@ class Dataset(object):
                  source,
                  states=None,
                  counties=None,
+                 add_indices=None,
                  boundary=None,
                  **kwargs):
 
@@ -367,9 +398,13 @@ class Dataset(object):
             _df = data
         else:
             raise ValueError(
-                "source must be one of 'ltdb', 'ncdb', 'nhgis', 'external'")
+                "source must be one of 'ltdb', 'ncdb', 'census', 'external'")
 
         self.data = _df[_df.index.isin(self.tracts.geoid)]
+        if add_indices:
+            self.data = self.data.append(_df[_df.index.isin(add_indices)])
+            self.tracts = self.tracts.append(
+                _tracts[_tracts.geoid.isin(add_indices)])
 
     def plot(self,
              column=None,
