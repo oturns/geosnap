@@ -2,6 +2,7 @@
 Tools for the spatial analysis of neighborhood change
 """
 
+import copy
 import numpy as np
 import pandas as pd
 from libpysal.weights import attach_islands
@@ -40,6 +41,7 @@ def cluster(dataset,
     """
     assert columns, "You must provide a subset of columns as input"
     assert method, "You must choose a clustering algorithm to use"
+    dataset = copy.deepcopy(dataset)
     data = dataset.data.copy()
     allcols = columns + ["year"]
     data = data[allcols]
@@ -113,6 +115,7 @@ def cluster_spatial(dataset,
     """
     assert columns, "You must provide a subset of columns as input"
     assert method, "You must choose a clustering algorithm to use"
+    dataset = copy.deepcopy(dataset)
 
     if threshold_variable == "count":
         allcols = columns + ["year"]
@@ -143,15 +146,11 @@ def cluster_spatial(dataset,
         tracts = tracts.copy()[tracts.geoid.isin(df.index)]
         weights = {"queen": Queen, "rook": Rook}
         w = weights[weights_type].from_dataframe(tracts, idVariable="geoid")
-        # drop islands from dataset and rebuild weights
-        df.drop(index=w.islands, inplace=True)
-        tracts.drop(index=w.islands, inplace=True)
-        w = weights[weights_type].from_dataframe(tracts, idVariable="geoid")
         knnw = KNN.from_dataframe(tracts, k=1)
 
         return df, w, knnw
 
-    years = [1980, 1990, 2000, 2010, 2015]
+    years = [1980, 1990, 2000, 2010]
     annual = []
     for year in years:
         df, w, knnw = _build_data(data, tracts, year, weights_type)
@@ -177,13 +176,13 @@ def cluster_spatial(dataset,
             val[1] = attach_islands(val[1], val[2])
         else:
             threshold_var = None
-        model = specification[method](
-            val[0].drop(columns="year"),
-            w=val[1],
-            n_clusters=n_clusters,
-            threshold_variable=threshold_var,
-            threshold=threshold,
-            **kwargs)
+            model = specification[method](
+                val[0].drop(columns="year"),
+                w=val[1],
+                n_clusters=n_clusters,
+                threshold_variable=threshold_var,
+                threshold=threshold,
+                **kwargs)
         labels = model.labels_.astype(str)
         labels = pd.DataFrame({
             method: labels,
@@ -204,3 +203,5 @@ def cluster_spatial(dataset,
     dataset.data = dataset.data.merge(clusters, on="joinkey", how="left")
     dataset.data["geoid"] = geoid
     dataset.data.set_index("geoid", inplace=True)
+
+    return dataset

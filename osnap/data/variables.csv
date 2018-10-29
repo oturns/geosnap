@@ -65,7 +65,7 @@ p_owner_occupied_units,n_occupied_housing_units / n_total_housing_units,p_owner_
 p_housing_units_multiunit_structures,n_housing_units_multiunit_structures / n_housing_units_multiunit_structures_denom,p_housing_units_multiunit_structures=n_housing_units_multiunit_structures / n_housing_units_multiunit_structures_denom*100,pmulti,,,,,,,percentage of housing units in multi-unit structures,"Housing, Age, & Marital Status",
 p_structures_30_old,n_structures_30_old / n_housing_units_multiunit_structures_denom,p_structures_30_old=n_structures_30_old / n_housing_units_multiunit_structures_denom*100,p30old,,,,,,,percentage of structures built more than 30 years ago,"Housing, Age, & Marital Status",
 p_household_recent_move,n_household_recent_move / n_total_households,p_household_recent_move=n_household_recent_move / n_total_households*100,p10yrs,,,,,,,percentage of household heads moved into unit less than 10 years ago,"Housing, Age, & Marital Status",
-p_persons_under_18,n_persons_under_18 / n_total_pop,p_persons_under_18=n_persons_under_18 / n_total_pop*100,p18und,CHILD,,,,,,percentage of persons age 17 years and under,"Housing, Age, & Marital Status",
+p_persons_under_18,n_persons_under_18 / n_total_pop,p_persons_under_18=n_persons_under_18 / n_total_pop*100,p18und,,,,,,,percentage of persons age 17 years and under,"Housing, Age, & Marital Status",
 p_persons_over_60,n_persons_over_60 / n_total_pop,p_persons_over_60=n_persons_over_60 / n_total_pop*100,p60up,,,,,,,percentage of persons age 60 years and over,"Housing, Age, & Marital Status",
 p_persons_over_75,n_persons_over_75 / n_total_pop,p_persons_over_75=n_persons_over_75 / n_total_pop*100,p75up,,,,,,,percentage of persons age 75 years and over,"Housing, Age, & Marital Status",
 p_married,n_married / n_total_pop,p_married=n_married / n_persons_over_15*100,pmar,,,,,,,percent currently married (excluding separated),"Housing, Age, & Marital Status",
@@ -174,7 +174,7 @@ n_poverty_native,,,nnapov,INDPR,,SF3,,P159C002,,Native Americans in poverty,Soci
 n_poverty_determined_asian,,,dapov,DASNPR,,SF3,,P159D001 + P159E001,,Asians and Pacific Islanders for whom poverty status is determined,Socioeconomic Status,"asian alone is D, hawaiian and pac islander is E"
 n_poverty_asian,,,napov,NASNPR,,SF3,,P159D002 + P159E002,,Asians and Pacific Islanders in poverty,Socioeconomic Status,
 n_edu_college_greater,,,col,EDUC16,,SF3,,P037015:18 + P037032:35,,persons with at least a four-year college degree,Socioeconomic Status,
-n_edu_hs_less,,,hs,,,SF3,,P037003:011 + P037020:028,,persons with high school degree or less,Socioeconomic Status,
+n_edu_hs_less,,,hs,EDUC12,,SF3,,P037003:011 + P037020:028,,persons with high school degree or less,Socioeconomic Status,
 p_edu_hs_less,n_edu_hs_less / n_persons_over_25,p_edu_hs_less=n_edu_hs_less / n_persons_over_25*100,phs,,DP02_0061E,,,,,percentage of persons with high school degree or less,Socioeconomic Status,
 p_edu_college_greater,n_edu_college_greater / n_persons_over_25,p_edu_college_greater=n_edu_college_greater / n_persons_over_25*100,pcol,,DP02_0064E,,,,,percentage of persons with at least a four-year college degree,Socioeconomic Status,
 p_unemployment_rate,n_unemployed_persons / n_labor_force,p_unemployment_rate=n_unemployed_persons / n_labor_force*100,punemp,UNEMPRT,,,,,,percent unemployed,Socioeconomic Status,
