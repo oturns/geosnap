@@ -1,23 +1,24 @@
 name: osnap
 channels:
-  - conda-forge
   - defaults
+  - conda-forge
 dependencies:
+  - pandas
+  - cython
   - jupyterlab
   - geopandas
   - hdbscan
   - matplotlib
   - notebook
   - networkx
-  - pysal
   - scikit-learn
   - pyarrow
   - pip
   - pip:
     - libpysal
     - mapclassify
-    - region
     - spenc
     - giddy
     - xlrd
     - cenpy
+    - git+git://github.com/pysal/region@master
