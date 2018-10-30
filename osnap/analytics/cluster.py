@@ -6,7 +6,7 @@ from region.max_p_regions.heuristics import MaxPRegionsHeu
 from region.p_regions.azp import AZP
 from region.skater.skater import Spanning_Forest
 from sklearn.cluster import (AffinityPropagation, AgglomerativeClustering,
-                             KMeans, SpectralClustering)
+                             KMeans, MiniBatchKMeans, SpectralClustering)
 from sklearn.mixture import GaussianMixture
 from spenc import SPENC
 
@@ -14,8 +14,7 @@ from spenc import SPENC
 
 
 def ward(X, n_clusters=5, **kwargs):
-    """Agglomerative clustering using Ward linkage
-
+    """Agglomerative clustering using Ward linkage.
 
     Parameters
     ----------
@@ -28,23 +27,31 @@ def ward(X, n_clusters=5, **kwargs):
 
     Returns
     -------
-
     model: sklearn AgglomerativeClustering instance
 
     """
-
     model = AgglomerativeClustering(n_clusters=n_clusters, linkage='ward')
     model.fit(X)
     return model
 
 
-def kmeans(X, n_clusters=5, seed=None, **kwargs):
-    """K-Means clustering
-
+def kmeans(X,
+           n_clusters,
+           init='k-means++',
+           n_init=10,
+           max_iter=300,
+           tol=0.0001,
+           verbose=0,
+           random_state=None,
+           copy_x=True,
+           n_jobs=None,
+           algorithm='auto',
+           precompute_distances='auto',
+           **kwargs):
+    """K-Means clustering.
 
     Parameters
     ----------
-
     X  : array-like
          n x k attribute data
 
@@ -52,20 +59,34 @@ def kmeans(X, n_clusters=5, seed=None, **kwargs):
         The number of clusters to form as well as the number of centroids to
         generate.
 
-    seed: int, optional, default: None
-        The seed to set the random number generator. If none, no seed is used
-        and the random number generator will be the RandomState instance used
-        by np.random.
-
-
     Returns
     -------
-
     model: sklearn KMeans instance
 
     """
+    if X.shape[0] > 12000:
+        model = MiniBatchKMeans(
+            n_clusters=n_clusters,
+            init=init,
+            n_init=n_init,
+            max_iter=max_iter,
+            tol=tol,
+            verbose=verbose,
+            random_state=random_state)
+    else:
+        model = KMeans(
+            n_clusters=n_clusters,
+            init='k-means++',
+            n_init=n_init,
+            max_iter=max_iter,
+            tol=tol,
+            precompute_distances=precompute_distances,
+            verbose=0,
+            random_state=random_state,
+            copy_x=copy_x,
+            n_jobs=n_jobs,
+            algorithm=algorithm)
 
-    model = KMeans(n_clusters, random_state=seed)
     model.fit(X)
     return model
 
@@ -73,15 +94,16 @@ def kmeans(X, n_clusters=5, seed=None, **kwargs):
 def affinity_propagation(X,
                          damping=0.8,
                          preference=-1000,
-                         verbose=False,
                          max_iter=500,
+                         convergence_iter=15,
+                         copy=True,
+                         affinity='euclidean',
+                         verbose=False,
                          **kwargs):
-    """Clustering with Affinity Propagation
-
+    """Clustering with Affinity Propagation.
 
     Parameters
     ----------
-
     X  : array-like
          n x k attribute data
 
@@ -100,23 +122,40 @@ def affinity_propagation(X,
 
     Returns
     -------
-
     model: sklearn AffinityPropagation instance
 
     """
     model = AffinityPropagation(
-        preference=preference, damping=damping, verbose=verbose)
+        preference=preference,
+        damping=damping,
+        max_iter=max_iter,
+        convergence_iter=convergence_iter,
+        copy=copy,
+        affinity=affinity,
+        verbose=verbose)
     model.fit(X)
     return model
 
 
-def spectral(X, n_clusters=5, n_jobs=-1, affinity='rbf', **kwargs):
-    """A-spatial Spectral Clustering
-
+def spectral(X,
+             n_clusters,
+             eigen_solver=None,
+             random_state=None,
+             n_init=10,
+             gamma=1.0,
+             affinity='rbf',
+             n_neighbors=10,
+             eigen_tol=0.0,
+             assign_labels='kmeans',
+             degree=3,
+             coef0=1,
+             kernel_params=None,
+             n_jobs=-1,
+             **kwargs):
+    """A-spatial Spectral Clustering.
 
     Parameters
     ----------
-
     X  : array-like
          n x k attribute data
 
@@ -133,13 +172,23 @@ def spectral(X, n_clusters=5, n_jobs=-1, affinity='rbf', **kwargs):
 
     Returns
     -------
-
     model: sklearn SpectralClustering instance
 
     """
-
     model = SpectralClustering(
-        n_clusters=n_clusters, n_jobs=n_jobs, affinity=affinity)
+        n_clusters=n_clusters,
+        eigen_solver=eigen_solver,
+        random_state=random_state,
+        n_init=n_init,
+        gamma=gamma,
+        affinity=affinity,
+        n_neighbors=n_neighbors,
+        eigen_tol=eigen_tol,
+        assign_labels=assign_labels,
+        degree=degree,
+        coef0=coef0,
+        kernel_params=kernel_params,
+        n_jobs=n_jobs)
     model.fit(X)
     return model
 

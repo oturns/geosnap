@@ -18,8 +18,6 @@ def cluster(dataset,
             method=None,
             best_model=False,
             columns=None,
-            preference=-1000,
-            damping=0.8,
             verbose=False,
             **kwargs):
     """
@@ -42,11 +40,11 @@ def cluster(dataset,
     assert columns, "You must provide a subset of columns as input"
     assert method, "You must choose a clustering algorithm to use"
     dataset = copy.deepcopy(dataset)
-    data = dataset.data.copy()
+    #data = dataset.data
     allcols = columns + ["year"]
-    data = data[allcols]
-    data.dropna(inplace=True)
-    data[columns] = data.groupby("year")[columns].apply(
+    dataset.data = dataset.data[allcols]
+    dataset.data = dataset.data.dropna(how='any')
+    dataset.data[columns] = dataset.data.groupby("year")[columns].apply(
         lambda x: (x - x.mean()) / x.std(ddof=0))
     # option to autoscale the data w/ mix-max or zscore?
     specification = {
@@ -57,26 +55,22 @@ def cluster(dataset,
         "spectral": spectral,
     }
     model = specification[method](
-        data.drop(columns="year"),
+        dataset.data[columns],
         n_clusters=n_clusters,
-        preference=preference,
-        damping=damping,
         best_model=best_model,
         verbose=verbose,
         **kwargs)
     labels = model.labels_.astype(str)
     clusters = pd.DataFrame({
         method: labels,
-        "year": data.year,
-        "geoid": data.index
+        "year": dataset.data.year.astype(str),
+        "geoid": dataset.data.index
     })
-    clusters["joinkey"] = clusters.index + clusters.year.astype(str)
+    clusters["joinkey"] = clusters.geoid + clusters.year
     clusters = clusters.drop(columns="year")
-    geoid = dataset.data.index
+    geoid = dataset.data.index.copy()
     dataset.data[
         "joinkey"] = dataset.data.index + dataset.data.year.astype(str)
-    if method in dataset.data.columns:
-        dataset.data.drop(columns=method, inplace=True)
     dataset.data = dataset.data.merge(clusters, on="joinkey", how="left")
     dataset.data["geoid"] = geoid
     dataset.data.set_index("geoid", inplace=True)
@@ -93,11 +87,12 @@ def cluster_spatial(dataset,
                     threshold=10,
                     **kwargs):
     """
+
     Create a *spatial* geodemographic typology by running a cluster
     analysis on the metro area's neighborhood attributes and including a
-    contiguity constraint
+    contiguity constraint.
 
-     Parameters
+    Parameters
     ----------
     n_clusters : int
         the number of clusters to derive
@@ -139,14 +134,18 @@ def cluster_spatial(dataset,
         data[columns] = data.groupby("year")[columns].apply(
             lambda x: (x - x.mean()) / x.std(ddof=0))
 
-    tracts = dataset.tracts.copy()
+    tracts = dataset.tracts
 
     def _build_data(data, tracts, year, weights_type):
-        df = data.loc[data.year == year].copy()
-        tracts = tracts.copy()[tracts.geoid.isin(df.index)]
+        df = data.loc[data.year == year].copy().dropna(how="any")
+        tracts = tracts.loc[tracts.geoid.isin(df.index)].copy()
         weights = {"queen": Queen, "rook": Rook}
         w = weights[weights_type].from_dataframe(tracts, idVariable="geoid")
-        knnw = KNN.from_dataframe(tracts, k=1)
+        # drop islands from dataset and rebuild weights
+        #df.drop(index=w.islands, inplace=True)
+        #tracts.drop(index=w.islands, inplace=True)
+        #w = weights[weights_type].from_dataframe(tracts, idVariable="geoid")
+        knnw = KNN.from_dataframe(tracts, k=1, ids=tracts.geoid.tolist())
 
         return df, w, knnw
 
@@ -166,10 +165,11 @@ def cluster_spatial(dataset,
     }
 
     clusters = []
-    for key, val in datasets.items():
+    for _, val in datasets.items():
         if threshold_variable == "count":
             threshold_var = np.ones(len(val[0]))
             val[1] = attach_islands(val[1], val[2])
+
         elif threshold_variable is not None:
             threshold_var = threshold_var[threshold.index.isin(
                 val[0].index)].values
@@ -196,7 +196,7 @@ def cluster_spatial(dataset,
 
     clusters = pd.concat(clusters)
     clusters.set_index("geoid")
-    clusters["joinkey"] = clusters.index + clusters.year.astype(str)
+    clusters["joinkey"] = clusters.geoid + clusters.year.astype(str)
     clusters = clusters.drop(columns="year")
     geoid = dataset.data.index
     dataset.data[
