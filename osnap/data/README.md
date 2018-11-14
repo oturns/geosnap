@@ -58,8 +58,8 @@ Creating a set of neighborhoods is as simple as instantiating the Dataset class 
 To use a boundary 
 
 ```
-import geopandas
-import osnap
+import geopandas as gpd
+from osnap.data import Dataset
 import libpysal
 
 # read in a geodataframe of Virginia
@@ -73,7 +73,7 @@ virginia = Dataset(name='Virginia', source='ltdb', boundary=va)
 To use a list of FIPS
 
 ```
-import osnap
+from osnap.data import Dataset
 
 # Maryland's fips code is 24, Baltimore City is 510 and Baltimore County is 005
 
