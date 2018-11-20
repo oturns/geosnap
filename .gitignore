@@ -1,5 +1,9 @@
 .ropeproject/*
+.ipynb_checkpoints/*
 */.ipynb_checkpoints/*
 __pycache__/*
 */__pycache__/*
 */*/__pycache__/*
+.mypy_cache/*
+.eggs
+osnap.egg-info

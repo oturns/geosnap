@@ -402,9 +402,11 @@ class Dataset(object):
 
         self.data = _df[_df.index.isin(self.tracts.geoid)]
         if add_indices:
-            self.data = self.data.append(_df[_df.index.isin(add_indices)])
-            self.tracts = self.tracts.append(
-                _tracts[_tracts.geoid.isin(add_indices)])
+            for index in add_indices:
+                self.data = self.data.append(
+                    _df[_df.index.str.startswith(index)])
+                self.tracts = self.tracts.append(
+                    _tracts[_tracts.geoid.str.startswith(index)])
 
     def plot(self,
              column=None,
