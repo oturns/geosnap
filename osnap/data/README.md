@@ -116,7 +116,7 @@ wash_dc = Dataset(name='Washington DC Metro', source='ltdb', boundary=dc_metro)
 To use a list of FIPS:
 
 ```python
-import osnap
+from osnap.data import Dataset
 
 # Maryland's fips code is 24, Baltimore City is 510 and Baltimore County is 005
 baltimore = Dataset(name='Baltimore', source='ltdb', states='24', counties = ['005', '510'])
