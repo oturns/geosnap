@@ -7,6 +7,8 @@ import itertools
 import scipy.spatial.distance as d
 
 import libpysal
+from libpysal.weights.contiguity import Rook, Queen
+from libpysal.weights.distance import KNN, Kernel
 
 
 class Transition(object):
@@ -14,12 +16,13 @@ class Transition(object):
     (Spatial) Markov approaches to transitional dynamics of neighborhood types.
 
     Parameters
-    ----------
-    y               : array
-                      (n,t), one row per observation, one column per neighborhood
-                      type of each spatial unit, with as many columns as time periods.
-    w               : W
+    ----------  
+    dataset          : osnap.Dataset
+                      osnap dataset object with column defining neighborhood clusters
+    w_type           : libpysal spatial weights type ("rook", "queen", "knn" or "kernel")
                       spatial weights object.
+    w_kwds          : dict
+                      dictionary with options to be passed to libpysal.weights generator        
     permutations    : int, optional
                       number of permutations for use in randomization based
                       inference (the default is 0).
@@ -46,11 +49,30 @@ class Transition(object):
                       categorical spatial lag.
     """
 
-    def __init__(self, y, w, permutations=0, cluster_type=None):
+    def __init__(self,
+                 dataset,
+                 w_type,
+                 w_kwds=None,
+                 permutations=0,
+                 cluster_type=None):
 
-        sm = ga.Spatial_Markov(
-            y, w, permutations=permutations, discrete=True, variable_name=cluster_type
-        )
+        y = dataset.data.copy().reset_index()
+        y = y[['geoid', 'year', cluster_type]]
+        y = y.groupby(['geoid', 'year']).first().unstack()
+        y = y.dropna()
+
+        tracts = dataset.tracts.copy().merge(
+            y.reset_index(), on='geoid', how='right')
+        w_dict = {'rook': Rook, 'queen': Queen, 'knn': KNN, 'kernel': Kernel}
+        w = w_dict[w_type].from_dataframe(tracts)
+        y = y.astype(int)
+
+        sm = ga.markov.Spatial_Markov(
+            y,
+            w,
+            permutations=permutations,
+            discrete=True,
+            variable_name=cluster_type)
         self.p = sm.p
         self.transitions = sm.transitions
         self.P = sm.P
@@ -236,9 +258,13 @@ class Sequence(object):
     ValueError: Please specify a proper `dist_type` or `subs_mat` and `indel` to proceed!
     """
 
-    def __init__(
-        self, y, subs_mat=None, dist_type=None, indel=None, w=None, cluster_type=None
-    ):
+    def __init__(self,
+                 y,
+                 subs_mat=None,
+                 dist_type=None,
+                 indel=None,
+                 w=None,
+                 cluster_type=None):
 
         merged = list(itertools.chain.from_iterable(y))
         self.classes = np.unique(merged)
@@ -267,15 +293,13 @@ class Sequence(object):
                 if len(y_int.shape) != 2:
                     raise ValueError(
                         "hamming distance cannot be calculated for "
-                        "sequences of unequal lengths!"
-                    )
-                hamming_dist = d.pdist(y_int, metric="hamming") * y_int.shape[1]
+                        "sequences of unequal lengths!")
+                hamming_dist = d.pdist(
+                    y_int, metric="hamming") * y_int.shape[1]
                 self.seq_dis_mat = d.squareform(hamming_dist)
             else:
-                raise ValueError(
-                    "Please specify a proper `dist_type` or "
-                    "`subs_mat` and `indel` to proceed!"
-                )
+                raise ValueError("Please specify a proper `dist_type` or "
+                                 "`subs_mat` and `indel` to proceed!")
         else:
             self._om_dist(y_int)
 
@@ -313,7 +337,8 @@ class Sequence(object):
             for j in range(1, t1 + 1):
                 gaps = D[i, j - 1] + self.indel
                 gapt = D[i - 1, j] + self.indel
-                match = D[i - 1, j - 1] + self.subs_mat[seq1[j - 1], seq2[i - 1]]
+                match = D[i - 1, j - 1] + self.subs_mat[seq1[j - 1], seq2[i -
+                                                                          1]]
                 D[i, j] = min(match, gaps, gapt)
         return D
 
@@ -342,6 +367,7 @@ class Sequence(object):
         for pair in combinations(range(self.n), 2):
             seq1 = y_int[pair[0]]
             seq2 = y_int[pair[1]]
-            seq_dis_mat[pair[0], pair[1]] = self._om_pair_dist(seq1, seq2)[-1, -1]
+            seq_dis_mat[pair[0], pair[1]] = self._om_pair_dist(seq1,
+                                                               seq2)[-1, -1]
 
         self.seq_dis_mat = seq_dis_mat + seq_dis_mat.transpose()

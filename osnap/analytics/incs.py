@@ -42,7 +42,7 @@ def linc(labels_sequence):
     Arguments
     ---------
     labels_sequence: sequence of neighborhood labels (n,t)
-                   n areas in n periods
+                   n areas in t periods
                    first element is a list of neighborhood labels per area in
                    period 0, second element is a list of neighborhood labels
                    per area in period 1, and so on for all T periods.
