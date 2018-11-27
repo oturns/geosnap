@@ -1,0 +1,364 @@
+<!DOCTYPE html> 
+<html>
+<head>
+	<title>Leaflet debug page</title>
+
+	<link rel="stylesheet" href="../../dist/leaflet.css" />
+	<!--[if lte IE 8]><link rel="stylesheet" href="../../dist/leaflet.ie.css" /><![endif]-->
+
+	<link rel="stylesheet" href="../css/screen.css" />
+
+	<style>
+		#map1 {
+			width: 800px;
+			height: 500px;
+		}
+		#map2 {
+			width: 900px;
+			height: 600px;
+		}
+		.info {
+			padding: 6px 8px;
+			font: 14px/16px Arial, Helvetica, sans-serif;
+			background: white;
+			background: rgba(255,255,255,0.8);
+			box-shadow: 0 0 15px rgba(0,0,0,0.2);
+			border-radius: 5px;
+		}
+		.info h4 {
+			margin: 0 0 5px;
+			color: #777;
+		}
+
+		.legend {
+			text-align: left;
+			line-height: 18px;
+			color: #555;
+		}
+		.legend i {
+			width: 18px;
+			height:15px;
+			float: left;
+			margin-right: 8px;
+			opacity: 0.7;
+		}
+	</style>
+
+	<script src="../leaflet-include.js"></script>
+	<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet-src.js"></script>
+	<script src="./L.Map.Sync.js"></script>
+</head>
+
+
+<body>
+
+<div id="menu" style="background-color:#ffffff;height:30px;width:490px;float:left;">
+    <form name="layerSelect" action="">
+		<span id="layer_change">Select Layer: </span>
+        <select name="ACSdata" onChange="layerChange()">
+			<option value="A0">Age 0-4</option>
+			<option value="A1">Age 5-14</option>
+			<option value="A2">Age 15-24</option>
+			<option value="A3">Age 25-44</option>
+			<option value="A4">Age 45-64 </option>
+			<option value="A5">Age 65+ </option>
+			<option value="A6">Males</option>
+			<option value="A7">Females</option>
+			<option value="A8">White</option>
+			<option value="A9">Hispanic</option>
+			<option value="A10">Black</option>
+			<option value="A11">Asian/Pacific Islander</option>
+			<option value="A12">Other Race/Ethnicity</option>
+			<option value="A13">Total Population</option>				
+        </select>
+    </form>
+</div>
+
+<div id="content" style="background-color:#ffffff;height:30px;width:320px;float:left;">	
+    <form name="classSelect" action="">
+		<span id="class_change">Select: </span>
+        <select name="classified" onChange="layerChange()">
+			<option value="equal">Equal Classification</option>
+			<option value="quantile">Quantile Classification</option>	
+        </select>
+    </form>	
+</div>	
+    
+</br>
+</br>
+	<div id="map1"></div>
+	<div id="map2"></div>
+
+</br>         		
+
+	<script type="text/javascript" src="census_2013.js"></script>
+	<script type="text/javascript">
+		var firstTime = true;
+		var geojson = null;
+		var info    = null;
+		var legend  = null;
+/*
+		var map = L.map('map').setView([37.746, -122.338], 10);
+
+		var cloudmade = L.tileLayer('http://{s}.tile.cloudmade.com/{key}/{styleId}/256/{z}/{x}/{y}.png', {
+			//attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
+			key: 'BC9A493B41014CAABB98F0471D759707',
+			styleId: 998
+		}).addTo(map);
+*/
+
+
+var layer1 = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6IjZjNmRjNzk3ZmE2MTcwOTEwMGY0MzU3YjUzOWFmNWZhIn0.Y8bhBaUMqFiPrDRW9hieoQ'); 
+
+var layer2 = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6IjZjNmRjNzk3ZmE2MTcwOTEwMGY0MzU3YjUzOWFmNWZhIn0.Y8bhBaUMqFiPrDRW9hieoQ', {
+    attribution: '© Kartverket'
+});
+
+var map1 = L.map('map1', {
+    layers: [layer1],
+    center: [33.0, -116.9],
+	id: 'mapbox.light',
+    zoom: 9            
+});
+
+var map2 = L.map('map2', {
+    layers: [layer1],
+    center: [33.0, -116.9],
+	id: 'mapbox.light',
+    zoom: 9                     
+});
+
+map1.sync(map2);
+map2.sync(map1);
+
+/*
+	var map = L.map('map').setView([33.0, -116.9], 9);
+	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6IjZjNmRjNzk3ZmE2MTcwOTEwMGY0MzU3YjUzOWFmNWZhIn0.Y8bhBaUMqFiPrDRW9hieoQ', {
+		//maxZoom: 7,
+		//minZoom: 3,
+		//continuousWorld: true,
+		noWrap: true,
+		//worldCopyJump: false,
+		//wrapDateLine: false,
+		attribution: '',
+		id: 'mapbox.light'
+	}).addTo(map);		
+
+	var map1 = L.map1('map').setView([33.0, -116.9], 9);
+	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6IjZjNmRjNzk3ZmE2MTcwOTEwMGY0MzU3YjUzOWFmNWZhIn0.Y8bhBaUMqFiPrDRW9hieoQ', {
+		//maxZoom: 7,
+		//minZoom: 3,
+		//continuousWorld: true,
+		noWrap: true,
+		//worldCopyJump: false,
+		//wrapDateLine: false,
+		attribution: '',
+		id: 'mapbox.light'
+	}).addTo(map1);
+*/	
+
+		var layersControl = new L.Control.Layers({
+			'CloudMade': cloudmade
+		}, {
+			//'Some marker': marker,
+			//'vector layer': geojson
+		});	
+
+		map1.addControl(layersControl);		   // 왜 위에는 묶었는데..?
+
+
+
+		
+function remove(){
+	if (geojson != null) map1.removeLayer(geojson);
+	if (info    != null) info.removeFrom(map1);
+	if (legend  != null) legend.removeFrom(map1);	
+}
+/*
+		function styleRemove(feature) {
+			return {
+				//weight: 2,
+				opacity: 0,
+				color: 'white',
+				//dashArray: '3',
+				fillOpacity: 0,
+				fillColor: 'white'
+			};
+		}
+*/		
+
+function layerChange() {
+
+  	var selectedLayer  = document.layerSelect.ACSdata.value;
+	var classification = document.classSelect.classified.value;  
+		
+	if (classification == "equal") {
+	
+		var min = Number.MAX_VALUE; 
+		var max = Number.MIN_VALUE;
+		for (var i=0; i<CA.features.length; i++){
+			if (CA.features[i].properties[selectedLayer] == -999) continue;
+			if (min > CA.features[i].properties[selectedLayer]) min = CA.features[i].properties[selectedLayer];
+			if (max < CA.features[i].properties[selectedLayer]) max = CA.features[i].properties[selectedLayer];
+		}
+		//alert(selectedLayer + " " + min + " " + max);
+		
+		var range = max - min;
+		var interval = range / 8;
+		var intervals = new Array();
+		intervals[0] = Math.round(min);
+		for (var i=1; i<8; i++) {
+			intervals[i] = Math.round(intervals[i-1] + interval);
+		}
+		//alert(intervals[0]+" "+intervals[1]+" "+intervals[2]+" "+intervals[3]+" "+intervals[4]+" "+intervals[5]+" "+intervals[6]+" "+intervals[7]);
+		ACSdata_render(selectedLayer, intervals);
+	}
+	
+	if (classification == "quantile") {
+			
+		var values = new Array();
+		var j=0;
+		for (var i=0; i<CA.features.length; i++) {
+			if (CA.features[i].properties[selectedLayer] == -999) continue;
+			values[j++] = CA.features[i].properties[selectedLayer];
+		}
+		values.sort(function(a,b){return a-b});
+		var interval = values.length / 8;
+		
+		var intervals = new Array();
+		var next_interval = 0;
+		intervals[0] = Math.round(values[0]);
+		for (var i=1; i<8; i++) {
+			next_interval += interval;
+			j = Math.round(next_interval);
+			intervals[i] = values[j];
+		}
+		//alert(selectedLayer+"  "+intervals[0]+" "+intervals[1]+" "+intervals[2]+" "+intervals[3]+" "+intervals[4]+" "+intervals[5]+" "+intervals[6]+" "+intervals[7]);
+		ACSdata_render(selectedLayer, intervals);
+	}
+
+	
+}
+
+function ACSdata_render(item, intervals) {
+
+        // clear a layer and two controls
+		remove();
+		
+		// control that shows state info on hover
+		 info = L.control();
+
+		info.onAdd = function (map1) {
+			this._div = L.DomUtil.create('div', 'info');
+			this.update();
+			return this._div;
+		};
+
+		info.update = function (props) {
+			this._div.innerHTML = '<h4>Per Capita Income</h4>' +  (props ?
+				'<b>'  + '</b>' + '$' + props[item] + '<br/><br/>'
+				+'<h4>Zip Code (area)</h4>'
+				+ props.NAME
+				: 'Hover over an area');
+		};
+
+		info.addTo(map1);
+
+
+		// get color depending on population density value
+		function getColor1(d) {
+			var color = ["#FFEDA0","#FED976","#FEB24C","#FD8D3C","#FC4E2A","#E31A1C","#BD0026","#800026"];
+			for (var i=color.length-1; i>=0; i--) {
+				if (d > intervals[i]) return color[i];
+			}
+			
+		}
+		
+		function style1(feature) {
+			return {
+				weight: 2,
+				opacity: 1,
+				color: 'white',
+				dashArray: '3',
+				fillOpacity: 0.5,
+				fillColor: getColor1(feature.properties[item])
+			};
+		}
+
+		
+		
+		function highlightFeature(e) {
+			var layer = e.target;
+
+			layer.setStyle({
+				weight: 5,
+				color: '#666',
+				dashArray: '',
+				fillOpacity: 0.7
+			});
+
+			if (!L.Browser.ie) {
+				layer.bringToFront();
+			}
+
+			info.update(layer.feature.properties);
+		}
+
+		
+
+		function resetHighlight(e) {
+			geojson.resetStyle(e.target);
+			info.update();
+		}
+
+		function zoomToFeature(e) {
+			map1.fitBounds(e.target.getBounds());
+		}
+
+		function onEachFeature(feature, layer) {
+			layer.on({
+				mouseover: highlightFeature,
+				mouseout: resetHighlight,
+				click: zoomToFeature
+				//click: highlightFeature
+			});
+		}
+
+		geojson = L.geoJson(CA, {
+			style: style1,
+			onEachFeature: onEachFeature
+		}).addTo(map1);
+
+		map1.attributionControl.addAttribution('Population data &copy; <a href="http://census.gov/">US Census Bureau</a>');
+
+
+		 legend = L.control({position: 'bottomright'});
+
+		legend.onAdd = function (map1) {
+
+			var div = L.DomUtil.create('div', 'info legend'),
+				//grades = [0, 13559    , 27118    , 40677    , 54236   , 67795   , 81354   , 94913  ],     // var
+				grades = intervals,
+				labels = [],
+				from, to;
+
+			for (var i = 0; i < grades.length; i++) {
+				from = grades[i];
+				to = grades[i + 1];
+
+				labels.push(
+					'<i style="background:' + getColor1(from + 1) + '"></i> ' +
+					from + (to ? '&ndash;' + to : '+'));
+			}
+			
+			div.innerHTML = labels.join('<br>');
+			return div;
+		};
+
+		legend.addTo(map1);
+}
+
+
+	</script>
+</body>
+</html>
