@@ -8,7 +8,7 @@ n_italian_pop,,itanc,,SF3,P0330016,SF3,PCT016051,,persons of Italian parentage o
 n_german_pop,,geanc,,SF3,P0330012,SF3,PCT016042,,persons of German parentage or ancestry,Ethnicity & Immigration,
 n_irish_pop,,iranc,,SF3,P0330015,SF3,PCT016049,,persons of Irish parentage or ancestry,Ethnicity & Immigration,
 n_scandaniavian_pop,,scanc,,,,SF3,PCT016059+PCT016039+PCT016033+PCT016090,,persons of Scandinavian parentage/ancestry,Ethnicity & Immigration,scanXX (page 18 of LTDB codebook) suggests dedicated nationalities are used in 1990 and 2000. This is despite there being a scandinavian category in 2000 SF3 (PCT016065)
-n_total_pop_sample,,dfb,,SF3,P0010001,,,,total population from sample-based data,Ethnicity & Immigration,LTDB suggests 1980 only
+n_total_pop_sample,,dfb,,,,,,,total population from sample-based data,Ethnicity & Immigration,LTDB suggests 1980 only
 n_foreign_born_pop,,fb,FORBORN,SF3,P0360001:P0360010,SF3,P021013,B05002_013E,foreign-born,Ethnicity & Immigration,
 n_recent_immigrant_pop,,n10imm,,SF3,P0360001:P0360004,SF3,P023002,,recent immigrants (within the past 10 years),Ethnicity & Immigration,
 n_naturalized_pop,,nat,FORBCZN,SF3,P0370005,SF3,P021014,B05002_014E,naturalized foreign-born,Ethnicity & Immigration,
@@ -43,9 +43,9 @@ n_vacant_housing_units,,vac,VACHU,SF1,H0020002,SF1,H003003,B25002_003E,vacant ho
 n_occupied_housing_units,,ohu,OCCHU,SF1,H0020001,SF1,H003002,B25002_002E,occupied housing units,"Housing, Age, & Marital Status",
 n_owner_occupied_housing_units,,own,OWNOCC,SF1,H0030001,SF1,H004002,B25003_002E,owner-occupied housing units,"Housing, Age, & Marital Status",
 n_renter_occupied_housing_units,,rent,RNTOCC,SF1,H0030002,SF1,H004003,B25003_003E,renter-occupied housing units,"Housing, Age, & Marital Status",
-n_housing_units_multiunit_structures_denom,,dmulti,,SF3,H0010001,SF3,H001001,,housing units denom,"Housing, Age, & Marital Status",
+n_housing_units_multiunit_structures_denom,n_housing_units_multiunit_structures_denom=H001001,dmulti,,SF3,,,,,housing units denom,"Housing, Age, & Marital Status",
 n_housing_units_multiunit_structures,,multi,,,,SF3,H030004+H030005+H030006+H030007+H030008+H030009,,housing units in multi-unit structures,"Housing, Age, & Marital Status",[ljw] LTDB is unclear as to the relevant computed column from SF3-H030*. Recorded columns here are all stationary housing units (not mobile home (H030010) or RV/Van/Boat (H030011)
-n_total_housing_units_sample,,husp,,SF3,H0010001,SF3,H001001,,housing units in sample-based data,"Housing, Age, & Marital Status",
+n_total_housing_units_sample,n_total_housing_units_sample=H001001,husp,,SF3,,,,,housing units in sample-based data,"Housing, Age, & Marital Status",
 median_home_value,,mhmval,MDVALHS,SF3,H061A001,SF3,H085001,B25077_001E,Median home value,"Housing, Age, & Marital Status",
 median_contract_rent,,mrent,MDGRENT,SF3,H043A001,SF3,H056001,B25058_001E,Median monthly contract rent,"Housing, Age, & Marital Status",
 n_structures_30_old,,h30old,,SF3,H0250005+H0250006+H0250007+H0250008,SF3,H034010+H034009+H034008+H034007,,structures built more than 30 years ago,"Housing, Age, & Marital Status",
@@ -55,7 +55,7 @@ n_persons_under_18,,a18und,NCHILD,SF3,P0130012+P0130011+P0130010+P0130009+P01300
 n_persons_over_60,,a60up,,SF3,P0130025+P0130026+P0130027+P0130028+P0130029+P0130030+P0130031,SF1,P012018:025+ P012042:049,,persons age 60 years and over,"Housing, Age, & Marital Status",
 n_persons_over_75,,a75up,,SF3,P0130029+P0130030+P0130031,SF1,P012023:25+ P012047:49,,persons age 75 years and over,"Housing, Age, & Marital Status",
 n_persons_over_15,,ag15up,PERS15P,SF3,P0130010+P0130011+P0130012+P0130013+P0130014+P0130015+P0130016+P0130017+P0130018+P0130019+P0130020+P0130021+P0130022+P0130023+P0130024+P0130025+P0130026+P0130027+P0130028+P0130029+P0130030+P0130031,SF3,P018001,B12001_001E,population 15 years and over,"Housing, Age, & Marital Status",
-n_persons_over_25,,ag25up,,SF3,P0130018+P0130019+P0130020+P0130021+P0130022+P0130023+P0130024+P0130025+P0130026+P0130027+P0130028+P0130029+P0130030+P0130031,,,,population 25 years and over,"Housing, Age, & Marital Status",denominator for educational attainment
+n_persons_over_25,,ag25up,,SF3,P0130018+P0130019+P0130020+P0130021+P0130022+P0130023+P0130024+P0130025+P0130026+P0130027+P0130028+P0130029+P0130030+P0130031,SF3,P037001,,population 25 years and over,"Housing, Age, & Marital Status",denominator for educational attainment
 n_married,,mar,MMARSPP,SF3,P0250001+P0250002,SF3,(P018004+P018013) - (P018007+P018016),B12001_005E,currently married (excluding separated),"Housing, Age, & Marital Status",
 n_widowed_divorced,,wds,,SF3,P0270005+P0270011+P0270006+P0270012,SF3,P018007+P018009+P018010+P018016+P018018+P018019,,"widowed, divorced, and separated","Housing, Age, & Marital Status",
 n_total_families,,family,FAMSUB,SF3,P0040001,SF1,P031001,B17010_001E,total families,"Housing, Age, & Marital Status",denominator for calculating % female-headed families w/ children
@@ -71,7 +71,7 @@ p_persons_over_75,p_persons_over_75=n_persons_over_75 / n_total_pop*100,p75up,,,
 p_married,p_married=n_married / n_persons_over_15*100,pmar,,,,,,,percent currently married (excluding separated),"Housing, Age, & Marital Status",
 p_widowed_divorced,p_widowed_divorced=n_widowed_divorced / n_persons_over_15*100,pwds,,,,,,,"percent widowed, divorced, and separated","Housing, Age, & Marital Status",should denom be families or individuals?
 p_female_headed_families,p_female_headed_families=n_female_headed_families / n_total_families*100,pfhh,,,,,,,percentage of female-headed families with children,"Housing, Age, & Marital Status",should denom be families or individuals?
-n_white_persons,,white,NSHRWHT,,P0100001+P0100006,NA,P003003,,persons of white race,Race & Age,"[ljw] inferring here, documentation suggests this is only available for 1970, but white alone (regardless of hispanic) gives this count? [ek] I think the question about hispanic ethnicity was added in 1980, so this is the best they can do to measdure the 'white alone' construct in 1970 "
+n_white_persons,,white,NSHRWHT,,P0100001+P0100006,SF1,P003003,,persons of white race,Race & Age,"[ljw] inferring here, documentation suggests this is only available for 1970, but white alone (regardless of hispanic) gives this count? [ek] I think the question about hispanic ethnicity was added in 1980, so this is the best they can do to measdure the 'white alone' construct in 1970 "
 n_nonhisp_white_persons,,nhwht,NSHRNHW,SF1,P0100001,SF1,P004005,B03002_003E,"persons of white race, not Hispanic origin",Race & Age,"[ljw] I read this as P004005 (not hispanic white alone), not P003003 (white alone)"
 n_black_persons,,black,NSHRBLK,SF1,P0100007+P0100002,SF1,P003004,,persons of black race,Race & Age, 
 n_nonhisp_black_persons,,nhblk,NSHRNHB,SF1,P0100002,SF1,P004006,B03002_004E,"persons of black race, not Hispanic origin",Race & Age,
@@ -83,7 +83,7 @@ n_chinese_persons,,china,,SF3,P0090006,SF1,PCT007005+PCT007015,,persons of Chine
 n_filipino_persons,,filip,,SF3,P0090007,SF1,PCT007006,,persons of Filipino race,Race & Age,
 n_japanese_persons,,japan,,SF3,P0090008,SF1,PCT007009,,persons of Japanese race,Race & Age,
 n_korean_persons,,korea,,SF3,P0090010,SF1,PCT007010,,persons of Korean race,Race & Age,
-n_asian_persons,,asian,,SF3,P0080004,,,,persons of Asian race,Race & Age,for 1990 this is Asian and PI
+n_asian_persons,,asian,,SF3,P0080004,SF1,P004008,,persons of Asian race,Race & Age,for 1990 this is Asian and PI
 n_vietnamese_persons,,viet,,SF3,P0090011,SF1,PCT007017,,persons of Vietnamese race,Race & Age,
 n_white_age_distribution,,agewht,,,P014A001:P014A031+P014001:P014B031,SF1,PCT012I001,,white population with known age distribution,Race & Age,
 n_white_under_15,,a15wht,,,P014A001:P014A009+P014001:P014009,SF1,PCT012I003:018+PCT012I108:122,,0-15 years old of white race,Race & Age,
