@@ -56,7 +56,7 @@ def fetch(unit='tract', filter=None):
             print(str(row) + ' ' + str(e))
     keeps = [col for col in df.columns if col in variables.variable.tolist()]
     df = df[keeps].round(2)
-    df.to_csv('census.csv')
+    #df.to_csv('census.csv')
     return df
 
 
@@ -112,5 +112,16 @@ def normalize_relation(relation):
     return relation
 
 
-fetch(filter=dict(state='06', county='073'))
-## sd example: dict(state='06', county='073')
+fips = pandas.read_csv(
+    'https://raw.githubusercontent.com/ljwolf/cenpy/master/cenpy/stfipstable.csv',
+    converters={"FIPS Code": str})
+states = []
+for each in fips['FIPS Code'].tolist():
+    print(each)
+    try:
+        df = fetch(filter={'state': each, 'county': '*'})
+        states.append(df)
+    except Exception:
+        print(each + ' failed')
+all = pandas.concat(states, sort=True)
+all.to_csv('census_2000.csv')
