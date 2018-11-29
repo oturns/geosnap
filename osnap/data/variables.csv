@@ -79,12 +79,12 @@ n_hispanic_persons,,hisp,NSHRHSP,SF1,P0080001,SF1,P004002,B03002_012E,persons of
 n_native_persons,,ntv,NSHRAMI,SF1,P0070003,SF1,P004007,B03002_005E,"persons of Native American race, not Hispanic origin",Race & Age,is this nonhispanic?
 n_hawaiian_persons,,haw,NSHRHIP,SF1,P0070017,SF1,P004009,B02001 _006E,"persons of Hawaiian race, not Hispanic origin",Race & Age,is this nonhispanic?
 n_asian_indian_persons,,india,,SF3,P0070009,SF1,PCT007002,,persons of Asian Indian race,Race & Age,
-n_chinese_persons,,china,,SF3,P0070006,SF1,PCT007005+PCT007015,,persons of Chinese race,Race & Age,
-n_filipino_persons,,filip,,SF3,P0070007,SF1,PCT007006,,persons of Filipino race,Race & Age,
-n_japanese_persons,,japan,,SF3,P0070008,SF1,PCT007009,,persons of Japanese race,Race & Age,
-n_korean_persons,,korea,,SF3,P0070010,SF1,PCT007010,,persons of Korean race,Race & Age,
-n_asian_persons,,asian,,SF3,P0060004,SF1,P004008,,persons of Asian race,Race & Age,for 1990 this is Asian and PI
-n_vietnamese_persons,,viet,,SF3,P0070011,SF1,PCT007017,,persons of Vietnamese race,Race & Age,
+n_chinese_persons,,china,,SF1,P0070006,SF1,PCT007005+PCT007015,,persons of Chinese race,Race & Age,
+n_filipino_persons,,filip,,SF1,P0070007,SF1,PCT007006,,persons of Filipino race,Race & Age,
+n_japanese_persons,,japan,,SF1,P0070008,SF1,PCT007009,,persons of Japanese race,Race & Age,
+n_korean_persons,,korea,,SF1,P0070010,SF1,PCT007010,,persons of Korean race,Race & Age,
+n_asian_persons,,asian,,SF1,P0060004,SF1,P004008,,persons of Asian race,Race & Age,for 1990 this is Asian and PI
+n_vietnamese_persons,,viet,,SF1,P0070011,SF1,PCT007017,,persons of Vietnamese race,Race & Age,
 n_white_age_distribution,,agewht,,SF1,P0120001:62,SF1,PCT012I001,,white population with known age distribution,Race & Age,
 n_white_under_15,,a15wht,,SF1,P0120001:09 + P0120032:40,SF1,PCT012I003:018+PCT012I108:122,,0-15 years old of white race,Race & Age,
 n_white_over_60,,a60wht,,SF1,P0120025:31 + P0120056:62,SF1,PCT012I063:105 + PCT012I167:209,,60 years and older of white race,Race & Age,is this nonhispanic?
