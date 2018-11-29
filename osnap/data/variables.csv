@@ -3,23 +3,23 @@ geoid,,geoid,GEO2010,,,,,,FIPS code,,
 n_mexican_pop,,mex,MEXIC,SF1,P0090001,SF1,PCT011004,B03001_004E,persons of Mexican parentage or ancestry,Ethnicity & Immigration,
 n_cuban_pop,,cuban,CUBAN,SF1,P0090004,SF1,PCT011006,B03001_006E,persons of Cuban parentage or ancestry,Ethnicity & Immigration,
 n_puerto_rican_pop,,pr,PRICAN,SF1,P0090003,SF1,PCT011005,B03001_005E,persons of Puerto Rican parentage or ancestry,Ethnicity & Immigration,
-n_russian_pop,,ruanc,,SF3,P0330022,SF3,PCT016064+PCT016053+PCT016052+PCT016037,,persons of Russian/USSR parentage or ancestry,Ethnicity & Immigration,ruancXX (page 17 of LTDB codebook) suggests that USSR is only selected for 1970. I gather you're aggregating soviet countries individually?  1990 doesn't seem to have USSR or several of its constituents (severl probably weren't created yet?)
+n_russian_pop,,ruanc,,SF3,P0330022,SF3,PCT016064+PCT016053+PCT016052+PCT016037,,persons of Russian/USSR parentage or ancestry,Ethnicity & Immigration,ruancXX (page 17 of LTDB codebook) suggests that USSR is only selected for 1970. I gather you're aggregating soviet countries individually?  1990 doesn't seem to have USSR or several of its constituents 
 n_italian_pop,,itanc,,SF3,P0330016,SF3,PCT016051,,persons of Italian parentage or ancestry,Ethnicity & Immigration,
 n_german_pop,,geanc,,SF3,P0330012,SF3,PCT016042,,persons of German parentage or ancestry,Ethnicity & Immigration,
 n_irish_pop,,iranc,,SF3,P0330015,SF3,PCT016049,,persons of Irish parentage or ancestry,Ethnicity & Immigration,
 n_scandaniavian_pop,,scanc,,,,SF3,PCT016059+PCT016039+PCT016033+PCT016090,,persons of Scandinavian parentage/ancestry,Ethnicity & Immigration,scanXX (page 18 of LTDB codebook) suggests dedicated nationalities are used in 1990 and 2000. This is despite there being a scandinavian category in 2000 SF3 (PCT016065)
 n_total_pop_sample,,dfb,,,,,,,total population from sample-based data,Ethnicity & Immigration,LTDB suggests 1980 only
-n_foreign_born_pop,,fb,FORBORN,SF3,P0360001:P0360010,SF3,P021013,B05002_013E,foreign-born,Ethnicity & Immigration,
-n_recent_immigrant_pop,,n10imm,,SF3,P0360001:P0360004,SF3,P023002,,recent immigrants (within the past 10 years),Ethnicity & Immigration,
+n_foreign_born_pop,,fb,FORBORN,SF3,P0360001:10,SF3,P021013,B05002_013E,foreign-born,Ethnicity & Immigration,
+n_recent_immigrant_pop,,n10imm,,SF3,P0360001:04,SF3,P023002,,recent immigrants (within the past 10 years),Ethnicity & Immigration,
 n_naturalized_pop,,nat,FORBCZN,SF3,P0370005,SF3,P021014,B05002_014E,naturalized foreign-born,Ethnicity & Immigration,
-n_age_5_older,,ag5up,,SF3,P0130004:P0130031,SF3,P019001,,persons 5 years and over,Ethnicity & Immigration,
-n_other_language,,olang,,SF3,P0310002:P0310026,SF3,P019001 - (P019025+P019003+P019047),DP02_0112E,persons who speak language other than English at home,Ethnicity & Immigration,Construct census 2000 count by subtraction from P019001
+n_age_5_older,,ag5up,,SF3,P0130004:31,SF3,P019001,,persons 5 years and over,Ethnicity & Immigration,
+n_other_language,,olang,,SF3,P0310002:26,SF3,P019001 - (P019025+P019003+P019047),DP02_0112E,persons who speak language other than English at home,Ethnicity & Immigration,Construct census 2000 count by subtraction from P019001
 n_limited_english,,lep,,SF3,P0280004+P0280007+P0280010+P0280014+P0280017+P0280020+P0280024+P0280027+P0280030,SF3,P019022+P019023+P019029+P019013+P019012+P019017+P019018+P019007+P019008+P019061+P019062+P019067+P019066+P019052+P019051+P019057+P019056+P019040+P019045+P019044+P019030+P019039+P019035+P019034,DP02_0113E,persons who speak English not well,Ethnicity & Immigration,"[ljw] cant tell if this includes ""speak other Languages"" as a catchall or if that is a pre-crosstab"
-n_russian_born_pop,,rufb,,,,SF3,PCT019026,,persons who were born in Russia/ USSR,Ethnicity & Immigration,
-n_italian_born_pop,,itfb,,,,SF3,PCT019016,,persons who were born in Italy,Ethnicity & Immigration,
-n_german_born_pop,,gefb,,,,SF3,PCT019011,,persons who were born in Germany,Ethnicity & Immigration,
-n_irish_born_pop,,irfb,,,,SF3,PCT019005,,persons who were born in Ireland,Ethnicity & Immigration,
-n_scandaniavian__born_pop,,scfb,,,,SF3,PCT019006+PCT019007,,persons who were born in Scandinavian Countries,Ethnicity & Immigration,
+n_russian_born_pop,,rufb,,,,SF3,PCT019026,,persons who were born in Russia/ USSR,Ethnicity & Immigration,"[ek] this is STF4 in 1990, so not available from the API"
+n_italian_born_pop,,itfb,,,,SF3,PCT019016,,persons who were born in Italy,Ethnicity & Immigration,"[ek] this is STF4 in 1990, so not available from the API"
+n_german_born_pop,,gefb,,,,SF3,PCT019011,,persons who were born in Germany,Ethnicity & Immigration,"[ek] this is STF4 in 1990, so not available from the API"
+n_irish_born_pop,,irfb,,,,SF3,PCT019005,,persons who were born in Ireland,Ethnicity & Immigration,"[ek] this is STF4 in 1990, so not available from the API"
+n_scandaniavian__born_pop,,scfb,,,,SF3,PCT019006+PCT019007,,persons who were born in Scandinavian Countries,Ethnicity & Immigration,"[ek] this is STF4 in 1990, so not available from the API"
 p_mexican_pop,p_mexican_pop=n_mexican_pop / n_total_pop*100,pmex,,,,,,,percentage of persons of Mexican parentage or ancestry,Ethnicity & Immigration,
 p_cuban_pop,p_cuban_pop=n_cuban_pop / n_total_pop*100,pcuban,,,,,,,percentage of persons of Cuban parentage or ancestry,Ethnicity & Immigration,
 p_puerto_rican_pop,p_puerto_rican_pop=n_puerto_rican_pop / n_total_pop*100,ppr,,,,,,,percentage of persons of Puerto Rican parentage or ancestry,Ethnicity & Immigration,
@@ -43,9 +43,9 @@ n_vacant_housing_units,,vac,VACHU,SF1,H0020002,SF1,H003003,B25002_003E,vacant ho
 n_occupied_housing_units,,ohu,OCCHU,SF1,H0020001,SF1,H003002,B25002_002E,occupied housing units,"Housing, Age, & Marital Status",
 n_owner_occupied_housing_units,,own,OWNOCC,SF1,H0030001,SF1,H004002,B25003_002E,owner-occupied housing units,"Housing, Age, & Marital Status",
 n_renter_occupied_housing_units,,rent,RNTOCC,SF1,H0030002,SF1,H004003,B25003_003E,renter-occupied housing units,"Housing, Age, & Marital Status",
-n_housing_units_multiunit_structures_denom,n_housing_units_multiunit_structures_denom=H001001,dmulti,,SF3,,,,,housing units denom,"Housing, Age, & Marital Status",
+n_housing_units_multiunit_structures_denom,n_housing_units_multiunit_structures_denom=H001001,dmulti,,,,,,,housing units denom,"Housing, Age, & Marital Status",
 n_housing_units_multiunit_structures,,multi,,,,SF3,H030004+H030005+H030006+H030007+H030008+H030009,,housing units in multi-unit structures,"Housing, Age, & Marital Status",[ljw] LTDB is unclear as to the relevant computed column from SF3-H030*. Recorded columns here are all stationary housing units (not mobile home (H030010) or RV/Van/Boat (H030011)
-n_total_housing_units_sample,n_total_housing_units_sample=H001001,husp,,SF3,,,,,housing units in sample-based data,"Housing, Age, & Marital Status",
+n_total_housing_units_sample,n_total_housing_units_sample=H001001,husp,,,,,,,housing units in sample-based data,"Housing, Age, & Marital Status",
 median_home_value,,mhmval,MDVALHS,SF3,H061A001,SF3,H085001,B25077_001E,Median home value,"Housing, Age, & Marital Status",
 median_contract_rent,,mrent,MDGRENT,SF3,H043A001,SF3,H056001,B25058_001E,Median monthly contract rent,"Housing, Age, & Marital Status",
 n_structures_30_old,,h30old,,SF3,H0250005+H0250006+H0250007+H0250008,SF3,H034010+H034009+H034008+H034007,,structures built more than 30 years ago,"Housing, Age, & Marital Status",
@@ -55,7 +55,7 @@ n_persons_under_18,,a18und,NCHILD,SF3,P0130012+P0130011+P0130010+P0130009+P01300
 n_persons_over_60,,a60up,,SF3,P0130025+P0130026+P0130027+P0130028+P0130029+P0130030+P0130031,SF1,P012018:025+ P012042:049,,persons age 60 years and over,"Housing, Age, & Marital Status",
 n_persons_over_75,,a75up,,SF3,P0130029+P0130030+P0130031,SF1,P012023:25+ P012047:49,,persons age 75 years and over,"Housing, Age, & Marital Status",
 n_persons_over_15,,ag15up,PERS15P,SF3,P0130010+P0130011+P0130012+P0130013+P0130014+P0130015+P0130016+P0130017+P0130018+P0130019+P0130020+P0130021+P0130022+P0130023+P0130024+P0130025+P0130026+P0130027+P0130028+P0130029+P0130030+P0130031,SF3,P018001,B12001_001E,population 15 years and over,"Housing, Age, & Marital Status",
-n_persons_over_25,,ag25up,,SF3,P0130018+P0130019+P0130020+P0130021+P0130022+P0130023+P0130024+P0130025+P0130026+P0130027+P0130028+P0130029+P0130030+P0130031,SF3,P037001,,population 25 years and over,"Housing, Age, & Marital Status",denominator for educational attainment
+n_persons_over_25,,ag25up,,SF3,P0130018+P0130019+P0130020+P0130021+P0130022+P0130023+P0130024+P0130025+P0130026+P0130027+P0130028+P0130029+P0130030+P0130031,SF3,P037001,B15002_001E,population 25 years and over,"Housing, Age, & Marital Status",denominator for educational attainment
 n_married,,mar,MMARSPP,SF3,P0250001+P0250002,SF3,(P018004+P018013) - (P018007+P018016),B12001_005E,currently married (excluding separated),"Housing, Age, & Marital Status",
 n_widowed_divorced,,wds,,SF3,P0270005+P0270011+P0270006+P0270012,SF3,P018007+P018009+P018010+P018016+P018018+P018019,,"widowed, divorced, and separated","Housing, Age, & Marital Status",
 n_total_families,,family,FAMSUB,SF3,P0040001,SF1,P031001,B17010_001E,total families,"Housing, Age, & Marital Status",denominator for calculating % female-headed families w/ children
@@ -71,38 +71,38 @@ p_persons_over_75,p_persons_over_75=n_persons_over_75 / n_total_pop*100,p75up,,,
 p_married,p_married=n_married / n_persons_over_15*100,pmar,,,,,,,percent currently married (excluding separated),"Housing, Age, & Marital Status",
 p_widowed_divorced,p_widowed_divorced=n_widowed_divorced / n_persons_over_15*100,pwds,,,,,,,"percent widowed, divorced, and separated","Housing, Age, & Marital Status",should denom be families or individuals?
 p_female_headed_families,p_female_headed_families=n_female_headed_families / n_total_families*100,pfhh,,,,,,,percentage of female-headed families with children,"Housing, Age, & Marital Status",should denom be families or individuals?
-n_white_persons,,white,NSHRWHT,,P0100001+P0100006,SF1,P003003,,persons of white race,Race & Age,"[ljw] inferring here, documentation suggests this is only available for 1970, but white alone (regardless of hispanic) gives this count? [ek] I think the question about hispanic ethnicity was added in 1980, so this is the best they can do to measdure the 'white alone' construct in 1970 "
+n_white_persons,,white,NSHRWHT,SF1,P0100001+P0100006,SF1,P003003,,persons of white race,Race & Age,"[ljw] inferring here, documentation suggests this is only available for 1970, but white alone (regardless of hispanic) gives this count? [ek] I think the question about hispanic ethnicity was added in 1980, so this is the best they can do to measdure the 'white alone' construct in 1970 "
 n_nonhisp_white_persons,,nhwht,NSHRNHW,SF1,P0100001,SF1,P004005,B03002_003E,"persons of white race, not Hispanic origin",Race & Age,"[ljw] I read this as P004005 (not hispanic white alone), not P003003 (white alone)"
 n_black_persons,,black,NSHRBLK,SF1,P0100007+P0100002,SF1,P003004,,persons of black race,Race & Age, 
 n_nonhisp_black_persons,,nhblk,NSHRNHB,SF1,P0100002,SF1,P004006,B03002_004E,"persons of black race, not Hispanic origin",Race & Age,
 n_hispanic_persons,,hisp,NSHRHSP,SF1,P0080001,SF1,P004002,B03002_012E,persons of Hispanic origin,Race & Age,
-n_native_persons,,ntv,NSHRAMI,SF1,P0080003,SF1,P004007,B03002_005E,"persons of Native American race, not Hispanic origin",Race & Age,is this nonhispanic?
-n_hawaiian_persons,,haw,NSHRHIP,SF1,P0090017,SF1,P004009,B02001 _006E,"persons of Hawaiian race, not Hispanic origin",Race & Age,is this nonhispanic?
-n_asian_indian_persons,,india,,SF3,P0090009,SF1,PCT007002,,persons of Asian Indian race,Race & Age,
-n_chinese_persons,,china,,SF3,P0090006,SF1,PCT007005+PCT007015,,persons of Chinese race,Race & Age,
-n_filipino_persons,,filip,,SF3,P0090007,SF1,PCT007006,,persons of Filipino race,Race & Age,
-n_japanese_persons,,japan,,SF3,P0090008,SF1,PCT007009,,persons of Japanese race,Race & Age,
-n_korean_persons,,korea,,SF3,P0090010,SF1,PCT007010,,persons of Korean race,Race & Age,
-n_asian_persons,,asian,,SF3,P0080004,SF1,P004008,,persons of Asian race,Race & Age,for 1990 this is Asian and PI
-n_vietnamese_persons,,viet,,SF3,P0090011,SF1,PCT007017,,persons of Vietnamese race,Race & Age,
-n_white_age_distribution,,agewht,,,P014A001:P014A031+P014001:P014B031,SF1,PCT012I001,,white population with known age distribution,Race & Age,
-n_white_under_15,,a15wht,,,P014A001:P014A009+P014001:P014009,SF1,PCT012I003:018+PCT012I108:122,,0-15 years old of white race,Race & Age,
-n_white_over_60,,a60wht,,,,SF1,PCT012I063:105 + PCT012I167:209,,60 years and older of white race,Race & Age,is this nonhispanic?
-n_white_over_65,,a65wht,,,,SF1,PCT012I068:105 + PCT012I172:209,,65 years and older of non-Hispanic whites,Race & Age,
-n_black_age_distribution,,ageblk,,,,SF1,PCT012J001,,black population with known age distribution,Race & Age,
-n_black_under_15,,a15blk,,,,SF1,PCT012J003:018+PCT012J108:122,,0-15 years old of black race,Race & Age,
-n_black_over_60,,a60blk,,,,SF1,PCT012J063:105 + PCT012J167:209,,60 years and older of black race,Race & Age,
-n_black_over_65,,a65blk,,,,SF1,PCT012J068:105 + PCT012J172:209,,65 years and older of black race,Race & Age,
-n_hispanic_age_distribution,,agehsp,,,,SF1,PCT012H001,,Hispanic population with known age distribution,Race & Age,
-n_hispanic_under_15,,a15hsp,,,,SF1,PCT012H003:018+PCT012H108:122,,"0-15 years old, persons of Hispanic origins",Race & Age,
-n_hispanic_over_60,,a60hsp,,,,SF1,PCT012H063:105 + PCT012H167:209,,"60 years and older, persons of Hispanic origins",Race & Age,
-n_hispanic_over_65,,a65hsp,,,,SF1,PCT012H068:105 + PCT012H172:209,,"65 years and older, persons of Hispanic origins",Race & Age,
-n_native_age_distribution,,agentv,,,,SF1,PCT012K001,,Native American population with known age distribution,Race & Age,
-n_native_under_15,,a15ntv,,,,SF1,PCT012K003:018+PCT012K108:122,,0-15 years old of Native American race,Race & Age,
-n_native_over_60,,a60ntv,,,,SF1,PCT012K063:105 + PCT012K167:209,,60 years and older of Native American race,Race & Age,
-n_native_over_65,,a65ntv,,,,SF1,PCT012K068:105 + PCT012K172:209,,65 years and older of Native American race,Race & Age,
-n_asian_age_distribution,,ageasn,,,,SF1,PCT012L001+PCT012M001,,Asian and Pacific Islander population with known age distribution,Race & Age,
-n_asian_under_15,,a15asn,,,,SF1,PCT012M003:018+PCT012M108:122+PCT012L003:018+PCT012L108:122,,0-15 years old of Asians and Pacific Islanders,Race & Age,
+n_native_persons,,ntv,NSHRAMI,SF1,P0070003,SF1,P004007,B03002_005E,"persons of Native American race, not Hispanic origin",Race & Age,is this nonhispanic?
+n_hawaiian_persons,,haw,NSHRHIP,SF1,P0070017,SF1,P004009,B02001 _006E,"persons of Hawaiian race, not Hispanic origin",Race & Age,is this nonhispanic?
+n_asian_indian_persons,,india,,SF3,P0070009,SF1,PCT007002,,persons of Asian Indian race,Race & Age,
+n_chinese_persons,,china,,SF3,P0070006,SF1,PCT007005+PCT007015,,persons of Chinese race,Race & Age,
+n_filipino_persons,,filip,,SF3,P0070007,SF1,PCT007006,,persons of Filipino race,Race & Age,
+n_japanese_persons,,japan,,SF3,P0070008,SF1,PCT007009,,persons of Japanese race,Race & Age,
+n_korean_persons,,korea,,SF3,P0070010,SF1,PCT007010,,persons of Korean race,Race & Age,
+n_asian_persons,,asian,,SF3,P0060004,SF1,P004008,,persons of Asian race,Race & Age,for 1990 this is Asian and PI
+n_vietnamese_persons,,viet,,SF3,P0070011,SF1,PCT007017,,persons of Vietnamese race,Race & Age,
+n_white_age_distribution,,agewht,,SF1,P0120001:62,SF1,PCT012I001,,white population with known age distribution,Race & Age,
+n_white_under_15,,a15wht,,SF1,P0120001:09 + P0120032:40,SF1,PCT012I003:018+PCT012I108:122,,0-15 years old of white race,Race & Age,
+n_white_over_60,,a60wht,,SF1,P0120025:31 + P0120056:62,SF1,PCT012I063:105 + PCT012I167:209,,60 years and older of white race,Race & Age,is this nonhispanic?
+n_white_over_65,,a65wht,,SF1,P0120027:31 + P0120058:62,SF1,PCT012I068:105 + PCT012I172:209,,65 years and older of non-Hispanic whites,Race & Age,
+n_black_age_distribution,,ageblk,,SF1,P0120063:0124,SF1,PCT012J001,,black population with known age distribution,Race & Age,
+n_black_under_15,,a15blk,,SF1,P0120063:71 + P0120094:102,SF1,PCT012J003:018+PCT012J108:122,,0-15 years old of black race,Race & Age,
+n_black_over_60,,a60blk,,SF1,P0120087:93 + P0120118:124,SF1,PCT012J063:105 + PCT012J167:209,,60 years and older of black race,Race & Age,
+n_black_over_65,,a65blk,,SF1,P0120089:93 + P0120120:124,SF1,PCT012J068:105 + PCT012J172:209,,65 years and older of black race,Race & Age,
+n_hispanic_age_distribution,,agehsp,,SF1,P0130001:62,SF1,PCT012H001,,Hispanic population with known age distribution,Race & Age,
+n_hispanic_under_15,,a15hsp,,SF1,P0130001:09 + P0130032:40,SF1,PCT012H003:018+PCT012H108:122,,"0-15 years old, persons of Hispanic origins",Race & Age,
+n_hispanic_over_60,,a60hsp,,SF1,P0130025:31 + P0130056:62,SF1,PCT012H063:105 + PCT012H167:209,,"60 years and older, persons of Hispanic origins",Race & Age,
+n_hispanic_over_65,,a65hsp,,SF1,P0130027:31 + P0130058:62,SF1,PCT012H068:105 + PCT012H172:209,,"65 years and older, persons of Hispanic origins",Race & Age,
+n_native_age_distribution,,agentv,,SF1,P0120125:86,SF1,PCT012K001,,Native American population with known age distribution,Race & Age,
+n_native_under_15,,a15ntv,,SF1,P0120125:33 +P0120156:64,SF1,PCT012K003:018+PCT012K108:122,,0-15 years old of Native American race,Race & Age,
+n_native_over_60,,a60ntv,,SF1,P0120149:55 + P0120180:86,SF1,PCT012K063:105 + PCT012K167:209,,60 years and older of Native American race,Race & Age,
+n_native_over_65,,a65ntv,,SF1,P0120151:55 + P0120182:86,SF1,PCT012K068:105 + PCT012K172:209,,65 years and older of Native American race,Race & Age,
+n_asian_age_distribution,,ageasn,,SF1,P0120187:248,SF1,PCT012L001+PCT012M001,,Asian and Pacific Islander population with known age distribution,Race & Age,
+n_asian_under_15,,a15asn,,SF1,P0120187:195 + P0120218:226,SF1,PCT012M003:018+PCT012M108:122+PCT012L003:018+PCT012L108:122,,0-15 years old of Asians and Pacific Islanders,Race & Age,
 n_asian_over_60,,a60asn,,,,SF1,PCT012M063:105 + PCT012M167:209,,60 years and older of Asians and Pacific Islanders,Race & Age,
 n_asian_over_65,,a65asn,,,,SF1,PCT012M068:105 + PCT012M172:209 + PCT012L068:105 + PCT012L172:209,,65 years and older of Asians and Pacific Islanders,Race & Age,
 p_white_persons,,pwhite,,,,,,,percentage of persons of white race,Race & Age,
@@ -134,45 +134,45 @@ p_native_over_65,p_native_over_65=n_native_over_65 / n_total_pop*100,p65ntv,,,,,
 p_asian_under_15,p_asian_under_15=n_asian_under_15 / n_total_pop*100,p15asn,,,,,,,percentage of 0-15 years old of Asians and Pacific Islanders,Race & Age,
 p_asian_over_60,p_asian_over_60=n_asian_over_60 / n_total_pop*100,p60asn,,,,,,,percentage of 60 years and older of Asians and Pacific Islanders,Race & Age,
 p_asian_over_65,p_asian_over_65=n_asian_over_65 / n_total_pop*100,p65asn,,,,,,,percentage of 65 years and older of Asians and Pacific Islanders,Race & Age,
-n_female_over_16,,dflabf,DCFEPR,,,SF3,P043012,,"females 16 years and over, except in armed forces",Socioeconomic Status,
-n_female_labor_force,,flabf,FEPR,,,SF3,P043010,,females in labor force,Socioeconomic Status,
-n_labor_force,,clf,,,,SF3,P043005 + P043012,,civilian labor force,Socioeconomic Status,
-n_unemployed_persons,,unemp,,,,SF3,P043007 + P043014,DP03_0005E,unemployed persons,Socioeconomic Status,
-n_employed_over_16,,empclf,EMPMT,,,SF3,P049001,DP03_0004E,employed persons 16 years and over,Socioeconomic Status,
-n_employed_professional,,prof,DLFRAT,,,SF3,P049017+P049044,,professional employees (by occupations),Socioeconomic Status,
-n_employed_manufacturing,,manuf,PRFEMP,,,SF3,P049007+P049034,,manufacturing employees (by industries),Socioeconomic Status,
-n_employed_self_employed,,semp,,,,SF3,P051012+P051023+P051033+P051044+P051055+P051065,,self-employed,Socioeconomic Status,
-n_civilians_over_16,,ag16cv,,,,SF3,P043005 + P043012,,civilian population 16 years and over,Socioeconomic Status,
+n_female_over_16,,dflabf,DCFEPR,SF3,P0700006 + P0700007 + P0700008,SF3,P043012,,"females 16 years and over, except in armed forces",Socioeconomic Status,
+n_female_labor_force,,flabf,FEPR,SF3,P0700006 + P0700007,SF3,P043010,,females in labor force,Socioeconomic Status,
+n_labor_force,,clf,,SF3,P0700002 + P0700003 + P0700006 + P0700007,SF3,P043005 + P043012,,civilian labor force,Socioeconomic Status,
+n_unemployed_persons,,unemp,,SF3,P0700003 + P0700007,SF3,P043007 + P043014,DP03_0005E,unemployed persons,Socioeconomic Status,
+n_employed_over_16,,empclf,EMPMT,SF3,P0700002 + P0700006,SF3,P049001,DP03_0004E,employed persons 16 years and over,Socioeconomic Status,
+n_employed_professional,,prof,DLFRAT,SF3,P0780001 + P0780002,SF3,P049017+P049044,,professional employees (by occupations),Socioeconomic Status,
+n_employed_manufacturing,,manuf,PRFEMP,SF3,P0770004 + P0770005,SF3,P049007+P049034,,manufacturing employees (by industries),Socioeconomic Status,
+n_employed_self_employed,,semp,,SF3,P0790006,SF3,P051012+P051023+P051033+P051044+P051055+P051065,,self-employed,Socioeconomic Status,
+n_civilians_over_16,,ag16cv,,SF3,P0640002 + P0640003 + P0640005 + P0640006 + P0640008 + P0640009 +P0640011 + P0640012,SF3,P043005 + P043012,,civilian population 16 years and over,Socioeconomic Status,
 n_civilians_over_18,,ag18cv,,,,SF3,P039005+P039010+P039016+P039021,,civilian population 18 years and over,Socioeconomic Status,
-n_veterans,,vet,,,,SF3,P039006+P039011+P039017+P039022,,veterans,Socioeconomic Status,
-n_civilians_16_64,,cni16u,,,,SF3,P042001,,civilian non-institutionalized persons 16-64 years old,Socioeconomic Status,
-n_disabled,,dis,,,,SF3,P042004+P042007+P042014+P042021+P042024+P042028+P042031+P042038+P042045+P042048,,disabled,Socioeconomic Status,
-median_household_income,,hinc,MDHHY,,P080A001,SF3,P053001,B19013_001E,Median household income,Socioeconomic Status,"in 2015 dollars, will need inflation adjustment for timeseries"
+n_veterans,,vet,,SF3,P0640002 + P0640005 + P0640008 + P0640011,SF3,P039006+P039011+P039017+P039022,B21001_002E,veterans,Socioeconomic Status,
+n_civilians_16_64,,cni16u,,SF3,P0640002 + P0640003 + P0640008 + P0640009,SF3,P042001,,civilian non-institutionalized persons 16-64 years old,Socioeconomic Status,
+n_disabled,,dis,,SF3,P0680001 + P0680002 + P0680005 + P0680006 + P0680009 + P0680010 + P0680013 + P0680014,SF3,P042004+P042007+P042014+P042021+P042024+P042028+P042031+P042038+P042045+P042048,,disabled,Socioeconomic Status,
+median_household_income,,hinc,MDHHY,SF3,P080A001,SF3,P053001,B19013_001E,Median household income,Socioeconomic Status,"in 2015 dollars, will need inflation adjustment for timeseries"
 n_total_households,,hh,NUMHHS,SF3,P0050001,SF3,P010001,B19001_001E,total households in sample-based data,Socioeconomic Status,
-median_income_whitehh,,hincw,,,,SF3,P152A001,,Median household income for whites,Socioeconomic Status,
+median_income_whitehh,,hincw,,,,SF3,P152A001,,Median household income for whites,Socioeconomic Status,"[ek] the 1990 table noted in the LTDB docs only has ranges, not median (e.g. P0820001)"
 n_white_households,,hhw,,SF3,P0080001,SF3,P146A001,B19001H_001E,total white households in sample-based data,Socioeconomic Status,
-median_income_blackhh,,hincb,,,,SF3,P152B001,,Median household income for blacks,Socioeconomic Status,
+median_income_blackhh,,hincb,,,,SF3,P152B001,,Median household income for blacks,Socioeconomic Status,"[ek] the 1990 table noted in the LTDB docs only has ranges, not median (e.g. P0820001)"
 n_black_households,,hhb,,SF3,P0080002,SF3,P146B001,B19001B_001E,total black households in sample-based data,Socioeconomic Status,
-median_income_hispanichh,,hinch,,,,SF3,P152H001,B19013I_001E,Median household income for Hispanics,Socioeconomic Status,
-n_hispanic_households,,hhh,,SF3,P0100001,SF3,P146H001,B19001I_001E,total Hispanic households in sample-based data,Socioeconomic Status,
-median_income_asianhh,,hinca,,,,SF3,P152D001,,Median household income for Asians and Pacific Islanders,Socioeconomic Status,"unclear how to calculate, since this is only provided as asian or as PI for 2000. Column recorded is asian only"
+median_income_hispanichh,,hinch,,,,SF3,P152H001,B19013I_001E,Median household income for Hispanics,Socioeconomic Status,"[ek] the 1990 table noted in the LTDB docs only has ranges, not median (e.g. P0820001)"
+n_hispanic_households,,hhh,,SF3,P0210001:07,SF3,P146H001,B19001I_001E,total Hispanic households in sample-based data,Socioeconomic Status,"[ek] the 1990 value is calculated differently than the LTDB codebook, because the their reference (P0830001) doesnt include hispanic origin"
+median_income_asianhh,,hinca,,,,SF3,P152D001,,Median household income for Asians and Pacific Islanders,Socioeconomic Status,"[ek] the 1990 and 2010 tables noted in the LTDB docs only have ranges, not median (e.g. P0820001 for 1990 and B19001F_012E for 2010)"
 n_asian_households,,hha,,SF3,P0080004,SF3,P152D001 + P152E001,B19001D_001E + B19001E_001E,total Asian/Pacific Islander households in sample-based data,Socioeconomic Status,"unclear how to calculate, since this is only provided as asian or as PI for 2000. Column recorded is asian + pacific islander"
 per_capita_income,,incpc,,SF3,P114A001,SF3,P082001,B19301_001E,Per capita income,Socioeconomic Status,
-n_poverty_determined_persons,,dpov,DPOVRAT,SF3,P1170001:P1170024,SF3,P087001,B17001_001E,persons for whom poverty status is determined,Socioeconomic Status,denominator for calculating poverty rate
-n_poverty_persons,,npov,NPOVRAT,SF3,P1170013:P1170024,SF3,P087002,B17001_002E,persons in poverty,Socioeconomic Status,numerator for calculating poverty rate
+n_poverty_determined_persons,,dpov,DPOVRAT,SF3,P1170001:24,SF3,P087001,B17001_001E,persons for whom poverty status is determined,Socioeconomic Status,denominator for calculating poverty rate
+n_poverty_persons,,npov,NPOVRAT,SF3,P1170013:24,SF3,P087002,B17001_002E,persons in poverty,Socioeconomic Status,numerator for calculating poverty rate
 n_poverty_over_65,,n65pov,NELDPOO,SF3,P1170023+P1170024,SF3,P087008 + P087009,,persons 65 years and older in poverty,Socioeconomic Status,
-n_poverty_determined_families,,dfmpov,,,P1230001:P1230024,SF3,P090001,,families for whom poverty status is determined,Socioeconomic Status,
+n_poverty_determined_families,,dfmpov,,SF3,P1230001:24,SF3,P090001,,families for whom poverty status is determined,Socioeconomic Status,
 n_poverty_families_children,,nfmpov,,,,SF3,P090002,,families with children in poverty,Socioeconomic Status,
-n_poverty_determined_white,,dwpov,DWHTPR,,,SF3,P159A001,B17001A_001E,white persons for whom poverty status is determined,Socioeconomic Status,is this nonhispanic? Recorded white (regardless). White (not hispanic) is P159I
-n_poverty_white,,nwpov,NWHTPR,,,SF3,P159A002,B17001A_002E,whites in poverty,Socioeconomic Status,
-n_poverty_determined_black,,dbpov,DBLKPR,,,SF3,P159B001,,black persons for whom poverty status is determined,Socioeconomic Status,
-n_poverty_black,,nbpov,NBLKPR,,,SF3,P159B002,,blacks in poverty,Socioeconomic Status,
-n_poverty_determined_hispanic,,dhpov,DHISPR,,,SF3,P159H001,,Hispanics for whom poverty status is determined,Socioeconomic Status,
+n_poverty_determined_white,,dwpov,DWHTPR,SF3,P1190001:07 + P1190036:42,SF3,P159A001,B17001A_001E,white persons for whom poverty status is determined,Socioeconomic Status,is this nonhispanic? Recorded white (regardless). White (not hispanic) is P159I
+n_poverty_white,,nwpov,NWHTPR,SF3,P1190036:42,SF3,P159A002,B17001A_002E,whites in poverty,Socioeconomic Status,
+n_poverty_determined_black,,dbpov,DBLKPR,SF3,P1190008:14 + P1190043:49,SF3,P159B001,B17001B_001E,black persons for whom poverty status is determined,Socioeconomic Status,
+n_poverty_black,,nbpov,NBLKPR,SF3,P1190043:49,SF3,P159B002,B17001B_002E,blacks in poverty,Socioeconomic Status,
+n_poverty_determined_hispanic,,dhpov,DHISPR,,,SF3,P159H001,,Hispanics for whom poverty status is determined,Socioeconomic Status,[ek] it's not clear to me how LTDB computed values from this variable https://api.census.gov/data/1990/sf3/variables/P1200001.json
 n_poverty_hispanic,,nhpov,NHISPR,,,SF3,P159H002,,Hispanics in poverty,Socioeconomic Status,
-n_poverty_determined_native,,dnapov,DINDPR,,,SF3,P159C001,,Native American for whom poverty status is determined,Socioeconomic Status,
-n_poverty_native,,nnapov,INDPR,,,SF3,P159C002,,Native Americans in poverty,Socioeconomic Status,
-n_poverty_determined_asian,,dapov,DASNPR,,,SF3,P159D001 + P159E001,,Asians and Pacific Islanders for whom poverty status is determined,Socioeconomic Status,"asian alone is D, hawaiian and pac islander is E"
-n_poverty_asian,,napov,NASNPR,,,SF3,P159D002 + P159E002,,Asians and Pacific Islanders in poverty,Socioeconomic Status,
+n_poverty_determined_native,,dnapov,DINDPR,SF3,P1190015:21 + P1190050:56,SF3,P159C001,,Native American for whom poverty status is determined,Socioeconomic Status,
+n_poverty_native,,nnapov,INDPR,SF3,P1190050:56,SF3,P159C002,,Native Americans in poverty,Socioeconomic Status,
+n_poverty_determined_asian,,dapov,DASNPR,SF3,P1190022:28 + P1190058:63,SF3,P159D001 + P159E001,,Asians and Pacific Islanders for whom poverty status is determined,Socioeconomic Status,"asian alone is D, hawaiian and pac islander is E"
+n_poverty_asian,,napov,NASNPR,SF3,P1190058:63,SF3,P159D002 + P159E002,,Asians and Pacific Islanders in poverty,Socioeconomic Status,
 n_edu_college_greater,,col,EDUC16,SF3,P0570006+P0570007,SF3,P037015:18 + P037032:35,,persons with at least a four-year college degree,Socioeconomic Status,
 n_edu_hs_less,,hs,EDUC12,SF3,P0570001+P0570002+P0570003,SF3,P037003:011 + P037020:028,,persons with high school degree or less,Socioeconomic Status,
 p_edu_hs_less,p_edu_hs_less=n_edu_hs_less / n_persons_over_25*100,phs,,,,,,DP02_0061E,percentage of persons with high school degree or less,Socioeconomic Status,
