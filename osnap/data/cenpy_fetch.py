@@ -2,7 +2,6 @@ import cenpy
 import pandas
 import os
 import numpy as np
-import sys
 
 filepath = os.path.dirname(__file__)
 variable_file = os.path.join(filepath, 'variables.csv')
@@ -33,13 +32,11 @@ def fetch(unit='tract', state=None, filter=None):
     varnames = variables.dropna(
         subset=['census_1990_table_column'])['variable']
     evals = [parts[0] + "=" + parts[1] for parts in zip(varnames, evalcols)]
-    _sf1 = cenpy.tools.national_to_tract(
-        c2000sf1, sf1cols, wait_by_state=2, wait_by_county=2)
+    _sf1 = cenpy.tools.national_to_tract(c2000sf1, sf1cols, wait_by_county=0.5)
     #_sf1 = c2000sf1.query(sf1cols, geo_unit=unit, geo_filter=filter)
     _sf1['geoid'] = _sf1.state + _sf1.county + _sf1.tract
 
-    _sf3 = cenpy.tools.national_to_tract(
-        c2000sf3, sf3cols, wait_by_state=2, wait_by_county=2)
+    _sf3 = cenpy.tools.national_to_tract(c2000sf3, sf3cols, wait_by_county=0.5)
     #_sf3 = c2000sf3.query(sf3cols, geo_unit=unit, geo_filter=filter)
     _sf3['geoid'] = _sf3.state + _sf3.county + _sf3.tract
 

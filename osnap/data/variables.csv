@@ -78,7 +78,7 @@ n_nonhisp_black_persons,,nhblk,NSHRNHB,SF1,P0100002,SF1,P004006,B03002_004E,"per
 n_hispanic_persons,,hisp,NSHRHSP,SF1,P0080001,SF1,P004002,B03002_012E,persons of Hispanic origin,Race & Age,
 n_native_persons,,ntv,NSHRAMI,SF1,P0070003,SF1,P004007,B03002_005E,"persons of Native American race, not Hispanic origin",Race & Age,is this nonhispanic?
 n_hawaiian_persons,,haw,NSHRHIP,SF1,P0070017,SF1,P004009,B02001 _006E,"persons of Hawaiian race, not Hispanic origin",Race & Age,is this nonhispanic?
-n_asian_indian_persons,,india,,SF3,P0070009,SF1,PCT007002,,persons of Asian Indian race,Race & Age,
+n_asian_indian_persons,,india,,SF1,P0070009,SF1,PCT007002,,persons of Asian Indian race,Race & Age,
 n_chinese_persons,,china,,SF1,P0070006,SF1,PCT007005+PCT007015,,persons of Chinese race,Race & Age,
 n_filipino_persons,,filip,,SF1,P0070007,SF1,PCT007006,,persons of Filipino race,Race & Age,
 n_japanese_persons,,japan,,SF1,P0070008,SF1,PCT007009,,persons of Japanese race,Race & Age,

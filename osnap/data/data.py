@@ -4,10 +4,15 @@ Data reader for longitudinal databases LTDB, geolytics NCDB and NHGIS
 
 import os
 import zipfile
-
+import quilt
+try:
+    from quilt.data.knaaptime import census
+except ImportError:
+    quilt.install("knaaptime/census")
+    from quilt.data.knaaptime import census
 import matplotlib.pyplot as plt
 import pandas as pd
-from shapely.wkt import loads
+from shapely import wkt, wkb
 
 import geopandas as gpd
 
@@ -18,7 +23,7 @@ _variables = pd.read_csv(os.path.join(_package_directory, "variables.csv"))
 
 _states = pd.read_parquet(
     os.path.join(_package_directory, 'states.parquet.gzip'))
-_states['geometry'] = _states.wkt.apply(lambda x: loads(x))
+_states['geometry'] = _states.wkt.apply(lambda x: wkt.loads(x))
 _states = _states[['geoid', 'geometry']]
 _states = gpd.GeoDataFrame(_states)
 _states[~_states.geoid.isin(["60", "66", "69", "72", "78"])]
@@ -26,21 +31,21 @@ _states.crs = {"init": "epsg:4326"}
 
 _counties = pd.read_parquet(
     os.path.join(_package_directory, 'counties.parquet.gzip'))
-_counties['geometry'] = _counties.wkt.apply(lambda x: loads(x))
+_counties['geometry'] = _counties.wkt.apply(lambda x: wkt.loads(x))
 _counties = _counties[['geoid', 'geometry']]
 _counties = gpd.GeoDataFrame(_counties)
 _counties.crs = {"init": "epsg:4326"}
 
-_tracts = pd.read_parquet(
-    os.path.join(_package_directory, 'tracts.parquet.gzip'))
-_tracts['geometry'] = _tracts.wkt.apply(lambda x: loads(x))
-_tracts['point'] = _tracts.wkt_point.apply(lambda x: loads(x))
-_tracts = _tracts[['geoid', 'geometry', 'point']]
+_tracts = census.tracts_2010()
+_tracts['geometry'] = _tracts.wkb.apply(lambda x: wkb.loads(x, hex=True))
 _tracts = gpd.GeoDataFrame(_tracts)
 _tracts.crs = {"init": "epsg:4326"}
+_tracts['point'] = _tracts.centroid
+_tracts = _tracts.rename(columns={"GEOID": "geoid"})
+_tracts = _tracts[['geoid', 'geometry', 'point']]
 
 metros = pd.read_parquet(os.path.join(_package_directory, 'msas.parquet.gzip'))
-metros['geometry'] = metros.wkt.apply(lambda x: loads(x))
+metros['geometry'] = metros.wkt.apply(lambda x: wkt.loads(x))
 metros.drop(columns=['wkt'], inplace=True)
 metros = gpd.GeoDataFrame(metros)
 metros.crs = {"init": "epsg:4326"}
