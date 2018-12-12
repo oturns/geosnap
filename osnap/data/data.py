@@ -407,11 +407,21 @@ class Dataset(object):
             self.counties = _convert_gdf(self.counties)
             self.states = _convert_gdf(self.states)
         if source == "ltdb":
-            _df = pd.read_parquet(
-                os.path.join(_package_directory, "ltdb.parquet.gzip"))
+            try:
+                _df = pd.read_parquet(
+                    os.path.join(_package_directory, "ltdb.parquet.gzip"))
+            except OSError:
+                print(
+                    "Unable to locate LTDB data. Please import the database with the `read_ltdb` function"
+                )
         elif source == "ncdb":
-            _df = pd.read_parquet(
-                os.path.join(_package_directory, "ncdb.parquet.gzip"))
+            try:
+                _df = pd.read_parquet(
+                    os.path.join(_package_directory, "ncdb.parquet.gzip"))
+            except OSError:
+                print(
+                    "Unable to locate NCDB data. Please import the database with the `read_ncdb` function"
+                )
         elif source == "external":
             _df = data
         else:
