@@ -21,4 +21,5 @@ dependencies:
     - giddy
     - xlrd
     - cenpy
+    - quilt
     - git+git://github.com/pysal/region@master

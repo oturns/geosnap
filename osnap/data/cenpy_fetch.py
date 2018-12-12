@@ -1,19 +1,22 @@
 import cenpy
 import pandas
 import os
+import numpy as np
 
 filepath = os.path.dirname(__file__)
 variable_file = os.path.join(filepath, 'variables.csv')
 variables = pandas.read_csv(variable_file)
 
-c2000sf1 = cenpy.base.Connection('2000sf1')
-c2000sf3 = cenpy.base.Connection('2000sf3')
+c2000sf1 = cenpy.base.Connection(
+    'DecennialSF11990', apikey='d4d0ad648fffc219dc272b6af90e5b2106235a12')
+c2000sf3 = cenpy.base.Connection(
+    'DecennialSF31990', apikey='d4d0ad648fffc219dc272b6af90e5b2106235a12')
 
-by_form = variables.groupby('census_2000_form')
-column_relations = by_form.census_2000_table_column.agg(list)
+by_form = variables.groupby('census_1990_form')
+column_relations = by_form.census_1990_table_column.agg(list)
 
 
-def fetch(unit='tract', filter=None):
+def fetch(unit='tract', state=None, filter=None):
     """
     use Cenpy to collect the necessary variables from the Census API
     """
@@ -22,29 +25,39 @@ def fetch(unit='tract', filter=None):
     sf3cols = process_columns(column_relations.loc['SF3'])
 
     evalcols = [
-        normalize_relation(rel) for rel in column_relations.loc['SF1']
-    ] + [normalize_relation(rel) for rel in column_relations.loc['SF3']]
+        normalize_relation(rel)
+        for rel in variables['census_1990_table_column'].dropna().tolist()
+    ]
 
     varnames = variables.dropna(
-        subset=['census_2000_table_column'])['variable']
+        subset=['census_1990_table_column'])['variable']
     evals = [parts[0] + "=" + parts[1] for parts in zip(varnames, evalcols)]
+    _sf1 = cenpy.tools.national_to_tract(c2000sf1, sf1cols, wait_by_county=0.5)
+    #_sf1 = c2000sf1.query(sf1cols, geo_unit=unit, geo_filter=filter)
+    _sf1['geoid'] = _sf1.state + _sf1.county + _sf1.tract
 
-    _sf1 = c2000sf1.query(['NAME'] + sf1cols, geo_unit=unit, geo_filter=filter)
-    _sf3 = c2000sf3.query(['NAME'] + sf3cols, geo_unit=unit, geo_filter=filter)
+    _sf3 = cenpy.tools.national_to_tract(c2000sf3, sf3cols, wait_by_county=0.5)
+    #_sf3 = c2000sf3.query(sf3cols, geo_unit=unit, geo_filter=filter)
+    _sf3['geoid'] = _sf3.state + _sf3.county + _sf3.tract
 
-    df = pandas.concat([_sf1, _sf3], axis=1)
+    df = _sf1.merge(_sf3, on='geoid')
+    df.set_index('geoid', inplace=True)
+    df = df.apply(lambda x: pandas.to_numeric(x, errors='coerce'), axis=1)
     # compute additional variables from lookup table
     for row in evals:
-        df.eval(row, inplace=True)
-
-    # _sf1_processed = [
-    #     _sf1[sf1cols].astype(float).eval(normalize_relation(rel))
-    #     for rel in column_relations.loc['SF1']
-    # ]
-    # _sf3_processed = [
-    #     _sf3[sf3cols].astype(float).eval(normalize_relation(rel))
-    #     for rel in column_relations.loc['SF3']
-    # ]
+        try:
+            df.eval(row, inplace=True, engine='python')
+        except Exception as e:
+            print(row + ' ' + str(e))
+    df = df.replace('nan', np.nan)
+    for row in variables['formula'].dropna().tolist():
+        try:
+            df.eval(row, inplace=True, engine='python')
+        except Exception as e:
+            print(str(row) + ' ' + str(e))
+    keeps = [col for col in df.columns if col in variables.variable.tolist()]
+    df = df[keeps].round(2)
+    return df
 
 
 def process_columns(input_columns):
@@ -99,13 +112,6 @@ def normalize_relation(relation):
     return relation
 
 
-## sd example: dict(state='06', county='073')
+df = fetch()
 
-# What is left:
-# 0. concatenate san_diego_sf1_processed/san_diego_sf3_processed along axis=1
-# 1. pull the applicable ltdb names from `variables`
-#    and make them the column names of the right
-#    elements of `san_diego_sf*`
-# 2. Concatenate the `*_processed` dataframes alongside the metadata columns
-#    [col for col in san_diego_sf1.columns if col not in sf1cols]
-# 3. merge this new concatenated data together between sf1 and sf3.
+df.to_csv('census_1990.csv')
