@@ -10,8 +10,8 @@ try:
     from quilt.data.knaaptime import census
 except ImportError:
     warn("Fetching data. This should only happen once")
-    quilt.install("knaaptime/census")
-    quilt.install("knaaptime/census_cartographic")
+    quilt.install("spatialucr/census")
+    quilt.install("spatialucr/census_cartographic")
     from quilt.data.knaaptime import census
 import matplotlib.pyplot as plt
 import pandas as pd
