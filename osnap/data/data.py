@@ -10,8 +10,8 @@ try:
     from quilt.data.knaaptime import census
 except ImportError:
     warn("Fetching data. This should only happen once")
-    quilt.install("knaaptime/census")
-    quilt.install("knaaptime/census_cartographic")
+    quilt.install("spatialucr/census")
+    quilt.install("spatialucr/census_cartographic")
     from quilt.data.knaaptime import census
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -45,9 +45,7 @@ counties = pd.read_parquet(
 #_counties = _counties[['geoid', 'geometry']]
 
 tracts = census.tracts_2010
-#_tracts = _convert_gdf(_tracts)
-#_tracts['point'] = _tracts.centroid
-#_tracts = _tracts.rename(columns={"GEOID": "geoid"})
+#tracts = tracts.rename(columns={"GEOID": "geoid"})
 #_tracts = _tracts[['geoid', 'geometry', 'point']]
 
 metros = pd.read_parquet(os.path.join(_package_directory, 'msas.parquet'))
@@ -354,10 +352,11 @@ class Dataset(object):
                  **kwargs):
 
         # If a boundary is passed, use it to clip out the appropriate tracts
+        tracts = census.tracts_2010().copy()
+        tracts.columns = tracts.columns.str.lower()
         self.name = name
         self.states = states.copy()
-        self.tracts = census.tracts_2010().copy()
-        self.tracts.columns = self.tracts.columns.str.lower()
+        self.tracts = tracts.copy()
         self.counties = counties.copy()
         if boundary is not None:
             self.tracts = _convert_gdf(self.tracts)
@@ -407,11 +406,21 @@ class Dataset(object):
             self.counties = _convert_gdf(self.counties)
             self.states = _convert_gdf(self.states)
         if source == "ltdb":
-            _df = pd.read_parquet(
-                os.path.join(_package_directory, "ltdb.parquet.gzip"))
+            try:
+                _df = pd.read_parquet(
+                    os.path.join(_package_directory, "ltdb.parquet.gzip"))
+            except OSError:
+                print(
+                    "Unable to locate LTDB data. Please import the database with the `read_ltdb` function"
+                )
         elif source == "ncdb":
-            _df = pd.read_parquet(
-                os.path.join(_package_directory, "ncdb.parquet.gzip"))
+            try:
+                _df = pd.read_parquet(
+                    os.path.join(_package_directory, "ncdb.parquet.gzip"))
+            except OSError:
+                print(
+                    "Unable to locate NCDB data. Please import the database with the `read_ncdb` function"
+                )
         elif source == "external":
             _df = data
         else:
@@ -424,7 +433,7 @@ class Dataset(object):
                 self.data = self.data.append(
                     _df[_df.index.str.startswith(index)])
                 self.tracts = self.tracts.append(
-                    tracts[tracts.geoid.str.startswith(index)])
+                    _convert_gdf(tracts[tracts.geoid.str.startswith(index)]))
 
     def plot(self,
              column=None,
