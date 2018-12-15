@@ -21,8 +21,8 @@ Visualize neighborhood dynamics
 The recommended method for installing OSNAP is with [anaconda](https://www.anaconda.com/download/). To get started with the development version, clone this repository or download it manually then `cd` into the directory and run the following commands:
 
 `conda env create -f environment.yml`  
-`python setup.py develop`  
 `source activate osnap`  
+`python setup.py develop`  
 
 This will download the appropriate dependencies and install OSNAP in its own conda environment. To get started analyzing the space-time dynamics of neighborhoods, check out the [example](https://github.com/spatialucr/osnap/tree/master/osnap/examples) directory, then start `ipython` or a Jupyter Notebook and hack away!
 
