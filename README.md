@@ -24,7 +24,11 @@ The recommended method for installing OSNAP is with [anaconda](https://www.anaco
 `source activate osnap`  
 `python setup.py develop`  
 
-This will download the appropriate dependencies and install OSNAP in its own conda environment. To get started analyzing the space-time dynamics of neighborhoods, check out the [example](https://github.com/spatialucr/osnap/tree/master/osnap/examples) directory, then start `ipython` or a Jupyter Notebook and hack away!
+This will download the appropriate dependencies and install OSNAP in its own conda environment.
+
+To get started analyzing the space-time dynamics of neighborhoods, you should install data from the Longitudinal Tract Database following these [instructions](https://github.com/spatialucr/osnap/tree/master/osnap/data/README.md).
+
+Once the LTDB data is installed, check out the [example](https://github.com/spatialucr/osnap/tree/master/osnap/examples) directory, then start `ipython` or a Jupyter Notebook and hack away!
 
 ## Development
 
