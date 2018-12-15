@@ -12,6 +12,7 @@ dependencies:
   - notebook
   - networkx
   - scikit-learn
+  - seaborn
   - pyarrow
   - pip
   - pip:
