@@ -12,7 +12,7 @@ except ImportError:
     warn("Fetching data. This should only happen once")
     quilt.install("spatialucr/census")
     quilt.install("spatialucr/census_cartographic")
-    from quilt.data.knaaptime import census
+    from quilt.data.spatialucr import census
 import matplotlib.pyplot as plt
 import pandas as pd
 from shapely import wkt, wkb
