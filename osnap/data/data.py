@@ -366,8 +366,8 @@ class Dataset(object):
                 self.counties = self.counties.to_crs(boundary.crs)
                 self.states = self.states.to_crs(boundary.crs)
 
-            self.tracts = self.tracts[self.tracts.centroid.within(
-                self.boundary.unary_union)]
+            self.tracts = self.tracts[self.tracts.representative_point()
+                                      .within(self.boundary.unary_union)]
             self.counties = self.counties[counties.geoid.isin(
                 self.tracts.geoid.str[0:5])]
             self.states = self.states[states.geoid.isin(
