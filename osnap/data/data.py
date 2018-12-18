@@ -379,14 +379,17 @@ class Dataset(object):
         # If county and state lists are passed, use them to filter based on geoid
         else:
             assert statefips or countyfips or cbsafips or add_indices
+
             statelist = []
             if isinstance(statefips, (list, )):
                 statelist.extend(statefips)
             else:
                 statelist.append(statefips)
+
             countylist = []
             if isinstance(countyfips, (list, )): countylist.extend(countyfips)
             else: countylist.append(countyfips)
+
             geo_filter = {'state': statelist, 'county': countylist}
             fips = []
             for state in geo_filter['state']:
@@ -395,6 +398,7 @@ class Dataset(object):
                         fips.append(state + county)
                 else:
                     fips.append(state)
+
             self.states = self.states[states.geoid.isin(statelist)]
             if countyfips is not None:
                 self.counties = self.counties[self.ounties.geoid.str[:5].isin(
@@ -403,7 +407,9 @@ class Dataset(object):
             else:
                 self.counties = self.counties[self.counties.geoid.str[:2].isin(
                     fips)]
+
             self.tracts = self.tracts[self.tracts.geoid.str[:2].isin(fips)]
+
             self.tracts = _convert_gdf(self.tracts)
             self.counties = _convert_gdf(self.counties)
             self.states = _convert_gdf(self.states)
@@ -433,13 +439,13 @@ class Dataset(object):
             if not add_indices: add_indices = []
             add_indices += _cbsa[_cbsa['CBSA Code'] == cbsafips][
                 'stcofips'].tolist()
-            for index in add_indices:
+        for index in add_indices:
 
-                self.tracts = self.tracts.append(
-                    _convert_gdf(tracts[tracts.geoid.str.startswith(index)]))
-                self.counties = self.counties.append(
-                    _convert_gdf(counties[counties.geoid.str.startswith(
-                        index[0:5])]))
+            self.tracts = self.tracts.append(
+                _convert_gdf(tracts[tracts.geoid.str.startswith(index)]))
+            self.counties = self.counties.append(
+                _convert_gdf(counties[counties.geoid.str.startswith(
+                    index[0:5])]))
         self.tracts = self.tracts[~self.tracts.geoid.duplicated(keep='first')]
         self.counties = self.counties[
             ~self.counties.geoid.duplicated(keep='first')]
