@@ -429,19 +429,21 @@ class Dataset(object):
             raise ValueError(
                 "source must be one of 'ltdb', 'ncdb', 'census', 'external'")
 
-        self.data = _df[_df.index.isin(self.tracts.geoid)]
         if cbsafips:
             if not add_indices: add_indices = []
             add_indices += _cbsa[_cbsa['CBSA Code'] == cbsafips][
                 'stcofips'].tolist()
             for index in add_indices:
-                self.data = self.data.append(
-                    _df[_df.index.str.startswith(index)])
+
                 self.tracts = self.tracts.append(
                     _convert_gdf(tracts[tracts.geoid.str.startswith(index)]))
                 self.counties = self.counties.append(
                     _convert_gdf(counties[counties.geoid.str.startswith(
                         index[0:5])]))
+        self.tracts = self.tracts[~self.tracts.geoid.duplicated(keep='first')]
+        self.counties = self.counties[
+            ~self.counties.geoid.duplicated(keep='first')]
+        self.data = _df[_df.index.isin(self.tracts.geoid)]
 
     def plot(self,
              column=None,
