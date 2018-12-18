@@ -36,7 +36,7 @@ def _convert_gdf(df):
 
 _package_directory = os.path.dirname(os.path.abspath(__file__))
 _variables = pd.read_csv(os.path.join(_package_directory, "variables.csv"))
-
+_cbsa = pd.read_parquet(os.path.join(_package_directory, 'cbsas.parquet'))
 states = pd.read_parquet(os.path.join(_package_directory, 'states.parquet'))
 
 counties = pd.read_parquet(
@@ -343,12 +343,13 @@ class Dataset(object):
     """
 
     def __init__(self,
-                 name,
                  source,
                  statefips=None,
                  countyfips=None,
+                 cbsafips=None,
                  add_indices=None,
                  boundary=None,
+                 name='',
                  **kwargs):
 
         # If a boundary is passed, use it to clip out the appropriate tracts
@@ -357,6 +358,7 @@ class Dataset(object):
         self.name = name
         self.states = states.copy()
         self.tracts = tracts.copy()
+        self.cbsa = metros.copy()[metros.copy().geoid == cbsafips]
         self.counties = counties.copy()
         if boundary is not None:
             self.tracts = _convert_gdf(self.tracts)
@@ -376,7 +378,7 @@ class Dataset(object):
             self.states = _convert_gdf(self.states)
         # If county and state lists are passed, use them to filter based on geoid
         else:
-            assert statefips
+            assert statefips or countyfips or cbsafips or add_indices
             statelist = []
             if isinstance(statefips, (list, )):
                 statelist.extend(statefips)
@@ -428,12 +430,18 @@ class Dataset(object):
                 "source must be one of 'ltdb', 'ncdb', 'census', 'external'")
 
         self.data = _df[_df.index.isin(self.tracts.geoid)]
-        if add_indices:
+        if cbsafips:
+            if not add_indices: add_indices = []
+            add_indices += _cbsa[_cbsa['CBSA Code'] == cbsafips][
+                'stcofips'].tolist()
             for index in add_indices:
                 self.data = self.data.append(
                     _df[_df.index.str.startswith(index)])
                 self.tracts = self.tracts.append(
                     _convert_gdf(tracts[tracts.geoid.str.startswith(index)]))
+                self.counties = self.counties.append(
+                    _convert_gdf(counties[counties.geoid.str.startswith(
+                        index[0:5])]))
 
     def plot(self,
              column=None,
