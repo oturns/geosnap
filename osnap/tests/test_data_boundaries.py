@@ -1,12 +1,19 @@
 from context import data
 
+from quilt.data.spatialucr import census
+from quilt.data.spatialucr import census_cartographic
+
+def test_metros():
+
+    mets = data.metros
+    assert mets.shape == (945, 4)
 
 
-def test_boundaries():
+def test_tracts():
 
-    geoids = [ '01001020100', '01001020300' ]
+    assert census.tracts_1990().shape == (61332, 3)
+    assert census.tracts_2000().shape == (65506, 2)
+    assert census.tracts_2010().shape == (73056, 2)
 
-    df = data.boundaries.us.get_geometries(geoids)
-
-    assert df.shape == (2, 195 )
-
+    assert census_cartographic.tracts_1990() == (61693, 2)
+    assert census_cartographic.tracts_2000() == (66688, 2)
