@@ -1,3 +1,7 @@
+[![Build Status](https://travis-ci.com/spatialucr/osnap.svg?branch=master)](https://travis-ci.com/spatialucr/osnap)
+
+[![Coverage Status](https://coveralls.io/repos/github/spatialucr/osnap/badge.svg?branch=master)](https://coveralls.io/github/spatialucr/osnap?branch=master)
+
 # Open Source Neighborhood Analysis Package
 
 <img src="osnap/doc/osnap.png" alt="osnap" width="500"/>
