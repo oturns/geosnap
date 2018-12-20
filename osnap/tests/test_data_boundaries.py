@@ -15,5 +15,5 @@ def test_tracts():
     assert census.tracts_2000().shape == (65506, 2)
     assert census.tracts_2010().shape == (73056, 2)
 
-    assert census_cartographic.tracts_1990() == (61693, 2)
-    assert census_cartographic.tracts_2000() == (66688, 2)
+    assert census_cartographic.tracts_1990().shape == (61693, 2)
+    assert census_cartographic.tracts_2000().shape == (66688, 2)
