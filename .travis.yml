@@ -20,12 +20,14 @@ before_install:
 
 install:
   - conda install --yes pip
+  - pip install pytest-cov
   - conda env create -f environment.yml python=$TRAVIS_PYTHON_VERSION
   - source activate osnap
 
 script:
   - python setup.py sdist >/dev/null
-  - pytest --ignore=examples --ignore=osnap/visualization --with-coverage --cover-package=osnap
+  - pytest --ignore=examples --ignore=osnap/visualization 
+  - py.test --cov osnap
 
 notifications:
     email:
