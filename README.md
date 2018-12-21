@@ -50,4 +50,4 @@ software, terms & conditions for usage, and a DISCLAIMER OF ALL
 WARRANTIES.
 
 ## Funding
-<img src="osnap/doc/nsf_logo.jpg" width=100</img> This project is supported by NSF Award #1733705, [Neighborhoods in Space-Time Contexts](https://www.nsf.gov/awardsearch/showAward?AWD_ID=1733705&HistoricalAwards=false)
+<img src="osnap/doc/nsf_logo.jpg" width=100 /> This project is supported by NSF Award #1733705, [Neighborhoods in Space-Time Contexts](https://www.nsf.gov/awardsearch/showAward?AWD_ID=1733705&HistoricalAwards=false)
