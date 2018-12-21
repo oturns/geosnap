@@ -1,4 +1,5 @@
 # Open Source Neighborhood Analysis Package
+[![Build Status](https://travis-ci.com/spatialucr/osnap.svg?branch=master)](https://travis-ci.com/spatialucr/osnap)  [![Coverage Status](https://coveralls.io/repos/github/spatialucr/osnap/badge.svg?branch=master)](https://coveralls.io/github/spatialucr/osnap?branch=master)
 
 <img src="osnap/doc/osnap.png" alt="osnap" width="500"/>
 
@@ -20,9 +21,11 @@ Visualize neighborhood dynamics
 ## Installation
 The recommended method for installing OSNAP is with [anaconda](https://www.anaconda.com/download/). To get started with the development version, clone this repository or download it manually then `cd` into the directory and run the following commands:
 
-`conda env create -f environment.yml`  
-`source activate osnap`  
-`python setup.py develop`  
+```bash
+$ conda env create -f environment.yml
+$ source activate osnap 
+$ python setup.py develop
+```
 
 This will download the appropriate dependencies and install OSNAP in its own conda environment.
 
@@ -45,3 +48,6 @@ To search for or report bugs, please see osnap's [issues](http://github.com/spat
 See the file "LICENSE.txt" for information on the history of this
 software, terms & conditions for usage, and a DISCLAIMER OF ALL
 WARRANTIES.
+
+## Funding
+<img src="osnap/doc/nsf_logo.jpg" width=100 /> This project is supported by NSF Award #1733705, [Neighborhoods in Space-Time Contexts](https://www.nsf.gov/awardsearch/showAward?AWD_ID=1733705&HistoricalAwards=false)
