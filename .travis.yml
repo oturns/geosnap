@@ -25,7 +25,7 @@ install:
 
 script:
   - python setup.py sdist >/dev/null
-  - pytest --ignore=examples --ignore=osnap/visualization
+  - pytest --ignore=examples --ignore=osnap/visualization --with-coverage --cover-package=osnap
 
 notifications:
     email:
