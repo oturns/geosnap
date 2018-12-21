@@ -22,8 +22,9 @@ install:
   - conda install --yes pip
   - conda env create -f environment.yml python=$TRAVIS_PYTHON_VERSION
   - source activate osnap
-  - pip install pytest-cov
   - pip install python-coveralls
+  - pip install pytest-cov
+
 
 script:
   - python setup.py sdist >/dev/null
