@@ -5,7 +5,6 @@
 API reference
 =============
 
-
 .. _data_api:
 
 Data Module
@@ -15,29 +14,40 @@ Data Module
 
     osnap.data.read_ltdb
     osnap.data.read_ncdb
+    osnap.data.Community
+    osnap.data.Community.plot
+    osnap.data.Community.to_crs
 
-    osnap.data.Dataset
 
+.. _analyze_api:
 
-.. _analytics_api:
-
-Analytics Module
+Analyze Module
 ----------------
 
-Clustering Methods
-`````````````````````
+Neighborhood Clustering Methods
+``````````````````````````````````
+Model neighborhood differentiation using multivariate clustering algorithms
 
 .. autosummary::
    :toctree: generated/
    
-    osnap.analytics.cluster
-    osnap.analytics.cluster_spatial
+    osnap.analyze.cluster
+    osnap.analyze.cluster_spatial
+
     
-Dynamics Methods
-````````````````````
+Neighborhod Dynamics Methods
+````````````````````````````````
+Model neighborhood change using optimal-matching algorithms or spatial discrete markov chains
 
 .. autosummary::
    :toctree: generated/
    
-   osnap.analytics.Sequence
-   osnap.analytics.Transition
+   osnap.analyze.linc
+   osnap.analyze.Sequence
+   osnap.analyze.Transition
+
+Harmonize Module
+----------------
+
+Visualize Module
+----------------

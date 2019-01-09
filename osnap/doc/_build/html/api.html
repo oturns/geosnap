@@ -66,7 +66,9 @@
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#data-module">Data Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#analytics-module">Analytics Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#analyze-module">Analyze Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#harmonize-module">Harmonize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#visualize-module">Visualize Module</a></li>
 </ul>
 </li>
 </ul>
@@ -84,11 +86,13 @@
       aria-labelledby="dLabelLocalToc"><ul>
 <li><a class="reference internal" href="#">API reference</a><ul>
 <li><a class="reference internal" href="#data-module">Data Module</a></li>
-<li><a class="reference internal" href="#analytics-module">Analytics Module</a><ul>
-<li><a class="reference internal" href="#clustering-methods">Clustering Methods</a></li>
-<li><a class="reference internal" href="#dynamics-methods">Dynamics Methods</a></li>
+<li><a class="reference internal" href="#analyze-module">Analyze Module</a><ul>
+<li><a class="reference internal" href="#neighborhood-clustering-methods">Neighborhood Clustering Methods</a></li>
+<li><a class="reference internal" href="#neighborhod-dynamics-methods">Neighborhod Dynamics Methods</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#harmonize-module">Harmonize Module</a></li>
+<li><a class="reference internal" href="#visualize-module">Visualize Module</a></li>
 </ul>
 </li>
 </ul>
@@ -136,48 +140,65 @@
 <tr class="row-even"><td><a class="reference internal" href="generated/osnap.data.read_ncdb.html#osnap.data.read_ncdb" title="osnap.data.read_ncdb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">osnap.data.read_ncdb</span></code></a>(filepath)</td>
 <td>Read data from Geolytics’s Neighborhood Change Database (NCDB) and store it for later use.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="generated/osnap.data.Dataset.html#osnap.data.Dataset" title="osnap.data.Dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">osnap.data.Dataset</span></code></a>(source[,&nbsp;statefips,&nbsp;…])</td>
-<td>Container for storing neighborhood data for a study region</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/osnap.data.Community.html#osnap.data.Community" title="osnap.data.Community"><code class="xref py py-obj docutils literal notranslate"><span class="pre">osnap.data.Community</span></code></a>(source[,&nbsp;statefips,&nbsp;…])</td>
+<td>A class for storing spatial and tabular data for a collection of “neighborhoods”.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/osnap.data.Community.plot.html#osnap.data.Community.plot" title="osnap.data.Community.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">osnap.data.Community.plot</span></code></a>([column,&nbsp;year,&nbsp;…])</td>
+<td>Convenience function for plotting tracts in the metro area.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/osnap.data.Community.to_crs.html#osnap.data.Community.to_crs" title="osnap.data.Community.to_crs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">osnap.data.Community.to_crs</span></code></a>([crs,&nbsp;epsg,&nbsp;inplace])</td>
+<td>Transform all geometries in the study area to a new coordinate reference system.</td>
 </tr>
 </tbody>
 </table>
 </div>
-<div class="section" id="analytics-module">
-<span id="analytics-api"></span><h2>Analytics Module<a class="headerlink" href="#analytics-module" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="clustering-methods">
-<h3>Clustering Methods<a class="headerlink" href="#clustering-methods" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="analyze-module">
+<span id="analyze-api"></span><h2>Analyze Module<a class="headerlink" href="#analyze-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="neighborhood-clustering-methods">
+<h3>Neighborhood Clustering Methods<a class="headerlink" href="#neighborhood-clustering-methods" title="Permalink to this headline">¶</a></h3>
+<p>Model neighborhood differentiation using multivariate clustering algorithms</p>
 <table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="generated/osnap.analytics.cluster.html#osnap.analytics.cluster" title="osnap.analytics.cluster"><code class="xref py py-obj docutils literal notranslate"><span class="pre">osnap.analytics.cluster</span></code></a>(dataset[,&nbsp;…])</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/osnap.analyze.cluster.html#osnap.analyze.cluster" title="osnap.analyze.cluster"><code class="xref py py-obj docutils literal notranslate"><span class="pre">osnap.analyze.cluster</span></code></a>(dataset[,&nbsp;n_clusters,&nbsp;…])</td>
 <td>Create a geodemographic typology by running a cluster analysis on the metro area’s neighborhood attributes</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/osnap.analytics.cluster_spatial.html#osnap.analytics.cluster_spatial" title="osnap.analytics.cluster_spatial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">osnap.analytics.cluster_spatial</span></code></a>(dataset[,&nbsp;…])</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/osnap.analyze.cluster_spatial.html#osnap.analyze.cluster_spatial" title="osnap.analyze.cluster_spatial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">osnap.analyze.cluster_spatial</span></code></a>(dataset[,&nbsp;…])</td>
 <td>Create a <em>spatial</em> geodemographic typology by running a cluster analysis on the metro area’s neighborhood attributes and including a contiguity constraint.</td>
 </tr>
 </tbody>
 </table>
 </div>
-<div class="section" id="dynamics-methods">
-<h3>Dynamics Methods<a class="headerlink" href="#dynamics-methods" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="neighborhod-dynamics-methods">
+<h3>Neighborhod Dynamics Methods<a class="headerlink" href="#neighborhod-dynamics-methods" title="Permalink to this headline">¶</a></h3>
+<p>Model neighborhood change using optimal-matching algorithms or spatial discrete markov chains</p>
 <table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="generated/osnap.analytics.Sequence.html#osnap.analytics.Sequence" title="osnap.analytics.Sequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">osnap.analytics.Sequence</span></code></a>(y[,&nbsp;subs_mat,&nbsp;…])</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/osnap.analyze.linc.html#osnap.analyze.linc" title="osnap.analyze.linc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">osnap.analyze.linc</span></code></a>(labels_sequence)</td>
+<td>Local Indicator of Neighborhood Change</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/osnap.analyze.Sequence.html#osnap.analyze.Sequence" title="osnap.analyze.Sequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">osnap.analyze.Sequence</span></code></a>(y[,&nbsp;subs_mat,&nbsp;…])</td>
 <td>Pairwise sequence analysis.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/osnap.analytics.Transition.html#osnap.analytics.Transition" title="osnap.analytics.Transition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">osnap.analytics.Transition</span></code></a>(dataset,&nbsp;w_type)</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/osnap.analyze.Transition.html#osnap.analyze.Transition" title="osnap.analyze.Transition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">osnap.analyze.Transition</span></code></a>(dataset,&nbsp;w_type[,&nbsp;…])</td>
 <td>(Spatial) Markov approaches to transitional dynamics of neighborhood types.</td>
 </tr>
 </tbody>
 </table>
 </div>
+</div>
+<div class="section" id="harmonize-module">
+<h2>Harmonize Module<a class="headerlink" href="#harmonize-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="visualize-module">
+<h2>Visualize Module<a class="headerlink" href="#visualize-module" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 

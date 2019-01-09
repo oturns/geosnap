@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>osnap.analyze.incs &#8212; osnap v0.0.0 Manual</title>
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pysal-styles.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="shortcut icon" href="../../../_static/pysal_favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+          osnap</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../installation.html">Installation</a></li>
+                <li><a href="../../../api.html">API</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#installing-released-version">Installing released version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#installing-development-version">Installing development version</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#data-module">Data Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#analyze-module">Analyze Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#harmonize-module">Harmonize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#visualize-module">Visualize Module</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for osnap.analyze.incs</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Indicators of Neighborhood Change</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">_labels_to_neighborhoods</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert a list of labels to neighborhoods dictionary</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    -----------</span>
+<span class="sd">    labels: list of neighborhood labels</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    neighborhoods: dictionary</span>
+<span class="sd">                   key is the label for each neighborhood, value is the list of</span>
+<span class="sd">                   area indexes defining that neighborhood</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; labels = [1,1,1,2,2,3]</span>
+<span class="sd">    &gt;&gt;&gt; neighborhoods = _labels_to_neighborhoods(labels)</span>
+<span class="sd">    &gt;&gt;&gt; neighborhoods[1]</span>
+<span class="sd">    [0, 1, 2]</span>
+<span class="sd">    &gt;&gt;&gt; neighborhoods[2]</span>
+<span class="sd">    [3, 4]</span>
+<span class="sd">    &gt;&gt;&gt; neighborhoods[3]</span>
+<span class="sd">    [5]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">neighborhoods</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
+        <span class="n">neighborhoods</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">neighborhoods</span>
+
+
+<div class="viewcode-block" id="linc"><a class="viewcode-back" href="../../../generated/osnap.analyze.linc.html#osnap.analyze.linc">[docs]</a><span class="k">def</span> <span class="nf">linc</span><span class="p">(</span><span class="n">labels_sequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Local Indicator of Neighborhood Change</span>
+
+
+<span class="sd">    Arguments</span>
+<span class="sd">    ---------</span>
+<span class="sd">    labels_sequence: sequence of neighborhood labels (n,t)</span>
+<span class="sd">                   n areas in t periods</span>
+<span class="sd">                   first element is a list of neighborhood labels per area in</span>
+<span class="sd">                   period 0, second element is a list of neighborhood labels</span>
+<span class="sd">                   per area in period 1, and so on for all T periods.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    lincs: array</span>
+<span class="sd">           local indicator of neighborhood change over all periods</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+
+<span class="sd">    The local indicator of neighborhood change defined here allows for</span>
+<span class="sd">    singleton neighborhoods (i.e., neighborhoods composed of a single primitive</span>
+<span class="sd">    area such as a tract or block.). This is in contrast to the initial</span>
+<span class="sd">    implementation in :cite:`rey2011` which prohibited singletons.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Time period 0 has the city defined as four neighborhoods on 10 tracts:</span>
+
+<span class="sd">    &gt;&gt;&gt; labels_0 = [1, 1, 1, 1, 2, 2, 3, 3, 3, 4]</span>
+
+<span class="sd">    Time period 1 in the same city, with slight change in composition of the four neighborhoods</span>
+
+<span class="sd">    &gt;&gt;&gt; labels_1 = [1, 1, 1, 1, 1, 2, 3, 3, 3, 4]</span>
+<span class="sd">    &gt;&gt;&gt; res = linc([labels_0, labels_1])</span>
+<span class="sd">    &gt;&gt;&gt; res[4]</span>
+<span class="sd">    1.0</span>
+<span class="sd">    &gt;&gt;&gt; res[1]</span>
+<span class="sd">    0.25</span>
+<span class="sd">    &gt;&gt;&gt; res[7]</span>
+<span class="sd">    0.0</span>
+<span class="sd">    &gt;&gt;&gt; res[-1]</span>
+<span class="sd">    0.0</span>
+
+<span class="sd">    And, in period 2, no change</span>
+
+<span class="sd">    &gt;&gt;&gt; labels_2 = [1, 1, 1, 1, 1, 2, 3, 3, 3, 4]</span>
+<span class="sd">    &gt;&gt;&gt; res = linc([labels_1, labels_2])</span>
+<span class="sd">    &gt;&gt;&gt; res[0]</span>
+<span class="sd">    0.0</span>
+
+<span class="sd">    We can pass more than two time periods, and get a &quot;time-wise global linc&quot;</span>
+<span class="sd">    for each unit</span>
+
+<span class="sd">    &gt;&gt;&gt; res = linc([labels_0, labels_1, labels_2])</span>
+<span class="sd">    &gt;&gt;&gt; res[0]</span>
+<span class="sd">    0.25</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ltn</span> <span class="o">=</span> <span class="n">_labels_to_neighborhoods</span>
+    <span class="n">neighborhood_sequences</span> <span class="o">=</span> <span class="p">[</span><span class="n">ltn</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="k">for</span> <span class="n">labels</span> <span class="ow">in</span> <span class="n">labels_sequence</span><span class="p">]</span>
+    <span class="n">ns</span> <span class="o">=</span> <span class="n">neighborhood_sequences</span>
+    <span class="n">n_areas</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels_sequence</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">lincs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_areas</span><span class="p">,))</span>
+
+    <span class="n">T</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels_sequence</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_areas</span><span class="p">):</span>
+        <span class="n">neighbors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">):</span>
+            <span class="n">neighbors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">ns</span><span class="p">[</span><span class="n">t</span><span class="p">][</span><span class="n">labels_sequence</span><span class="p">[</span><span class="n">t</span><span class="p">][</span><span class="n">i</span><span class="p">]]))</span>
+        <span class="n">intersection</span> <span class="o">=</span> <span class="nb">set</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="o">*</span><span class="n">neighbors</span><span class="p">)</span>
+        <span class="n">union</span> <span class="o">=</span> <span class="nb">set</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="o">*</span><span class="n">neighbors</span><span class="p">)</span>
+        <span class="n">n_union</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">union</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n_union</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="c1"># singleton at all points in time</span>
+            <span class="n">lincs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lincs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">intersection</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">n_union</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">lincs</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2018, osnap developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

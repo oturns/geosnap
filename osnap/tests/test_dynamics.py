@@ -1,8 +1,8 @@
-from context import analytics
+from context import analyze
 import numpy as np
 import pytest
 
-Sequence = analytics.dynamics.Sequence
+Sequence = analyze.dynamics.Sequence
 
 def test_Sequence_unequal():
     '''
@@ -87,4 +87,3 @@ def test_Sequence_equal():
     seq_dis_mat = np.array([[0., 5., 5.],[5., 0., 1.],[5., 1., 0.]])
     assert all([a == b for a, b in zip(seqAna.seq_dis_mat.flatten(),
                                        seq_dis_mat.flatten())])
-

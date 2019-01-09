@@ -1,6 +1,6 @@
-from context import analytics
+from context import analyze
 
-linc = analytics.incs.linc
+linc = analyze.incs.linc
 
 def test_linc():
     labels_0 = [1, 1, 1, 1, 2, 2, 3, 3, 3, 4]
@@ -15,4 +15,3 @@ def test_linc():
 
     res = linc([labels_0, labels_1, labels_2])
     assert res[0] == 0.25
-

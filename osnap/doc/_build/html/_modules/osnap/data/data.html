@@ -64,7 +64,9 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../api.html#data-module">Data Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../api.html#analytics-module">Analytics Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#analyze-module">Analyze Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#harmonize-module">Harmonize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#visualize-module">Visualize Module</a></li>
 </ul>
 </li>
 </ul>
@@ -108,9 +110,7 @@
     <div class="col-md-12 content">
       
   <h1>Source code for osnap.data.data</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Data reader for longitudinal databases LTDB, geolytics NCDB and NHGIS</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;Tools for creating and manipulating neighborhood datasets.&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">zipfile</span>
@@ -151,12 +151,8 @@
 
 <span class="n">counties</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span>
     <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_package_directory</span><span class="p">,</span> <span class="s1">&#39;counties.parquet.gzip&#39;</span><span class="p">))</span>
-<span class="c1">#_counties = _convert_gdf(_counties)</span>
-<span class="c1">#_counties = _counties[[&#39;geoid&#39;, &#39;geometry&#39;]]</span>
 
 <span class="n">tracts</span> <span class="o">=</span> <span class="n">census</span><span class="o">.</span><span class="n">tracts_2010</span>
-<span class="c1">#tracts = tracts.rename(columns={&quot;GEOID&quot;: &quot;geoid&quot;})</span>
-<span class="c1">#_tracts = _tracts[[&#39;geoid&#39;, &#39;geometry&#39;, &#39;point&#39;]]</span>
 
 <span class="n">metros</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_package_directory</span><span class="p">,</span> <span class="s1">&#39;msas.parquet&#39;</span><span class="p">))</span>
 <span class="n">metros</span> <span class="o">=</span> <span class="n">_convert_gdf</span><span class="p">(</span><span class="n">metros</span><span class="p">)</span>
@@ -180,7 +176,7 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    DataFrame</span>
+<span class="sd">    pandas.DataFrame</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">sample_zip</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
@@ -311,16 +307,17 @@
 
 <div class="viewcode-block" id="read_ncdb"><a class="viewcode-back" href="../../../generated/osnap.data.read_ncdb.html#osnap.data.read_ncdb">[docs]</a><span class="k">def</span> <span class="nf">read_ncdb</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Read data from Geolytics&#39;s Neighborhood Change Database (NCDB) and store it for later use.</span>
+<span class="sd">    Read data from Geolytics&#39;s Neighborhood Change Database (NCDB) and store</span>
+<span class="sd">    it for later use.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    input_dir : str</span>
+<span class="sd">    filepath : str</span>
 <span class="sd">        location of the input CSV file extracted from your Geolytics DVD</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    DataFrame</span>
+<span class="sd">    pandas.DataFrame</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -416,8 +413,15 @@
 <span class="c1"># TODO NHGIS reader</span>
 
 
-<div class="viewcode-block" id="Dataset"><a class="viewcode-back" href="../../../generated/osnap.data.Dataset.html#osnap.data.Dataset">[docs]</a><span class="k">class</span> <span class="nc">Dataset</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Container for storing neighborhood data for a study region</span>
+<div class="viewcode-block" id="Community"><a class="viewcode-back" href="../../../generated/osnap.data.Community.html#osnap.data.Community">[docs]</a><span class="k">class</span> <span class="nc">Community</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A class for storing spatial and tabular data for a collection of &quot;neighborhoods&quot;.</span>
+
+<span class="sd">       A community is a collection of &quot;neighborhoods&quot; represented by spatial</span>
+<span class="sd">       boundaries (e.g. census tracts, or blocks in the US), and tabular data</span>
+<span class="sd">       which describe the composition of each neighborhood (e.g. data from</span>
+<span class="sd">       surveys, sensors, or geocoded misc.). A Community can be large (e.g. a</span>
+<span class="sd">       metropolitan region), or small (e.g. a handfull of census tracts) and</span>
+<span class="sd">       may have data pertaining to multiple discrete points in time.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -425,10 +429,12 @@
 <span class="sd">        name or title of dataset.</span>
 <span class="sd">    source : str</span>
 <span class="sd">        database from which to query attribute data. must of one of [&#39;ltdb&#39;, &#39;ncdb&#39;, &#39;census&#39;, &#39;external&#39;].</span>
-<span class="sd">    states : list-like</span>
+<span class="sd">    statefips : list-like</span>
 <span class="sd">        list of two-digit State FIPS codes that define a study region. These will be used to select tracts or blocks that fall within the region.</span>
-<span class="sd">    counties : list-like</span>
+<span class="sd">    countyfips : list-like</span>
 <span class="sd">                list of three-digit County FIPS codes that define a study region. These will be used to select tracts or blocks that fall within the region.</span>
+<span class="sd">    cbsafips : str</span>
+<span class="sd">              CBSA fips code that defines a study region. This is used to select tracts or blocks that fall within the metropolitan region</span>
 <span class="sd">    add_indices : list-like</span>
 <span class="sd">        list of additional indices that should be included in the region. This is likely a list of additional tracts that are relevant to the study area but do not fall inside the passed boundary</span>
 <span class="sd">    boundary : GeoDataFrame</span>
@@ -450,9 +456,10 @@
 <span class="sd">        GeoDataFrame containing County boundaries</span>
 <span class="sd">    states</span>
 <span class="sd">        GeoDataFrame containing State boundaries</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Dataset.__init__"><a class="viewcode-back" href="../../../generated/osnap.data.Dataset.html#osnap.data.Dataset.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="Community.__init__"><a class="viewcode-back" href="../../../generated/osnap.data.Community.html#osnap.data.Community.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">source</span><span class="p">,</span>
                  <span class="n">statefips</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">countyfips</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -559,17 +566,36 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">tracts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tracts</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">tracts</span><span class="o">.</span><span class="n">geoid</span><span class="o">.</span><span class="n">duplicated</span><span class="p">(</span><span class="n">keep</span><span class="o">=</span><span class="s1">&#39;first&#39;</span><span class="p">)]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">counties</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">counties</span><span class="p">[</span>
             <span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">counties</span><span class="o">.</span><span class="n">geoid</span><span class="o">.</span><span class="n">duplicated</span><span class="p">(</span><span class="n">keep</span><span class="o">=</span><span class="s1">&#39;first&#39;</span><span class="p">)]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">_df</span><span class="p">[</span><span class="n">_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tracts</span><span class="o">.</span><span class="n">geoid</span><span class="p">)]</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">census</span> <span class="o">=</span> <span class="n">_df</span><span class="p">[</span><span class="n">_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tracts</span><span class="o">.</span><span class="n">geoid</span><span class="p">)]</span></div>
 
-<div class="viewcode-block" id="Dataset.plot"><a class="viewcode-back" href="../../../generated/osnap.data.Dataset.plot.html#osnap.data.Dataset.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="Community.plot"><a class="viewcode-back" href="../../../generated/osnap.data.Community.plot.html#osnap.data.Community.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
              <span class="n">column</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
              <span class="n">year</span><span class="o">=</span><span class="mi">2010</span><span class="p">,</span>
              <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
              <span class="n">plot_counties</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
              <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        convenience function for plotting tracts in the metro area</span>
+        <span class="sd">&quot;&quot;&quot;Convenience function for plotting tracts in the metro area.</span>
+
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        column : str</span>
+<span class="sd">            The column to be plotted (the default is None).</span>
+<span class="sd">        year : str</span>
+<span class="sd">            The decennial census year to be plotted (the default is 2010).</span>
+<span class="sd">        ax : type</span>
+<span class="sd">            matplotlib.axes on which to plot.</span>
+<span class="sd">        plot_counties : bool</span>
+<span class="sd">            Whether the plot should include county boundaries (the default is True).</span>
+<span class="sd">        **kwargs</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        type</span>
+<span class="sd">            Description of returned object.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">assert</span> <span class="n">column</span><span class="p">,</span> <span class="s2">&quot;You must choose a column to plot&quot;</span>
         <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">ax</span> <span class="o">=</span> <span class="n">ax</span>
@@ -583,7 +609,7 @@
 
         <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
         <span class="n">plotme</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tracts</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">year</span> <span class="o">==</span> <span class="n">year</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">census</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">census</span><span class="o">.</span><span class="n">year</span> <span class="o">==</span> <span class="n">year</span><span class="p">],</span>
             <span class="n">left_on</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span>
             <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">plotme</span> <span class="o">=</span> <span class="n">plotme</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="n">column</span><span class="p">])</span>
@@ -599,8 +625,8 @@
 
         <span class="k">return</span> <span class="n">ax</span></div>
 
-<div class="viewcode-block" id="Dataset.to_crs"><a class="viewcode-back" href="../../../generated/osnap.data.Dataset.to_crs.html#osnap.data.Dataset.to_crs">[docs]</a>    <span class="k">def</span> <span class="nf">to_crs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Transform all geometries in the study are to a new coordinate reference system.</span>
+<div class="viewcode-block" id="Community.to_crs"><a class="viewcode-back" href="../../../generated/osnap.data.Community.to_crs.html#osnap.data.Community.to_crs">[docs]</a>    <span class="k">def</span> <span class="nf">to_crs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transform all geometries in the study area to a new coordinate reference system.</span>
 
 <span class="sd">            Parameters</span>
 <span class="sd">            ----------</span>

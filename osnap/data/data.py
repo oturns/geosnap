@@ -1,6 +1,4 @@
-"""
-Data reader for longitudinal databases LTDB, geolytics NCDB and NHGIS
-"""
+"""Tools for creating and manipulating neighborhood datasets."""
 
 import os
 import zipfile
@@ -41,12 +39,8 @@ states = pd.read_parquet(os.path.join(_package_directory, 'states.parquet'))
 
 counties = pd.read_parquet(
     os.path.join(_package_directory, 'counties.parquet.gzip'))
-#_counties = _convert_gdf(_counties)
-#_counties = _counties[['geoid', 'geometry']]
 
 tracts = census.tracts_2010
-#tracts = tracts.rename(columns={"GEOID": "geoid"})
-#_tracts = _tracts[['geoid', 'geometry', 'point']]
 
 metros = pd.read_parquet(os.path.join(_package_directory, 'msas.parquet'))
 metros = _convert_gdf(metros)
@@ -70,7 +64,7 @@ def read_ltdb(sample, fullcount):
 
     Returns
     -------
-    DataFrame
+    pandas.DataFrame
 
     """
     sample_zip = zipfile.ZipFile(sample)
@@ -201,16 +195,17 @@ def read_ltdb(sample, fullcount):
 
 def read_ncdb(filepath):
     """
-    Read data from Geolytics's Neighborhood Change Database (NCDB) and store it for later use.
+    Read data from Geolytics's Neighborhood Change Database (NCDB) and store
+    it for later use.
 
     Parameters
     ----------
-    input_dir : str
+    filepath : str
         location of the input CSV file extracted from your Geolytics DVD
 
     Returns
     -------
-    DataFrame
+    pandas.DataFrame
 
     """
 
@@ -306,8 +301,15 @@ def read_ncdb(filepath):
 # TODO NHGIS reader
 
 
-class Dataset(object):
-    """Container for storing neighborhood data for a study region
+class Community(object):
+    """A class for storing spatial and tabular data for a collection of "neighborhoods".
+
+       A community is a collection of "neighborhoods" represented by spatial
+       boundaries (e.g. census tracts, or blocks in the US), and tabular data
+       which describe the composition of each neighborhood (e.g. data from
+       surveys, sensors, or geocoded misc.). A Community can be large (e.g. a
+       metropolitan region), or small (e.g. a handfull of census tracts) and
+       may have data pertaining to multiple discrete points in time.
 
     Parameters
     ----------
@@ -315,10 +317,12 @@ class Dataset(object):
         name or title of dataset.
     source : str
         database from which to query attribute data. must of one of ['ltdb', 'ncdb', 'census', 'external'].
-    states : list-like
+    statefips : list-like
         list of two-digit State FIPS codes that define a study region. These will be used to select tracts or blocks that fall within the region.
-    counties : list-like
+    countyfips : list-like
                 list of three-digit County FIPS codes that define a study region. These will be used to select tracts or blocks that fall within the region.
+    cbsafips : str
+              CBSA fips code that defines a study region. This is used to select tracts or blocks that fall within the metropolitan region
     add_indices : list-like
         list of additional indices that should be included in the region. This is likely a list of additional tracts that are relevant to the study area but do not fall inside the passed boundary
     boundary : GeoDataFrame
@@ -340,6 +344,7 @@ class Dataset(object):
         GeoDataFrame containing County boundaries
     states
         GeoDataFrame containing State boundaries
+
     """
 
     def __init__(self,
@@ -449,7 +454,7 @@ class Dataset(object):
         self.tracts = self.tracts[~self.tracts.geoid.duplicated(keep='first')]
         self.counties = self.counties[
             ~self.counties.geoid.duplicated(keep='first')]
-        self.data = _df[_df.index.isin(self.tracts.geoid)]
+        self.census = _df[_df.index.isin(self.tracts.geoid)]
 
     def plot(self,
              column=None,
@@ -457,9 +462,28 @@ class Dataset(object):
              ax=None,
              plot_counties=True,
              **kwargs):
+        """Convenience function for plotting tracts in the metro area.
+
+
+        Parameters
+        ----------
+        column : str
+            The column to be plotted (the default is None).
+        year : str
+            The decennial census year to be plotted (the default is 2010).
+        ax : type
+            matplotlib.axes on which to plot.
+        plot_counties : bool
+            Whether the plot should include county boundaries (the default is True).
+        **kwargs
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
         """
-        convenience function for plotting tracts in the metro area
-        """
+
         assert column, "You must choose a column to plot"
         if ax is not None:
             ax = ax
@@ -473,7 +497,7 @@ class Dataset(object):
 
         ax.set_aspect("equal")
         plotme = self.tracts.merge(
-            self.data[self.data.year == year],
+            self.census[self.census.year == year],
             left_on="geoid",
             right_index=True)
         plotme = plotme.dropna(subset=[column])
@@ -490,7 +514,7 @@ class Dataset(object):
         return ax
 
     def to_crs(self, crs=None, epsg=None, inplace=False):
-        """Transform all geometries in the study are to a new coordinate reference system.
+        """Transform all geometries in the study area to a new coordinate reference system.
 
             Parameters
             ----------
