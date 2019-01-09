@@ -1,0 +1,12 @@
+Open Source Neighborhood Analysis Package
+===================================
+
+`osnap` is a python package that provides tools for spatial modeling and analysis of neighborhoods.
+
+.. toctree::
+   :hidden:
+   :maxdepth: 3
+   :caption: Contents:
+
+   Installation <installation>
+   API <api>

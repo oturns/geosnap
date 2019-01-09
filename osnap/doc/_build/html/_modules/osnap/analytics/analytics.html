@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>osnap.analytics.analytics &#8212; osnap v0.0.0 Manual</title>
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pysal-styles.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="shortcut icon" href="../../../_static/pysal_favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+          osnap</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../installation.html">Installation</a></li>
+                <li><a href="../../../api.html">API</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#installing-released-version">Installing released version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#installing-development-version">Installing development version</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#data-module">Data Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#analytics-module">Analytics Module</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for osnap.analytics.analytics</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Tools for the spatial analysis of neighborhood change</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">libpysal.weights</span> <span class="k">import</span> <span class="n">attach_islands</span>
+<span class="kn">from</span> <span class="nn">libpysal.weights.contiguity</span> <span class="k">import</span> <span class="n">Queen</span><span class="p">,</span> <span class="n">Rook</span>
+<span class="kn">from</span> <span class="nn">libpysal.weights.distance</span> <span class="k">import</span> <span class="n">KNN</span>
+
+<span class="kn">from</span> <span class="nn">.cluster</span> <span class="k">import</span> <span class="p">(</span><span class="n">affinity_propagation</span><span class="p">,</span> <span class="n">gaussian_mixture</span><span class="p">,</span> <span class="n">kmeans</span><span class="p">,</span> <span class="n">max_p</span><span class="p">,</span>
+                      <span class="n">skater</span><span class="p">,</span> <span class="n">spectral</span><span class="p">,</span> <span class="n">spenc</span><span class="p">,</span> <span class="n">ward</span><span class="p">,</span> <span class="n">ward_spatial</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="cluster"><a class="viewcode-back" href="../../../generated/osnap.analytics.cluster.html#osnap.analytics.cluster">[docs]</a><span class="k">def</span> <span class="nf">cluster</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span>
+            <span class="n">n_clusters</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+            <span class="n">method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">best_model</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a geodemographic typology by running a cluster analysis on the</span>
+<span class="sd">    metro area&#39;s neighborhood attributes</span>
+
+<span class="sd">     Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_clusters : int</span>
+<span class="sd">        the number of clusters to derive</span>
+<span class="sd">    method : str</span>
+<span class="sd">        the clustering algorithm used to identify neighborhood types</span>
+<span class="sd">    columns : list-like</span>
+<span class="sd">        subset of columns on which to apply the clustering</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    DataFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">columns</span><span class="p">,</span> <span class="s2">&quot;You must provide a subset of columns as input&quot;</span>
+    <span class="k">assert</span> <span class="n">method</span><span class="p">,</span> <span class="s2">&quot;You must choose a clustering algorithm to use&quot;</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+    <span class="n">allcols</span> <span class="o">=</span> <span class="n">columns</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">]</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;any&#39;</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span>
+    <span class="n">opset</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+    <span class="n">opset</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">opset</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">allcols</span><span class="p">]</span>
+    <span class="n">opset</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span> <span class="o">=</span> <span class="n">opset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;year&quot;</span><span class="p">)[</span><span class="n">columns</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="o">/</span> <span class="n">x</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">ddof</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+    <span class="c1"># option to autoscale the data w/ mix-max or zscore?</span>
+    <span class="n">specification</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;ward&quot;</span><span class="p">:</span> <span class="n">ward</span><span class="p">,</span>
+        <span class="s2">&quot;kmeans&quot;</span><span class="p">:</span> <span class="n">kmeans</span><span class="p">,</span>
+        <span class="s2">&quot;ap&quot;</span><span class="p">:</span> <span class="n">affinity_propagation</span><span class="p">,</span>
+        <span class="s2">&quot;gm&quot;</span><span class="p">:</span> <span class="n">gaussian_mixture</span><span class="p">,</span>
+        <span class="s2">&quot;spectral&quot;</span><span class="p">:</span> <span class="n">spectral</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">specification</span><span class="p">[</span><span class="n">method</span><span class="p">](</span>
+        <span class="n">opset</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">columns</span><span class="p">],</span>
+        <span class="n">n_clusters</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">,</span>
+        <span class="n">best_model</span><span class="o">=</span><span class="n">best_model</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">labels_</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="n">clusters</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+        <span class="n">method</span><span class="p">:</span> <span class="n">labels</span><span class="p">,</span>
+        <span class="s2">&quot;year&quot;</span><span class="p">:</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">),</span>
+        <span class="s2">&quot;geoid&quot;</span><span class="p">:</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">index</span>
+    <span class="p">})</span>
+    <span class="n">clusters</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clusters</span><span class="o">.</span><span class="n">geoid</span> <span class="o">+</span> <span class="n">clusters</span><span class="o">.</span><span class="n">year</span>
+    <span class="n">clusters</span> <span class="o">=</span> <span class="n">clusters</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">)</span>
+    <span class="n">geoid</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">index</span> <span class="o">+</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;geoid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">geoid</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dataset</span></div>
+
+
+<div class="viewcode-block" id="cluster_spatial"><a class="viewcode-back" href="../../../generated/osnap.analytics.cluster_spatial.html#osnap.analytics.cluster_spatial">[docs]</a><span class="k">def</span> <span class="nf">cluster_spatial</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span>
+                    <span class="n">n_clusters</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+                    <span class="n">weights_type</span><span class="o">=</span><span class="s2">&quot;rook&quot;</span><span class="p">,</span>
+                    <span class="n">method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">best_model</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">threshold_variable</span><span class="o">=</span><span class="s1">&#39;count&#39;</span><span class="p">,</span>
+                    <span class="n">threshold</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Create a *spatial* geodemographic typology by running a cluster</span>
+<span class="sd">    analysis on the metro area&#39;s neighborhood attributes and including a</span>
+<span class="sd">    contiguity constraint.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_clusters : int</span>
+<span class="sd">        the number of clusters to derive</span>
+<span class="sd">    weights_type : str &#39;queen&#39; or &#39;rook&#39;</span>
+<span class="sd">        spatial weights matrix specification</span>
+<span class="sd">    method : str</span>
+<span class="sd">        the clustering algorithm used to identify neighborhood types</span>
+<span class="sd">    columns : list-like</span>
+<span class="sd">        subset of columns on which to apply the clustering</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    DataFrame</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">columns</span><span class="p">,</span> <span class="s2">&quot;You must provide a subset of columns as input&quot;</span>
+    <span class="k">assert</span> <span class="n">method</span><span class="p">,</span> <span class="s2">&quot;You must choose a clustering algorithm to use&quot;</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">threshold_variable</span> <span class="o">==</span> <span class="s2">&quot;count&quot;</span><span class="p">:</span>
+        <span class="n">allcols</span> <span class="o">=</span> <span class="n">columns</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">]</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">allcols</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s2">&quot;any&quot;</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;year&quot;</span><span class="p">)[</span><span class="n">columns</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="o">/</span> <span class="n">x</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">ddof</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+
+    <span class="k">elif</span> <span class="n">threshold_variable</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">threshold_var</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">threshold_variable</span><span class="p">]</span>
+        <span class="n">allcols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">threshold_variable</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">]</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">allcols</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s2">&quot;any&quot;</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;year&quot;</span><span class="p">)[</span><span class="n">columns</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="o">/</span> <span class="n">x</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">ddof</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">allcols</span> <span class="o">=</span> <span class="n">columns</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">]</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">allcols</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s2">&quot;any&quot;</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;year&quot;</span><span class="p">)[</span><span class="n">columns</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="o">/</span> <span class="n">x</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">ddof</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+
+    <span class="n">tracts</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">tracts</span>
+
+    <span class="k">def</span> <span class="nf">_build_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">tracts</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">weights_type</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">year</span> <span class="o">==</span> <span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s2">&quot;any&quot;</span><span class="p">)</span>
+        <span class="n">tracts</span> <span class="o">=</span> <span class="n">tracts</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">tracts</span><span class="o">.</span><span class="n">geoid</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;queen&quot;</span><span class="p">:</span> <span class="n">Queen</span><span class="p">,</span> <span class="s2">&quot;rook&quot;</span><span class="p">:</span> <span class="n">Rook</span><span class="p">}</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[</span><span class="n">weights_type</span><span class="p">]</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">tracts</span><span class="p">,</span> <span class="n">idVariable</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">)</span>
+        <span class="c1"># drop islands from dataset and rebuild weights</span>
+        <span class="c1">#df.drop(index=w.islands, inplace=True)</span>
+        <span class="c1">#tracts.drop(index=w.islands, inplace=True)</span>
+        <span class="c1">#w = weights[weights_type].from_dataframe(tracts, idVariable=&quot;geoid&quot;)</span>
+        <span class="n">knnw</span> <span class="o">=</span> <span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">tracts</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ids</span><span class="o">=</span><span class="n">tracts</span><span class="o">.</span><span class="n">geoid</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="n">df</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">knnw</span>
+
+    <span class="n">years</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1980</span><span class="p">,</span> <span class="mi">1990</span><span class="p">,</span> <span class="mi">2000</span><span class="p">,</span> <span class="mi">2010</span><span class="p">]</span>
+    <span class="n">annual</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">years</span><span class="p">:</span>
+        <span class="n">df</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">knnw</span> <span class="o">=</span> <span class="n">_build_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">tracts</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">weights_type</span><span class="p">)</span>
+        <span class="n">annual</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">df</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">knnw</span><span class="p">])</span>
+
+    <span class="n">datasets</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">years</span><span class="p">,</span> <span class="n">annual</span><span class="p">))</span>
+
+    <span class="n">specification</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;spenc&quot;</span><span class="p">:</span> <span class="n">spenc</span><span class="p">,</span>
+        <span class="s2">&quot;ward_spatial&quot;</span><span class="p">:</span> <span class="n">ward_spatial</span><span class="p">,</span>
+        <span class="s2">&quot;skater&quot;</span><span class="p">:</span> <span class="n">skater</span><span class="p">,</span>
+        <span class="s2">&quot;max_p&quot;</span><span class="p">:</span> <span class="n">max_p</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="n">clusters</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">threshold_variable</span> <span class="o">==</span> <span class="s2">&quot;count&quot;</span><span class="p">:</span>
+            <span class="n">threshold_var</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="n">val</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">attach_islands</span><span class="p">(</span><span class="n">val</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">val</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+        <span class="k">elif</span> <span class="n">threshold_variable</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">threshold_var</span> <span class="o">=</span> <span class="n">threshold_var</span><span class="p">[</span><span class="n">threshold</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span>
+                <span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">)]</span><span class="o">.</span><span class="n">values</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">val</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">attach_islands</span><span class="p">(</span><span class="n">val</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">val</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">threshold_var</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">specification</span><span class="p">[</span><span class="n">method</span><span class="p">](</span>
+            <span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">),</span>
+            <span class="n">w</span><span class="o">=</span><span class="n">val</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">n_clusters</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">,</span>
+            <span class="n">threshold_variable</span><span class="o">=</span><span class="n">threshold_var</span><span class="p">,</span>
+            <span class="n">threshold</span><span class="o">=</span><span class="n">threshold</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">labels_</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+            <span class="n">method</span><span class="p">:</span> <span class="n">labels</span><span class="p">,</span>
+            <span class="s2">&quot;year&quot;</span><span class="p">:</span> <span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">year</span><span class="p">,</span>
+            <span class="s2">&quot;geoid&quot;</span><span class="p">:</span> <span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">index</span>
+        <span class="p">})</span>
+        <span class="n">clusters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+
+    <span class="n">clusters</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
+    <span class="n">clusters</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;geoid&quot;</span><span class="p">)</span>
+    <span class="n">clusters</span><span class="p">[</span><span class="s2">&quot;joinkey&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clusters</span><span class="o">.</span><span class="n">geoid</span> <span class="o">+</span> <span class="n">clusters</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="n">clusters</span> <span class="o">=</span> <span class="n">clusters</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">)</span>
+    <span class="n">geoid</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">index</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="p">[</span>
+        <span class="s2">&quot;joinkey&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">index</span> <span class="o">+</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;joinkey&quot;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;geoid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">geoid</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dataset</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2018, osnap developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

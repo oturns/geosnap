@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>osnap.analytics.dynamics &#8212; osnap v0.0.0 Manual</title>
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pysal-styles.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="shortcut icon" href="../../../_static/pysal_favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+          osnap</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../installation.html">Installation</a></li>
+                <li><a href="../../../api.html">API</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#installing-released-version">Installing released version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#installing-development-version">Installing development version</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#data-module">Data Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#analytics-module">Analytics Module</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for osnap.analytics.dynamics</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Transition and sequence analysis of neighborhood change.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">giddy</span> <span class="k">as</span> <span class="nn">ga</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">combinations</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">scipy.spatial.distance</span> <span class="k">as</span> <span class="nn">d</span>
+
+<span class="kn">import</span> <span class="nn">libpysal</span>
+<span class="kn">from</span> <span class="nn">libpysal.weights.contiguity</span> <span class="k">import</span> <span class="n">Rook</span><span class="p">,</span> <span class="n">Queen</span>
+<span class="kn">from</span> <span class="nn">libpysal.weights.distance</span> <span class="k">import</span> <span class="n">KNN</span><span class="p">,</span> <span class="n">Kernel</span>
+
+
+<div class="viewcode-block" id="Transition"><a class="viewcode-back" href="../../../generated/osnap.analytics.Transition.html#osnap.analytics.Transition">[docs]</a><span class="k">class</span> <span class="nc">Transition</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    (Spatial) Markov approaches to transitional dynamics of neighborhood types.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------  </span>
+<span class="sd">    dataset          : osnap.Dataset</span>
+<span class="sd">                      osnap dataset object with column defining neighborhood clusters</span>
+<span class="sd">    w_type           : libpysal spatial weights type (&quot;rook&quot;, &quot;queen&quot;, &quot;knn&quot; or &quot;kernel&quot;)</span>
+<span class="sd">                      spatial weights object.</span>
+<span class="sd">    w_kwds          : dict</span>
+<span class="sd">                      dictionary with options to be passed to libpysal.weights generator        </span>
+<span class="sd">    permutations    : int, optional</span>
+<span class="sd">                      number of permutations for use in randomization based</span>
+<span class="sd">                      inference (the default is 0).</span>
+<span class="sd">    cluster_type    : string</span>
+<span class="sd">                      cluster algorithm (specification) used to generate</span>
+<span class="sd">                      neighborhood types, such as &quot;ward&quot;, &quot;kmeans&quot;, etc.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    p               : matrix</span>
+<span class="sd">                      (k, k), transition probability matrix for a-spatial</span>
+<span class="sd">                      Markov.</span>
+<span class="sd">    transitions     : matrix</span>
+<span class="sd">                      (k, k), counts of transitions between each neighborhood type</span>
+<span class="sd">                       i and j for a-spatial Markov.</span>
+<span class="sd">    T               : matrix</span>
+<span class="sd">                      (k, k, k), counts of transitions for each conditional</span>
+<span class="sd">                      Markov.  T[0] is the matrix of transitions for</span>
+<span class="sd">                      observations with categorical spatial lags of 0; T[k-1] is</span>
+<span class="sd">                      the transitions for the observations with lags of k-1.</span>
+<span class="sd">    P               : matrix</span>
+<span class="sd">                      (k, k, k), transition probability matrix for spatial</span>
+<span class="sd">                      Markov. First dimension is the conditioned on the</span>
+<span class="sd">                      categorical spatial lag.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Transition.__init__"><a class="viewcode-back" href="../../../generated/osnap.analytics.Transition.html#osnap.analytics.Transition.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">dataset</span><span class="p">,</span>
+                 <span class="n">w_type</span><span class="p">,</span>
+                 <span class="n">w_kwds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">permutations</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">cluster_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="n">y</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[[</span><span class="s1">&#39;geoid&#39;</span><span class="p">,</span> <span class="s1">&#39;year&#39;</span><span class="p">,</span> <span class="n">cluster_type</span><span class="p">]]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;geoid&#39;</span><span class="p">,</span> <span class="s1">&#39;year&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">first</span><span class="p">()</span><span class="o">.</span><span class="n">unstack</span><span class="p">()</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+
+        <span class="n">tracts</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">tracts</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+            <span class="n">y</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;geoid&#39;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+        <span class="n">w_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;rook&#39;</span><span class="p">:</span> <span class="n">Rook</span><span class="p">,</span> <span class="s1">&#39;queen&#39;</span><span class="p">:</span> <span class="n">Queen</span><span class="p">,</span> <span class="s1">&#39;knn&#39;</span><span class="p">:</span> <span class="n">KNN</span><span class="p">,</span> <span class="s1">&#39;kernel&#39;</span><span class="p">:</span> <span class="n">Kernel</span><span class="p">}</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">w_dict</span><span class="p">[</span><span class="n">w_type</span><span class="p">]</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">tracts</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+        <span class="n">sm</span> <span class="o">=</span> <span class="n">ga</span><span class="o">.</span><span class="n">markov</span><span class="o">.</span><span class="n">Spatial_Markov</span><span class="p">(</span>
+            <span class="n">y</span><span class="p">,</span>
+            <span class="n">w</span><span class="p">,</span>
+            <span class="n">permutations</span><span class="o">=</span><span class="n">permutations</span><span class="p">,</span>
+            <span class="n">discrete</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">variable_name</span><span class="o">=</span><span class="n">cluster_type</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">p</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transitions</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">transitions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">P</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">P</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">T</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">T</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">summary</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">summary</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cluster_type</span> <span class="o">=</span> <span class="n">cluster_type</span>
+        <span class="c1"># keep the spatial markov instance here in case that users want to</span>
+        <span class="c1"># estimate steady state distribution etc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sm</span> <span class="o">=</span> <span class="n">sm</span></div></div>
+
+
+<div class="viewcode-block" id="Sequence"><a class="viewcode-back" href="../../../generated/osnap.analytics.Sequence.html#osnap.analytics.Sequence">[docs]</a><span class="k">class</span> <span class="nc">Sequence</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Pairwise sequence analysis.</span>
+
+<span class="sd">    Dynamic programming if optimal matching.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y               : array</span>
+<span class="sd">                      one row per sequence of neighborhood types for each</span>
+<span class="sd">                      spatial unit. Sequences could be of varying lengths.</span>
+<span class="sd">    w               : W</span>
+<span class="sd">                      spatial weights object.</span>
+<span class="sd">    subs_mat        : array</span>
+<span class="sd">                      (k,k), substitution cost matrix. Should be hollow (</span>
+<span class="sd">                      0 cost between the same type), symmetric and non-negative.</span>
+<span class="sd">    dist_type       : string</span>
+<span class="sd">                      &quot;hamming&quot;: hamming distance (substitution only</span>
+<span class="sd">                      and its cost is constant 1) from sklearn.metrics,</span>
+<span class="sd">                      &quot;Levenshtein&quot;: Levenshtein distance (allow</span>
+<span class="sd">                      indels, but substitution cost is constant 1) from</span>
+<span class="sd">                      jellyfish; &quot;Markov&quot;: utilize empirical transition</span>
+<span class="sd">                      probabilities to define substitution costs;</span>
+<span class="sd">                      &quot;interval&quot;: differences between states are used</span>
+<span class="sd">                      to define substitution costs. Default is None.</span>
+<span class="sd">    indel           : float</span>
+<span class="sd">                      insertion/deletion cost.</span>
+<span class="sd">    cluster_type    : string</span>
+<span class="sd">                      cluster algorithm (specification) used to generate</span>
+<span class="sd">                      neighborhood types, such as &quot;ward&quot;, &quot;kmeans&quot;, etc.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    seq_dis_mat     : array</span>
+<span class="sd">                      (n,n), distance/dissimilarity matrix for each pair of</span>
+<span class="sd">                      sequences</span>
+<span class="sd">    classes         : array</span>
+<span class="sd">                      (k, ), unique classes</span>
+<span class="sd">    k               : int</span>
+<span class="sd">                      number of unique classes</span>
+<span class="sd">    label_dict      : dict</span>
+<span class="sd">                      dictionary - {input label: int value between 0 and k-1 (k</span>
+<span class="sd">                      is the number of unique classes for the pooled data)}</span>
+
+
+<span class="sd">    Done:</span>
+<span class="sd">    * Handle sequences of non-equal length</span>
+<span class="sd">    * Handle different input data type (array of string/integer)</span>
+<span class="sd">    * Integrate hamming distance</span>
+
+<span class="sd">    Todo:</span>
+<span class="sd">    1. Integrate other distance metrics: markov...</span>
+<span class="sd">    2. test on empirical datasets</span>
+<span class="sd">    5. Look at local alignment?</span>
+<span class="sd">    6. All the sequences should be transformed in the same way (should not</span>
+<span class="sd">    rely on transformation when trying to compare every pair - the label</span>
+<span class="sd">    might be different)</span>
+
+<span class="sd">    To think about:</span>
+<span class="sd">    * provide a sequence class so that users can create a sequence object</span>
+<span class="sd">    which has several meaningful attribute/method:</span>
+<span class="sd">        * balanced or unbalanced?</span>
+<span class="sd">            * max/min/median/mean length</span>
+<span class="sd">        * characteristics of individual sequences/ a set of sequences (</span>
+<span class="sd">        sharing the same past or future)</span>
+<span class="sd">            * distribution</span>
+<span class="sd">            * sequence indicator:</span>
+<span class="sd">                * longitudinal diversity</span>
+<span class="sd">                * complexity of the sequence</span>
+<span class="sd">                * duration in each state</span>
+<span class="sd">            * max/min/median/mean duration in each state</span>
+<span class="sd">        * visualization of sequences</span>
+<span class="sd">            * allow for plotting the most frequent sequences</span>
+<span class="sd">            * allow for plotting user-selected sequences</span>
+<span class="sd">            * empirical transition matrix - could be used as the input for</span>
+<span class="sd">            substitution cost matrix</span>
+<span class="sd">        * other representations of a sequence:</span>
+<span class="sd">            * distinct successive states (DSSs)</span>
+<span class="sd">        * handle different input types: pandas dataframe, array, list...</span>
+<span class="sd">    * survival analysis?</span>
+<span class="sd">    * deal with missing values NA?</span>
+<span class="sd">        * a special state: another &quot;unique&quot; class and corresponding</span>
+<span class="sd">        substitution cost (the cost should be the same as the indel)</span>
+
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+
+<span class="sd">    1. Testing on unequal string sequences</span>
+<span class="sd">    1.1 substitution cost matrix and indel cost are not given, and will be</span>
+<span class="sd">    generated based on the distance type &quot;interval&quot;</span>
+
+<span class="sd">    &gt;&gt;&gt; seq1 = &#39;ACGGTAG&#39;</span>
+<span class="sd">    &gt;&gt;&gt; seq2 = &#39;CCTAAG&#39;</span>
+<span class="sd">    &gt;&gt;&gt; seq3 = &#39;CCTAAGC&#39;</span>
+<span class="sd">    &gt;&gt;&gt; seqAna = Sequence([seq1,seq2,seq3],dist_type=&quot;interval&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; seqAna.k</span>
+<span class="sd">    4</span>
+<span class="sd">    &gt;&gt;&gt; seqAna.classes</span>
+<span class="sd">    array([&#39;A&#39;, &#39;C&#39;, &#39;G&#39;, &#39;T&#39;], dtype=&#39;&lt;U1&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; seqAna.subs_mat</span>
+<span class="sd">    array([[0., 1., 2., 3.],</span>
+<span class="sd">           [1., 0., 1., 2.],</span>
+<span class="sd">           [2., 1., 0., 1.],</span>
+<span class="sd">           [3., 2., 1., 0.]])</span>
+<span class="sd">    &gt;&gt;&gt; seqAna.seq_dis_mat</span>
+<span class="sd">    array([[ 0.,  7., 10.],</span>
+<span class="sd">           [ 7.,  0.,  3.],</span>
+<span class="sd">           [10.,  3.,  0.]])</span>
+
+<span class="sd">    1.2 User-defined substitution cost matrix and indel cost</span>
+
+<span class="sd">    &gt;&gt;&gt; subs_mat = np.array([[0, 0.76, 0.29, 0.05],[0.30, 0, 0.40, 0.60],[0.16, 0.61, 0, 0.26],[0.38, 0.20, 0.12, 0]])</span>
+<span class="sd">    &gt;&gt;&gt; indel = subs_mat.max()</span>
+<span class="sd">    &gt;&gt;&gt; seqAna = Sequence([seq1,seq2,seq3], subs_mat=subs_mat, indel=indel)</span>
+<span class="sd">    &gt;&gt;&gt; seqAna.seq_dis_mat</span>
+<span class="sd">    array([[0.  , 1.94, 2.46],</span>
+<span class="sd">           [1.94, 0.  , 0.76],</span>
+<span class="sd">           [2.46, 0.76, 0.  ]])</span>
+
+<span class="sd">    1.3 Calculating &quot;hamming&quot; distance will fail on unequal sequences</span>
+
+<span class="sd">    &gt;&gt;&gt; seqAna = Sequence([seq1,seq2,seq3], dist_type=&quot;hamming&quot;)</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">    ValueError: hamming distance cannot be calculated for sequences of unequal lengths!</span>
+
+
+<span class="sd">    2. Testing on equal string sequences</span>
+<span class="sd">    &gt;&gt;&gt; seq1 = &#39;ACGGTAG&#39;</span>
+<span class="sd">    &gt;&gt;&gt; seq2 = &#39;CCTAAGA&#39;</span>
+<span class="sd">    &gt;&gt;&gt; seq3 = &#39;CCTAAGC&#39;</span>
+
+<span class="sd">    2.1  Calculating &quot;hamming&quot; distance</span>
+<span class="sd">    &gt;&gt;&gt; seqAna = Sequence([seq1,seq2,seq3], dist_type=&quot;hamming&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; seqAna.seq_dis_mat</span>
+<span class="sd">    array([[0., 6., 6.],</span>
+<span class="sd">           [6., 0., 1.],</span>
+<span class="sd">           [6., 1., 0.]])</span>
+
+<span class="sd">    2.2 User-defined substitution cost matrix and indel cost (distance</span>
+<span class="sd">    between different types is always 1 and indel cost is 2) - give the same</span>
+<span class="sd">    sequence distance matrix as &quot;hamming&quot; distance</span>
+<span class="sd">    &gt;&gt;&gt; subs_mat = np.array([[0., 1., 1., 1.],[1., 0., 1., 1.],[1., 1., 0., 1.],[1., 1., 1., 0.]])</span>
+<span class="sd">    &gt;&gt;&gt; indel = 2</span>
+<span class="sd">    &gt;&gt;&gt; seqAna = Sequence([seq1,seq2,seq3], subs_mat=subs_mat, indel=indel)</span>
+<span class="sd">    &gt;&gt;&gt; seqAna.seq_dis_mat</span>
+<span class="sd">    array([[0., 6., 6.],</span>
+<span class="sd">           [6., 0., 1.],</span>
+<span class="sd">           [6., 1., 0.]])</span>
+
+<span class="sd">    2.3 User-defined substitution cost matrix and indel cost (distance</span>
+<span class="sd">    between different types is always 1 and indel cost is 1) - give a</span>
+<span class="sd">    slightly different sequence distance matrix from &quot;hamming&quot; distance since</span>
+<span class="sd">    insertion and deletion is happening</span>
+<span class="sd">    &gt;&gt;&gt; subs_mat = np.array([[0., 1., 1., 1.],[1., 0., 1., 1.],[1., 1., 0.,1.],[1., 1., 1., 0.]])</span>
+<span class="sd">    &gt;&gt;&gt; indel = 1</span>
+<span class="sd">    &gt;&gt;&gt; seqAna = Sequence([seq1,seq2,seq3], subs_mat=subs_mat, indel=indel)</span>
+<span class="sd">    &gt;&gt;&gt; seqAna.seq_dis_mat</span>
+<span class="sd">    array([[0., 5., 5.],</span>
+<span class="sd">           [5., 0., 1.],</span>
+<span class="sd">           [5., 1., 0.]])</span>
+
+<span class="sd">    3. Not passing proper parameters will raise an error</span>
+<span class="sd">    &gt;&gt;&gt; seqAna = Sequence([seq1,seq2,seq3])</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">    ValueError: Please specify a proper `dist_type` or `subs_mat` and `indel` to proceed!</span>
+
+<span class="sd">    &gt;&gt;&gt; seqAna = Sequence([seq1,seq2,seq3], subs_mat=subs_mat)</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">    ValueError: Please specify a proper `dist_type` or `subs_mat` and `indel` to proceed!</span>
+<span class="sd">    </span>
+<span class="sd">    &gt;&gt;&gt; seqAna = Sequence([seq1,seq2,seq3], indel=indel)</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">    ValueError: Please specify a proper `dist_type` or `subs_mat` and `indel` to proceed!</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Sequence.__init__"><a class="viewcode-back" href="../../../generated/osnap.analytics.Sequence.html#osnap.analytics.Sequence.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">y</span><span class="p">,</span>
+                 <span class="n">subs_mat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">dist_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">indel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">w</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">cluster_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="n">merged</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">classes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">merged</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">classes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indel</span> <span class="o">=</span> <span class="n">indel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subs_mat</span> <span class="o">=</span> <span class="n">subs_mat</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cluster_type</span> <span class="o">=</span> <span class="n">cluster_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">classes</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)))</span>
+
+        <span class="n">y_int</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">yi</span> <span class="ow">in</span> <span class="n">y</span><span class="p">:</span>
+            <span class="n">y_int</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_dict</span><span class="o">.</span><span class="n">get</span><span class="p">,</span> <span class="n">yi</span><span class="p">)))</span>
+        <span class="n">y_int</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_int</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">subs_mat</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">indel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dist_type</span> <span class="o">==</span> <span class="s2">&quot;interval&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">indel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">subs_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">subs_mat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">j</span> <span class="o">-</span> <span class="n">i</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">subs_mat</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">j</span> <span class="o">-</span> <span class="n">i</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_om_dist</span><span class="p">(</span><span class="n">y_int</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">dist_type</span> <span class="o">==</span> <span class="s2">&quot;hamming&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_int</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="s2">&quot;hamming distance cannot be calculated for &quot;</span>
+                        <span class="s2">&quot;sequences of unequal lengths!&quot;</span><span class="p">)</span>
+                <span class="n">hamming_dist</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">pdist</span><span class="p">(</span>
+                    <span class="n">y_int</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;hamming&quot;</span><span class="p">)</span> <span class="o">*</span> <span class="n">y_int</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">seq_dis_mat</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">squareform</span><span class="p">(</span><span class="n">hamming_dist</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please specify a proper `dist_type` or &quot;</span>
+                                 <span class="s2">&quot;`subs_mat` and `indel` to proceed!&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_om_dist</span><span class="p">(</span><span class="n">y_int</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_om_pair_dist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq1</span><span class="p">,</span> <span class="n">seq2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method for calculating the optimal matching distance between a pair of</span>
+<span class="sd">        sequences given a substitution cost matrix and a indel cost.</span>
+
+<span class="sd">        Arguments</span>
+<span class="sd">        ---------</span>
+<span class="sd">        seq1            : array</span>
+<span class="sd">                          (t1, ), the first sequence</span>
+<span class="sd">        seq2            : array</span>
+<span class="sd">                          (t2, ), the second sequence</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        D               : array</span>
+<span class="sd">                          (t2+1, t1+1), score matrix: D[i+1,j+1] is the best</span>
+<span class="sd">                          score for aligning the substring, seq1[0:j] and seq2[0:i],</span>
+<span class="sd">                          and D[t2+1, t1+1] (or D[-1,-1]) is the global optimal score.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">t1</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq1</span><span class="p">)</span>
+        <span class="n">t2</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq2</span><span class="p">)</span>
+
+        <span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">t2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">t1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">t1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">D</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indel</span> <span class="o">*</span> <span class="n">j</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">t2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">D</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indel</span> <span class="o">*</span> <span class="n">i</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">t2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">t1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">gaps</span> <span class="o">=</span> <span class="n">D</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">indel</span>
+                <span class="n">gapt</span> <span class="o">=</span> <span class="n">D</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">indel</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="n">D</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">subs_mat</span><span class="p">[</span><span class="n">seq1</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">seq2</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span>
+                                                                          <span class="mi">1</span><span class="p">]]</span>
+                <span class="n">D</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">match</span><span class="p">,</span> <span class="n">gaps</span><span class="p">,</span> <span class="n">gapt</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">D</span>
+
+    <span class="k">def</span> <span class="nf">_om_dist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method for calculating the optimal matching distance between any pair of</span>
+<span class="sd">        sequences given a substitution cost matrix and a indel cost.</span>
+
+<span class="sd">        Arguments</span>
+<span class="sd">        ---------</span>
+<span class="sd">        seq1            : array</span>
+<span class="sd">                          (t1, ), the first sequence</span>
+<span class="sd">        seq2            : array</span>
+<span class="sd">                          (t2, ), the second sequence</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        D               : array</span>
+<span class="sd">                          (t2+1, t1+1), score matrix: D[i+1,j+1] is the best</span>
+<span class="sd">                          score for aligning the substring, seq1[0:j] and seq2[0:i],</span>
+<span class="sd">                          and D[t2+1, t1+1] (or D[-1,-1]) is the global optimal score.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">seq_dis_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">combinations</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">),</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="n">seq1</span> <span class="o">=</span> <span class="n">y_int</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="n">seq2</span> <span class="o">=</span> <span class="n">y_int</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="n">seq_dis_mat</span><span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_om_pair_dist</span><span class="p">(</span><span class="n">seq1</span><span class="p">,</span>
+                                                               <span class="n">seq2</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">seq_dis_mat</span> <span class="o">=</span> <span class="n">seq_dis_mat</span> <span class="o">+</span> <span class="n">seq_dis_mat</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2018, osnap developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
