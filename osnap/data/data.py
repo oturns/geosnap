@@ -573,16 +573,8 @@ def _adjust_inflation(df, columns, base_year):
     inflation.columns = inflation.columns.str.lower()
     inflation.columns = inflation.columns.str.strip(".")
     inflation = inflation.dropna(subset=["year"])
-
-    inflator = {
-        2015: inflation[inflation.year == 2015]["avg"].values[0],
-        2010: inflation[inflation.year == 2010]["avg"].values[0],
-        2000: inflation[inflation.year == 2000]["avg"].values[0],
-        1990: inflation[inflation.year == 1990]["avg"].values[0],
-        1980: inflation[inflation.year == 1980]["avg"].values[0],
-        1970:
-        63.9,  # https://www2.census.gov/programs-surveys/demo/tables/p60/249/CPI-U-RS-Index-2013.pdf
-    }
+    inflator = inflation.groupby('year')['avg'].first().to_dict()
+    inflator[1970] = 63.9
 
     df = df.copy()
     df[columns].apply(lambda x: x * (inflator[2015] / inflator[base_year]))
