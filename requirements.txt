@@ -1,19 +1,19 @@
-- pandas
-- cython
-- jupyterlab
-- geopandas
-- hdbscan
-- matplotlib
-- notebook
-- networkx
-- scikit-learn
-- seaborn
-- pyarrow
-- libpysal
-- mapclassify
-- spenc
-- giddy
-- xlrd
-- cenpy
-- quilt
-- git+git://github.com/pysal/region@master
+pandas
+cython
+jupyterlab
+geopandas
+hdbscan
+matplotlib
+notebook
+networkx
+scikit-learn
+seaborn
+pyarrow
+libpysal
+mapclassify
+spenc
+giddy
+xlrd
+cenpy
+quilt
+region

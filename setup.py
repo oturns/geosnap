@@ -65,7 +65,7 @@ def setup_package():
         long_description=long_description,
         maintainer="OSNAP Developers",
         maintainer_email='pysal-dev@googlegroups.com',
-        url='http://osnap.org',
+        url='http://osnap.cloud',
         # download_url='https://pypi.python.org/pypi/oslnap',
         license='BSD',
         py_modules=['osnap'],
