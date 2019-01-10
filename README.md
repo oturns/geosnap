@@ -1,7 +1,7 @@
 # Open Source Neighborhood Analysis Package
 [![Build Status](https://travis-ci.com/spatialucr/osnap.svg?branch=master)](https://travis-ci.com/spatialucr/osnap)  [![Coverage Status](https://coveralls.io/repos/github/spatialucr/osnap/badge.svg?branch=master)](https://coveralls.io/github/spatialucr/osnap?branch=master)
 
-<img src="osnap/doc/osnap.png" alt="osnap" width="500"/>
+<img src="doc/osnap.png" alt="osnap" width="500"/>
 
 
 ## osnap modules
@@ -50,4 +50,4 @@ software, terms & conditions for usage, and a DISCLAIMER OF ALL
 WARRANTIES.
 
 ## Funding
-<img src="osnap/doc/nsf_logo.jpg" width=100 /> This project is supported by NSF Award #1733705, [Neighborhoods in Space-Time Contexts](https://www.nsf.gov/awardsearch/showAward?AWD_ID=1733705&HistoricalAwards=false)
+<img src="doc/nsf_logo.jpg" width=100 /> This project is supported by NSF Award #1733705, [Neighborhoods in Space-Time Contexts](https://www.nsf.gov/awardsearch/showAward?AWD_ID=1733705&HistoricalAwards=false)
