@@ -1,9 +1,9 @@
-from context import data
+import context
 import os
-import pandas as pd
+from importlib import reload
 
 path = os.environ['DLPATH']
-read_ltdb = data.read_ltdb
+read_ltdb = context.data.read_ltdb
 
 _package_directory = os.path.dirname(os.path.abspath(__file__))
 
@@ -15,7 +15,7 @@ def test_read_ltdb():
         fullcount=path+"/ltdb_full.zip",
     )
 
-    df = pd.read_parquet(os.path.join(
-        _package_directory, "../data/ltdb.parquet.gzip"))
-    df = data.db.ltdb
+    reload(context)
+
+    df = context.data.db.ltdb
     assert df.shape == (330388, 192)
