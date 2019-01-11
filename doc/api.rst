@@ -45,6 +45,7 @@ Classic (aspatial) Clustering
 
     osnap.analyze.analytics.affinity_propagation
     osnap.analyze.analytics.gaussian_mixture
+    osnap.analyze.analytics.hdbscan
     osnap.analyze.analytics.kmeans
     osnap.analyze.analytics.spectral
     osnap.analyze.analytics.ward
@@ -55,6 +56,7 @@ Spatial Clustering
 .. autosummary::
    :toctree: generated/
 
+    osnap.analyze.analytics.azp
     osnap.analyze.analytics.max_p
     osnap.analyze.analytics.skater
     osnap.analyze.analytics.spenc

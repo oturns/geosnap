@@ -264,23 +264,41 @@
              <span class="n">kernel_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
              <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
              <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A-spatial Spectral Clustering.</span>
+    <span class="sd">&quot;&quot;&quot;Short summary.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    X  : array-like</span>
-<span class="sd">         n x k attribute data</span>
-
-<span class="sd">    n_clusters : int, optional, default: 8</span>
+<span class="sd">    X : arral-like</span>
+<span class="sd">        n x k attribute data</span>
+<span class="sd">    n_clusters : type</span>
 <span class="sd">        The number of clusters to form as well as the number of centroids to</span>
 <span class="sd">        generate.</span>
-
-<span class="sd">    n_jobs: int, optional, default: -1</span>
-<span class="sd">        The damping parameter passed to scikit-learn&#39;s affinity propagation</span>
-<span class="sd">        algorithm</span>
-
-<span class="sd">    affinity : str, optional, default &#39;rbf&#39;</span>
-<span class="sd">        The kernel type passed to scikit-learn&#39;s SpectralClustering algorithm</span>
+<span class="sd">    eigen_solver : type</span>
+<span class="sd">        Description of parameter `eigen_solver` (the default is None).</span>
+<span class="sd">    random_state : type</span>
+<span class="sd">        Description of parameter `random_state` (the default is None).</span>
+<span class="sd">    n_init : type</span>
+<span class="sd">        Description of parameter `n_init` (the default is 10).</span>
+<span class="sd">    gamma : type</span>
+<span class="sd">        Description of parameter `gamma` (the default is 1.0).</span>
+<span class="sd">    affinity : type</span>
+<span class="sd">        Description of parameter `affinity` (the default is &#39;rbf&#39;).</span>
+<span class="sd">    n_neighbors : type</span>
+<span class="sd">        Description of parameter `n_neighbors` (the default is 10).</span>
+<span class="sd">    eigen_tol : type</span>
+<span class="sd">        Description of parameter `eigen_tol` (the default is 0.0).</span>
+<span class="sd">    assign_labels : type</span>
+<span class="sd">        Description of parameter `assign_labels` (the default is &#39;kmeans&#39;).</span>
+<span class="sd">    degree : type</span>
+<span class="sd">        Description of parameter `degree` (the default is 3).</span>
+<span class="sd">    coef0 : type</span>
+<span class="sd">        Description of parameter `coef0` (the default is 1).</span>
+<span class="sd">    kernel_params : type</span>
+<span class="sd">        Description of parameter `kernel_params` (the default is None).</span>
+<span class="sd">    n_jobs : type</span>
+<span class="sd">        Description of parameter `n_jobs` (the default is -1).</span>
+<span class="sd">    **kwargs : type</span>
+<span class="sd">        Description of parameter `**kwargs`.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -384,7 +402,7 @@
     <span class="k">return</span> <span class="n">model</span></div>
 
 
-<span class="k">def</span> <span class="nf">hdbscan</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">min_cluster_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">gen_min_span_tree</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="hdbscan"><a class="viewcode-back" href="../../../generated/osnap.analyze.analytics.hdbscan.html#osnap.analyze.analytics.hdbscan">[docs]</a><span class="k">def</span> <span class="nf">hdbscan</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">min_cluster_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">gen_min_span_tree</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Clustering with Hierarchical DBSCAN</span>
 
 <span class="sd">    Parameters</span>
@@ -406,7 +424,7 @@
 
     <span class="n">model</span> <span class="o">=</span> <span class="n">HDBSCAN</span><span class="p">(</span><span class="n">min_cluster_size</span><span class="o">=</span><span class="n">min_cluster_size</span><span class="p">)</span>
     <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">model</span>
+    <span class="k">return</span> <span class="n">model</span></div>
 
 
 <span class="c1"># Spatially Explicit/Encouraged Methods</span>
@@ -509,12 +527,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">model</span> <span class="o">=</span> <span class="n">Spanning_Forest</span><span class="p">()</span>
-    <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">n_clusters</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">quorum</span><span class="o">=</span><span class="n">floor</span><span class="p">,</span> <span class="n">trace</span><span class="o">=</span><span class="n">trace</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">n_clusters</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">quorum</span><span class="o">=</span><span class="n">floor</span><span class="p">,</span> <span class="n">trace</span><span class="o">=</span><span class="n">trace</span><span class="p">)</span>
     <span class="n">model</span><span class="o">.</span><span class="n">labels_</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">current_labels_</span>
     <span class="k">return</span> <span class="n">model</span></div>
 
 
-<span class="k">def</span> <span class="nf">azp</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="azp"><a class="viewcode-back" href="../../../generated/osnap.analyze.analytics.azp.html#osnap.analyze.analytics.azp">[docs]</a><span class="k">def</span> <span class="nf">azp</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;AZP clustering algorithm</span>
 
 <span class="sd">    Parameters</span>
@@ -536,8 +554,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">model</span> <span class="o">=</span> <span class="n">AZP</span><span class="p">()</span>
-    <span class="n">model</span><span class="o">.</span><span class="n">fit_from_w</span><span class="p">(</span><span class="n">attr</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="n">w</span><span class="p">,</span> <span class="n">n_regions</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">model</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">fit_from_w</span><span class="p">(</span><span class="n">attr</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="n">w</span><span class="p">,</span> <span class="n">n_regions</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span></div>
 
 
 <div class="viewcode-block" id="max_p"><a class="viewcode-back" href="../../../generated/osnap.analyze.analytics.max_p.html#osnap.analyze.analytics.max_p">[docs]</a><span class="k">def</span> <span class="nf">max_p</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">threshold_variable</span><span class="o">=</span><span class="s2">&quot;count&quot;</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>

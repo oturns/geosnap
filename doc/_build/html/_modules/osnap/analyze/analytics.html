@@ -119,7 +119,7 @@
 <span class="kn">from</span> <span class="nn">libpysal.weights.contiguity</span> <span class="k">import</span> <span class="n">Queen</span><span class="p">,</span> <span class="n">Rook</span>
 <span class="kn">from</span> <span class="nn">libpysal.weights.distance</span> <span class="k">import</span> <span class="n">KNN</span>
 
-<span class="kn">from</span> <span class="nn">.cluster</span> <span class="k">import</span> <span class="p">(</span><span class="n">affinity_propagation</span><span class="p">,</span> <span class="n">gaussian_mixture</span><span class="p">,</span> <span class="n">kmeans</span><span class="p">,</span> <span class="n">max_p</span><span class="p">,</span>
+<span class="kn">from</span> <span class="nn">.cluster</span> <span class="k">import</span> <span class="p">(</span><span class="n">azp</span><span class="p">,</span> <span class="n">affinity_propagation</span><span class="p">,</span> <span class="n">gaussian_mixture</span><span class="p">,</span> <span class="n">hdbscan</span><span class="p">,</span> <span class="n">kmeans</span><span class="p">,</span> <span class="n">max_p</span><span class="p">,</span>
                       <span class="n">skater</span><span class="p">,</span> <span class="n">spectral</span><span class="p">,</span> <span class="n">spenc</span><span class="p">,</span> <span class="n">ward</span><span class="p">,</span> <span class="n">ward_spatial</span><span class="p">)</span>
 
 
@@ -153,8 +153,8 @@
     <span class="n">allcols</span> <span class="o">=</span> <span class="n">columns</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">]</span>
     <span class="n">dataset</span><span class="o">.</span><span class="n">census</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">census</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;any&#39;</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span>
     <span class="n">opset</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-    <span class="n">opset</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">opset</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">allcols</span><span class="p">]</span>
-    <span class="n">opset</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span> <span class="o">=</span> <span class="n">opset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;year&quot;</span><span class="p">)[</span><span class="n">columns</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+    <span class="n">opset</span><span class="o">.</span><span class="n">census</span> <span class="o">=</span> <span class="n">opset</span><span class="o">.</span><span class="n">census</span><span class="p">[</span><span class="n">allcols</span><span class="p">]</span>
+    <span class="n">opset</span><span class="o">.</span><span class="n">census</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span> <span class="o">=</span> <span class="n">opset</span><span class="o">.</span><span class="n">census</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;year&quot;</span><span class="p">)[</span><span class="n">columns</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
         <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="o">/</span> <span class="n">x</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">ddof</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
     <span class="c1"># option to autoscale the data w/ mix-max or zscore?</span>
     <span class="n">specification</span> <span class="o">=</span> <span class="p">{</span>
@@ -163,9 +163,10 @@
         <span class="s2">&quot;ap&quot;</span><span class="p">:</span> <span class="n">affinity_propagation</span><span class="p">,</span>
         <span class="s2">&quot;gm&quot;</span><span class="p">:</span> <span class="n">gaussian_mixture</span><span class="p">,</span>
         <span class="s2">&quot;spectral&quot;</span><span class="p">:</span> <span class="n">spectral</span><span class="p">,</span>
+        <span class="s2">&quot;hdbscan&quot;</span><span class="p">:</span> <span class="n">hdbscan</span>
     <span class="p">}</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">specification</span><span class="p">[</span><span class="n">method</span><span class="p">](</span>
-        <span class="n">opset</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">columns</span><span class="p">],</span>
+        <span class="n">opset</span><span class="o">.</span><span class="n">census</span><span class="p">[</span><span class="n">columns</span><span class="p">],</span>
         <span class="n">n_clusters</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">,</span>
         <span class="n">best_model</span><span class="o">=</span><span class="n">best_model</span><span class="p">,</span>
         <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
@@ -268,6 +269,7 @@
     <span class="n">datasets</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">years</span><span class="p">,</span> <span class="n">annual</span><span class="p">))</span>
 
     <span class="n">specification</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;azp&quot;</span><span class="p">:</span> <span class="n">azp</span><span class="p">,</span>
         <span class="s2">&quot;spenc&quot;</span><span class="p">:</span> <span class="n">spenc</span><span class="p">,</span>
         <span class="s2">&quot;ward_spatial&quot;</span><span class="p">:</span> <span class="n">ward_spatial</span><span class="p">,</span>
         <span class="s2">&quot;skater&quot;</span><span class="p">:</span> <span class="n">skater</span><span class="p">,</span>

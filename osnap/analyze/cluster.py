@@ -152,23 +152,41 @@ def spectral(X,
              kernel_params=None,
              n_jobs=-1,
              **kwargs):
-    """A-spatial Spectral Clustering.
+    """Short summary.
 
     Parameters
     ----------
-    X  : array-like
-         n x k attribute data
-
-    n_clusters : int, optional, default: 8
+    X : arral-like
+        n x k attribute data
+    n_clusters : type
         The number of clusters to form as well as the number of centroids to
         generate.
-
-    n_jobs: int, optional, default: -1
-        The damping parameter passed to scikit-learn's affinity propagation
-        algorithm
-
-    affinity : str, optional, default 'rbf'
-        The kernel type passed to scikit-learn's SpectralClustering algorithm
+    eigen_solver : type
+        Description of parameter `eigen_solver` (the default is None).
+    random_state : type
+        Description of parameter `random_state` (the default is None).
+    n_init : type
+        Description of parameter `n_init` (the default is 10).
+    gamma : type
+        Description of parameter `gamma` (the default is 1.0).
+    affinity : type
+        Description of parameter `affinity` (the default is 'rbf').
+    n_neighbors : type
+        Description of parameter `n_neighbors` (the default is 10).
+    eigen_tol : type
+        Description of parameter `eigen_tol` (the default is 0.0).
+    assign_labels : type
+        Description of parameter `assign_labels` (the default is 'kmeans').
+    degree : type
+        Description of parameter `degree` (the default is 3).
+    coef0 : type
+        Description of parameter `coef0` (the default is 1).
+    kernel_params : type
+        Description of parameter `kernel_params` (the default is None).
+    n_jobs : type
+        Description of parameter `n_jobs` (the default is -1).
+    **kwargs : type
+        Description of parameter `**kwargs`.
 
     Returns
     -------
@@ -397,7 +415,7 @@ def skater(X,
     """
 
     model = Spanning_Forest()
-    model.fit(n_clusters, w, data=X, quorum=floor, trace=trace)
+    model.fit(n_clusters, w, data=X.values, quorum=floor, trace=trace)
     model.labels_ = model.current_labels_
     return model
 
@@ -424,7 +442,7 @@ def azp(X, w, n_clusters=5, **kwargs):
     """
 
     model = AZP()
-    model.fit_from_w(attr=X, w=w, n_regions=n_clusters)
+    model.fit_from_w(attr=X.values, w=w, n_regions=n_clusters)
     return model
 
 

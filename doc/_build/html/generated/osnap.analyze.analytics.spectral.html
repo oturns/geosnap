@@ -19,8 +19,8 @@
     <link rel="shortcut icon" href="../_static/pysal_favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="osnap.analyze.analytics.spenc" href="osnap.analyze.analytics.spenc.html" />
-    <link rel="prev" title="osnap.analyze.analytics.skater" href="osnap.analyze.analytics.skater.html" />
+    <link rel="next" title="osnap.analyze.analytics.ward" href="osnap.analyze.analytics.ward.html" />
+    <link rel="prev" title="osnap.analyze.analytics.kmeans" href="osnap.analyze.analytics.kmeans.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -119,25 +119,57 @@
 <dl class="function">
 <dt id="osnap.analyze.analytics.spectral">
 <code class="descclassname">osnap.analyze.analytics.</code><code class="descname">spectral</code><span class="sig-paren">(</span><em>X</em>, <em>n_clusters</em>, <em>eigen_solver=None</em>, <em>random_state=None</em>, <em>n_init=10</em>, <em>gamma=1.0</em>, <em>affinity='rbf'</em>, <em>n_neighbors=10</em>, <em>eigen_tol=0.0</em>, <em>assign_labels='kmeans'</em>, <em>degree=3</em>, <em>coef0=1</em>, <em>kernel_params=None</em>, <em>n_jobs=-1</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/osnap/analyze/cluster.html#spectral"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#osnap.analyze.analytics.spectral" title="Permalink to this definition">¶</a></dt>
-<dd><p>A-spatial Spectral Clustering.</p>
+<dd><p>Short summary.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>X</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like</span></dt>
+<dt><strong>X</strong> <span class="classifier-delimiter">:</span> <span class="classifier">arral-like</span></dt>
 <dd><p class="first last">n x k attribute data</p>
 </dd>
-<dt><strong>n_clusters</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, optional, default: 8</span></dt>
+<dt><strong>n_clusters</strong> <span class="classifier-delimiter">:</span> <span class="classifier">type</span></dt>
 <dd><p class="first last">The number of clusters to form as well as the number of centroids to
 generate.</p>
 </dd>
-<dt><strong>n_jobs: int, optional, default: -1</strong></dt>
-<dd><p class="first last">The damping parameter passed to scikit-learn’s affinity propagation
-algorithm</p>
+<dt><strong>eigen_solver</strong> <span class="classifier-delimiter">:</span> <span class="classifier">type</span></dt>
+<dd><p class="first last">Description of parameter <cite>eigen_solver</cite> (the default is None).</p>
 </dd>
-<dt><strong>affinity</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional, default ‘rbf’</span></dt>
-<dd><p class="first last">The kernel type passed to scikit-learn’s SpectralClustering algorithm</p>
+<dt><strong>random_state</strong> <span class="classifier-delimiter">:</span> <span class="classifier">type</span></dt>
+<dd><p class="first last">Description of parameter <cite>random_state</cite> (the default is None).</p>
+</dd>
+<dt><strong>n_init</strong> <span class="classifier-delimiter">:</span> <span class="classifier">type</span></dt>
+<dd><p class="first last">Description of parameter <cite>n_init</cite> (the default is 10).</p>
+</dd>
+<dt><strong>gamma</strong> <span class="classifier-delimiter">:</span> <span class="classifier">type</span></dt>
+<dd><p class="first last">Description of parameter <cite>gamma</cite> (the default is 1.0).</p>
+</dd>
+<dt><strong>affinity</strong> <span class="classifier-delimiter">:</span> <span class="classifier">type</span></dt>
+<dd><p class="first last">Description of parameter <cite>affinity</cite> (the default is ‘rbf’).</p>
+</dd>
+<dt><strong>n_neighbors</strong> <span class="classifier-delimiter">:</span> <span class="classifier">type</span></dt>
+<dd><p class="first last">Description of parameter <cite>n_neighbors</cite> (the default is 10).</p>
+</dd>
+<dt><strong>eigen_tol</strong> <span class="classifier-delimiter">:</span> <span class="classifier">type</span></dt>
+<dd><p class="first last">Description of parameter <cite>eigen_tol</cite> (the default is 0.0).</p>
+</dd>
+<dt><strong>assign_labels</strong> <span class="classifier-delimiter">:</span> <span class="classifier">type</span></dt>
+<dd><p class="first last">Description of parameter <cite>assign_labels</cite> (the default is ‘kmeans’).</p>
+</dd>
+<dt><strong>degree</strong> <span class="classifier-delimiter">:</span> <span class="classifier">type</span></dt>
+<dd><p class="first last">Description of parameter <cite>degree</cite> (the default is 3).</p>
+</dd>
+<dt><strong>coef0</strong> <span class="classifier-delimiter">:</span> <span class="classifier">type</span></dt>
+<dd><p class="first last">Description of parameter <cite>coef0</cite> (the default is 1).</p>
+</dd>
+<dt><strong>kernel_params</strong> <span class="classifier-delimiter">:</span> <span class="classifier">type</span></dt>
+<dd><p class="first last">Description of parameter <cite>kernel_params</cite> (the default is None).</p>
+</dd>
+<dt><strong>n_jobs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">type</span></dt>
+<dd><p class="first last">Description of parameter <cite>n_jobs</cite> (the default is -1).</p>
+</dd>
+<dt><strong>**kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">type</span></dt>
+<dd><p class="first last">Description of parameter <cite>**kwargs</cite>.</p>
 </dd>
 </dl>
 </td>

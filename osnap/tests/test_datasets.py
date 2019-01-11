@@ -8,7 +8,9 @@ def test_db_ltdb():
 def test_Community_from_extent():
 
     dc_bound = data.metros[data.metros.name.str.startswith('Washington-Arlington')]
+    dc_bound = dc_bound.to_crs(epsg=2248)
     dc = data.Community(boundary=dc_bound, source='ltdb')
+    dc = dc.to_crs(epsg=4326)
 
     assert dc.tracts.shape == (1359, 2)
     assert dc.census.shape == (6560, 192)

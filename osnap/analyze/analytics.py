@@ -7,7 +7,7 @@ from libpysal.weights import attach_islands
 from libpysal.weights.contiguity import Queen, Rook
 from libpysal.weights.distance import KNN
 
-from .cluster import (affinity_propagation, gaussian_mixture, kmeans, max_p,
+from .cluster import (azp, affinity_propagation, gaussian_mixture, hdbscan, kmeans, max_p,
                       skater, spectral, spenc, ward, ward_spatial)
 
 
@@ -41,8 +41,8 @@ def cluster(dataset,
     allcols = columns + ["year"]
     dataset.census = dataset.census.dropna(how='any', subset=columns)
     opset = copy.deepcopy(dataset)
-    opset.data = opset.data[allcols]
-    opset.data[columns] = opset.data.groupby("year")[columns].apply(
+    opset.census = opset.census[allcols]
+    opset.census[columns] = opset.census.groupby("year")[columns].apply(
         lambda x: (x - x.mean()) / x.std(ddof=0))
     # option to autoscale the data w/ mix-max or zscore?
     specification = {
@@ -51,9 +51,10 @@ def cluster(dataset,
         "ap": affinity_propagation,
         "gm": gaussian_mixture,
         "spectral": spectral,
+        "hdbscan": hdbscan
     }
     model = specification[method](
-        opset.data[columns],
+        opset.census[columns],
         n_clusters=n_clusters,
         best_model=best_model,
         verbose=verbose,
@@ -156,6 +157,7 @@ def cluster_spatial(dataset,
     datasets = dict(zip(years, annual))
 
     specification = {
+        "azp": azp,
         "spenc": spenc,
         "ward_spatial": ward_spatial,
         "skater": skater,
