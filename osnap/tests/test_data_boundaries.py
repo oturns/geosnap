@@ -3,6 +3,7 @@ from context import data
 from quilt.data.spatialucr import census
 from quilt.data.spatialucr import census_cartographic
 
+
 def test_metros():
 
     mets = data.metros

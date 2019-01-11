@@ -1,5 +1,10 @@
 from context import data
 
+def test_db_ltdb():
+    df = data.db.ltdb
+    assert df.shape == (330388, 192)
+
+
 def test_Community_from_extent():
 
     dc_bound = data.metros[data.metros.name.str.startswith('Washington-Arlington')]

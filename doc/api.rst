@@ -33,6 +33,33 @@ Model neighborhood differentiation using multivariate clustering algorithms
     osnap.analyze.cluster
     osnap.analyze.cluster_spatial
 
+Clustering algorithms
+'''''''''''''''''''''''
+The following algorithms may be passed to `osnap.analyze.cluster` or `osnap.analyze.cluster_spatial` but they should not be called directly
+
+Classic (aspatial) Clustering
+""""""""""""""""""""""""""""
+
+.. autosummary::
+   :toctree: generated/
+
+    osnap.analyze.analytics.affinity_propagation
+    osnap.analyze.analytics.gaussian_mixture
+    osnap.analyze.analytics.kmeans
+    osnap.analyze.analytics.spectral
+    osnap.analyze.analytics.ward
+
+Spatial Clustering
+""""""""""""""""""
+
+.. autosummary::
+   :toctree: generated/
+
+    osnap.analyze.analytics.max_p
+    osnap.analyze.analytics.skater
+    osnap.analyze.analytics.spenc
+    osnap.analyze.analytics.ward_spatial    
+
     
 Neighborhod Dynamics Methods
 ````````````````````````````````

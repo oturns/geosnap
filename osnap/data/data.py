@@ -76,8 +76,8 @@ else:
     _ncdb = ''
 
 #: A dict containing tabular data available to OSNAP
-db = Bunch(census_90=quilt.data.spatialucr.census.variables_1990(),
-           census_00=quilt.data.spatialucr.census.variables_2000(),
+db = Bunch(census_90=census.variables_1990(),
+           census_00=census.variables_2000(),
            ltdb=_ltdb,
            ncdb=_ncdb
            )

@@ -118,8 +118,8 @@
 <h1>osnap.data.Community<a class="headerlink" href="#osnap-data-community" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="osnap.data.Community">
-<em class="property">class </em><code class="descclassname">osnap.data.</code><code class="descname">Community</code><span class="sig-paren">(</span><em>source</em>, <em>statefips=None</em>, <em>countyfips=None</em>, <em>cbsafips=None</em>, <em>add_indices=None</em>, <em>boundary=None</em>, <em>name=''</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/osnap/data/data.html#Community"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#osnap.data.Community" title="Permalink to this definition">¶</a></dt>
-<dd><p>A class for storing spatial and tabular data for a collection of “neighborhoods”.</p>
+<em class="property">class </em><code class="descclassname">osnap.data.</code><code class="descname">Community</code><span class="sig-paren">(</span><em>source</em>, <em>statefips=None</em>, <em>countyfips=None</em>, <em>cbsafips=None</em>, <em>add_indices=None</em>, <em>boundary=None</em>, <em>name=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/osnap/data/data.html#Community"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#osnap.data.Community" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spatial and tabular data for a collection of “neighborhoods”.</p>
 <blockquote>
 <div>A community is a collection of “neighborhoods” represented by spatial
 boundaries (e.g. census tracts, or blocks in the US), and tabular data
@@ -136,34 +136,41 @@ may have data pertaining to multiple discrete points in time.</div></blockquote>
 <dd><p class="first last">name or title of dataset.</p>
 </dd>
 <dt><strong>source</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
-<dd><p class="first last">database from which to query attribute data. must of one of [‘ltdb’, ‘ncdb’, ‘census’, ‘external’].</p>
+<dd><p class="first last">database from which to query attribute data.
+Must of one of [‘ltdb’, ‘ncdb’, ‘census’, ‘external’].</p>
 </dd>
 <dt><strong>statefips</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list-like</span></dt>
-<dd><p class="first last">list of two-digit State FIPS codes that define a study region. These will be used to select tracts or blocks that fall within the region.</p>
+<dd><p class="first last">list of two-digit State FIPS codes that define a study region.
+These will be used to select tracts or blocks that fall within
+the region.</p>
 </dd>
 <dt><strong>countyfips</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list-like</span></dt>
-<dd><p class="first last">list of three-digit County FIPS codes that define a study region. These will be used to select tracts or blocks that fall within the region.</p>
+<dd><p class="first last">list of three-digit County FIPS codes that define a study
+region. These will be used to select tracts or blocks that
+fall within the region.</p>
 </dd>
 <dt><strong>cbsafips</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
-<dd><p class="first last">CBSA fips code that defines a study region. This is used to select tracts or blocks that fall within the metropolitan region</p>
+<dd><p class="first last">CBSA fips code that defines a study region. This is used to
+select tracts or blocks that fall within the metropolitan region</p>
 </dd>
 <dt><strong>add_indices</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list-like</span></dt>
-<dd><p class="first last">list of additional indices that should be included in the region. This is likely a list of additional tracts that are relevant to the study area but do not fall inside the passed boundary</p>
+<dd><p class="first last">list of additional indices that should be included in the region.
+This is likely a list of additional tracts that are relevant to the
+study area but do not fall inside the passed boundary</p>
 </dd>
 <dt><strong>boundary</strong> <span class="classifier-delimiter">:</span> <span class="classifier">GeoDataFrame</span></dt>
-<dd><dl class="first last docutils">
-<dt>A GeoDataFrame that defines the extent of the boundary in question.</dt>
-<dd><p class="first last">If a boundary is passed, it will be used to clip the tracts or blocks that fall within it and the 
-state and county lists will be ignored</p>
-</dd>
-</dl>
+<dd><p class="first last">A GeoDataFrame that defines the extent of the boundary in question.
+If a boundary is passed, it will be used to clip the tracts or
+blocks that fall within it and the state and county lists will
+be ignored</p>
 </dd>
 </dl>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
 <dt><strong>data</strong> <span class="classifier-delimiter">:</span> <span class="classifier">Pandas DataFrame</span></dt>
-<dd><p class="first last">long-form dataframe containing attribute variables for each unit of analysis.</p>
+<dd><p class="first last">long-form dataframe containing attribute variables for each unit
+of analysis.</p>
 </dd>
 <dt><strong>name</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
 <dd><p class="first last">name or title of dataset</p>
@@ -192,18 +199,18 @@ state and county lists will be ignored</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="osnap.data.Community.plot.html#osnap.data.Community.plot" title="osnap.data.Community.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([column,&nbsp;year,&nbsp;ax,&nbsp;plot_counties])</td>
-<td>Convenience function for plotting tracts in the metro area.</td>
+<tr class="row-odd"><td><a class="reference internal" href="osnap.data.Community.plot.html#osnap.data.Community.plot" title="osnap.data.Community.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([column,&nbsp;year,&nbsp;ax,&nbsp;plot_counties,&nbsp;title])</td>
+<td>Conveniently plot a choropleth of the Community.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="osnap.data.Community.to_crs.html#osnap.data.Community.to_crs" title="osnap.data.Community.to_crs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_crs</span></code></a>([crs,&nbsp;epsg,&nbsp;inplace])</td>
-<td>Transform all geometries in the study area to a new coordinate reference system.</td>
+<td>Transform all geometries to a new coordinate reference system.</td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="osnap.data.Community.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>source</em>, <em>statefips=None</em>, <em>countyfips=None</em>, <em>cbsafips=None</em>, <em>add_indices=None</em>, <em>boundary=None</em>, <em>name=''</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/osnap/data/data.html#Community.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#osnap.data.Community.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>source</em>, <em>statefips=None</em>, <em>countyfips=None</em>, <em>cbsafips=None</em>, <em>add_indices=None</em>, <em>boundary=None</em>, <em>name=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/osnap/data/data.html#Community.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#osnap.data.Community.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiate a Community.</p>
 </dd></dl>
 
 <p class="rubric">Methods</p>
@@ -214,13 +221,13 @@ state and county lists will be ignored</p>
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td><a class="reference internal" href="#osnap.data.Community.__init__" title="osnap.data.Community.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(source[,&nbsp;statefips,&nbsp;countyfips,&nbsp;…])</td>
-<td>Initialize self.</td>
+<td>Instantiate a Community.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="osnap.data.Community.plot.html#osnap.data.Community.plot" title="osnap.data.Community.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([column,&nbsp;year,&nbsp;ax,&nbsp;plot_counties])</td>
-<td>Convenience function for plotting tracts in the metro area.</td>
+<tr class="row-even"><td><a class="reference internal" href="osnap.data.Community.plot.html#osnap.data.Community.plot" title="osnap.data.Community.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([column,&nbsp;year,&nbsp;ax,&nbsp;plot_counties,&nbsp;title])</td>
+<td>Conveniently plot a choropleth of the Community.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="osnap.data.Community.to_crs.html#osnap.data.Community.to_crs" title="osnap.data.Community.to_crs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_crs</span></code></a>([crs,&nbsp;epsg,&nbsp;inplace])</td>
-<td>Transform all geometries in the study area to a new coordinate reference system.</td>
+<td>Transform all geometries to a new coordinate reference system.</td>
 </tr>
 </tbody>
 </table>

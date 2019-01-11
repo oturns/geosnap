@@ -129,13 +129,13 @@
 <span class="sd">    (Spatial) Markov approaches to transitional dynamics of neighborhood types.</span>
 
 <span class="sd">    Parameters</span>
-<span class="sd">    ----------  </span>
+<span class="sd">    ----------</span>
 <span class="sd">    dataset          : osnap.Dataset</span>
 <span class="sd">                      osnap dataset object with column defining neighborhood clusters</span>
 <span class="sd">    w_type           : libpysal spatial weights type (&quot;rook&quot;, &quot;queen&quot;, &quot;knn&quot; or &quot;kernel&quot;)</span>
 <span class="sd">                      spatial weights object.</span>
 <span class="sd">    w_kwds          : dict</span>
-<span class="sd">                      dictionary with options to be passed to libpysal.weights generator        </span>
+<span class="sd">                      dictionary with options to be passed to libpysal.weights generator</span>
 <span class="sd">    permutations    : int, optional</span>
 <span class="sd">                      number of permutations for use in randomization based</span>
 <span class="sd">                      inference (the default is 0).</span>
@@ -169,7 +169,7 @@
                  <span class="n">permutations</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                  <span class="n">cluster_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
-        <span class="n">y</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">census</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[[</span><span class="s1">&#39;geoid&#39;</span><span class="p">,</span> <span class="s1">&#39;year&#39;</span><span class="p">,</span> <span class="n">cluster_type</span><span class="p">]]</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;geoid&#39;</span><span class="p">,</span> <span class="s1">&#39;year&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">first</span><span class="p">()</span><span class="o">.</span><span class="n">unstack</span><span class="p">()</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
