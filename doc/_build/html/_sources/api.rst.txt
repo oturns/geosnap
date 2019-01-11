@@ -38,34 +38,40 @@ Clustering algorithms
 The following algorithms may be passed to `osnap.analyze.cluster` or `osnap.analyze.cluster_spatial` but they should not be called directly
 
 Classic (aspatial) Clustering
-""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""
+
+.. currentmodule:: osnap.analyze.analytics
 
 .. autosummary::
    :toctree: generated/
 
-    osnap.analyze.analytics.affinity_propagation
-    osnap.analyze.analytics.gaussian_mixture
-    osnap.analyze.analytics.hdbscan
-    osnap.analyze.analytics.kmeans
-    osnap.analyze.analytics.spectral
-    osnap.analyze.analytics.ward
+    affinity_propagation
+    gaussian_mixture
+    hdbscan
+    kmeans
+    spectral
+    ward
 
 Spatial Clustering
 """"""""""""""""""
 
+.. currentmodule:: osnap.analyze.analytics
+
 .. autosummary::
    :toctree: generated/
 
-    osnap.analyze.analytics.azp
-    osnap.analyze.analytics.max_p
-    osnap.analyze.analytics.skater
-    osnap.analyze.analytics.spenc
-    osnap.analyze.analytics.ward_spatial    
+    azp
+    max_p
+    skater
+    spenc
+    ward_spatial    
 
     
 Neighborhod Dynamics Methods
 ````````````````````````````````
 Model neighborhood change using optimal-matching algorithms or spatial discrete markov chains
+
+.. currentmodule:: osnap
 
 .. autosummary::
    :toctree: generated/
