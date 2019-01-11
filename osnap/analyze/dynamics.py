@@ -17,13 +17,13 @@ class Transition(object):
     (Spatial) Markov approaches to transitional dynamics of neighborhood types.
 
     Parameters
-    ----------  
+    ----------
     dataset          : osnap.Dataset
                       osnap dataset object with column defining neighborhood clusters
     w_type           : libpysal spatial weights type ("rook", "queen", "knn" or "kernel")
                       spatial weights object.
     w_kwds          : dict
-                      dictionary with options to be passed to libpysal.weights generator        
+                      dictionary with options to be passed to libpysal.weights generator
     permutations    : int, optional
                       number of permutations for use in randomization based
                       inference (the default is 0).
@@ -57,7 +57,7 @@ class Transition(object):
                  permutations=0,
                  cluster_type=None):
 
-        y = dataset.data.copy().reset_index()
+        y = dataset.census.copy().reset_index()
         y = y[['geoid', 'year', cluster_type]]
         y = y.groupby(['geoid', 'year']).first().unstack()
         y = y.dropna()

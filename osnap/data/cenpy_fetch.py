@@ -8,9 +8,9 @@ variable_file = os.path.join(filepath, 'variables.csv')
 variables = pandas.read_csv(variable_file)
 
 c2000sf1 = cenpy.base.Connection(
-    'DecennialSF11990', apikey='d4d0ad648fffc219dc272b6af90e5b2106235a12')
+    'DecennialSF11990')
 c2000sf3 = cenpy.base.Connection(
-    'DecennialSF31990', apikey='d4d0ad648fffc219dc272b6af90e5b2106235a12')
+    'DecennialSF31990')
 
 by_form = variables.groupby('census_1990_form')
 column_relations = by_form.census_1990_table_column.agg(list)

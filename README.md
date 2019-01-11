@@ -9,13 +9,13 @@
 - `osnap.data`:  
 Ingest, create, and manipulate space-time datasets
 
-- `osnap.analytics`:  
+- `osnap.analyze`:  
 Analyze neighborhood dynamics
 
 - `osnap.harmonize`:  
 Harmonize neighborhood boundaries with spatial statistical methods
 
-- `osnap.visualization`:    
+- `osnap.visualize`:    
 Visualize neighborhood dynamics
 
 ## Installation

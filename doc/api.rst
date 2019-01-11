@@ -11,13 +11,12 @@ Data Module
 --------------
 .. autosummary::
    :toctree: generated/
-
+   
+    osnap.data.db
+    osnap.data.metros
     osnap.data.read_ltdb
     osnap.data.read_ncdb
     osnap.data.Community
-    osnap.data.Community.plot
-    osnap.data.Community.to_crs
-
 
 .. _analyze_api:
 

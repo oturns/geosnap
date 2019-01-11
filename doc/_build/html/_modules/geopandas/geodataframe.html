@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>geopandas.geodataframe &#8212; osnap v0.0.0 Manual</title>
+    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pysal-styles.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
+    <link rel="shortcut icon" href="../../_static/pysal_favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          osnap</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../installation.html">Installation</a></li>
+                <li><a href="../../api.html">API</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#installing-released-version">Installing released version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#installing-development-version">Installing development version</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#data-module">Data Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#analyze-module">Analyze Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#harmonize-module">Harmonize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#visualize-module">Visualize Module</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <h1>Source code for geopandas.geodataframe</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="k">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">mapping</span><span class="p">,</span> <span class="n">shape</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry.base</span> <span class="k">import</span> <span class="n">BaseGeometry</span>
+<span class="kn">from</span> <span class="nn">six</span> <span class="k">import</span> <span class="n">string_types</span><span class="p">,</span> <span class="n">PY3</span>
+
+<span class="kn">from</span> <span class="nn">geopandas.base</span> <span class="k">import</span> <span class="n">GeoPandasBase</span><span class="p">,</span> <span class="n">_CoordinateIndexer</span>
+<span class="kn">from</span> <span class="nn">geopandas.geoseries</span> <span class="k">import</span> <span class="n">GeoSeries</span>
+<span class="kn">from</span> <span class="nn">geopandas.plotting</span> <span class="k">import</span> <span class="n">plot_dataframe</span>
+<span class="kn">import</span> <span class="nn">geopandas.io</span>
+
+
+<span class="n">DEFAULT_GEO_COLUMN_NAME</span> <span class="o">=</span> <span class="s1">&#39;geometry&#39;</span>
+
+
+<span class="k">class</span> <span class="nc">GeoDataFrame</span><span class="p">(</span><span class="n">GeoPandasBase</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A GeoDataFrame object is a pandas.DataFrame that has a column</span>
+<span class="sd">    with geometry. In addition to the standard DataFrame constructor arguments,</span>
+<span class="sd">    GeoDataFrame also accepts the following keyword arguments:</span>
+
+<span class="sd">    Keyword Arguments</span>
+<span class="sd">    -----------------</span>
+<span class="sd">    crs : str (optional)</span>
+<span class="sd">        Coordinate system</span>
+<span class="sd">    geometry : str or array (optional)</span>
+<span class="sd">        If str, column to use as geometry. If array, will be set as &#39;geometry&#39;</span>
+<span class="sd">        column on GeoDataFrame.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># XXX: This will no longer be necessary in pandas 0.17</span>
+    <span class="n">_internal_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;_data&#39;</span><span class="p">,</span> <span class="s1">&#39;_cacher&#39;</span><span class="p">,</span> <span class="s1">&#39;_item_cache&#39;</span><span class="p">,</span> <span class="s1">&#39;_cache&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;is_copy&#39;</span><span class="p">,</span> <span class="s1">&#39;_subtyp&#39;</span><span class="p">,</span> <span class="s1">&#39;_index&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;_default_kind&#39;</span><span class="p">,</span> <span class="s1">&#39;_default_fill_value&#39;</span><span class="p">,</span> <span class="s1">&#39;_metadata&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;__array_struct__&#39;</span><span class="p">,</span> <span class="s1">&#39;__array_interface__&#39;</span><span class="p">]</span>
+
+    <span class="n">_metadata</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;crs&#39;</span><span class="p">,</span> <span class="s1">&#39;_geometry_column_name&#39;</span><span class="p">]</span>
+
+    <span class="n">_geometry_column_name</span> <span class="o">=</span> <span class="n">DEFAULT_GEO_COLUMN_NAME</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">crs</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;crs&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">geometry</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;geometry&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GeoDataFrame</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="n">crs</span>
+        <span class="k">if</span> <span class="n">geometry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_geometry</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_invalidate_sindex</span><span class="p">()</span>
+
+    <span class="c1"># Serialize metadata (will no longer be necessary in pandas 0.17+)</span>
+    <span class="c1"># See https://github.com/pydata/pandas/pull/10557</span>
+    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">k</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">,</span> <span class="n">_typ</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_typ</span><span class="p">,</span>
+                    <span class="n">_metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">,</span> <span class="o">**</span><span class="n">meta</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="c1"># have to special case geometry b/c pandas tries to use as column...</span>
+        <span class="k">if</span> <span class="n">attr</span> <span class="o">==</span> <span class="s1">&#39;geometry&#39;</span><span class="p">:</span>
+            <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">GeoDataFrame</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry_column_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;No geometry data set yet (expected in&quot;</span>
+                                 <span class="s2">&quot; column &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry_column_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_geometry_column_name</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_set_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col</span><span class="p">):</span>
+        <span class="c1"># TODO: Use pandas&#39; core.common.is_list_like() here.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">Series</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Must use a list-like to set the geometry&quot;</span>
+                             <span class="s2">&quot; property&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_geometry</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">geometry</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">fget</span><span class="o">=</span><span class="n">_get_geometry</span><span class="p">,</span> <span class="n">fset</span><span class="o">=</span><span class="n">_set_geometry</span><span class="p">,</span>
+                        <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Geometry data for GeoDataFrame&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">set_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the GeoDataFrame geometry using either an existing column or</span>
+<span class="sd">        the specified input. By default yields a new object.</span>
+
+<span class="sd">        The original geometry column is replaced with the input.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        keys : column label or array</span>
+<span class="sd">        drop : boolean, default True</span>
+<span class="sd">            Delete column to be used as the new geometry</span>
+<span class="sd">        inplace : boolean, default False</span>
+<span class="sd">            Modify the GeoDataFrame in place (do not create a new object)</span>
+<span class="sd">        crs : str/result of fion.get_crs (optional)</span>
+<span class="sd">            Coordinate system to use. If passed, overrides both DataFrame and</span>
+<span class="sd">            col&#39;s crs. Otherwise, tries to get crs from passed col values or</span>
+<span class="sd">            DataFrame.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; df1 = df.set_geometry([Point(0,0), Point(1,1), Point(2,2)])</span>
+<span class="sd">        &gt;&gt;&gt; df2 = df.set_geometry(&#39;geom1&#39;)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        geodataframe : GeoDataFrame</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Most of the code here is taken from DataFrame.set_index()</span>
+        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">crs</span><span class="p">:</span>
+            <span class="n">crs</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="s1">&#39;crs&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
+
+        <span class="n">to_remove</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">geo_column_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry_column_name</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="p">(</span><span class="n">Series</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+            <span class="n">level</span> <span class="o">=</span> <span class="n">col</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="s1">&#39;ndim&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">col</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Must pass array with one dimension only.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">level</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown column </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">col</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span>
+            <span class="k">if</span> <span class="n">drop</span><span class="p">:</span>
+                <span class="n">to_remove</span> <span class="o">=</span> <span class="n">col</span>
+                <span class="n">geo_column_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry_column_name</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">geo_column_name</span> <span class="o">=</span> <span class="n">col</span>
+
+        <span class="k">if</span> <span class="n">to_remove</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">frame</span><span class="p">[</span><span class="n">to_remove</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="n">GeoSeries</span><span class="p">)</span> <span class="ow">and</span> <span class="n">level</span><span class="o">.</span><span class="n">crs</span> <span class="o">!=</span> <span class="n">crs</span><span class="p">:</span>
+            <span class="c1"># Avoids caching issues/crs sharing issues</span>
+            <span class="n">level</span> <span class="o">=</span> <span class="n">level</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">level</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="n">crs</span>
+
+        <span class="c1"># Check that we are using a listlike of geometries</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">BaseGeometry</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">level</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input geometry column must contain valid geometry objects.&quot;</span><span class="p">)</span>
+        <span class="n">frame</span><span class="p">[</span><span class="n">geo_column_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">level</span>
+        <span class="n">frame</span><span class="o">.</span><span class="n">_geometry_column_name</span> <span class="o">=</span> <span class="n">geo_column_name</span>
+        <span class="n">frame</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="n">crs</span>
+        <span class="n">frame</span><span class="o">.</span><span class="n">_invalidate_sindex</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">frame</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Alternate constructor to create a ``GeoDataFrame`` from a file.</span>
+
+<span class="sd">        Can load a ``GeoDataFrame`` from a file in any format recognized by</span>
+<span class="sd">        `fiona`. See http://toblerity.org/fiona/manual.html for details.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        filename : str</span>
+<span class="sd">            File path or file handle to read from. Depending on which kwargs</span>
+<span class="sd">            are included, the content of filename may vary. See</span>
+<span class="sd">            http://toblerity.org/fiona/README.html#usage for usage details.</span>
+<span class="sd">        kwargs : key-word arguments</span>
+<span class="sd">            These arguments are passed to fiona.open, and can be used to</span>
+<span class="sd">            access multi-layer data, data stored within archives (zip files),</span>
+<span class="sd">            etc.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+
+<span class="sd">        &gt;&gt;&gt; df = geopandas.GeoDataFrame.from_file(&#39;nybb.shp&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_features</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">features</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Alternate constructor to create GeoDataFrame from an iterable of</span>
+<span class="sd">        features or a feature collection.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        features</span>
+<span class="sd">            - Iterable of features, where each element must be a feature</span>
+<span class="sd">              dictionary or implement the __geo_interface__.</span>
+<span class="sd">            - Feature collection, where the &#39;features&#39; key contains an</span>
+<span class="sd">              iterable of features.</span>
+<span class="sd">            - Object holding a feature collection that implements the</span>
+<span class="sd">              ``__geo_interface__``.</span>
+<span class="sd">        crs : str or dict (optional)</span>
+<span class="sd">            Coordinate reference system to set on the resulting frame.</span>
+<span class="sd">        columns : list of column names, optional</span>
+<span class="sd">            Optionally specify the column names to include in the output frame.</span>
+<span class="sd">            This does not overwrite the property names of the input, but can</span>
+<span class="sd">            ensure a consistent output format.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        GeoDataFrame</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        For more information about the ``__geo_interface__``, see</span>
+<span class="sd">        https://gist.github.com/sgillies/2217756</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Handle feature collections</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="s2">&quot;__geo_interface__&quot;</span><span class="p">):</span>
+            <span class="n">fs</span> <span class="o">=</span> <span class="n">features</span><span class="o">.</span><span class="n">__geo_interface__</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fs</span> <span class="o">=</span> <span class="n">features</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="n">fs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;FeatureCollection&#39;</span><span class="p">:</span>
+            <span class="n">features_lst</span> <span class="o">=</span> <span class="n">fs</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">features_lst</span> <span class="o">=</span> <span class="n">features</span>
+
+        <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">features_lst</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">&quot;__geo_interface__&quot;</span><span class="p">):</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">__geo_interface__</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">f</span>
+
+            <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;geometry&#39;</span><span class="p">:</span> <span class="n">shape</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">])</span> <span class="k">if</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span><span class="p">}</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">])</span>
+            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="n">crs</span>
+        <span class="k">return</span> <span class="n">df</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_postgis</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">sql</span><span class="p">,</span> <span class="n">con</span><span class="p">,</span> <span class="n">geom_col</span><span class="o">=</span><span class="s1">&#39;geom&#39;</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">hex_encoded</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">coerce_float</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                     <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Alternate constructor to create a ``GeoDataFrame`` from a sql query</span>
+<span class="sd">        containing a geometry column.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sql : string</span>
+<span class="sd">        con : DB connection object or SQLAlchemy engine</span>
+<span class="sd">        geom_col : string, default &#39;geom&#39;</span>
+<span class="sd">            column name to convert to shapely geometries</span>
+<span class="sd">        crs : optional</span>
+<span class="sd">            Coordinate reference system to use for the returned GeoDataFrame</span>
+<span class="sd">        hex_encoded : bool, optional</span>
+<span class="sd">            Whether the geometry is in a hex-encoded string. Default is True,</span>
+<span class="sd">            standard for postGIS.</span>
+<span class="sd">        index_col : string or list of strings, optional, default: None</span>
+<span class="sd">            Column(s) to set as index(MultiIndex)</span>
+<span class="sd">        coerce_float : boolean, default True</span>
+<span class="sd">            Attempt to convert values of non-string, non-numeric objects (like</span>
+<span class="sd">            decimal.Decimal) to floating point, useful for SQL result sets</span>
+<span class="sd">        params : list, tuple or dict, optional, default: None</span>
+<span class="sd">            List of parameters to pass to execute method.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; sql = &quot;SELECT geom, highway FROM roads;&quot;</span>
+<span class="sd">        &gt;&gt;&gt; df = geopandas.GeoDataFrame.from_postgis(sql, con)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_postgis</span><span class="p">(</span>
+                <span class="n">sql</span><span class="p">,</span> <span class="n">con</span><span class="p">,</span> <span class="n">geom_col</span><span class="o">=</span><span class="n">geom_col</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">,</span> <span class="n">hex_encoded</span><span class="o">=</span><span class="n">hex_encoded</span><span class="p">,</span>
+                <span class="n">index_col</span><span class="o">=</span><span class="n">index_col</span><span class="p">,</span> <span class="n">coerce_float</span><span class="o">=</span><span class="n">coerce_float</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span>
+
+    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">na</span><span class="o">=</span><span class="s1">&#39;null&#39;</span><span class="p">,</span> <span class="n">show_bbox</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a GeoJSON representation of the ``GeoDataFrame`` as a string.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        na : {&#39;null&#39;, &#39;drop&#39;, &#39;keep&#39;}, default &#39;null&#39;</span>
+<span class="sd">            Indicates how to output missing (NaN) values in the GeoDataFrame.</span>
+<span class="sd">            See below.</span>
+<span class="sd">        show_bbox : bool, optional, default: False</span>
+<span class="sd">            Include bbox (bounds) in the geojson</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The remaining *kwargs* are passed to json.dumps().</span>
+
+<span class="sd">        Missing (NaN) values in the GeoDataFrame can be represented as follows:</span>
+
+<span class="sd">        - ``null``: output the missing entries as JSON null.</span>
+<span class="sd">        - ``drop``: remove the property from the feature. This applies to each</span>
+<span class="sd">          feature individually so that features may have different properties.</span>
+<span class="sd">        - ``keep``: output the missing entries as NaN.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_to_geo</span><span class="p">(</span><span class="n">na</span><span class="o">=</span><span class="n">na</span><span class="p">,</span> <span class="n">show_bbox</span><span class="o">=</span><span class="n">show_bbox</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">__geo_interface__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a ``GeoDataFrame`` as a python feature collection.</span>
+
+<span class="sd">        Implements the `geo_interface`. The returned python data structure</span>
+<span class="sd">        represents the ``GeoDataFrame`` as a GeoJSON-like</span>
+<span class="sd">        ``FeatureCollection``.</span>
+
+<span class="sd">        This differs from `_to_geo()` only in that it is a property with</span>
+<span class="sd">        default args instead of a method</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_geo</span><span class="p">(</span><span class="n">na</span><span class="o">=</span><span class="s1">&#39;null&#39;</span><span class="p">,</span> <span class="n">show_bbox</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">iterfeatures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">na</span><span class="o">=</span><span class="s1">&#39;null&#39;</span><span class="p">,</span> <span class="n">show_bbox</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns an iterator that yields feature dictionaries that comply with</span>
+<span class="sd">        __geo_interface__</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        na : {&#39;null&#39;, &#39;drop&#39;, &#39;keep&#39;}, default &#39;null&#39;</span>
+<span class="sd">            Indicates how to output missing (NaN) values in the GeoDataFrame</span>
+<span class="sd">            * null: ouput the missing entries as JSON null</span>
+<span class="sd">            * drop: remove the property from the feature. This applies to</span>
+<span class="sd">                    each feature individually so that features may have</span>
+<span class="sd">                    different properties</span>
+<span class="sd">            * keep: output the missing entries as NaN</span>
+
+<span class="sd">        show_bbox : include bbox (bounds) in the geojson. default False</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">fill_none</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Takes in a Series, converts to a dictionary with null values</span>
+<span class="sd">            set to None</span>
+
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">na_keys</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">isnull</span><span class="p">()]</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">na_keys</span><span class="p">:</span>
+                <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="n">d</span>
+
+        <span class="c1"># na_methods must take in a Series and return dict</span>
+        <span class="n">na_methods</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;null&#39;</span><span class="p">:</span> <span class="n">fill_none</span><span class="p">,</span>
+                      <span class="s1">&#39;drop&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span>
+                      <span class="s1">&#39;keep&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()}</span>
+
+        <span class="k">if</span> <span class="n">na</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">na_methods</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown na method </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">na</span><span class="p">))</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">na_methods</span><span class="p">[</span><span class="n">na</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">properties</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+            <span class="k">del</span> <span class="n">properties</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_geometry_column_name</span><span class="p">]</span>
+
+            <span class="n">feature</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;Feature&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="n">properties</span><span class="p">,</span>
+                <span class="s1">&#39;geometry&#39;</span><span class="p">:</span> <span class="n">mapping</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_geometry_column_name</span><span class="p">])</span>
+                            <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_geometry_column_name</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="p">}</span>
+
+            <span class="k">if</span> <span class="n">show_bbox</span><span class="p">:</span>
+                <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;bbox&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">bounds</span>
+
+            <span class="k">yield</span> <span class="n">feature</span>
+
+    <span class="k">def</span> <span class="nf">_to_geo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a python feature collection (i.e. the geointerface)</span>
+<span class="sd">        representation of the GeoDataFrame.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">geo</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;FeatureCollection&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;features&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iterfeatures</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">))}</span>
+
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;show_bbox&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="n">geo</span><span class="p">[</span><span class="s1">&#39;bbox&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_bounds</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">geo</span>
+
+    <span class="k">def</span> <span class="nf">to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;ESRI Shapefile&quot;</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write the ``GeoDataFrame`` to a file.</span>
+
+<span class="sd">        By default, an ESRI shapefile is written, but any OGR data source</span>
+<span class="sd">        supported by Fiona can be written. A dictionary of supported OGR</span>
+<span class="sd">        providers is available via:</span>
+
+<span class="sd">        &gt;&gt;&gt; import fiona</span>
+<span class="sd">        &gt;&gt;&gt; fiona.supported_drivers</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : string</span>
+<span class="sd">            File path or file handle to write to.</span>
+<span class="sd">        driver : string, default: &#39;ESRI Shapefile&#39;</span>
+<span class="sd">            The OGR format driver used to write the vector file.</span>
+<span class="sd">        schema : dict, default: None</span>
+<span class="sd">            If specified, the schema dictionary is passed to Fiona to</span>
+<span class="sd">            better control how the file is written.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The extra keyword arguments ``**kwargs`` are passed to fiona.open and</span>
+<span class="sd">        can be used to write to multi-layer data, store data within archives</span>
+<span class="sd">        (zip files), etc.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">geopandas.io.file</span> <span class="k">import</span> <span class="n">to_file</span>
+        <span class="n">to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">driver</span><span class="p">,</span> <span class="n">schema</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">to_crs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transform geometries to a new coordinate reference system.</span>
+
+<span class="sd">        Transform all geometries in a GeoSeries to a different coordinate</span>
+<span class="sd">        reference system.  The ``crs`` attribute on the current GeoSeries must</span>
+<span class="sd">        be set.  Either ``crs`` in string or dictionary form or an EPSG code</span>
+<span class="sd">        may be specified for output.</span>
+
+<span class="sd">        This method will transform all points in all objects.  It has no notion</span>
+<span class="sd">        or projecting entire geometries.  All segments joining points are</span>
+<span class="sd">        assumed to be lines in the current projection, not geodesics.  Objects</span>
+<span class="sd">        crossing the dateline (or other projection boundary) will have</span>
+<span class="sd">        undesirable behavior.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        crs : dict or str</span>
+<span class="sd">            Output projection parameters as string or in dictionary form.</span>
+<span class="sd">        epsg : int</span>
+<span class="sd">            EPSG code specifying output projection.</span>
+<span class="sd">        inplace : bool, optional, default: False</span>
+<span class="sd">            Whether to return a new GeoDataFrame or do the transformation in</span>
+<span class="sd">            place.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">geom</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">epsg</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">geometry</span> <span class="o">=</span> <span class="n">geom</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="n">geom</span><span class="o">.</span><span class="n">crs</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">df</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If the result is a column containing only &#39;geometry&#39;, return a</span>
+<span class="sd">        GeoSeries. If it&#39;s a DataFrame with a &#39;geometry&#39; column, return a</span>
+<span class="sd">        GeoDataFrame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">GeoDataFrame</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">geo_col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry_column_name</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">string_types</span><span class="p">)</span> <span class="ow">and</span> <span class="n">key</span> <span class="o">==</span> <span class="n">geo_col</span><span class="p">:</span>
+            <span class="n">result</span><span class="o">.</span><span class="vm">__class__</span> <span class="o">=</span> <span class="n">GeoSeries</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crs</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">_invalidate_sindex</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">)</span> <span class="ow">and</span> <span class="n">geo_col</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+            <span class="n">result</span><span class="o">.</span><span class="vm">__class__</span> <span class="o">=</span> <span class="n">GeoDataFrame</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crs</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">_geometry_column_name</span> <span class="o">=</span> <span class="n">geo_col</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">_invalidate_sindex</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">)</span> <span class="ow">and</span> <span class="n">geo_col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+            <span class="n">result</span><span class="o">.</span><span class="vm">__class__</span> <span class="o">=</span> <span class="n">DataFrame</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="c1">#</span>
+    <span class="c1"># Implement pandas methods</span>
+    <span class="c1">#</span>
+
+    <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">geo_col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry_column_name</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">)</span> <span class="ow">and</span> <span class="n">geo_col</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+            <span class="n">result</span><span class="o">.</span><span class="vm">__class__</span> <span class="o">=</span> <span class="n">GeoDataFrame</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crs</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">_geometry_column_name</span> <span class="o">=</span> <span class="n">geo_col</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">_invalidate_sindex</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">)</span> <span class="ow">and</span> <span class="n">geo_col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+            <span class="n">result</span><span class="o">.</span><span class="vm">__class__</span> <span class="o">=</span> <span class="n">DataFrame</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_constructor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">GeoDataFrame</span>
+
+    <span class="k">def</span> <span class="nf">__finalize__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;propagate metadata from other to self &quot;&quot;&quot;</span>
+        <span class="c1"># merge operation: using metadata of the left object</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;merge&#39;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">:</span>
+                <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="c1"># concat operation: using metadata of the first object</span>
+        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;concat&#39;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">:</span>
+                <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">objs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">:</span>
+                <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Make a copy of this GeoDataFrame object</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        deep : boolean, default True</span>
+<span class="sd">            Make a deep copy, i.e. also copy data</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        copy : GeoDataFrame</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># FIXME: this will likely be unnecessary in pandas &gt;= 0.13</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span>
+        <span class="k">if</span> <span class="n">deep</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">__finalize__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generate a plot of the geometries in the ``GeoDataFrame``.</span>
+
+<span class="sd">        If the ``column`` parameter is given, colors plot according to values</span>
+<span class="sd">        in that column, otherwise calls ``GeoSeries.plot()`` on the</span>
+<span class="sd">        ``geometry`` column.</span>
+
+<span class="sd">        Wraps the ``plot_dataframe()`` function, and documentation is copied</span>
+<span class="sd">        from there.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">plot_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="n">plot</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">plot_dataframe</span><span class="o">.</span><span class="vm">__doc__</span>
+
+
+    <span class="k">def</span> <span class="nf">dissolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">aggfunc</span><span class="o">=</span><span class="s1">&#39;first&#39;</span><span class="p">,</span> <span class="n">as_index</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Dissolve geometries within `groupby` into single observation.</span>
+<span class="sd">        This is accomplished by applying the `unary_union` method</span>
+<span class="sd">        to all geometries within a groupself.</span>
+
+<span class="sd">        Observations associated with each `groupby` group will be aggregated</span>
+<span class="sd">        using the `aggfunc`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        by : string, default None</span>
+<span class="sd">            Column whose values define groups to be dissolved</span>
+<span class="sd">        aggfunc : function or string, default &quot;first&quot;</span>
+<span class="sd">            Aggregation function for manipulation of data associated</span>
+<span class="sd">            with each group. Passed to pandas `groupby.agg` method.</span>
+<span class="sd">        as_index : boolean, default True</span>
+<span class="sd">            If true, groupby columns become index of result.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        GeoDataFrame</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Process non-spatial component</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">labels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">aggregated_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">by</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">aggfunc</span><span class="p">)</span>
+
+
+        <span class="c1"># Process spatial component</span>
+        <span class="k">def</span> <span class="nf">merge_geometries</span><span class="p">(</span><span class="n">block</span><span class="p">):</span>
+            <span class="n">merged_geom</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">unary_union</span>
+            <span class="k">return</span> <span class="n">merged_geom</span>
+
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">by</span><span class="p">,</span> <span class="n">group_keys</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">merge_geometries</span><span class="p">)</span>
+
+        <span class="c1"># Aggregate</span>
+        <span class="n">aggregated_geometry</span> <span class="o">=</span> <span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
+        <span class="c1"># Recombine</span>
+        <span class="n">aggregated</span> <span class="o">=</span> <span class="n">aggregated_geometry</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">aggregated_data</span><span class="p">)</span>
+
+        <span class="c1"># Reset if requested</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">as_index</span><span class="p">:</span>
+            <span class="n">aggregated</span> <span class="o">=</span> <span class="n">aggregated</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">aggregated</span>
+
+    <span class="c1"># overrides GeoPandasBase method</span>
+    <span class="k">def</span> <span class="nf">explode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Explode muti-part geometries into multiple single geometries.</span>
+
+<span class="sd">        Each row containing a multi-part geometry will be split into</span>
+<span class="sd">        multiple rows with single geometries, thereby increasing the vertical</span>
+<span class="sd">        size of the GeoDataFrame.</span>
+
+<span class="sd">        The index of the input geodataframe is no longer unique and is</span>
+<span class="sd">        replaced with a multi-index (original index with additional level</span>
+<span class="sd">        indicating the multiple geometries: a new zero-based index for each</span>
+<span class="sd">        single part geometry per multi-part geometry).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        GeoDataFrame</span>
+<span class="sd">            Exploded geodataframe with each single geometry</span>
+<span class="sd">            as a separate entry in the geodataframe.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df_copy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="n">exploded_geom</span> <span class="o">=</span> <span class="n">df_copy</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">explode</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">level</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">exploded_index</span> <span class="o">=</span> <span class="n">exploded_geom</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">df_copy</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">df_copy</span><span class="o">.</span><span class="n">_geometry_column_name</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+             <span class="n">exploded_geom</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># reset to MultiIndex, otherwise df index is only first level of</span>
+        <span class="c1"># exploded GeoSeries index.</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">exploded_index</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">names</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+        <span class="n">geo_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_geometry</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_geometry_column_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">geo_df</span>
+
+
+<span class="k">def</span> <span class="nf">_dataframe_set_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can&#39;t do inplace setting when converting from&quot;</span>
+                         <span class="s2">&quot; DataFrame to GeoDataFrame&quot;</span><span class="p">)</span>
+    <span class="n">gf</span> <span class="o">=</span> <span class="n">GeoDataFrame</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="c1"># this will copy so that BlockManager gets copied</span>
+    <span class="k">return</span> <span class="n">gf</span><span class="o">.</span><span class="n">set_geometry</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="n">drop</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">PY3</span><span class="p">:</span>
+    <span class="n">DataFrame</span><span class="o">.</span><span class="n">set_geometry</span> <span class="o">=</span> <span class="n">_dataframe_set_geometry</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">types</span>
+    <span class="n">DataFrame</span><span class="o">.</span><span class="n">set_geometry</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">(</span><span class="n">_dataframe_set_geometry</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
+                                              <span class="n">DataFrame</span><span class="p">)</span>
+
+
+<span class="n">GeoDataFrame</span><span class="o">.</span><span class="n">_create_indexer</span><span class="p">(</span><span class="s1">&#39;cx&#39;</span><span class="p">,</span> <span class="n">_CoordinateIndexer</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2018, osnap developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

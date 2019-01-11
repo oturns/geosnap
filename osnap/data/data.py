@@ -2,8 +2,15 @@
 
 import os
 import zipfile
-import quilt
 from warnings import warn
+
+import matplotlib.pyplot as plt
+import pandas as pd
+import quilt
+from shapely import wkb, wkt
+
+import geopandas as gpd
+
 try:
     from quilt.data.spatialucr import census
 except ImportError:
@@ -11,13 +18,22 @@ except ImportError:
     quilt.install("spatialucr/census")
     quilt.install("spatialucr/census_cartographic")
     from quilt.data.spatialucr import census
-import matplotlib.pyplot as plt
-import pandas as pd
-from shapely import wkt, wkb
 
-import geopandas as gpd
 
-# Variables
+class Bunch(dict):
+    """A dict with attribute-access."""
+
+    def __getattr__(self, key):
+        try:
+            return self.__getitem__(key)
+        except KeyError:
+            raise AttributeError(key)
+
+    def __setattr__(self, key, value):
+        self.__setitem__(key, value)
+
+    def __dir__(self):
+        return self.keys()
 
 
 def _convert_gdf(df):
@@ -33,7 +49,8 @@ def _convert_gdf(df):
 
 
 _package_directory = os.path.dirname(os.path.abspath(__file__))
-_variables = pd.read_csv(os.path.join(_package_directory, "variables.csv"))
+
+dictionary = pd.read_csv(os.path.join(_package_directory, "variables.csv"))
 _cbsa = pd.read_parquet(os.path.join(_package_directory, 'cbsas.parquet'))
 states = pd.read_parquet(os.path.join(_package_directory, 'states.parquet'))
 
@@ -42,24 +59,46 @@ counties = pd.read_parquet(
 
 tracts = census.tracts_2010
 
+#: A GeoDataFrame containing metropolitan statistical areas for the U.S.
 metros = pd.read_parquet(os.path.join(_package_directory, 'msas.parquet'))
-metros = _convert_gdf(metros)
+metros = _convert_gdf(metros) 
+
+if os.path.exists(os.path.join(_package_directory, "ltdb.parquet.gzip")):
+    _ltdb = pd.read_parquet(os.path.join(
+        _package_directory, "ltdb.parquet.gzip"))
+else:
+    _ltdb = ''
+
+if os.path.exists(os.path.join(_package_directory, "ncdb.parquet.gzip")):
+    _ncdb = pd.read_parquet(os.path.join(
+        _package_directory, "ncdb.parquet.gzip"))
+else:
+    _ncdb = ''
+
+#: A dict containing tabular data available to OSNAP
+db = Bunch(census_90=quilt.data.spatialucr.census.variables_1990(),
+           census_00=quilt.data.spatialucr.census.variables_2000(),
+           ltdb=_ltdb,
+           ncdb=_ncdb
+           )
 
 # LTDB importer
 
 
 def read_ltdb(sample, fullcount):
     """
-    Read data from Brown's Longitudinal Tract Database (LTDB) and store it for later use.
+    Read & store data from Brown's Longitudinal Tract Database (LTDB).
 
     Parameters
     ----------
     sample : str
-        file path of the zip file containing the standard Sample CSV files downloaded from
+        file path of the zip file containing the standard Sample CSV files
+        downloaded from
         https://s4.ad.brown.edu/projects/diversity/Researcher/LTBDDload/Default.aspx
 
     fullcount: str
-        file path of the zip file containing the standard Fullcount CSV files downloaded from
+        file path of the zip file containing the standard Fullcount CSV files
+        downloaded from
         https://s4.ad.brown.edu/projects/diversity/Researcher/LTBDDload/Default.aspx
 
     Returns
@@ -106,8 +145,7 @@ def read_ltdb(sample, fullcount):
         try:
             df = _adjust_inflation(df, inflate_cols, year)
         except:
-            pass
-
+            warn('something went wrong adjusting for inflation')
         return df
 
     # read in Brown's LTDB data, both the sample and fullcount files for each
@@ -172,17 +210,17 @@ def read_ltdb(sample, fullcount):
         [ltdb_1970, ltdb_1980, ltdb_1990, ltdb_2000, ltdb_2010], sort=True)
 
     renamer = dict(
-        zip(_variables['ltdb'].tolist(), _variables['variable'].tolist()))
+        zip(dictionary['ltdb'].tolist(), dictionary['variable'].tolist()))
 
     df.rename(renamer, axis="columns", inplace=True)
 
     # compute additional variables from lookup table
-    for row in _variables['formula'].dropna().tolist():
+    for row in dictionary['formula'].dropna().tolist():
         df.eval(row, inplace=True)
 
     df = df.round(0)
 
-    keeps = df.columns[df.columns.isin(_variables['variable'].tolist() +
+    keeps = df.columns[df.columns.isin(dictionary['variable'].tolist() +
                                        ['year'])]
     df = df[keeps]
 
@@ -190,13 +228,10 @@ def read_ltdb(sample, fullcount):
         os.path.join(_package_directory, "ltdb.parquet.gzip"),
         compression='gzip')
 
-    return df
-
 
 def read_ncdb(filepath):
     """
-    Read data from Geolytics's Neighborhood Change Database (NCDB) and store
-    it for later use.
+    Read & store data from Geolytics's Neighborhood Change Database.
 
     Parameters
     ----------
@@ -208,8 +243,7 @@ def read_ncdb(filepath):
     pandas.DataFrame
 
     """
-
-    ncdb_vars = _variables["ncdb"].dropna()[1:].values
+    ncdb_vars = dictionary["ncdb"].dropna()[1:].values
 
     names = []
     for name in ncdb_vars:
@@ -268,7 +302,7 @@ def read_ncdb(filepath):
     })
     df = df.groupby(["GEO2010", "year"]).first()
 
-    mapper = dict(zip(_variables.ncdb, _variables.variable))
+    mapper = dict(zip(dictionary.ncdb, dictionary.variable))
 
     df.reset_index(inplace=True)
 
@@ -276,15 +310,15 @@ def read_ncdb(filepath):
 
     df = df.set_index("geoid")
 
-    for row in _variables['formula'].dropna().tolist():
+    for row in dictionary['formula'].dropna().tolist():
         try:
             df.eval(row, inplace=True)
         except:
-            pass
+            warn('Unable to compute ' + str(row))
 
     df = df.round(0)
 
-    keeps = df.columns[df.columns.isin(_variables['variable'].tolist() +
+    keeps = df.columns[df.columns.isin(dictionary['variable'].tolist() +
                                        ['year'])]
 
     df = df[keeps]
@@ -295,14 +329,12 @@ def read_ncdb(filepath):
         os.path.join(_package_directory, "ncdb.parquet.gzip"),
         compression='gzip')
 
-    return df
-
 
 # TODO NHGIS reader
 
 
 class Community(object):
-    """A class for storing spatial and tabular data for a collection of "neighborhoods".
+    """Spatial and tabular data for a collection of "neighborhoods".
 
        A community is a collection of "neighborhoods" represented by spatial
        boundaries (e.g. census tracts, or blocks in the US), and tabular data
@@ -314,36 +346,46 @@ class Community(object):
     Parameters
     ----------
     name : str
-        name or title of dataset.
+            name or title of dataset.
     source : str
-        database from which to query attribute data. must of one of ['ltdb', 'ncdb', 'census', 'external'].
+            database from which to query attribute data.
+            Must of one of ['ltdb', 'ncdb', 'census', 'external'].
     statefips : list-like
-        list of two-digit State FIPS codes that define a study region. These will be used to select tracts or blocks that fall within the region.
+            list of two-digit State FIPS codes that define a study region.
+            These will be used to select tracts or blocks that fall within
+            the region.
     countyfips : list-like
-                list of three-digit County FIPS codes that define a study region. These will be used to select tracts or blocks that fall within the region.
+            list of three-digit County FIPS codes that define a study
+            region. These will be used to select tracts or blocks that
+            fall within the region.
     cbsafips : str
-              CBSA fips code that defines a study region. This is used to select tracts or blocks that fall within the metropolitan region
+            CBSA fips code that defines a study region. This is used to
+            select tracts or blocks that fall within the metropolitan region
     add_indices : list-like
-        list of additional indices that should be included in the region. This is likely a list of additional tracts that are relevant to the study area but do not fall inside the passed boundary
+            list of additional indices that should be included in the region.
+            This is likely a list of additional tracts that are relevant to the
+            study area but do not fall inside the passed boundary
     boundary : GeoDataFrame
-        A GeoDataFrame that defines the extent of the boundary in question.
-         If a boundary is passed, it will be used to clip the tracts or blocks that fall within it and the 
-         state and county lists will be ignored
+            A GeoDataFrame that defines the extent of the boundary in question.
+            If a boundary is passed, it will be used to clip the tracts or
+            blocks that fall within it and the state and county lists will
+            be ignored
 
     Attributes
     ----------
     data : Pandas DataFrame
-        long-form dataframe containing attribute variables for each unit of analysis.
+            long-form dataframe containing attribute variables for each unit
+            of analysis.
     name : str
-        name or title of dataset
+            name or title of dataset
     boundary : GeoDataFrame
-        outer boundary of the study area
+            outer boundary of the study area
     tracts
-        GeoDataFrame containing tract boundaries
+            GeoDataFrame containing tract boundaries
     counties
-        GeoDataFrame containing County boundaries
+            GeoDataFrame containing County boundaries
     states
-        GeoDataFrame containing State boundaries
+            GeoDataFrame containing State boundaries
 
     """
 
@@ -354,9 +396,8 @@ class Community(object):
                  cbsafips=None,
                  add_indices=None,
                  boundary=None,
-                 name='',
-                 **kwargs):
-
+                 name=''):
+        """Instantiate a Community."""
         # If a boundary is passed, use it to clip out the appropriate tracts
         tracts = census.tracts_2010().copy()
         tracts.columns = tracts.columns.str.lower()
@@ -369,9 +410,12 @@ class Community(object):
             self.tracts = _convert_gdf(self.tracts)
             self.boundary = boundary
             if boundary.crs != self.tracts.crs:
+                if not boundary.crs:
+                    raise('Boundary must have a CRS to ensure valid spatial \
+                    selection')
                 self.tracts = self.tracts.to_crs(boundary.crs)
-                self.counties = self.counties.to_crs(boundary.crs)
-                self.states = self.states.to_crs(boundary.crs)
+                self.counties = _convert_gdf(self.counties).to_crs(boundary.crs)
+                self.states = _convert_gdf(self.states).to_crs(boundary.crs)
 
             self.tracts = self.tracts[self.tracts.representative_point()
                                       .within(self.boundary.unary_union)]
@@ -379,9 +423,12 @@ class Community(object):
                 self.tracts.geoid.str[0:5])]
             self.states = self.states[states.geoid.isin(
                 self.tracts.geoid.str[0:2])]
-            self.counties = _convert_gdf(self.counties)
-            self.states = _convert_gdf(self.states)
-        # If county and state lists are passed, use them to filter based on geoid
+            if not isinstance(self.counties, gpd.GeoDataFrame):
+                self.counties = _convert_gdf(self.counties)
+            if not isinstance(self.states, gpd.GeoDataFrame):
+                self.states = _convert_gdf(self.states)
+        # If county and state lists are passed, use them to filter
+        # based on geoid
         else:
             assert statefips or countyfips or cbsafips or add_indices
 
@@ -392,8 +439,10 @@ class Community(object):
                 statelist.append(statefips)
 
             countylist = []
-            if isinstance(countyfips, (list, )): countylist.extend(countyfips)
-            else: countylist.append(countyfips)
+            if isinstance(countyfips, (list, )):
+                countylist.extend(countyfips)
+            else:
+                countylist.append(countyfips)
 
             geo_filter = {'state': statelist, 'county': countylist}
             fips = []
@@ -423,7 +472,8 @@ class Community(object):
                     os.path.join(_package_directory, "ltdb.parquet.gzip"))
             except OSError:
                 print(
-                    "Unable to locate LTDB data. Please import the database with the `read_ltdb` function"
+                    "Unable to locate LTDB data. Please import the database\
+                     with the `read_ltdb` function"
                 )
         elif source == "ncdb":
             try:
@@ -431,7 +481,8 @@ class Community(object):
                     os.path.join(_package_directory, "ncdb.parquet.gzip"))
             except OSError:
                 print(
-                    "Unable to locate NCDB data. Please import the database with the `read_ncdb` function"
+                    "Unable to locate NCDB data. Please import the database with\
+                     the `read_ncdb` function"
                 )
         elif source == "external":
             _df = data
@@ -440,7 +491,8 @@ class Community(object):
                 "source must be one of 'ltdb', 'ncdb', 'census', 'external'")
 
         if cbsafips:
-            if not add_indices: add_indices = []
+            if not add_indices:
+                add_indices = []
             add_indices += _cbsa[_cbsa['CBSA Code'] == cbsafips][
                 'stcofips'].tolist()
         if add_indices:
@@ -461,9 +513,9 @@ class Community(object):
              year=2010,
              ax=None,
              plot_counties=True,
+             title=None,
              **kwargs):
-        """Convenience function for plotting tracts in the metro area.
-
+        """Conveniently plot a choropleth of the Community.
 
         Parameters
         ----------
@@ -474,7 +526,10 @@ class Community(object):
         ax : type
             matplotlib.axes on which to plot.
         plot_counties : bool
-            Whether the plot should include county boundaries (the default is True).
+            Whether the plot should include county boundaries
+            (the default is True).
+        title: str
+            Title of figure passed to matplotlib.pyplot.title()
         **kwargs
 
         Returns
@@ -483,16 +538,29 @@ class Community(object):
             Description of returned object.
 
         """
-
         assert column, "You must choose a column to plot"
+        colname = '%s' % column
         if ax is not None:
             ax = ax
         else:
             fig, ax = plt.subplots(figsize=(15, 15))
-            colname = column.replace("_", " ")
+            if colname.startswith('n_'):
+                colname = colname[1:]
+            elif colname.startswith('p_'):
+                colname = colname[1:]
+                colname = colname + ' (%)'
+            colname = colname.replace("_", " ")
             colname = colname.title()
-            plt.title(
-                self.name + ": " + colname + ", " + str(year), fontsize=20)
+
+            if title:
+                plt.title(title, fontsize=20)
+            else:
+                if self.name:
+                    plt.title(
+                        self.name + " " + str(year) + '\n' +
+                        colname, fontsize=20)
+                else:
+                    plt.title(colname + " " + str(year), fontsize=20)
             plt.axis("off")
 
         ax.set_aspect("equal")
@@ -508,13 +576,12 @@ class Community(object):
                 edgecolor="#5c5353",
                 linewidth=0.8,
                 facecolor="none",
-                ax=ax,
-                **kwargs)
+                ax=ax)
 
         return ax
 
     def to_crs(self, crs=None, epsg=None, inplace=False):
-        """Transform all geometries in the study area to a new coordinate reference system.
+        """Transform all geometries to a new coordinate reference system.
 
             Parameters
             ----------
@@ -523,9 +590,10 @@ class Community(object):
             epsg : int
                 EPSG code specifying output projection.
             inplace : bool, optional, default: False
-                Whether to return a new GeoDataFrame or do the transformation in
-                place.
-            """
+                Whether to return a new GeoDataFrame or do the transformation
+                in place.
+
+        """
         if inplace:
             self.tracts = self.tracts
             self.counties = self.counties
@@ -547,8 +615,7 @@ class Community(object):
 
 def _adjust_inflation(df, columns, base_year):
     """
-    Adjust currency data for inflation. Currently, this function generates
-    output in 2015 dollars, but this could be parameterized later
+    Adjust currency data for inflation.
 
     Parameters
     ----------
@@ -566,7 +633,6 @@ def _adjust_inflation(df, columns, base_year):
         DataFrame
 
     """
-    # adjust for inflation
     # get inflation adjustment table from BLS
     inflation = pd.read_excel(
         "https://www.bls.gov/cpi/research-series/allitems.xlsx", skiprows=6)
