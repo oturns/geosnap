@@ -10,12 +10,7 @@ if not os.path.exists(os.path.join(os.path.dirname(os.path.abspath(data.__file__
     )
 
 
-def test_db_ltdb():
-    df = data.db.ltdb
-    assert df.shape == (330388, 192)
-
-
-def test_Community_from_extent():
+def test_Community_from_boundary():
 
     dc_bound = data.metros[data.metros.name.str.startswith('Washington-Arlington')]
     dc_bound = dc_bound.to_crs(epsg=2248)
