@@ -1,6 +1,5 @@
 import context
 import os
-from importlib import reload
 
 path = os.environ['DLPATH']
 read_ltdb = context.data.read_ltdb
