@@ -16,4 +16,4 @@ giddy
 xlrd
 cenpy
 quilt
-region@https://github.com/pysal/region
+region@https://github.com/pysal/region@master#egg=region
