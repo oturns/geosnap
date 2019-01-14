@@ -43,6 +43,7 @@ def setup_package():
 
     reqs = _get_requirements_from_files(_groups_files)
     install_reqs = reqs.pop('base')
+    extras_reqs = reqs
 
     # get all file endings and copy whole file names without a file suffix
     # assumes nested directories are only down one level
@@ -88,6 +89,7 @@ def setup_package():
             'Programming Language :: Python :: 3.6'
         ],
         install_requires=install_reqs,
+        extras_require=extras_reqs,
         cmdclass={'build_py': build_py},
         python_requires='>3.4')
 
