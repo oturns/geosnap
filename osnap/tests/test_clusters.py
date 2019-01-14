@@ -17,8 +17,8 @@ columns = ['median_household_income', 'p_poverty_rate', 'p_unemployment_rate']
 
 def test_gm():
 
-    gm = analyze.cluster(reno, columns=columns, method='gm', best_model=True)
-    assert len(gm.census.gm.unique()) > 6
+    gm = analyze.cluster(reno, columns=columns, method='gaussian_mixture', best_model=True)
+    assert len(gm.census.gaussian_mixture.unique()) > 6
 
 
 def test_ward():
@@ -41,9 +41,9 @@ def test_kmeans():
 
 def test_aff_prop():
 
-    aff_prop = analyze.cluster(reno, columns=columns, method='ap',
+    aff_prop = analyze.cluster(reno, columns=columns, method='affinity_propagation',
                                preference=-100)
-    assert len(aff_prop.census.ap.unique()) == 4
+    assert len(aff_prop.census.affinity_propagation.unique()) == 4
 
 
 def test_hdbscan():

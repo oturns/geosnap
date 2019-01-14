@@ -61,26 +61,29 @@ tracts = census.tracts_2010
 
 #: A GeoDataFrame containing metropolitan statistical areas for the U.S.
 metros = pd.read_parquet(os.path.join(_package_directory, 'msas.parquet'))
-metros = _convert_gdf(metros) 
+metros = _convert_gdf(metros)
 
-if os.path.exists(os.path.join(_package_directory, "ltdb.parquet.gzip")):
-    _ltdb = pd.read_parquet(os.path.join(
-        _package_directory, "ltdb.parquet.gzip"))
-else:
-    _ltdb = ''
 
-if os.path.exists(os.path.join(_package_directory, "ncdb.parquet.gzip")):
-    _ncdb = pd.read_parquet(os.path.join(
-        _package_directory, "ncdb.parquet.gzip"))
-else:
-    _ncdb = ''
+def _db_checker(dbase):
+
+    fname = dbase + ".parquet.gzip"
+    path = os.path.join(_package_directory, fname)
+
+    if os.path.exists(path):
+        db = pd.read_parquet(path)
+    else:
+        db = ''
+
+    return db
+
 
 #: A dict containing tabular data available to OSNAP
 db = Bunch(census_90=census.variables_1990(),
            census_00=census.variables_2000(),
-           ltdb=_ltdb,
-           ncdb=_ncdb
+           ltdb=_db_checker('ltdb'),
+           ncdb=_db_checker('ncdb')
            )
+
 
 # LTDB importer
 
@@ -414,19 +417,16 @@ class Community(object):
                     raise('Boundary must have a CRS to ensure valid spatial \
                     selection')
                 self.tracts = self.tracts.to_crs(boundary.crs)
-                self.counties = _convert_gdf(self.counties).to_crs(boundary.crs)
-                self.states = _convert_gdf(self.states).to_crs(boundary.crs)
 
             self.tracts = self.tracts[self.tracts.representative_point()
                                       .within(self.boundary.unary_union)]
-            self.counties = self.counties[counties.geoid.isin(
-                self.tracts.geoid.str[0:5])]
-            self.states = self.states[states.geoid.isin(
-                self.tracts.geoid.str[0:2])]
-            if not isinstance(self.counties, gpd.GeoDataFrame):
-                self.counties = _convert_gdf(self.counties)
-            if not isinstance(self.states, gpd.GeoDataFrame):
-                self.states = _convert_gdf(self.states)
+            self.counties = _convert_gdf(self.counties[counties.geoid.isin(
+                self.tracts.geoid.str[0:5])])
+            self.states = _convert_gdf(self.states[states.geoid.isin(
+                self.tracts.geoid.str[0:2])])
+            self.counties = self.counties.to_crs(boundary.crs)
+            self.states = self.states.to_crs(boundary.crs)
+
         # If county and state lists are passed, use them to filter
         # based on geoid
         else:

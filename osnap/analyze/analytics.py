@@ -48,8 +48,8 @@ def cluster(dataset,
     specification = {
         "ward": ward,
         "kmeans": kmeans,
-        "ap": affinity_propagation,
-        "gm": gaussian_mixture,
+        "affinity_propagation": affinity_propagation,
+        "gaussian_mixture": gaussian_mixture,
         "spectral": spectral,
         "hdbscan": hdbscan
     }
