@@ -3,7 +3,7 @@ from context import data
 import os
 path = os.environ['DLPATH']
 
-if not os.path.exists(os.path.join(os.path.dirname(os.path.abspath(data.__file__)), "ltdb.parquet.gzip")):
+if not os.path.exists(os.path.join(os.path.dirname(os.path.abspath(data.__file__)), "ltdb.parquet")):
     data.read_ltdb(
         sample=path+"/ltdb_sample.zip",
         fullcount=path+"/ltdb_full.zip",

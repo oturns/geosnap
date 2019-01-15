@@ -12,4 +12,4 @@ def test_read_ltdb():
         fullcount=path+"/ltdb_full.zip",
     )
 
-    assert os.path.exists(os.path.join(os.path.dirname(os.path.abspath(context.data.__file__)), "ltdb.parquet.gzip"))
+    assert os.path.exists(os.path.join(os.path.dirname(os.path.abspath(context.data.__file__)), "ltdb.parquet"))
