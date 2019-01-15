@@ -9,3 +9,4 @@ __pycache__/*
 osnap.egg-info
 .coverage*
 .pytest*
+docs/_build/

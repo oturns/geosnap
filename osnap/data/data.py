@@ -85,6 +85,41 @@ db = Bunch(census_90=census.variables_1990(),
            )
 
 
+def _adjust_inflation(df, columns, base_year):
+    """
+    Adjust currency data for inflation.
+
+    Parameters
+    ----------
+    df : DataFrame
+        Dataframe of historical data
+    columns : list-like
+        The columns of the dataframe with currency data
+    base_year: int
+        Base year the data were collected; e.g. to convert data from the 1990
+        census to 2015 dollars, this value should be 1990
+
+    Returns
+    -------
+    type
+        DataFrame
+
+    """
+    # get inflation adjustment table from BLS
+    inflation = pd.read_excel(
+        "https://www.bls.gov/cpi/research-series/allitems.xlsx", skiprows=6)
+    inflation.columns = inflation.columns.str.lower()
+    inflation.columns = inflation.columns.str.strip(".")
+    inflation = inflation.dropna(subset=["year"])
+    inflator = inflation.groupby('year')['avg'].first().to_dict()
+    inflator[1970] = 63.9
+
+    df = df.copy()
+    updated = df[columns].apply(lambda x: x * (inflator[2015] / inflator[base_year]))
+    df.update(updated)
+
+    return df
+
 # LTDB importer
 
 
@@ -145,10 +180,11 @@ def read_ltdb(sample, fullcount):
         df["year"] = year
 
         inflate_cols = ["mhmval", "mrent", "hinc"]
-        try:
-            df = _adjust_inflation(df, inflate_cols, year)
-        except:
-            warn('something went wrong adjusting for inflation')
+        for col in inflate_cols:
+            try:
+                df = _adjust_inflation(df, inflate_cols, year)
+            except KeyError:  # half the dfs don't have these variables
+                pass
         return df
 
     # read in Brown's LTDB data, both the sample and fullcount files for each
@@ -228,8 +264,8 @@ def read_ltdb(sample, fullcount):
     df = df[keeps]
 
     df.to_parquet(
-        os.path.join(_package_directory, "ltdb.parquet.gzip"),
-        compression='gzip')
+        os.path.join(_package_directory, "ltdb.parquet"),
+        compression='brotli')
 
 
 def read_ncdb(filepath):
@@ -611,38 +647,3 @@ class Community(object):
 
 
 # Utilities
-
-
-def _adjust_inflation(df, columns, base_year):
-    """
-    Adjust currency data for inflation.
-
-    Parameters
-    ----------
-    df : DataFrame
-        Dataframe of historical data
-    columns : list-like
-        The columns of the dataframe with currency data
-    base_year: int
-        Base year the data were collected; e.g. to convert data from the 1990
-        census to 2015 dollars, this value should be 1990
-
-    Returns
-    -------
-    type
-        DataFrame
-
-    """
-    # get inflation adjustment table from BLS
-    inflation = pd.read_excel(
-        "https://www.bls.gov/cpi/research-series/allitems.xlsx", skiprows=6)
-    inflation.columns = inflation.columns.str.lower()
-    inflation.columns = inflation.columns.str.strip(".")
-    inflation = inflation.dropna(subset=["year"])
-    inflator = inflation.groupby('year')['avg'].first().to_dict()
-    inflator[1970] = 63.9
-
-    df = df.copy()
-    df[columns].apply(lambda x: x * (inflator[2015] / inflator[base_year]))
-
-    return df
