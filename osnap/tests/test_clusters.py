@@ -49,7 +49,7 @@ def test_aff_prop():
 def test_hdbscan():
 
     hdbscan = analyze.cluster(reno, columns=columns, method='hdbscan')
-    assert len(hdbscan.census.hdbscan.unique()) == 30
+    assert len(hdbscan.census.hdbscan.unique()) > 25
 
 
 # Spatial Clusters
