@@ -180,11 +180,10 @@ def read_ltdb(sample, fullcount):
         df["year"] = year
 
         inflate_cols = ["mhmval", "mrent", "hinc"]
-        for col in inflate_cols:
-            try:
-                df = _adjust_inflation(df, inflate_cols, year)
-            except KeyError:  # half the dfs don't have these variables
-                pass
+        try:
+            df = _adjust_inflation(df, inflate_cols, year)
+        except KeyError:  # half the dfs don't have these variables
+            pass
         return df
 
     # read in Brown's LTDB data, both the sample and fullcount files for each
