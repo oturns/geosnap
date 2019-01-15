@@ -66,7 +66,7 @@ metros = _convert_gdf(metros)
 
 def _db_checker(dbase):
 
-    fname = dbase + ".parquet.gzip"
+    fname = dbase + ".parquet"
     path = os.path.join(_package_directory, fname)
 
     if os.path.exists(path):
@@ -364,8 +364,8 @@ def read_ncdb(filepath):
     df = df.loc[df.n_total_pop != 0]
 
     df.to_parquet(
-        os.path.join(_package_directory, "ncdb.parquet.gzip"),
-        compression='gzip')
+        os.path.join(_package_directory, "ncdb.parquet"),
+        compression='brotli')
 
 
 # TODO NHGIS reader
@@ -504,7 +504,7 @@ class Community(object):
         if source == "ltdb":
             try:
                 _df = pd.read_parquet(
-                    os.path.join(_package_directory, "ltdb.parquet.gzip"))
+                    os.path.join(_package_directory, "ltdb.parquet"))
             except OSError:
                 print(
                     "Unable to locate LTDB data. Please import the database\
@@ -513,7 +513,7 @@ class Community(object):
         elif source == "ncdb":
             try:
                 _df = pd.read_parquet(
-                    os.path.join(_package_directory, "ncdb.parquet.gzip"))
+                    os.path.join(_package_directory, "ncdb.parquet"))
             except OSError:
                 print(
                     "Unable to locate NCDB data. Please import the database with\
