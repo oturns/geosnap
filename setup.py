@@ -36,11 +36,14 @@ def setup_package():
     # get all file endings and copy whole file names without a file suffix
     # assumes nested directories are only down one level
     _groups_files = {
-        'base': 'requirements.txt',
+        'base': 'requirements.txt', #basic requirements
+        'tests': 'requirements_tests.txt', #requirements for tests
+        'docs': 'requirements_docs.txt' #requirements for building docs
     }
 
     reqs = _get_requirements_from_files(_groups_files)
     install_reqs = reqs.pop('base')
+    extras_reqs = reqs
 
     # get all file endings and copy whole file names without a file suffix
     # assumes nested directories are only down one level
@@ -65,7 +68,7 @@ def setup_package():
         long_description=long_description,
         maintainer="OSNAP Developers",
         maintainer_email='pysal-dev@googlegroups.com',
-        url='http://osnap.org',
+        url='http://osnap.cloud',
         # download_url='https://pypi.python.org/pypi/oslnap',
         license='BSD',
         py_modules=['osnap'],
@@ -86,7 +89,10 @@ def setup_package():
             'Programming Language :: Python :: 3.6'
         ],
         install_requires=install_reqs,
+        extras_require=extras_reqs,
         cmdclass={'build_py': build_py},
+        include_package_data=True,
+        package_data={'osnap': ['data/variables.csv', 'data/cbsas.parquet', 'data/msas.parquet', 'data/states.parquet', 'data/counties.parquet.gzip']},
         python_requires='>3.4')
 
 
