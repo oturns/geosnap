@@ -411,7 +411,7 @@ class Community(object):
 
     Attributes
     ----------
-    data : Pandas DataFrame
+    census : Pandas DataFrame
             long-form dataframe containing attribute variables for each unit
             of analysis.
     name : str
