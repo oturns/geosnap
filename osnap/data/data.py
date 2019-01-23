@@ -37,12 +37,14 @@ class Bunch(dict):
 
 
 def _convert_gdf(df):
+    df = df.copy()
+    df.reset_index(inplace=True)
     if 'wkt' in df.columns.tolist():
         df['geometry'] = df.wkt.apply(wkt.loads)
-        df.drop(columns=['wkt'], inplace=True)
     else:
         df['geometry'] = df.wkb.apply(lambda x: wkb.loads(x, hex=True))
-        df.drop(columns=['wkb'], inplace=True)
+    df.columns = df.columns.str.lower()
+    df = df[['geoid', 'geometry']]
     df = gpd.GeoDataFrame(df)
     df.crs = {"init": "epsg:4326"}
     return df
