@@ -41,10 +41,12 @@ def _convert_gdf(df):
     df.reset_index(inplace=True)
     if 'wkt' in df.columns.tolist():
         df['geometry'] = df.wkt.apply(wkt.loads)
+        df.drop(columns=['wkt'], inplace=True)
     else:
         df['geometry'] = df.wkb.apply(lambda x: wkb.loads(x, hex=True))
-    df.columns = df.columns.str.lower()
-    df = df[['geoid', 'geometry']]
+        df.drop(columns=['wkb'], inplace=True)
+    if 'index' in df.columns.tolist():
+        df.drop(columns=['index'], inplace=True)
     df = gpd.GeoDataFrame(df)
     df.crs = {"init": "epsg:4326"}
     return df
