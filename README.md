@@ -3,6 +3,11 @@
 
 <img src="doc/osnap.png" alt="osnap" width="500"/>
 
+OSNAP is an open-source, Python3 package for exploring, modeling, and visualizing neighborhood dynamics. It provides a suite of tools for creating socio-spatial datasets, harmonizing those datasets into consistent set of time-static boundaries, and modeling neighborhood change using classic and spatial statistical methods. 
+
+![](doc/figs/Washington-Arlington-Alexandria_DC-VA-MD-WV.gif)
+
+![](doc/figs/Washington-Arlington-Alexandria_DC-VA-MD-WV_transition_matrix.png)
 
 ## osnap modules
 
