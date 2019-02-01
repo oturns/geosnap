@@ -6,7 +6,7 @@
 OSNAP is an open-source, Python3 package for exploring, modeling, and visualizing neighborhood dynamics. Although neighborhoods are critically important for human development and public policy, they present a variety of novel challenges for urban researchers:
 
 -  there is no formally accepted scientific definition of ["neighborhood"](https://www.cnu.org/publicsquare/2019/01/29/once-and-future-neighborhood)
-- neighborhoods evolve through both space and Time
+- neighborhoods evolve through both space and time
 - many different physical and social data can characterize a neighborhood
 - primitive spatial units change boundaries over time
 
