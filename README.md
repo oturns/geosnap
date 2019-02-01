@@ -19,7 +19,6 @@ OSNAP aims to help fill these gaps. It provides a suite of tools for creating so
 
 
 
-
 Since there is no accepted definition of "neighborhood," most quantitative studies involving [neighborhood effects](https://www.annualreviews.org/doi/10.1146/annurev.soc.28.110601.141114) or [neighborhood dynamics](https://www.sciencedirect.com/science/article/pii/S0094119000921818) use census data and their administrative boundaries to define spatial areas that reasonably approximate neighborhoods. In the U.S., this typically means using census tracts, since they have a relatively small spatial footprint and a wide variety of variables are tabulated at that scale. For this reason, OSNAP's first release is targeted at researchers working with US Census tract data. This allows the software to make available a wide variety of data and commonly-used variables with minimal interaction from the end-user. Later releases will expand functionality to other geographies and data sources.  
 
 ## Modules:
