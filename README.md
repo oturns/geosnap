@@ -3,15 +3,24 @@
 
 <img src="doc/osnap.png" alt="osnap" width="500"/>
 
-OSNAP is an open-source, Python3 package for exploring, modeling, and visualizing neighborhood dynamics. It provides a suite of tools for creating socio-spatial datasets, harmonizing those datasets into consistent set of time-static boundaries, and modeling neighborhood change using classic and spatial statistical methods. 
+OSNAP is an open-source, Python3 package for exploring, modeling, and visualizing neighborhood dynamics. Although neighborhoods are critically important for human development and public policy, they present a variety of novel challenges for urban researchers:
+
+-  there is no formally accepted scientific definition of ["neighborhood"](https://www.cnu.org/publicsquare/2019/01/29/once-and-future-neighborhood)
+- neighborhoods evolve through both space and Time
+- many different physical and social data can characterize a neighborhood
+- primitive spatial units change boundaries over time
+
+OSNAP aims to help fill these gaps. It provides a suite of tools for creating socio-spatial datasets, harmonizing those datasets into consistent set of time-static boundaries, and modeling neighborhood change using classic and spatial statistical methods. 
 
 
-![](doc/figs/Washington-Arlington-Alexandria_DC-VA-MD-WV.gif)
+<img src='doc/figs/Washington-Arlington-Alexandria_DC-VA-MD-WV.gif' alt='DC Transitions' width='750'/>
 
 ![](doc/figs/Washington-Arlington-Alexandria_DC-VA-MD-WV_transition_matrix.png)
 
 
-OSNAP is designed for researchers in the Urban Studies who are interested in exploring, modeling, and analyzing the social and spatial dynamics of neighborhoods. Although neighborhoods are critically important for human development and public policy, they present a variety of novel challenges for quantitative researchers. Since there is no accepted definition of "neighborhood," most quantitative studies involving [neighborhood effects](https://www.annualreviews.org/doi/10.1146/annurev.soc.28.110601.141114) or [neighborhood dynamics](https://www.sciencedirect.com/science/article/pii/S0094119000921818) use census data and their administrative boundaries to define spatial areas that reasonably approximate neighborhoods. In the U.S., this typically means using census tracts, since they have a relatively small spatial footprint and a wide variety of variables are tabulated at that scale. For this reason, OSNAP's first release is targeted at researchers working with US Census tract data. This allows the software to make available a wide variety of data and commonly-used variables with minimal interaction from the end-user. Later releases will expand functionality to other geographies and data sources.  
+
+
+Since there is no accepted definition of "neighborhood," most quantitative studies involving [neighborhood effects](https://www.annualreviews.org/doi/10.1146/annurev.soc.28.110601.141114) or [neighborhood dynamics](https://www.sciencedirect.com/science/article/pii/S0094119000921818) use census data and their administrative boundaries to define spatial areas that reasonably approximate neighborhoods. In the U.S., this typically means using census tracts, since they have a relatively small spatial footprint and a wide variety of variables are tabulated at that scale. For this reason, OSNAP's first release is targeted at researchers working with US Census tract data. This allows the software to make available a wide variety of data and commonly-used variables with minimal interaction from the end-user. Later releases will expand functionality to other geographies and data sources.  
 
 ## Modules:
 
