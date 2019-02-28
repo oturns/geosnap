@@ -126,38 +126,8 @@ class Sequence(object):
                       dictionary - {input label: int value between 0 and k-1 (k
                       is the number of unique classes for the pooled data)}
 
-
-    Done:
-    * Handle sequences of non-equal length
-    * Handle different input data type (array of string/integer)
-    * Integrate hamming distance
-
-    To think about:
-    * provide a sequence class so that users can create a sequence object
-    which has several meaningful attribute/method:
-        * balanced or unbalanced?
-            * max/min/median/mean length
-        * characteristics of individual sequences/ a set of sequences (
-        sharing the same past or future)
-            * distribution
-            * sequence indicator:
-                * longitudinal diversity
-                * complexity of the sequence
-                * duration in each state
-            * max/min/median/mean duration in each state
-        * visualization of sequences
-            * allow for plotting the most frequent sequences
-            * allow for plotting user-selected sequences
-            * empirical transition matrix - could be used as the input for
-            substitution cost matrix
-        * other representations of a sequence:
-            * distinct successive states (DSSs)
-        * handle different input types: pandas dataframe, array, list...
-    * survival analysis?
-    * deal with missing values NA?
-        * a special state: another "unique" class and corresponding
-        substitution cost (the cost should be the same as the indel)
-
+    Examples
+    --------
     >>> import numpy as np
 
     1. Testing on unequal string sequences
@@ -200,11 +170,13 @@ class Sequence(object):
 
 
     2. Testing on equal string sequences
+
     >>> seq1 = 'ACGGTAG'
     >>> seq2 = 'CCTAAGA'
     >>> seq3 = 'CCTAAGC'
 
     2.1  Calculating "hamming" distance
+
     >>> seqAna = Sequence([seq1,seq2,seq3], dist_type="hamming")
     >>> seqAna.seq_dis_mat
     array([[0., 6., 6.],
@@ -214,6 +186,7 @@ class Sequence(object):
     2.2 User-defined substitution cost matrix and indel cost (distance
     between different types is always 1 and indel cost is 2) - give the same
     sequence distance matrix as "hamming" distance
+
     >>> subs_mat = np.array([[0., 1., 1., 1.],[1., 0., 1., 1.],[1., 1., 0., 1.],[1., 1., 1., 0.]])
     >>> indel = 2
     >>> seqAna = Sequence([seq1,seq2,seq3], subs_mat=subs_mat, indel=indel)
@@ -226,6 +199,7 @@ class Sequence(object):
     between different types is always 1 and indel cost is 1) - give a
     slightly different sequence distance matrix from "hamming" distance since
     insertion and deletion is happening
+
     >>> subs_mat = np.array([[0., 1., 1., 1.],[1., 0., 1., 1.],[1., 1., 0.,1.],[1., 1., 1., 0.]])
     >>> indel = 1
     >>> seqAna = Sequence([seq1,seq2,seq3], subs_mat=subs_mat, indel=indel)
@@ -235,6 +209,7 @@ class Sequence(object):
            [5., 1., 0.]])
 
     3. Not passing proper parameters will raise an error
+
     >>> seqAna = Sequence([seq1,seq2,seq3])
     Traceback (most recent call last):
     ValueError: Please specify a proper `dist_type` or `subs_mat` and `indel` to proceed!
