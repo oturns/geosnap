@@ -258,7 +258,7 @@ def read_ltdb(sample, fullcount):
     for row in dictionary['formula'].dropna().tolist():
         df.eval(row, inplace=True)
 
-    df = df.round(0)
+    # df = df.round(0)
 
     keeps = df.columns[df.columns.isin(dictionary['variable'].tolist() +
                                        ['year'])]
