@@ -58,7 +58,7 @@ def linc(labels_sequence):
     The local indicator of neighborhood change defined here allows for
     singleton neighborhoods (i.e., neighborhoods composed of a single primitive
     area such as a tract or block.). This is in contrast to the initial
-    implementation in :cite:`rey2011` which prohibited singletons.
+    implementation in :cite:`Rey_2011` which prohibited singletons.
 
     Examples
     --------
