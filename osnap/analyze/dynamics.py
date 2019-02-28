@@ -105,8 +105,8 @@ class Sequence(object):
                       to define substitution costs, and indel=k-1;
                       "arbitrary": arbitrary distance if there is not a
                       strong theory guidance: substitution=0.5, indel=1.
-                      "tran":
-
+                      "tran": transition-oriented optimal matching. Sequence of
+                      transitions. Based on :cite:`Biemann:2011`.
     indel           : float
                       insertion/deletion cost.
     cluster_type    : string
