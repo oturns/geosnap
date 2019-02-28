@@ -98,8 +98,8 @@ def _adjust_inflation(df, columns, given_year, base_year=2015):
     columns : list-like
         The columns of the dataframe with currency data
     given_year: int
-        Base year the data were collected; e.g. to convert data from the 1990
-        census to 2015 dollars, this value should be 1990
+        The year in which the data were collected; e.g. to convert data from
+        the 1990 census to 2015 dollars, this value should be 1990.
     base_year: int, optional
         Constant dollar year; e.g. to convert data from the 1990
         census to constant 2015 dollars, this value should be 2015.
