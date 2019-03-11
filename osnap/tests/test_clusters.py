@@ -42,13 +42,13 @@ def test_aff_prop():
 
     aff_prop = analyze.cluster(reno, columns=columns, method='affinity_propagation',
                                preference=-100)
-    assert len(aff_prop.census.affinity_propagation.unique()) == 4
+    assert len(aff_prop.census.affinity_propagation.unique()) == 3
 
 
 def test_hdbscan():
 
     hdbscan = analyze.cluster(reno, columns=columns, method='hdbscan')
-    assert len(hdbscan.census.hdbscan.unique()) > 30
+    assert len(hdbscan.census.hdbscan.unique()) > 27
 
 
 # Spatial Clusters
@@ -77,7 +77,7 @@ def test_skater():
 
     skater = analyze.cluster_spatial(reno, columns=columns, method='skater',
                                      n_clusters=10)
-    assert len(skater.census.skater.unique()) == 14
+    assert len(skater.census.skater.unique()) == 11
 
 
 def test_azp():
