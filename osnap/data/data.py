@@ -7,9 +7,9 @@ from warnings import warn
 import matplotlib.pyplot as plt
 import pandas as pd
 import quilt
-from shapely import wkb, wkt
 
-import geopandas as gpd
+from ..util import adjust_inflation, convert_gdf
+
 
 try:
     from quilt.data.spatialucr import census
@@ -36,20 +36,6 @@ class Bunch(dict):
         return self.keys()
 
 
-def _convert_gdf(df):
-    df = df.copy()
-    df.reset_index(inplace=True, drop=True)
-    if 'wkt' in df.columns.tolist():
-        df['geometry'] = df.wkt.apply(wkt.loads)
-        df = df.drop(columns=['wkt'])
-    else:
-        df['geometry'] = df.wkb.apply(lambda x: wkb.loads(x, hex=True))
-        df = df.drop(columns=['wkb'])
-    df = gpd.GeoDataFrame(df)
-    df.crs = {"init": "epsg:4326"}
-    return df
-
-
 _package_directory = os.path.dirname(os.path.abspath(__file__))
 
 dictionary = pd.read_csv(os.path.join(_package_directory, "variables.csv"))
@@ -63,7 +49,7 @@ tracts = census.tracts_2010
 
 #: A GeoDataFrame containing metropolitan statistical areas for the U.S.
 metros = pd.read_parquet(os.path.join(_package_directory, 'msas.parquet'))
-metros = _convert_gdf(metros)
+metros = convert_gdf(metros)
 
 
 def _db_checker(dbase):
@@ -86,45 +72,6 @@ db = Bunch(census_90=census.variables_1990(),
            ncdb=_db_checker('ncdb')
            )
 
-
-def _adjust_inflation(df, columns, given_year, base_year=2015):
-    """
-    Adjust currency data for inflation.
-
-    Parameters
-    ----------
-    df : DataFrame
-        Dataframe of historical data
-    columns : list-like
-        The columns of the dataframe with currency data
-    given_year: int
-        The year in which the data were collected; e.g. to convert data from
-        the 1990 census to 2015 dollars, this value should be 1990.
-    base_year: int, optional
-        Constant dollar year; e.g. to convert data from the 1990
-        census to constant 2015 dollars, this value should be 2015.
-        Default is 2015.
-
-    Returns
-    -------
-    type
-        DataFrame
-
-    """
-    # get inflation adjustment table from BLS
-    inflation = pd.read_excel(
-        "https://www.bls.gov/cpi/research-series/allitems.xlsx", skiprows=6)
-    inflation.columns = inflation.columns.str.lower()
-    inflation.columns = inflation.columns.str.strip(".")
-    inflation = inflation.dropna(subset=["year"])
-    inflator = inflation.groupby('year')['avg'].first().to_dict()
-    inflator[1970] = 63.9
-
-    df = df.copy()
-    updated = df[columns].apply(lambda x: x * (inflator[base_year] / inflator[given_year]))
-    df.update(updated)
-
-    return df
 
 # LTDB importer
 
@@ -193,7 +140,7 @@ def read_ltdb(sample, fullcount):
 
         if len(inflate_available):
         # try:
-            df = _adjust_inflation(df, inflate_available, year)
+            df = adjust_inflation(df, inflate_available, year)
         # except KeyError:  # half the dfs don't have these variables
         #     pass
         return df
@@ -270,8 +217,7 @@ def read_ltdb(sample, fullcount):
 
     # df = df.round(0)
 
-    keeps = df.columns[df.columns.isin(dictionary['variable'].tolist() +
-                                       ['year'])]
+    keeps = df.columns[df.columns.isin(dictionary['variable'].tolist() + ['year'])]
     df = df[keeps]
 
     df.to_parquet(
@@ -368,8 +314,7 @@ def read_ncdb(filepath):
 
     df = df.round(0)
 
-    keeps = df.columns[df.columns.isin(dictionary['variable'].tolist() +
-                                       ['year'])]
+    keeps = df.columns[df.columns.isin(dictionary['variable'].tolist() + ['year'])]
 
     df = df[keeps]
 
@@ -457,7 +402,7 @@ class Community(object):
         self.cbsa = metros.copy()[metros.copy().geoid == cbsafips]
         self.counties = counties.copy()
         if boundary is not None:
-            self.tracts = _convert_gdf(self.tracts)
+            self.tracts = convert_gdf(self.tracts)
             self.boundary = boundary
             if boundary.crs != self.tracts.crs:
                 if not boundary.crs:
@@ -467,9 +412,9 @@ class Community(object):
 
             self.tracts = self.tracts[self.tracts.representative_point()
                                       .within(self.boundary.unary_union)]
-            self.counties = _convert_gdf(self.counties[counties.geoid.isin(
+            self.counties = convert_gdf(self.counties[counties.geoid.isin(
                 self.tracts.geoid.str[0:5])])
-            self.states = _convert_gdf(self.states[states.geoid.isin(
+            self.states = convert_gdf(self.states[states.geoid.isin(
                 self.tracts.geoid.str[0:2])])
             self.counties = self.counties.to_crs(boundary.crs)
             self.states = self.states.to_crs(boundary.crs)
@@ -510,9 +455,9 @@ class Community(object):
                     fips)]
                 self.tracts = self.tracts[self.tracts.geoid.str[:2].isin(fips)]
 
-            self.tracts = _convert_gdf(self.tracts)
-            self.counties = _convert_gdf(self.counties)
-            self.states = _convert_gdf(self.states)
+            self.tracts = convert_gdf(self.tracts)
+            self.counties = convert_gdf(self.counties)
+            self.states = convert_gdf(self.states)
         if source == "ltdb":
             try:
                 _df = pd.read_parquet(
@@ -546,9 +491,9 @@ class Community(object):
             for index in add_indices:
 
                 self.tracts = self.tracts.append(
-                    _convert_gdf(tracts[tracts.geoid.str.startswith(index)]))
+                    convert_gdf(tracts[tracts.geoid.str.startswith(index)]))
                 self.counties = self.counties.append(
-                    _convert_gdf(counties[counties.geoid.str.startswith(
+                    convert_gdf(counties[counties.geoid.str.startswith(
                         index[0:5])]))
         self.tracts = self.tracts[~self.tracts.geoid.duplicated(keep='first')]
         self.counties = self.counties[
@@ -655,6 +600,3 @@ class Community(object):
         self.counties = self.counties.to_crs(crs=crs, epsg=epsg)
         if not inplace:
             return self
-
-
-# Utilities

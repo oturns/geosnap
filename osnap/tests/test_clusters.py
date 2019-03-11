@@ -12,13 +12,12 @@ if not os.path.exists(os.path.join(os.path.dirname(os.path.abspath(data.__file__
 reno = data.Community(source='ltdb', cbsafips='39900')
 columns = ['median_household_income', 'p_poverty_rate', 'p_unemployment_rate']
 
-
 # Aspatial Clusters
 
 def test_gm():
 
     gm = analyze.cluster(reno, columns=columns, method='gaussian_mixture', best_model=True)
-    assert len(gm.census.gaussian_mixture.unique()) > 6
+    assert len(gm.census.gaussian_mixture.unique()) > 9
 
 
 def test_ward():
@@ -49,7 +48,7 @@ def test_aff_prop():
 def test_hdbscan():
 
     hdbscan = analyze.cluster(reno, columns=columns, method='hdbscan')
-    assert len(hdbscan.census.hdbscan.unique()) > 25
+    assert len(hdbscan.census.hdbscan.unique()) > 31
 
 
 # Spatial Clusters
@@ -64,7 +63,7 @@ def test_maxp():
 
     maxp = analyze.cluster_spatial(reno, columns=columns, method='max_p',
                                    initial=10)
-    assert len(maxp.census.max_p.unique()) > 8
+    assert len(maxp.census.max_p.unique()) > 11
 
 
 def test_ward_spatial():
