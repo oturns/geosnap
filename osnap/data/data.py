@@ -8,7 +8,10 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import quilt
 
-from ..util import adjust_inflation, convert_gdf
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from util import adjust_inflation, convert_gdf
 
 
 try:
