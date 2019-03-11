@@ -17,7 +17,7 @@ columns = ['median_household_income', 'p_poverty_rate', 'p_unemployment_rate']
 def test_gm():
 
     gm = analyze.cluster(reno, columns=columns, method='gaussian_mixture', best_model=True)
-    assert len(gm.census.gaussian_mixture.unique()) > 9
+    assert len(gm.census.gaussian_mixture.unique()) > 8
 
 
 def test_ward():
@@ -48,7 +48,7 @@ def test_aff_prop():
 def test_hdbscan():
 
     hdbscan = analyze.cluster(reno, columns=columns, method='hdbscan')
-    assert len(hdbscan.census.hdbscan.unique()) > 31
+    assert len(hdbscan.census.hdbscan.unique()) > 30
 
 
 # Spatial Clusters
@@ -63,7 +63,7 @@ def test_maxp():
 
     maxp = analyze.cluster_spatial(reno, columns=columns, method='max_p',
                                    initial=10)
-    assert len(maxp.census.max_p.unique()) > 11
+    assert len(maxp.census.max_p.unique()) > 9
 
 
 def test_ward_spatial():
