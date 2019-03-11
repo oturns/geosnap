@@ -17,7 +17,7 @@ columns = ['median_household_income', 'p_poverty_rate', 'p_unemployment_rate']
 def test_gm():
 
     gm = analyze.cluster(reno, columns=columns, method='gaussian_mixture', best_model=True)
-    assert len(gm.census.gaussian_mixture.unique()) > 8
+    assert len(gm.census.gaussian_mixture.unique()) > 7
 
 
 def test_ward():
