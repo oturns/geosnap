@@ -87,7 +87,7 @@ db = Bunch(census_90=census.variables_1990(),
            )
 
 
-def _adjust_inflation(df, columns, base_year):
+def _adjust_inflation(df, columns, given_year, base_year=2015):
     """
     Adjust currency data for inflation.
 
@@ -97,9 +97,13 @@ def _adjust_inflation(df, columns, base_year):
         Dataframe of historical data
     columns : list-like
         The columns of the dataframe with currency data
-    base_year: int
-        Base year the data were collected; e.g. to convert data from the 1990
-        census to 2015 dollars, this value should be 1990
+    given_year: int
+        The year in which the data were collected; e.g. to convert data from
+        the 1990 census to 2015 dollars, this value should be 1990.
+    base_year: int, optional
+        Constant dollar year; e.g. to convert data from the 1990
+        census to constant 2015 dollars, this value should be 2015.
+        Default is 2015.
 
     Returns
     -------
@@ -117,7 +121,7 @@ def _adjust_inflation(df, columns, base_year):
     inflator[1970] = 63.9
 
     df = df.copy()
-    updated = df[columns].apply(lambda x: x * (inflator[2015] / inflator[base_year]))
+    updated = df[columns].apply(lambda x: x * (inflator[base_year] / inflator[given_year]))
     df.update(updated)
 
     return df
@@ -181,11 +185,17 @@ def read_ltdb(sample, fullcount):
 
         df["year"] = year
 
-        inflate_cols = ["mhmval", "mrent", "hinc"]
-        try:
-            df = _adjust_inflation(df, inflate_cols, year)
-        except KeyError:  # half the dfs don't have these variables
-            pass
+        inflate_cols = ["mhmval", "mrent", "incpc",
+                        "hinc", "hincw", "hincb", "hinch", "hinca"]
+
+        inflate_available = list(set(df.columns).intersection(set(
+            inflate_cols)))
+
+        if len(inflate_available):
+        # try:
+            df = _adjust_inflation(df, inflate_available, year)
+        # except KeyError:  # half the dfs don't have these variables
+        #     pass
         return df
 
     # read in Brown's LTDB data, both the sample and fullcount files for each
@@ -258,7 +268,7 @@ def read_ltdb(sample, fullcount):
     for row in dictionary['formula'].dropna().tolist():
         df.eval(row, inplace=True)
 
-    df = df.round(0)
+    # df = df.round(0)
 
     keeps = df.columns[df.columns.isin(dictionary['variable'].tolist() +
                                        ['year'])]
