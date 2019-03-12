@@ -2,19 +2,16 @@
 
 import itertools
 from itertools import combinations
-
-import giddy as ga
+from giddy.markov import Markov, Spatial_Markov
 import numpy as np
 import scipy.spatial.distance as d
-
-import libpysal
 from libpysal.weights.contiguity import Queen, Rook
 from libpysal.weights.distance import KNN, Kernel
 
 
 class Transition(object):
     """
-    (Spatial) Markov approaches to transitional dynamics of neighborhood types.
+    (Spatial) Markov approach to transitional dynamics of neighborhoods.
 
     Parameters
     ----------
@@ -68,7 +65,7 @@ class Transition(object):
         w = w_dict[w_type].from_dataframe(tracts)
         y = y.astype(int)
 
-        sm = ga.markov.Spatial_Markov(
+        sm = Spatial_Markov(
             y,
             w,
             permutations=permutations,
@@ -96,20 +93,20 @@ class Sequence(object):
     y               : array
                       one row per sequence of neighborhood types for each
                       spatial unit. Sequences could be of varying lengths.
-    w               : W
-                      spatial weights object.
     subs_mat        : array
                       (k,k), substitution cost matrix. Should be hollow (
                       0 cost between the same type), symmetric and non-negative.
     dist_type       : string
                       "hamming": hamming distance (substitution only
-                      and its cost is constant 1) from sklearn.metrics,
-                      "Levenshtein": Levenshtein distance (allow
-                      indels, but substitution cost is constant 1) from
-                      jellyfish; "Markov": utilize empirical transition
+                      and its cost is constant 1) from sklearn.metrics;
+                      "markov": utilize empirical transition
                       probabilities to define substitution costs;
                       "interval": differences between states are used
-                      to define substitution costs. Default is None.
+                      to define substitution costs, and indel=k-1;
+                      "arbitrary": arbitrary distance if there is not a
+                      strong theory guidance: substitution=0.5, indel=1.
+                      "tran": transition-oriented optimal matching. Sequence of
+                      transitions. Based on :cite:`Biemann:2011`.
     indel           : float
                       insertion/deletion cost.
     cluster_type    : string
@@ -129,46 +126,8 @@ class Sequence(object):
                       dictionary - {input label: int value between 0 and k-1 (k
                       is the number of unique classes for the pooled data)}
 
-
-    Done:
-    * Handle sequences of non-equal length
-    * Handle different input data type (array of string/integer)
-    * Integrate hamming distance
-
-    Todo:
-    1. Integrate other distance metrics: markov...
-    2. test on empirical datasets
-    5. Look at local alignment?
-    6. All the sequences should be transformed in the same way (should not
-    rely on transformation when trying to compare every pair - the label
-    might be different)
-
-    To think about:
-    * provide a sequence class so that users can create a sequence object
-    which has several meaningful attribute/method:
-        * balanced or unbalanced?
-            * max/min/median/mean length
-        * characteristics of individual sequences/ a set of sequences (
-        sharing the same past or future)
-            * distribution
-            * sequence indicator:
-                * longitudinal diversity
-                * complexity of the sequence
-                * duration in each state
-            * max/min/median/mean duration in each state
-        * visualization of sequences
-            * allow for plotting the most frequent sequences
-            * allow for plotting user-selected sequences
-            * empirical transition matrix - could be used as the input for
-            substitution cost matrix
-        * other representations of a sequence:
-            * distinct successive states (DSSs)
-        * handle different input types: pandas dataframe, array, list...
-    * survival analysis?
-    * deal with missing values NA?
-        * a special state: another "unique" class and corresponding
-        substitution cost (the cost should be the same as the indel)
-
+    Examples
+    --------
     >>> import numpy as np
 
     1. Testing on unequal string sequences
@@ -211,11 +170,13 @@ class Sequence(object):
 
 
     2. Testing on equal string sequences
+
     >>> seq1 = 'ACGGTAG'
     >>> seq2 = 'CCTAAGA'
     >>> seq3 = 'CCTAAGC'
 
     2.1  Calculating "hamming" distance
+
     >>> seqAna = Sequence([seq1,seq2,seq3], dist_type="hamming")
     >>> seqAna.seq_dis_mat
     array([[0., 6., 6.],
@@ -225,6 +186,7 @@ class Sequence(object):
     2.2 User-defined substitution cost matrix and indel cost (distance
     between different types is always 1 and indel cost is 2) - give the same
     sequence distance matrix as "hamming" distance
+
     >>> subs_mat = np.array([[0., 1., 1., 1.],[1., 0., 1., 1.],[1., 1., 0., 1.],[1., 1., 1., 0.]])
     >>> indel = 2
     >>> seqAna = Sequence([seq1,seq2,seq3], subs_mat=subs_mat, indel=indel)
@@ -237,6 +199,7 @@ class Sequence(object):
     between different types is always 1 and indel cost is 1) - give a
     slightly different sequence distance matrix from "hamming" distance since
     insertion and deletion is happening
+
     >>> subs_mat = np.array([[0., 1., 1., 1.],[1., 0., 1., 1.],[1., 1., 0.,1.],[1., 1., 1., 0.]])
     >>> indel = 1
     >>> seqAna = Sequence([seq1,seq2,seq3], subs_mat=subs_mat, indel=indel)
@@ -246,6 +209,7 @@ class Sequence(object):
            [5., 1., 0.]])
 
     3. Not passing proper parameters will raise an error
+
     >>> seqAna = Sequence([seq1,seq2,seq3])
     Traceback (most recent call last):
     ValueError: Please specify a proper `dist_type` or `subs_mat` and `indel` to proceed!
@@ -259,14 +223,10 @@ class Sequence(object):
     ValueError: Please specify a proper `dist_type` or `subs_mat` and `indel` to proceed!
     """
 
-    def __init__(self,
-                 y,
-                 subs_mat=None,
-                 dist_type=None,
-                 indel=None,
-                 w=None,
-                 cluster_type=None):
+    def __init__(self, y, subs_mat=None, dist_type=None,
+                 indel=None, cluster_type=None):
 
+        y = np.asarray(y)
         merged = list(itertools.chain.from_iterable(y))
         self.classes = np.unique(merged)
         self.k = len(self.classes)
@@ -282,32 +242,89 @@ class Sequence(object):
         y_int = np.array(y_int)
 
         if subs_mat is None or indel is None:
-            if dist_type == "interval":
-                self.indel = self.k - 1
-                self.subs_mat = np.zeros((self.k, self.k))
-                for i in range(0, self.k - 1):
-                    for j in range(i + 1, self.k):
-                        self.subs_mat[i, j] = j - i
-                        self.subs_mat[j, i] = j - i
-                self._om_dist(y_int)
-            elif dist_type == "hamming":
-                if len(y_int.shape) != 2:
-                    raise ValueError(
-                        "hamming distance cannot be calculated for "
-                        "sequences of unequal lengths!")
-                hamming_dist = d.pdist(
-                    y_int, metric="hamming") * y_int.shape[1]
-                self.seq_dis_mat = d.squareform(hamming_dist)
-            else:
+            if dist_type is None:
                 raise ValueError("Please specify a proper `dist_type` or "
                                  "`subs_mat` and `indel` to proceed!")
+            else:
+                if dist_type.lower() == "interval":
+                    self.indel = self.k - 1
+                    self.subs_mat = np.zeros((self.k, self.k))
+                    for i in range(0, self.k - 1):
+                        for j in range(i + 1, self.k):
+                            self.subs_mat[i, j] = j - i
+                            self.subs_mat[j, i] = j - i
+                    self._om_dist(y_int)
+
+                elif dist_type.lower() == "hamming":
+                    if len(y_int.shape) != 2:
+                        raise ValueError('hamming distance cannot be calculated for '
+                                         'sequences of unequal lengths!')
+                    hamming_dist = d.pdist(y_int, metric='hamming') * y_int.shape[1]
+                    self.seq_dis_mat = d.squareform(hamming_dist)
+
+                elif dist_type.lower() == "arbitrary":
+                    self.indel = 1
+                    mat = np.ones((self.k, self.k)) * 0.5
+                    np.fill_diagonal(mat, 0)
+                    self.subs_mat = mat
+                    self._om_dist(y_int)
+
+                elif dist_type.lower() == "markov":
+                    p = Markov(y_int).p
+                    self.indel = 1
+                    mat = (2-(p+p.T))/2
+                    np.fill_diagonal(mat, 0)
+                    self.subs_mat = mat
+                    self._om_dist(y_int)
+
+                elif dist_type.lower() == "tran": #sequence of transitions
+                    self.indel = 2
+                    y_uni = np.unique(y_int)
+                    dict_trans_state = {}
+                    trans_list = []
+                    for i, tran in enumerate(itertools.product([-1], y_uni)):
+                        trans_list.append(tran)
+                        dict_trans_state[tran] = i
+                    for i, tran in enumerate(itertools.product(y_uni, y_uni)):
+                        trans_list.append(tran)
+                        dict_trans_state[tran] = i + len(y_uni)
+                    subs_mat = np.ones((self.k * (self.k + 1), self.k * (self.k +
+                                                                         1)))
+                    np.fill_diagonal(subs_mat, 0)
+                    for row in range(self.k ** 2):
+                        row_index = row + self.k
+                        row_tran = trans_list[row_index]
+                        for col in range(self.k ** 2):
+                            col_Index = col + self.k
+                            col_tran = trans_list[col_Index]
+                            if row_tran[0] == row_tran[1]:
+                                if col_tran[0] == col_tran[1]:
+                                    subs_mat[row_index, col_Index] = 0
+                            elif row_tran[0] != row_tran[1]:
+                                if col_tran[0] != col_tran[1]:
+                                    subs_mat[row_index, col_Index] = 0
+                    self.dict_trans_state = dict_trans_state
+                    self.subs_mat = subs_mat
+
+                    # Transform sequences of states into sequences of transitions.
+                    y_int_ext = np.insert(y_int, 0, -1, axis=1)
+                    y_tran_index = np.zeros_like(y_int)
+                    y_tran = []
+                    for i in range(y_int.shape[1]):
+                        y_tran.append(
+                            list(zip(y_int_ext[:, i], y_int_ext[:, i + 1])))
+                    for i in range(y_int.shape[0]):
+                        for j in range(y_int.shape[1]):
+                            y_tran_index[i, j] = dict_trans_state[y_tran[j][i]]
+                    self._om_dist(y_tran_index)
+
         else:
             self._om_dist(y_int)
 
     def _om_pair_dist(self, seq1, seq2):
-        """
+        '''
         Method for calculating the optimal matching distance between a pair of
-        sequences given a substitution cost matrix and a indel cost.
+        sequences given a substitution cost matrix and an indel cost.
 
         Arguments
         ---------
@@ -323,7 +340,7 @@ class Sequence(object):
                           score for aligning the substring, seq1[0:j] and seq2[0:i],
                           and D[t2+1, t1+1] (or D[-1,-1]) is the global optimal score.
 
-        """
+        '''
 
         t1 = len(seq1)
         t2 = len(seq2)
@@ -338,37 +355,53 @@ class Sequence(object):
             for j in range(1, t1 + 1):
                 gaps = D[i, j - 1] + self.indel
                 gapt = D[i - 1, j] + self.indel
-                match = D[i - 1, j - 1] + self.subs_mat[seq1[j - 1], seq2[i -
-                                                                          1]]
+                match = D[i - 1, j - 1] + self.subs_mat[seq1[j - 1], seq2[i - 1]]
                 D[i, j] = min(match, gaps, gapt)
         return D
 
     def _om_dist(self, y_int):
-        """
-        Method for calculating the optimal matching distance between any pair of
-        sequences given a substitution cost matrix and a indel cost.
+        '''
+        Method for calculating optimal matching distances between all
+        sequence pairs.
 
         Arguments
         ---------
-        seq1            : array
-                          (t1, ), the first sequence
-        seq2            : array
-                          (t2, ), the second sequence
+        y_int           : array
+                          Encoded longitudinal data ready for optimal matching.
 
-        Returns
-        -------
-        D               : array
-                          (t2+1, t1+1), score matrix: D[i+1,j+1] is the best
-                          score for aligning the substring, seq1[0:j] and seq2[0:i],
-                          and D[t2+1, t1+1] (or D[-1,-1]) is the global optimal score.
+        Note
+        ----
+        This method is optimized to calculate the distance between unique
+        sequences only in order to save computation time.
 
-        """
+        '''
+
+        y_str = []
+        for i in y_int:
+            y_str.append(''.join(list(map(str, i))))
+
+        moves_str, counts = np.unique(y_str, axis=0, return_counts=True)
+        uni_num = len(moves_str)
+        dict_move_index = dict(zip(list(moves_str), range(uni_num)))
+
+        # moves, counts = np.unique(y_int, axis=0, return_counts=True)
+        y_int_uni = []
+        for i in moves_str:
+            y_int_uni.append(list(map(int, i)))
+        uni_seq_dis_mat = np.zeros((uni_num,uni_num))
+        for pair in combinations(range(uni_num), 2):
+            seq1 = y_int_uni[pair[0]]
+            seq2 = y_int_uni[pair[1]]
+            uni_seq_dis_mat[pair[0], pair[1]] = self._om_pair_dist(seq1,
+                                                               seq2)[-1, -1]
+        uni_seq_dis_mat = uni_seq_dis_mat + uni_seq_dis_mat.transpose()
 
         seq_dis_mat = np.zeros((self.n, self.n))
         for pair in combinations(range(self.n), 2):
-            seq1 = y_int[pair[0]]
-            seq2 = y_int[pair[1]]
-            seq_dis_mat[pair[0], pair[1]] = self._om_pair_dist(seq1,
-                                                               seq2)[-1, -1]
+            seq1 = y_str[pair[0]]
+            seq2 = y_str[pair[1]]
+            seq_dis_mat[pair[0], pair[1]] = uni_seq_dis_mat[dict_move_index[seq1],
+                                                            dict_move_index[
+                                                                seq2]]
 
         self.seq_dis_mat = seq_dis_mat + seq_dis_mat.transpose()
