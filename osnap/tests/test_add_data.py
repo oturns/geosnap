@@ -11,5 +11,5 @@ def test_read_ltdb():
         sample=path+"/ltdb_sample.zip",
         fullcount=path+"/ltdb_full.zip",
     )
-
-    assert os.path.exists(os.path.join(os.path.dirname(os.path.abspath(context.data.__file__)), "ltdb.parquet"))
+    from quilt.data.osnap_data import data_store
+    assert data_store.ltdb().shape == (330388, 192)

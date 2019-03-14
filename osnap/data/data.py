@@ -21,6 +21,11 @@ except ImportError:
     quilt.install("spatialucr/census")
     quilt.install("spatialucr/census_cartographic")
     from quilt.data.spatialucr import census
+try:
+    from quilt.data.osnap_data import data_store
+except ImportError:
+    quilt.build("osnap_data/data_store") 
+    from quilt.data.osnap_data import data_store
 
 
 class Bunch(dict):
@@ -40,32 +45,27 @@ class Bunch(dict):
 
 
 _package_directory = os.path.dirname(os.path.abspath(__file__))
+_cbsa = pd.read_parquet(os.path.join(_package_directory, 'cbsas.parquet'))
 
 dictionary = pd.read_csv(os.path.join(_package_directory, "variables.csv"))
-_cbsa = pd.read_parquet(os.path.join(_package_directory, 'cbsas.parquet'))
-states = pd.read_parquet(os.path.join(_package_directory, 'states.parquet'))
 
-counties = pd.read_parquet(
-    os.path.join(_package_directory, 'counties.parquet.gzip'))
-
+states = census.states()
+counties = census.counties()
 tracts = census.tracts_2010
-
-#: A GeoDataFrame containing metropolitan statistical areas for the U.S.
-metros = pd.read_parquet(os.path.join(_package_directory, 'msas.parquet'))
-metros = convert_gdf(metros)
+metros = convert_gdf(census.msas())
 
 
-def _db_checker(dbase):
+def _db_checker(database):
 
-    fname = dbase + ".parquet"
-    path = os.path.join(_package_directory, fname)
-
-    if os.path.exists(path):
-        db = pd.read_parquet(path)
-    else:
-        db = ''
-
-    return db
+    try:
+        if database == 'ltdb':
+            df = data_store.ltdb()
+        else:
+            df = data_store.ncdb()
+    except AttributeError:
+        df = ''
+        
+    return df
 
 
 #: A dict containing tabular data available to OSNAP
@@ -223,9 +223,9 @@ def read_ltdb(sample, fullcount):
     keeps = df.columns[df.columns.isin(dictionary['variable'].tolist() + ['year'])]
     df = df[keeps]
 
-    df.to_parquet(
-        os.path.join(_package_directory, "ltdb.parquet"),
-        compression='brotli')
+    data_store._set(['ltdb'], df)
+    quilt.build("osnap_data/data_store", data_store)
+
 
 
 def read_ncdb(filepath):
@@ -323,9 +323,8 @@ def read_ncdb(filepath):
 
     df = df.loc[df.n_total_pop != 0]
 
-    df.to_parquet(
-        os.path.join(_package_directory, "ncdb.parquet"),
-        compression='brotli')
+    data_store._set(['ncdb'], df)
+    quilt.build("osnap_data/data_store", data_store)
 
 
 # TODO NHGIS reader
@@ -461,24 +460,10 @@ class Community(object):
             self.tracts = convert_gdf(self.tracts)
             self.counties = convert_gdf(self.counties)
             self.states = convert_gdf(self.states)
-        if source == "ltdb":
-            try:
-                _df = pd.read_parquet(
-                    os.path.join(_package_directory, "ltdb.parquet"))
-            except OSError:
-                print(
-                    "Unable to locate LTDB data. Please import the database\
-                     with the `read_ltdb` function"
-                )
-        elif source == "ncdb":
-            try:
-                _df = pd.read_parquet(
-                    os.path.join(_package_directory, "ncdb.parquet"))
-            except OSError:
-                print(
-                    "Unable to locate NCDB data. Please import the database with\
-                     the `read_ncdb` function"
-                )
+        if source in ['ltdb', 'ncdb']:
+            _df = _db_checker(source)
+            if len(_df) == 0:
+                raise ValueError("Unable to locate {source} data. Please import the database with the `read_{source}` function".format(source=source))
         elif source == "external":
             _df = data
         else:
