@@ -12,4 +12,4 @@ def test_read_ltdb():
         fullcount=path+"/ltdb_full.zip",
     )
     from quilt.data.osnap_data import data_store
-    assert context.data.db.ltdb.shape == (330388, 192)
+    assert data_store.ltdb().shape == (330388, 192)
