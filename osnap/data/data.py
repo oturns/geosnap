@@ -43,16 +43,12 @@ _package_directory = os.path.dirname(os.path.abspath(__file__))
 
 dictionary = pd.read_csv(os.path.join(_package_directory, "variables.csv"))
 _cbsa = pd.read_parquet(os.path.join(_package_directory, 'cbsas.parquet'))
-states = pd.read_parquet(os.path.join(_package_directory, 'states.parquet'))
+#states = pd.read_parquet(os.path.join(_package_directory, 'states.parquet'))
 
-counties = pd.read_parquet(
-    os.path.join(_package_directory, 'counties.parquet.gzip'))
-
+states = census.states()
+counties = census.counties()
 tracts = census.tracts_2010
-
-#: A GeoDataFrame containing metropolitan statistical areas for the U.S.
-metros = pd.read_parquet(os.path.join(_package_directory, 'msas.parquet'))
-metros = convert_gdf(metros)
+metros = convert_gdf(census.msas())
 
 
 def _db_checker(dbase):
