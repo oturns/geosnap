@@ -135,14 +135,14 @@ def read_ltdb(sample, fullcount):
 
         df["year"] = year
 
-        # inflate_cols = ["mhmval", "mrent", "incpc",
-        #                 "hinc", "hincw", "hincb", "hinch", "hinca"]
-        #
-        # inflate_available = list(set(df.columns).intersection(set(
-        #     inflate_cols)))
-        #
-        # if len(inflate_available):
-        #     df = adjust_inflation(df, inflate_available, year)
+        inflate_cols = ["mhmval", "mrent", "incpc",
+                        "hinc", "hincw", "hincb", "hinch", "hinca"]
+
+        inflate_available = list(set(df.columns).intersection(set(
+            inflate_cols)))
+
+        if len(inflate_available):
+            df = adjust_inflation(df, inflate_available, year)
         return df
 
     # read in Brown's LTDB data, both the sample and fullcount files for each
