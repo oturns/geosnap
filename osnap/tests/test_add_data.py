@@ -18,8 +18,6 @@ def test_read_ltdb():
 
 def test_read_ncdb():
 
-    read_ncdb(
-        sample=path+"/ncdb.csv",
-    )
+    read_ncdb(path+"/ncdb.csv")
     from quilt.data.osnap_data import data_store
     assert data_store.ncdb().shape == (328633, 77)
