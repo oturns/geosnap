@@ -259,7 +259,6 @@ def read_ncdb(filepath):
     df = pd.read_csv(
         filepath,
         usecols=keep,
-        low_memory=False,
         engine='c',
         na_values=["", " ", 99999, -999],
         converters={
