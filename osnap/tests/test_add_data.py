@@ -3,6 +3,7 @@ import os
 
 path = os.environ['DLPATH']
 read_ltdb = context.data.read_ltdb
+read_ncdb = context.data.read_ncdb
 
 
 def test_read_ltdb():
@@ -13,3 +14,10 @@ def test_read_ltdb():
     )
     from quilt.data.osnap_data import data_store
     assert data_store.ltdb().shape == (330388, 192)
+
+
+def test_read_ncdb():
+
+    read_ncdb(path+"/ncdb.csv")
+    from quilt.data.osnap_data import data_store
+    assert data_store.ncdb().shape == (328633, 77)

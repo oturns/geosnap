@@ -5,12 +5,9 @@ channels:
 dependencies:
   - pandas
   - cython
-  - jupyterlab
   - geopandas
   - hdbscan
   - matplotlib
-  - notebook
-  - networkx
   - scikit-learn
   - seaborn
   - pyarrow
