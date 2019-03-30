@@ -24,7 +24,7 @@ except ImportError:
 try:
     from quilt.data.osnap_data import data_store
 except ImportError:
-    quilt.build("osnap_data/data_store") 
+    quilt.build("osnap_data/data_store")
     from quilt.data.osnap_data import data_store
 
 
@@ -64,7 +64,7 @@ def _db_checker(database):
             df = data_store.ncdb()
     except AttributeError:
         df = ''
-        
+
     return df
 
 
@@ -218,14 +218,11 @@ def read_ltdb(sample, fullcount):
     for row in dictionary['formula'].dropna().tolist():
         df.eval(row, inplace=True)
 
-    # df = df.round(0)
-
     keeps = df.columns[df.columns.isin(dictionary['variable'].tolist() + ['year'])]
     df = df[keeps]
 
     data_store._set(['ltdb'], df)
     quilt.build("osnap_data/data_store", data_store)
-
 
 
 def read_ncdb(filepath):
@@ -249,8 +246,20 @@ def read_ncdb(filepath):
         for suffix in ['7', '8', '9', '0', '1', '2']:
             names.append(name + suffix)
     names.append('GEO2010')
+
+    c = pd.read_csv(filepath, nrows=1).columns
+    c = pd.Series(c.values)
+
+    keep = []
+    for i, col in c.items():
+        for name in names:
+            if col.startswith(name):
+                keep.append(col)
+
     df = pd.read_csv(
         filepath,
+        usecols=keep,
+        low_memory=False,
         engine='c',
         na_values=["", " ", 99999, -999],
         converters={
