@@ -77,7 +77,7 @@ def setup_package():
         tests_require=["pytest"],
         keywords=['spatial statistics', 'neighborhoods', 'demography'],
         classifiers=[
-            'Development Status :: 1 - Alpha',
+            'Development Status :: 3 - Alpha',
             'Intended Audience :: Science/Research',
             'Intended Audience :: Developers',
             'Intended Audience :: Education',

@@ -10,3 +10,4 @@ osnap.egg-info
 .coverage*
 .pytest*
 docs/_build/
+snap/tests/.ipynb_checkpoints/

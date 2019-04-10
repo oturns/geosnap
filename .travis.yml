@@ -6,6 +6,7 @@ only:
 python:
   - "3.5"
   - "3.6"
+  - "3.7"
 
 
 before_install:
@@ -35,7 +36,6 @@ notifications:
     email:
         recipients:
             - sjsrey@gmail.com
-            - suhanmappingideas@gmail.com
             - weikang9009@gmail.com
             - levi.john.wolf@gmail.com
             - ek@knaaptime.com 
