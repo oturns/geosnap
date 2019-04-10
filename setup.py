@@ -92,7 +92,7 @@ def setup_package():
         extras_require=extras_reqs,
         cmdclass={'build_py': build_py},
         include_package_data=True,
-        package_data={'osnap': ['data/variables.csv', 'data/cbsas.parquet', 'data/msas.parquet', 'data/states.parquet', 'data/counties.parquet.gzip']},
+        package_data={'osnap': ['data/variables.csv', 'data/cbsas.parquet']},
         python_requires='>3.4')
 
 
