@@ -7,10 +7,30 @@ module = "osnap"
 dist-name = "o-snap"
 author = "osnap developers"
 author-email = "ek@knaaptime.com"
-home-page = "http://spatialucr.edu"
+home-page = "http://github.com/spatialucr/osnap"
 requires-python = ">=3.5"
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.7",
 ]
+description-file="README.md"
+requires = [
+    "pandas",
+    "cython",
+    "geopandas",
+    "hdbscan",
+    "matplotlib",
+    "scikit-learn",
+    "seaborn",
+    "pyarrow",
+    "libpysal",
+    "mapclassify",
+    "spenc",
+    "giddy",
+    "xlrd",
+    "cenpy",
+    "quilt",
+    "region"
+]
+keywords='spatial statistics, neighborhoods, demography'
