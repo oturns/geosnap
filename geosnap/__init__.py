@@ -1,8 +1,8 @@
 
 r"""
 
-geosnap: Open-Source Neighborhood Analysis Package.
-================================================
+geosnap: Geospatial Neighborhood Analysis Package.
+======================================================
 
 Documentation
 -------------
@@ -22,8 +22,7 @@ data
     ingest, store, and manipulate spatiotemporal neighborhood data
 
 """
-
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 # __version__ has to be define in the first line
 
