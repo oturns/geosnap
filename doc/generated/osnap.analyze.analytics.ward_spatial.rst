@@ -1,6 +1,6 @@
-osnap.analyze.analytics.ward\_spatial
+geosnap.analyze.analytics.ward\_spatial
 =====================================
 
-.. currentmodule:: osnap.analyze.analytics
+.. currentmodule:: geosnap.analyze.analytics
 
 .. autofunction:: ward_spatial

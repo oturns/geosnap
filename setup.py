@@ -62,16 +62,16 @@ def setup_package():
     #    example_data_files.add(glob_name)
 
     setup(
-        name='osnap',
+        name='geosnap',
         version=VERSION,
         description="Open Source Neighborhood Analysis Program.",
         long_description=long_description,
-        maintainer="OSNAP Developers",
+        maintainer="geosnap Developers",
         maintainer_email='pysal-dev@googlegroups.com',
-        url='http://osnap.cloud',
+        url='http://geosnap.cloud',
         # download_url='https://pypi.python.org/pypi/oslnap',
         license='BSD',
-        py_modules=['osnap'],
+        py_modules=['geosnap'],
         packages=find_packages(),
         setup_requires=["pytest-runner"],
         tests_require=["pytest"],
@@ -92,7 +92,7 @@ def setup_package():
         extras_require=extras_reqs,
         cmdclass={'build_py': build_py},
         include_package_data=True,
-        package_data={'osnap': ['data/variables.csv', 'data/cbsas.parquet']},
+        package_data={'geosnap': ['data/variables.csv', 'data/cbsas.parquet']},
         python_requires='>3.4')
 
 

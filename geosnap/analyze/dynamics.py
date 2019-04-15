@@ -15,8 +15,8 @@ class Transition(object):
 
     Parameters
     ----------
-    dataset          : osnap.Dataset
-                      osnap dataset object with column defining neighborhood clusters
+    dataset          : geosnap.Dataset
+                      geosnap dataset object with column defining neighborhood clusters
     w_type           : libpysal spatial weights type ("rook", "queen", "knn" or "kernel")
                       spatial weights object.
     w_kwds          : dict

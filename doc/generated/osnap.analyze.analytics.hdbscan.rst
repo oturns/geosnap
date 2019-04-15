@@ -1,6 +1,6 @@
-osnap.analyze.analytics.hdbscan
+geosnap.analyze.analytics.hdbscan
 ===============================
 
-.. currentmodule:: osnap.analyze.analytics
+.. currentmodule:: geosnap.analyze.analytics
 
 .. autofunction:: hdbscan

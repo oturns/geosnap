@@ -23,14 +23,14 @@ before_install:
 install:
   - conda install --yes pip
   - conda env create -f environment.yml python=$TRAVIS_PYTHON_VERSION
-  - source activate osnap
+  - source activate geosnap
   - pip install python-coveralls
   - pip install pytest-cov
 
 
 script:
   - python setup.py sdist >/dev/null
-  - pytest --ignore=examples --ignore=osnap/util  --cov osnap
+  - pytest --ignore=examples --ignore=geosnap/util  --cov geosnap
 
 notifications:
     email:

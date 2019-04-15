@@ -22,10 +22,10 @@ except ImportError:
     quilt.install("spatialucr/census_cartographic")
     from quilt.data.spatialucr import census
 try:
-    from quilt.data.osnap_data import data_store
+    from quilt.data.geosnap_data import data_store
 except ImportError:
-    quilt.build("osnap_data/data_store")
-    from quilt.data.osnap_data import data_store
+    quilt.build("geosnap_data/data_store")
+    from quilt.data.geosnap_data import data_store
 
 
 class Bunch(dict):
@@ -68,7 +68,7 @@ def _db_checker(database):
     return df
 
 
-#: A dict containing tabular data available to OSNAP
+#: A dict containing tabular data available to geosnap
 db = Bunch(census_90=census.variables_1990(),
            census_00=census.variables_2000(),
            ltdb=_db_checker('ltdb'),
@@ -222,7 +222,7 @@ def read_ltdb(sample, fullcount):
     df = df[keeps]
 
     data_store._set(['ltdb'], df)
-    quilt.build("osnap_data/data_store", data_store)
+    quilt.build("geosnap_data/data_store", data_store)
 
 
 def read_ncdb(filepath):
@@ -332,7 +332,7 @@ def read_ncdb(filepath):
     df = df.loc[df.n_total_pop != 0]
 
     data_store._set(['ncdb'], df)
-    quilt.build("osnap_data/data_store", data_store)
+    quilt.build("geosnap_data/data_store", data_store)
 
 
 # TODO NHGIS reader

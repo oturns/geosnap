@@ -1,6 +1,6 @@
-osnap.analyze.analytics.azp
+geosnap.analyze.analytics.azp
 ===========================
 
-.. currentmodule:: osnap.analyze.analytics
+.. currentmodule:: geosnap.analyze.analytics
 
 .. autofunction:: azp

@@ -6,7 +6,7 @@ __pycache__/*
 */*/__pycache__/*
 .mypy_cache/*
 .eggs
-osnap.egg-info
+geosnap.egg-info
 .coverage*
 .pytest*
 docs/_build/

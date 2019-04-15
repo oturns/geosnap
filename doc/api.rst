@@ -1,6 +1,6 @@
 .. _api_ref:
 
-.. currentmodule:: osnap
+.. currentmodule:: geosnap
 
 API reference
 =============
@@ -12,11 +12,11 @@ Data Module
 .. autosummary::
    :toctree: generated/
    
-    osnap.data.db
-    osnap.data.metros
-    osnap.data.read_ltdb
-    osnap.data.read_ncdb
-    osnap.data.Community
+    geosnap.data.db
+    geosnap.data.metros
+    geosnap.data.read_ltdb
+    geosnap.data.read_ncdb
+    geosnap.data.Community
 
 .. _analyze_api:
 
@@ -30,17 +30,17 @@ Model neighborhood differentiation using multivariate clustering algorithms
 .. autosummary::
    :toctree: generated/
    
-    osnap.analyze.cluster
-    osnap.analyze.cluster_spatial
+    geosnap.analyze.cluster
+    geosnap.analyze.cluster_spatial
 
 Clustering algorithms
 '''''''''''''''''''''''
-The following algorithms may be passed to `osnap.analyze.cluster` or `osnap.analyze.cluster_spatial` but they should not be called directly
+The following algorithms may be passed to `geosnap.analyze.cluster` or `geosnap.analyze.cluster_spatial` but they should not be called directly
 
 Classic (aspatial) Clustering
 """"""""""""""""""""""""""""""
 
-.. currentmodule:: osnap.analyze.analytics
+.. currentmodule:: geosnap.analyze.analytics
 
 .. autosummary::
    :toctree: generated/
@@ -55,7 +55,7 @@ Classic (aspatial) Clustering
 Spatial Clustering
 """"""""""""""""""
 
-.. currentmodule:: osnap.analyze.analytics
+.. currentmodule:: geosnap.analyze.analytics
 
 .. autosummary::
    :toctree: generated/
@@ -71,14 +71,14 @@ Neighborhod Dynamics Methods
 ````````````````````````````````
 Model neighborhood change using optimal-matching algorithms or spatial discrete markov chains
 
-.. currentmodule:: osnap
+.. currentmodule:: geosnap
 
 .. autosummary::
    :toctree: generated/
    
-   osnap.analyze.linc
-   osnap.analyze.Sequence
-   osnap.analyze.Transition
+   geosnap.analyze.linc
+   geosnap.analyze.Sequence
+   geosnap.analyze.Transition
 
 Harmonize Module
 ----------------

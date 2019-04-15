@@ -3,11 +3,11 @@ requires = ["flit"]
 build-backend = "flit.buildapi"
 
 [tool.flit.metadata]
-module = "osnap"
-dist-name = "o-snap"
-author = "osnap developers"
+module = "geosnap"
+dist-name = "geosnap"
+author = "geosnap developers"
 author-email = "ek@knaaptime.com"
-home-page = "http://github.com/spatialucr/osnap"
+home-page = "http://github.com/spatialucr/geosnap"
 requires-python = ">=3.5"
 classifiers = [
     "License :: OSI Approved :: MIT License",

@@ -1,7 +1,7 @@
-osnap.analyze.Transition
+geosnap.analyze.Transition
 ========================
 
-.. currentmodule:: osnap.analyze
+.. currentmodule:: geosnap.analyze
 
 .. autoclass:: Transition
 

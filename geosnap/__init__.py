@@ -1,13 +1,13 @@
 
 r"""
 
-OSNAP: Open-Source Neighborhood Analysis Package.
+geosnap: Open-Source Neighborhood Analysis Package.
 ================================================
 
 Documentation
 -------------
-OSNAP documentation is available in two forms: python docstrings and an html\
-        webpage at http://osnap.org/
+geosnap documentation is available in two forms: python docstrings and an html\
+        webpage at http://geosnap.org/
 
 Available sub-packages
 ----------------------
@@ -23,7 +23,7 @@ data
 
 """
 
-__version__ = "0.0.0"
+__version__ = "0.0.1"
 
 # __version__ has to be define in the first line
 
