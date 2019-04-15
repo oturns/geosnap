@@ -1,6 +1,6 @@
-osnap.data.read\_ltdb
+geosnap.data.read\_ltdb
 =====================
 
-.. currentmodule:: osnap.data
+.. currentmodule:: geosnap.data
 
 .. autofunction:: read_ltdb

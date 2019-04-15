@@ -1,6 +1,6 @@
-osnap.analyze.analytics.affinity\_propagation
+geosnap.analyze.analytics.affinity\_propagation
 =============================================
 
-.. currentmodule:: osnap.analyze.analytics
+.. currentmodule:: geosnap.analyze.analytics
 
 .. autofunction:: affinity_propagation

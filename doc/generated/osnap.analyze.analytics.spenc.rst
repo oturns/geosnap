@@ -1,6 +1,6 @@
-osnap.analyze.analytics.spenc
+geosnap.analyze.analytics.spenc
 =============================
 
-.. currentmodule:: osnap.analyze.analytics
+.. currentmodule:: geosnap.analyze.analytics
 
 .. autofunction:: spenc

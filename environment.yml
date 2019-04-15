@@ -1,4 +1,4 @@
-name: osnap
+name: geosnap
 channels:
   - defaults
   - conda-forge

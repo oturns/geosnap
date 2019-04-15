@@ -1,7 +1,7 @@
-osnap.data.Community
+geosnap.data.Community
 ====================
 
-.. currentmodule:: osnap.data
+.. currentmodule:: geosnap.data
 
 .. autoclass:: Community
 

@@ -1,6 +1,6 @@
-osnap.data.read\_ncdb
+geosnap.data.read\_ncdb
 =====================
 
-.. currentmodule:: osnap.data
+.. currentmodule:: geosnap.data
 
 .. autofunction:: read_ncdb

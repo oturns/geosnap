@@ -1,6 +1,6 @@
-osnap.analyze.cluster
+geosnap.analyze.cluster
 =====================
 
-.. currentmodule:: osnap.analyze
+.. currentmodule:: geosnap.analyze
 
 .. autofunction:: cluster
