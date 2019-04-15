@@ -1,4 +1,4 @@
-# Neighborhood Analysis in Python
+# Geospatial Neighborhood Analysis in Python
 [![Build Status](https://travis-ci.com/spatialucr/geosnap.svg?branch=master)](https://travis-ci.com/spatialucr/geosnap)  [![Coverage Status](https://coveralls.io/repos/github/spatialucr/geosnap/badge.svg?branch=master)](https://coveralls.io/github/spatialucr/geosnap?branch=master&service=github)
 
 <img src="doc/geosnap.png" alt="geosnap" width="500"/>
