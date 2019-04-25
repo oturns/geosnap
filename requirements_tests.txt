@@ -3,5 +3,5 @@ nose-progressive
 nose-exclude
 coverage
 coveralls
-matplotlibp
+matplotlib
 pytest-mpl
