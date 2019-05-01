@@ -23,7 +23,7 @@ def harmonize(raw_community,
         Multiple GeoDataFrames given by geosnap.data.Community(..., type = "raw") (see (1) in Notes).
     
     target_year_of_reference : string
-        The name of variable in data that contains the population size of the group of interest.
+        The target year that represents the bondaries of all datasets generated in the harmonization. Could be, for example '2010'.
         
     weights_method : string
         The method that the harmonization will be conducted. This can be set to:
