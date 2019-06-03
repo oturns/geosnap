@@ -2,10 +2,15 @@
 
 import pandas
 import sys
+import os
 from tqdm.auto import tqdm
-from ..data import dictionary
 from quilt.data.spatialucr.census import states
 from cenpy import products
+
+sys.path.insert(0,
+                os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from data import dictionary
 
 _variables = dictionary.copy()
 
