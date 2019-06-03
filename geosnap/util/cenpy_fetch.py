@@ -4,16 +4,7 @@ import pandas
 import sys
 import os
 from tqdm.auto import tqdm
-from warnings import warn
-import quilt
-
-try:
-    from quilt.data.spatialucr import states
-except ImportError:
-    warn("Fetching data. This should only happen once")
-    quilt.install("spatialucr/census")
-    quilt.install("spatialucr/census_cartographic")
-    from quilt.data.spatialucr import states
+from quilt.data.spatialucr.census import states
 
 from cenpy import products
 
