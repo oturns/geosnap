@@ -1,47 +1,48 @@
-import cenpy
+from cenpy import products
 import pandas
 import os
+import sys
+from tqdm.auto import tqdm
 import numpy as np
+from ..data import dictionary
+from quilt.data.spatialucr.census import states
 
-filepath = os.path.dirname(__file__)
-variable_file = os.path.join(filepath, 'variables.csv')
-variables = pandas.read_csv(variable_file)
-
-c2000sf1 = cenpy.base.Connection(
-    'DecennialSF11990')
-c2000sf3 = cenpy.base.Connection(
-    'DecennialSF31990')
-
-by_form = variables.groupby('census_1990_form')
-column_relations = by_form.census_1990_table_column.agg(list)
+_variables = dictionary.copy()
 
 
-def fetch(unit='tract', state=None, filter=None):
+def fetch_acs(level='tract', state='all', year=2017):
     """
-    use Cenpy to collect the necessary variables from the Census API
+    use Cenpy to collect the variables defined in `geosnap.data.dictionary` from the Census API
     """
 
-    sf1cols = process_columns(column_relations.loc['SF1'])
-    sf3cols = process_columns(column_relations.loc['SF3'])
+    acsvars = process_columns(_variables['acs'].dropna())
 
     evalcols = [
-        normalize_relation(rel)
-        for rel in variables['census_1990_table_column'].dropna().tolist()
+        normalize_relation(rel) for rel in _variables['acs'].dropna().tolist()
     ]
 
-    varnames = variables.dropna(
-        subset=['census_1990_table_column'])['variable']
+    varnames = _variables.dropna(subset=['acs'])['variable']
     evals = [parts[0] + "=" + parts[1] for parts in zip(varnames, evalcols)]
-    _sf1 = cenpy.tools.national_to_tract(c2000sf1, sf1cols, wait_by_county=0.5)
-    #_sf1 = c2000sf1.query(sf1cols, geo_unit=unit, geo_filter=filter)
-    _sf1['geoid'] = _sf1.state + _sf1.county + _sf1.tract
 
-    _sf3 = cenpy.tools.national_to_tract(c2000sf3, sf3cols, wait_by_county=0.5)
-    #_sf3 = c2000sf3.query(sf3cols, geo_unit=unit, geo_filter=filter)
-    _sf3['geoid'] = _sf3.state + _sf3.county + _sf3.tract
+    if state == 'all':
+        dfs = []
+        with tqdm(total=len(states()), file=sys.stdout) as pbar:
+            for state in states().sort_values(by='name').name.tolist():
+                try:
+                    df = products.ACS(year).from_state(
+                        state, level=level, variables=acsvars.copy())
+                    dfs.append(df)
+                    pbar.update(1)
+                except:
+                    tqdm.write('{state} failed'.format(state=state))
+                    pbar.update(1)
+        df = pandas.concat(dfs)
+    else:
+        df = products.ACS(year).from_state(name=state,
+                                           level=level,
+                                           variables=acsvars.copy())
 
-    df = _sf1.merge(_sf3, on='geoid')
-    df.set_index('geoid', inplace=True)
+    df.set_index('GEOID', inplace=True)
     df = df.apply(lambda x: pandas.to_numeric(x, errors='coerce'), axis=1)
     # compute additional variables from lookup table
     for row in evals:
@@ -49,14 +50,13 @@ def fetch(unit='tract', state=None, filter=None):
             df.eval(row, inplace=True, engine='python')
         except Exception as e:
             print(row + ' ' + str(e))
-    df = df.replace('nan', np.nan)
-    for row in variables['formula'].dropna().tolist():
+    for row in _variables['formula'].dropna().tolist():
         try:
             df.eval(row, inplace=True, engine='python')
         except Exception as e:
             print(str(row) + ' ' + str(e))
-    keeps = [col for col in df.columns if col in variables.variable.tolist()]
-    df = df[keeps].round(2)
+    keeps = [col for col in df.columns if col in _variables.variable.tolist()]
+    df = df[keeps]
     return df
 
 
@@ -110,8 +110,3 @@ def normalize_relation(relation):
         ]
         return '+'.join(cols)
     return relation
-
-
-df = fetch()
-
-df.to_csv('census_1990.csv')
