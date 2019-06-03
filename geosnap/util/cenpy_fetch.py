@@ -41,7 +41,7 @@ def fetch_acs(level='tract', state='all', year=2017):
 
     """
 
-    acsvars = process_columns(_variables['acs'].dropna())
+    acsvars = process_columns(list(set(_variables['acs'].dropna())))
 
     evalcols = [
         normalize_relation(rel) for rel in _variables['acs'].dropna().tolist()
