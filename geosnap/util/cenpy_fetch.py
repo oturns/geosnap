@@ -24,7 +24,7 @@ from data import dictionary
 _variables = dictionary.copy()
 
 
-def fetch_acs(level='tract', state='all', year=2017):
+def fetch_acs(level='tract', state='all', year=2017, apikey=''):
     """Collect the variables defined in `geosnap.data.dictionary` from the Census API.
 
     Parameters
@@ -49,7 +49,6 @@ def fetch_acs(level='tract', state='all', year=2017):
     >>> dc = fetch_acs('District of Columbia', year=2015)
 
     """
-
     acsvars = process_columns(list(set(_variables['acs'].dropna())))
 
     evalcols = [
