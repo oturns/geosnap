@@ -37,7 +37,7 @@ p_russian_born_pop,percentage of persons who were born in Russia/ USSR,p_russian
 p_italian_born_pop,percentage of persons who were born in Italy,p_italian_born_pop=n_italian_born_pop / n_total_pop*100,pitfb,,,,,,,Ethnicity & Immigration,
 p_german_born_pop,percentage of persons who were born in Germany,p_german_born_pop=n_german_born_pop / n_total_pop*100,pgefb,,,,,,,Ethnicity & Immigration,
 p_irish_born_pop,percentage of persons who were born in Ireland,p_irish_born_pop=n_irish_born_pop / n_total_pop*100,pirfb,,,,,,,Ethnicity & Immigration,
-p_scandanavian_born_pop,percentage of persons who were born in Scandinavian Countries,p_scandanavian_born_pop=n_scandaniavian__born_pop / n_total_pop*100,pscfb,,,,,,,Ethnicity & Immigration,
+p_scandanavian_born_pop,percentage of persons who were born in Scandinavian Countries,p_scandanavian_born_pop=n_scandaniavian_born_pop / n_total_pop*100,pscfb,,,,,,,Ethnicity & Immigration,
 n_total_housing_units,housing units,,hu,TOTHSUN,SF1,H0010001,SF1,H001001,B25002_001E,"Housing, Age, & Marital Status",
 n_vacant_housing_units,vacant housing units,,vac,VACHU,SF1,H0020002,SF1,H003003,B25002_003E,"Housing, Age, & Marital Status",divide by B25002_001E for vacancy rate
 n_occupied_housing_units,occupied housing units,,ohu,OCCHU,SF1,H0020001,SF1,H003002,B25002_002E,"Housing, Age, & Marital Status",
