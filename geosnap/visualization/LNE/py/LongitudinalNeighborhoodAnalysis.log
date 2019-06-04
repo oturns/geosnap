@@ -1,0 +1,7 @@
+///Example Run////////////////////////////////////////////////////////////////////////////////////
+
+LongitudinalNeighborhoodAnalysis.py -y 1990 -i "LongitudinalNeighborhoodAnalysis_SelectedVariableList.txt"
+
+LongitudinalNeighborhoodAnalysis.py -y 1990,2000,2010 -i "LongitudinalNeighborhoodAnalysis_SelectedVariableList.txt"
+
+LongitudinalNeighborhoodAnalysis.py -i "LongitudinalNeighborhoodAnalysis_SelectedVariableList.txt"

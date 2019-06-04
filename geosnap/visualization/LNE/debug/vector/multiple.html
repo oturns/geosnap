@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Leaflet Sync Demo - with three maps listening</title>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+    <style type="text/css">
+        html, body { width: 100%; height: 100%; margin: 0; }
+        #map, #container { width: 49.5%; height: 100%; }
+        #map { float: left; }
+        #container { float: right; }
+        #container .map { width: 100%; height: 50%; }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <div id="container">
+        <div id="mapA" class="map"></div>
+        <div id="mapB" class="map"></div>
+    </div>
+
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+    <script src="../L.Map.Sync.js"></script>
+
+    <script type="text/javascript">
+        var center = [59.336, 5.967];
+
+        var stamenOptions = {
+            attribution:
+                'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ' +
+                '<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; ' +
+                'Map data OpenStreetmap',
+            subdomains: 'abcd',
+            minZoom: 0,
+            maxZoom: 20
+        };
+
+        var toner = L.tileLayer('http://{s}.tile.stamen.com/toner/{z}/{x}/{y}.png', stamenOptions);
+        var tonerLite = L.tileLayer('http://{s}.tile.stamen.com/toner-lite/{z}/{x}/{y}.png', stamenOptions);
+        var watercolor = L.tileLayer('http://{s}.tile.stamen.com/watercolor/{z}/{x}/{y}.jpg', stamenOptions);
+
+        var map = L.map('map', {
+            layers: [toner],
+            center: center,
+            zoom: 14
+        });
+
+        var mapA = L.map('mapA', {
+            layers: [watercolor],
+            center: center,
+            zoom: 14,
+            zoomControl: false
+        });
+        var mapB = L.map('mapB', {
+            layers: [tonerLite],
+            center: center,
+            zoom: 14,
+            zoomControl: false
+        });
+
+        map.sync(mapA);
+        map.sync(mapB);
+
+        // If you want interaction with mapA|B to be synchronized on map,
+        // add other links as well.
+        // mapA.sync(map);
+        // mapA.sync(mapB);
+
+        // mapB.sync(map);
+        // mapB.sync(mapA);
+    </script>
+</body>
+</html>

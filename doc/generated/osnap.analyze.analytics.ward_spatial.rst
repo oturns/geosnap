@@ -1,0 +1,6 @@
+geosnap.analyze.analytics.ward\_spatial
+=====================================
+
+.. currentmodule:: geosnap.analyze.analytics
+
+.. autofunction:: ward_spatial

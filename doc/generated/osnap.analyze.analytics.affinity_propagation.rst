@@ -1,0 +1,6 @@
+geosnap.analyze.analytics.affinity\_propagation
+=============================================
+
+.. currentmodule:: geosnap.analyze.analytics
+
+.. autofunction:: affinity_propagation

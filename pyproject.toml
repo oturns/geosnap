@@ -1,0 +1,36 @@
+[build-system]
+requires = ["flit"]
+build-backend = "flit.buildapi"
+
+[tool.flit.metadata]
+module = "geosnap"
+dist-name = "geosnap"
+author = "geosnap developers"
+author-email = "ek@knaaptime.com"
+home-page = "http://github.com/spatialucr/geosnap"
+requires-python = ">=3.5"
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+]
+description-file="README.md"
+requires = [
+    "pandas",
+    "cython",
+    "geopandas",
+    "hdbscan",
+    "matplotlib",
+    "scikit-learn",
+    "seaborn",
+    "pyarrow",
+    "libpysal",
+    "mapclassify",
+    "spenc",
+    "giddy",
+    "xlrd",
+    "cenpy",
+    "quilt",
+    "region"
+]
+keywords='spatial statistics, neighborhoods, demography'

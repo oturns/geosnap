@@ -1,0 +1,858 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Leaflet Sync Demo</title>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+
+    <style type="text/css">
+        html, body { width: 100%; height: 100%; margin: 0;     font: 15px arial, sans-serif; }
+        #map1, #map2 { width: 49.5%; height: 90%; }
+        #map1 { float: left; }
+        #map2 { float: right; }
+		#input_area_left {
+			width: 50.5%;
+			height:10%;;
+			background-color:#ffffff;
+			float: left;
+			font-size: 120%;
+		}
+		#input_area_right {
+			width: 49.5%;
+			height:10%;;
+			background-color:#ffffff;
+			float: right; 
+			font-size: 120%;
+		}
+		.info {
+			padding: 6px 8px;
+			font: 14px/16px Arial, Helvetica, sans-serif;
+			background: white;
+			background: rgba(255,255,255,0.8);
+			box-shadow: 0 0 15px rgba(0,0,0,0.2);
+			border-radius: 5px;
+		}
+		.info h4 {
+			margin: 0 0 5px;
+			color: #777;
+		}
+
+		.legend {
+			text-align: left;
+			line-height: 18px;
+			color: #555;
+		}
+		.legend i {
+			width: 18px;
+			height:15px;
+			float: left;
+			margin-right: 8px;
+			opacity: 0.7;
+		}		
+    </style>
+</head>
+
+<body>
+
+
+	<div id="input_area_left">
+		<br/>
+		<div id="menu_L1" style="background-color:#ffffff;height:30px;width:310px;float:left;">
+			<form name="ConditionSelect" action="">
+				<span id="condition_change">Cancer Type: </span>
+				<select name="condition" onChange="layerChange1()">
+					<option value="Bladder Cancer">Bladder Cancer</option>
+					<option value="Brain Cancer">Brain Cancer</option>
+					<option value="Cervical Cancer">Cervical Cancer</option>
+					<option value="Colorectal Cancer">Colorectal Cancer</option>
+					<option value="Esophageal Cancer">Esophageal Cancer</option>
+					<option value="Female Breast Cancer">Female Breast Cancer </option>
+					<option value="Hodgkins Disease">Hodgkins Disease</option>
+					<option value="Kidney Cancer">Kidney Cancer</option>
+					<option value="Laryngeal Cancer">Laryngeal Cancer</option>
+					<option value="Leukemia">Leukemia</option>
+					<option value="Liver Cancer">Liver Cancer</option>
+					<option value="Lung Cancer">Lung Cancer</option>
+					<option value="Non-Hodgkins Lymphoma">Non-Hodgkins Lymphoma</option>
+					<option value="Oral Cancer">Oral Cancer/option>
+					<option value="Other Cancer">Other Cancer </option>
+					<option value="Ovarian Cancer">Ovarian Cancer </option>
+					<option value="Overall Cancer">Overall Cancer</option>
+					<option value="Pancreatic Cancer">Pancreatic Cancer</option>
+					<option value="Prostate Cancer">Prostate Cancer</option>
+					<option value="Skin Cancer">Skin Cancer</option>
+					<option value="Stomach Cancer">Stomach Cancer</option>
+					<option value="Thyroid Cancer">Thyroid Cancer</option>
+					<option value="Uterine Cancer">Uterine Cancer</option>
+					
+				</select>
+			</form>
+		</div>
+		
+		<div id="menu_L2" style="background-color:#ffffff;height:30px;width:210px;float:left;">
+			<form name="OutcomeSelect" action="">
+				<span id="outcome_change">Outcome: </span>
+				<select name="outcome" onChange="layerChange1()">				
+					<option value="Death">Death</option>
+					<option value="Hospitalization">Hospitalization</option>
+					<option value="ED Discharge">ED Discharge</option>				
+				</select>
+			</form>
+		</div>
+		
+		<div id="menu_L3" style="background-color:#ffffff;height:30px;width:300px;float:left;">
+			<form name="CaseSelect" action="">
+				<span id="case_change">Case: </span>
+				<select name="case" id="case_options" onChange="layerChange1()">			
+					<option value="Total_Cases">Total_Cases</option>
+					<option value="Total_Rate">Total_Rate</option>
+					<option value="Age_Adjusted_Rate">Age_Adjusted_Rate</option>				
+				</select>
+			</form>
+		</div>
+		
+		<div id="menu_L4" style="background-color:#ffffff;height:30px;width:150px;float:left;">
+			<form name="YearSelect1" action="">
+				<span id="year_change">Year: </span>
+				<select name="year1" onChange="layerChange1()">			
+					<option value="2010">2010</option>
+					<option value="2011">2011</option>
+					<option value="2012">2012</option>
+					<option value="2013">2013</option>					
+				</select>
+			</form>
+		</div>
+		
+		<div id="menu_L5" style="background-color:#ffffff;height:30px;width:250px;float:left;">
+			<form name="classSelect1" action="">
+				<span id="class_change">Select: </span>
+				<select name="classified" onChange="layerChange1()">
+					<option value="equal">Equal Classification</option>
+					<option value="quantile">Quantile Classification</option>	
+				</select>
+			</form>	
+		</div>
+		
+	</div>	
+	
+	<div id="input_area_right">
+		<br/>
+		<!--div id="menu_R1" style="background-color:#ffffff;height:30px;width:600px;float:left;"-->
+		<div id="menu_R1" style="background-color:#ffffff;">
+			<form name="layerSelect" action="">
+				<span id="layer_change">Socioeconomic and Demographic Variables: </span>
+				<select name="ACSdata" id="ACSdata_options" onChange="layerChange2()">
+					<option value="A0">Total 2013 Population</option>
+					<option value="A1">Age 0-4</option>
+					<option value="A2">Age 5-14</option>
+					<option value="A3">Age 15-24</option>
+					<option value="A4">Age 25-44</option>
+					<option value="A5">Age 45-64 </option>
+					<option value="A6">Age 65+ </option>
+					<option value="A7">Males</option>
+					<option value="A8">Females</option>
+					<option value="A9">White</option>
+					<option value="A10">Hispanic</option>
+					<option value="A11">Black</option>
+					<option value="A12">Asian/Pacific Islander</option>
+					<option value="A13">Other Race/Ethnicity</option>
+				</select>
+			</form>
+		</div>
+		
+		<div id="menu_R2" style="background-color:#ffffff;height:30px;width:150px;float:left;">
+			<form name="YearSelect2" action="">
+				<span id="year_change">Year: </span>
+				<select name="year2" onChange="yearChange2()">			
+					<option value="2012">2012</option>
+					<option value="2013">2013</option>					
+				</select>
+			</form>
+		</div>
+		
+		<!--div id="menu_R2" style="background-color:#ffffff;height:30px;width:250px;float:right;"-->
+		<div id="menu_R3" style="background-color:#ffffff;height:30px;">
+			<form name="classSelect2" action="">
+				<span id="class_change">Select: </span>
+				<select name="classified" onChange="layerChange2()">
+					<option value="equal">Equal Classification</option>
+					<option value="quantile">Quantile Classification</option>	
+				</select>
+			</form>	
+		</div>		
+	
+	</div>
+
+    <div id="map1"></div>
+		
+		
+    <div id="map2"></div>
+		
+
+	
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet-src.js"></script>
+    <script src="../L.Map.Sync.js"></script>
+	<script type="text/javascript" src="polygon.js"></script>
+	<script type="text/javascript" src="cancer.js"></script>
+	<script type="text/javascript" src="census2012.js"></script>
+	<script type="text/javascript" src="census2013.js"></script>
+	
+    <script type="text/javascript">
+	
+		var geojson1 = null;
+		var info1    = null;
+		var legend1  = null;
+
+		var geojson2 = null;
+		var info2    = null;
+		var legend2  = null;
+		
+		setSelectField(CANCER[0], 13, "case_options");
+		if (document.YearSelect2.year2.value == "2012")  setSelectField(CENSUS2012[0], 5, "ACSdata_options");
+		if (document.YearSelect2.year2.value == "2013")  setSelectField(CENSUS2013[0], 5, "ACSdata_options");
+
+		var center = [33.0, -116.9]; //
+
+        var stamenOptions = {
+            attribution:
+                'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ' +
+                '<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; ' +
+                'Map data OpenStreetmap',
+            subdomains: 'abcd',
+            minZoom: 0,
+            maxZoom: 20
+        };		 
+		 
+        var layer1 = L.tileLayer('http://{s}.tile.stamen.com/toner-lite/{z}/{x}/{y}.png', stamenOptions);
+
+        var layer2 = L.tileLayer('http://{s}.tile.stamen.com/toner-lite/{z}/{x}/{y}.png', stamenOptions);
+
+        var map1 = L.map('map1', {
+            layers: [layer1],
+            center: center,
+            zoom: 10
+        });
+
+        map1.attributionControl.setPrefix('');
+
+        var map2 = L.map('map2', {
+            layers: [layer2],
+            center: center,
+            zoom: 10,
+            zoomControl: false
+        });
+
+        map1.sync(map2);
+        map2.sync(map1);
+
+
+		var layersControl = new L.Control.Layers({
+			//'CloudMade': cloudmade
+		}, {
+			//'Some marker': marker,
+			//'vector layer': geojson
+		});	
+
+		//map2.addControl(layersControl);
+
+		
+function setSelectField(header, startIDX, target) {
+		options = ""
+		for (var i=startIDX; i<header.length; i++) {
+			options += '<option value="' + header[i] + '">' + header[i] + '</option>';
+		}
+		//alert(options);
+		document.getElementById(target).innerHTML = options;
+}
+
+function getColumnIndex(header, columnName) {
+	for (var i=0; i<header.length; i++) {
+		if (header[i] == columnName) return i;
+	}
+	alert("Column name['" + columnName + "'] not found in the cancer header.");
+	return -1;
+}
+		
+function remove1() {
+	if (geojson1 != null) map1.removeLayer(geojson1);
+	if (info1    != null) info1.removeFrom(map1);
+	if (legend1  != null) legend1.removeFrom(map1);	
+}
+
+function remove2() {
+	if (geojson2 != null) map2.removeLayer(geojson2);
+	if (info2    != null) info2.removeFrom(map2);
+	if (legend2  != null) legend2.removeFrom(map2);	
+}
+/*
+		function styleRemove(feature) {
+			return {
+				//weight: 2,
+				opacity: 0,
+				color: 'white',
+				//dashArray: '3',
+				fillOpacity: 0,
+				fillColor: 'white'
+			};
+		}
+*/		
+
+function layerChange1() {
+
+	var selectedCondition  = document.ConditionSelect.condition.value;
+	var selectedOutcom     = document.OutcomeSelect.outcome.value;
+	var selectedCase       = document.CaseSelect.case.value;
+	var selectedYear       = document.YearSelect1.year1.value;
+	var classification     = document.classSelect1.classified.value;
+	//alert("selectedCondition: " + selectedCondition);
+	//alert("selectedOutcom: " + selectedOutcom);
+	//alert("selectedCase: " + selectedCase);
+	//alert("selectedYear: " + selectedYear);
+	//alert("classification: " + classification);
+	
+	var iCondition = getColumnIndex(CANCER[0], "CONDITION")
+	var iOutcom    = getColumnIndex(CANCER[0], "OUTCOME")
+	var iYEAR      = getColumnIndex(CANCER[0], "YEAR")
+	var iGeography = getColumnIndex(CANCER[0], "Geography")
+	var iSRANum    = getColumnIndex(CANCER[0], "SRANum")
+	var iCase      = getColumnIndex(CANCER[0], selectedCase)
+	
+	// Build cancer data here.
+	features = []
+	for (var i=1; i<CANCER.length; i++) {	
+		var cols = CANCER[i];
+		//alert(dump(cols));
+		//alert("CONDITION: "+cols[iCondition]);
+		//alert("OUTCOME: "+cols[iOutcom]);
+		//alert("YEAR: "+cols[iYEAR]);
+		if (cols[iCondition] != selectedCondition) continue;
+		if (cols[iOutcom]    != selectedOutcom) continue;
+		if (cols[iYEAR]      != selectedYear) continue;
+		var NAME   = cols[iGeography];
+		var SRANum = cols[iSRANum];
+		var value  = cols[iCase];
+		if (value == "") continue;
+
+		property = {}
+		property["NAME"] = NAME;
+		property[selectedCase] = value * 1;
+		
+		// Search SRANum in CA.features and store it to the geometry
+		for (var j=0; j<CA.features.length; j++){
+			if (CA.features[j].properties["SRA"] == cols[iSRANum]) {
+				geometry = CA.features[j].geometry;
+				break;
+			}
+		}		
+		if (j >= CA.features.length) continue;    // not found in the CA.features
+
+		features.push({"type": "Feature", "geometry": geometry, "properties": property});
+		//features.push({"type": "Feature", "properties": property});
+	}
+	
+	geojson = {
+		"type": CA.type,
+		"bbox": CA.bbox,
+		"features": features
+	}
+	//alert(dump(geojson));
+	
+	if (features.length == 0) {
+		alert("No selected data found in the Cancer. Please reselect.");
+		return;
+	}
+	
+	if (classification == "equal") {
+	
+		var min = geojson.features[0].properties[selectedCase]; 
+		var max = geojson.features[0].properties[selectedCase];
+		for (var i=0; i<geojson.features.length; i++){
+			try {
+				value = parseFloat(geojson.features[i].properties[selectedCase]);
+			} catch(e) {
+				alert("cancer data invalid!!");
+				return;
+			}
+			//if (value == -999) continue;
+			if (min > value) min = value;
+			if (max < value) max = value;
+		}
+		//alert(selectedCase + " " + min + " " + max);
+		
+		var range = max - min;
+		var interval = range / 8.0;
+		var intervals = new Array();
+		intervals[0] = min * 1;
+		for (var i=1; i<8; i++) {
+			intervals[i] = intervals[i-1] * 1 + interval;
+		}
+		for (var i=0; i<8; i++) {
+			if (range > 8) intervals[i] = Math.floor(intervals[i]);
+			else           intervals[i] = (Math.floor(intervals[i]*100)/100).toFixed(2);
+		}
+		//alert(intervals[0]+" "+intervals[1]+" "+intervals[2]+" "+intervals[3]+" "+intervals[4]+" "+intervals[5]+" "+intervals[6]+" "+intervals[7]);
+		ACSdata_render1(geojson, selectedCase, intervals);
+	}
+	
+	if (classification == "quantile") {
+			
+		var values = new Array();
+		var j=0;
+		for (var i=0; i<geojson.features.length; i++) {
+			value = parseFloat(geojson.features[i].properties[selectedCase]);
+			//if (value == -999) continue;
+			values[j++] = value;
+		}
+		values.sort(function(a,b){return a-b});
+		var interval = values.length / 8.0;
+		//alert("values.length: "+values.length+"    interval: "+interval);
+		
+		var intervals = new Array();
+		var next_interval = 0;
+		//intervals[0] = Math.round(values[0]);
+		intervals[0] = values[0];
+		for (var i=1; i<8; i++) {
+			next_interval += interval;
+			j = Math.round(next_interval);
+			intervals[i] = values[j];
+		}
+		for (var i=0; i<8; i++) {
+			if (isFloat(intervals[i])) intervals[i] = (Math.floor(intervals[i]*100)/100).toFixed(2);
+		}
+		//alert(selectedCase+"  "+intervals[0]+" "+intervals[1]+" "+intervals[2]+" "+intervals[3]+" "+intervals[4]+" "+intervals[5]+" "+intervals[6]+" "+intervals[7]);
+		ACSdata_render1(geojson, selectedCase, intervals);
+	}
+
+	
+}
+
+function yearChange2() {
+	var selectedLayer  = document.layerSelect.ACSdata.value;
+	if (document.YearSelect2.year2.value == "2012")  setSelectField(CENSUS2012[0], 5, "ACSdata_options");
+	if (document.YearSelect2.year2.value == "2013")  setSelectField(CENSUS2013[0], 5, "ACSdata_options");
+	var options = document.getElementById("ACSdata_options").options;
+	for (var i=0; i<options.length; i++) {
+		if (options[i].text == selectedLayer) break;
+	}
+	if (i >= options.length) {    // not found in the options
+		//alert("The data that you selected are not available. please select a different year or socioeconomic and demographic variable.");
+		//alert("The '" + selectedLayer + "' is not found in " + document.YearSelect2.year2.value + ".\n" +
+		//	  "The '" + document.layerSelect.ACSdata.value + "' of " + document.YearSelect2.year2.value + " will show up.");
+		document.getElementById("ACSdata_options").selectedIndex = options.length - 1;
+		layerChange2();
+		return;
+	}
+	document.getElementById("ACSdata_options").selectedIndex = i;
+	layerChange2();
+}
+
+function layerChange2() {
+
+  	var selectedLayer  = document.layerSelect.ACSdata.value;
+	var selectedYear   = document.YearSelect2.year2.value;
+	var classification = document.classSelect2.classified.value;
+	//var x = document.layerSelect.ACSdata.selectedIndex;
+    //var y = document.layerSelect.ACSdata.options;
+    //alert("Index: " + y[x].index + " is " + y[x].text);
+	//var selectedText = document.layerSelect.ACSdata.options[document.layerSelect.ACSdata.selectedIndex].text;
+	//alert(selectedText);
+	
+	var CENSUS;
+	if (document.YearSelect2.year2.value == "2012")  CENSUS = CENSUS2012;
+	if (document.YearSelect2.year2.value == "2013")  CENSUS = CENSUS2013;
+	
+	var iYEAR      = getColumnIndex(CENSUS[0], "Year")
+	var iSRAName   = getColumnIndex(CENSUS[0], "SRA Name")
+	var iSRANum    = getColumnIndex(CENSUS[0], "SRA Num")
+	var iLayer     = getColumnIndex(CENSUS[0], selectedLayer)
+	
+	// Build cancer data here.
+	features = []
+	for (var i=1; i<CENSUS.length; i++) {	
+		var cols = CENSUS[i];
+		//alert(dump(cols));
+		//alert("Variable: "+cols[iLayer]);
+		//alert("YEAR: "+cols[iYEAR]);
+		if (cols[iYEAR]  != selectedYear) continue;
+		var NAME   = cols[iSRAName];
+		var SRANum = cols[iSRANum];
+		var value  = cols[iLayer];
+		if (value == "") continue;
+
+		property = {}
+		property["NAME"] = NAME;
+		property[selectedLayer] = value.replace('%','') * 1;
+		
+		// Search SRANum in CA.features and store it to the geometry
+		for (var j=0; j<CA.features.length; j++){
+			if (CA.features[j].properties["SRA"] == cols[iSRANum]) {
+				geometry = CA.features[j].geometry;
+				break;
+			}
+		}		
+		if (j >= CA.features.length) continue;    // not found in the CA.features
+
+		features.push({"type": "Feature", "geometry": geometry, "properties": property});
+		//features.push({"type": "Feature", "properties": property});
+	}
+	
+	geojson = {
+		"type": CA.type,
+		"bbox": CA.bbox,
+		"features": features
+	}
+	//alert(dump(geojson));
+	
+	if (features.length == 0) {
+		alert("No selected data found in the Census. Please reselect.");
+		return;
+	}
+
+	if (classification == "equal") {
+	
+		var min = geojson.features[0].properties[selectedLayer]; 
+		var max = geojson.features[0].properties[selectedLayer];
+		for (var i=0; i<geojson.features.length; i++){
+			try {
+				value = parseFloat(geojson.features[i].properties[selectedLayer]);
+			} catch(e) {
+				alert("census data invalid!!");
+				return;
+			}
+			//if (value == -999) continue;
+			if (min > value) min = value;
+			if (max < value) max = value;
+		}
+		//alert(selectedLayer + " " + min + " " + max);
+		
+		var range = max - min;
+		var interval = range / 8.0;
+		var intervals = new Array();
+		intervals[0] = min * 1;
+		for (var i=1; i<8; i++) {
+			intervals[i] = intervals[i-1] * 1 + interval;
+		}
+		for (var i=0; i<8; i++) {
+			if (range > 8) intervals[i] = Math.floor(intervals[i]);
+			else           intervals[i] = (Math.floor(intervals[i]*100)/100).toFixed(2);
+		}
+		//alert(intervals[0]+" "+intervals[1]+" "+intervals[2]+" "+intervals[3]+" "+intervals[4]+" "+intervals[5]+" "+intervals[6]+" "+intervals[7]);
+		ACSdata_render2(geojson, selectedLayer, intervals);
+	}
+	
+	if (classification == "quantile") {
+			
+		var values = new Array();
+		var j=0;
+		for (var i=0; i<geojson.features.length; i++) {
+			value = parseFloat(geojson.features[i].properties[selectedLayer]);
+			//if (value == -999) continue;
+			values[j++] = value;
+		}
+		values.sort(function(a,b){return a-b});
+		var interval = values.length / 8.0;
+		
+		var intervals = new Array();
+		var next_interval = 0;
+		intervals[0] = values[0];
+		for (var i=1; i<8; i++) {
+			next_interval += interval;
+			j = Math.round(next_interval);
+			intervals[i] = values[j];
+		}
+		for (var i=0; i<8; i++) {
+			if (isFloat(intervals[i])) intervals[i] = (Math.floor(intervals[i]*100)/100).toFixed(2);
+		}
+		//alert(selectedLayer+"  "+intervals[0]+" "+intervals[1]+" "+intervals[2]+" "+intervals[3]+" "+intervals[4]+" "+intervals[5]+" "+intervals[6]+" "+intervals[7]);
+		ACSdata_render2(geojson, selectedLayer, intervals);
+	}
+
+	
+}
+
+function ACSdata_render1(geojson, item, intervals) {
+
+        // clear a layer and two controls
+		remove1();
+		
+		// control that shows state info on hover
+		info1 = L.control();
+
+		info1.onAdd = function (map1) {
+			this._div = L.DomUtil.create('div', 'info');
+			this.update();
+			return this._div;
+		};
+
+		info1.update = function (props) {
+			this._div.innerHTML = document.CaseSelect.case.options[document.CaseSelect.case.selectedIndex].text + '<b><br/>'  + (props ?
+				'<b>'  + '</b>'  + props[item] + '<br/><br/>'
+				+'<h4>area</h4>'
+				+ props.NAME
+				: 'Hover over an area');
+		};
+
+		info1.addTo(map1);
+
+
+		// get color depending on population density value
+		function getColor1(d) {
+			var color = ["#FFEDA0","#FED976","#FEB24C","#FD8D3C","#FC4E2A","#E31A1C","#BD0026","#800026"];
+			for (var i=color.length-1; i>=0; i--) {
+				//if (d >= intervals[i]) return color[i];
+				if (d >= intervals[i]) {
+					//alert(d+" color["+i+"]="+color[i]);
+					return color[i];
+				}
+			}
+			
+		}
+		
+		function style1(feature) {
+			return {
+				weight: 2,
+				opacity: 1,
+				color: 'white',
+				dashArray: '3',
+				fillOpacity: 0.5,
+				fillColor: getColor1(feature.properties[item])
+			};
+		}
+
+		
+		
+		function highlightFeature(e) {
+			var layer = e.target;
+
+			layer.setStyle({
+				weight: 5,
+				color: '#666',
+				dashArray: '',
+				fillOpacity: 0.7
+			});
+
+			if (!L.Browser.ie) {
+				layer.bringToFront();
+			}
+
+			info1.update(layer.feature.properties);
+		}
+
+		
+
+		function resetHighlight(e) {
+			geojson1.resetStyle(e.target);
+			info1.update();
+		}
+
+		function zoomToFeature(e) {
+			map1.fitBounds(e.target.getBounds());
+		}
+
+		function onEachFeature(feature, layer) {
+			layer.on({
+				mouseover: highlightFeature,
+				mouseout: resetHighlight,
+				click: zoomToFeature
+				//click: highlightFeature
+			});
+		}
+
+		geojson1 = L.geoJson(geojson, {
+			style: style1,
+			onEachFeature: onEachFeature
+		}).addTo(map1);
+
+		map1.attributionControl.addAttribution('Population data &copy; <a href="http://census.gov/">US Census Bureau</a>');
+
+
+		legend1 = L.control({position: 'bottomright'});
+
+		legend1.onAdd = function (map1) {
+
+			var div = L.DomUtil.create('div', 'info legend'),
+				//grades = [0, 13559    , 27118    , 40677    , 54236   , 67795   , 81354   , 94913  ],     // var
+				grades = intervals,
+				labels = [],
+				from, to;
+
+			for (var i = 0; i < grades.length; i++) {
+				from = grades[i];
+				to = grades[i + 1];
+
+				labels.push(
+					'<i style="background:' + getColor1(from * 1) + '"></i> ' +
+					from + (to ? '&ndash;' + to : '+'));
+			}
+			
+			div.innerHTML = labels.join('<br>');
+			return div;
+		};
+
+		legend1.addTo(map1);
+}
+
+function ACSdata_render2(geojson, item, intervals) {
+
+        // clear a layer and two controls
+		remove2();
+		
+		// control that shows state info on hover
+		info2 = L.control();
+
+		info2.onAdd = function (map2) {
+			this._div = L.DomUtil.create('div', 'info');
+			this.update();
+			return this._div;
+		};
+
+		info2.update = function (props) {
+			this._div.innerHTML = document.layerSelect.ACSdata.options[document.layerSelect.ACSdata.selectedIndex].text + '<b><br/>'  + (props ?
+				'<b>'  + '</b>'  + props[item] + '<br/><br/>'
+				+'<h4>area</h4>'
+				+ props.NAME
+				: 'Hover over an area');
+		};
+
+		info2.addTo(map2);
+
+
+		// get color depending on population density value
+		function getColor1(d) {
+			var color = ["#FFEDA0","#FED976","#FEB24C","#FD8D3C","#FC4E2A","#E31A1C","#BD0026","#800026"];
+			for (var i=color.length-1; i>=0; i--) {
+				if (d >= intervals[i]) return color[i];
+			}
+			
+		}
+		
+		function style1(feature) {
+			return {
+				weight: 2,
+				opacity: 1,
+				color: 'white',
+				dashArray: '3',
+				fillOpacity: 0.5,
+				fillColor: getColor1(feature.properties[item])
+			};
+		}
+
+		
+		
+		function highlightFeature(e) {
+			var layer = e.target;
+
+			layer.setStyle({
+				weight: 5,
+				color: '#666',
+				dashArray: '',
+				fillOpacity: 0.7
+			});
+
+			if (!L.Browser.ie) {
+				layer.bringToFront();
+			}
+
+			info2.update(layer.feature.properties);
+		}
+
+		
+
+		function resetHighlight(e) {
+			geojson2.resetStyle(e.target);
+			info2.update();
+		}
+
+		function zoomToFeature(e) {
+			map2.fitBounds(e.target.getBounds());
+		}
+
+		function onEachFeature(feature, layer) {
+			layer.on({
+				mouseover: highlightFeature,
+				mouseout: resetHighlight,
+				click: zoomToFeature
+				//click: highlightFeature
+			});
+		}
+
+		geojson2 = L.geoJson(geojson, {
+			style: style1,
+			onEachFeature: onEachFeature
+		}).addTo(map2);
+
+		map2.attributionControl.addAttribution('Population data &copy; <a href="http://census.gov/">US Census Bureau</a>');
+
+
+		legend2 = L.control({position: 'bottomright'});
+
+		legend2.onAdd = function (map2) {
+
+			var div = L.DomUtil.create('div', 'info legend'),
+				//grades = [0, 13559    , 27118    , 40677    , 54236   , 67795   , 81354   , 94913  ],     // var
+				grades = intervals,
+				labels = [],
+				from, to;
+
+			for (var i = 0; i < grades.length; i++) {
+				from = grades[i];
+				to = grades[i + 1];
+
+				labels.push(
+					'<i style="background:' + getColor1(from * 1) + '"></i> ' +
+					from + (to ? '&ndash;' + to : '+'));
+			}
+			
+			div.innerHTML = labels.join('<br>');
+			return div;
+		};
+
+		legend2.addTo(map2);
+}
+
+
+/**
+ * Function : dump()
+ * Arguments: The data - array,hash(associative array),object
+ *    The level - OPTIONAL
+ * Returns  : The textual representation of the array.
+ * This function was inspired by the print_r function of PHP.
+ * This will accept some data as the argument and return a
+ * text that will be a more readable version of the
+ * array/hash/object that is given.
+ * Docs: http://www.openjs.com/scripts/others/dump_function_php_print_r.php
+ */
+function dump(arr,level) {
+	var dumped_text = "";
+	if(!level) level = 0;
+	
+	//The padding given at the beginning of the line.
+	var level_padding = "";
+	for(var j=0;j<level+1;j++) level_padding += "    ";
+	
+	if(typeof(arr) == 'object') { //Array/Hashes/Objects 
+		for(var item in arr) {
+			var value = arr[item];
+			
+			if(typeof(value) == 'object') { //If it is an array,
+				dumped_text += level_padding + "'" + item + "' ...\n";
+				dumped_text += dump(value,level+1);
+			} else {
+				dumped_text += level_padding + "'" + item + "' => \"" + value + "\"\n";
+			}
+		}
+	} else { //Stings/Chars/Numbers etc.
+		dumped_text = "===>"+arr+"<===("+typeof(arr)+")";
+	}
+	return dumped_text;
+}
+function isInt(n) 
+{
+    return n != "" && !isNaN(n) && Math.round(n) == n;
+}
+function isFloat(n){
+    return n != "" && !isNaN(n) && Math.round(n) != n;
+}
+    </script>
+</body>
+</html>

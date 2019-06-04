@@ -1,4 +1,0 @@
-http://sarasen.asuscomm.com/neighborhood_dev/python/getCodebook.py
-
-http://sarasen.asuscomm.com/neighborhood_dev/python/getLNAnalysis.py?year=1980&state=01
-

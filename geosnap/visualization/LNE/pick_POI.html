@@ -1,0 +1,704 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	
+	<title>MSA and County</title>
+
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ==" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js" integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw==" crossorigin=""></script>
+	<script src="http://sa3m.github.io/leaflet-control-bing-geocoder/Control.BingGeocoder.js"></script>
+
+	<link rel="stylesheet" href="css/screen.css" />
+
+
+
+
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}	
+		#map {
+			width: 100%;
+			height: 800px;
+		}
+		header {background: white;color:black; height:50px;}
+		//section {background: green; height:820px; }
+		//section {background: white; height:820px; }
+		//footer {background:red; height:820px;}
+		//footer {background:white; height:680px;}
+		
+		.info {
+			padding: 6px 8px;
+			font: 14px/16px Arial, Helvetica, sans-serif;
+			background: white;
+			background: rgba(255,255,255,0.8);
+			box-shadow: 0 0 15px rgba(0,0,0,0.2);
+			border-radius: 5px;
+		}
+		.info h4 {
+			margin: 0 0 5px;
+			color: #777;
+		}
+
+		.info1 {
+			padding: 6px 8px;
+			font: 14px/16px Arial, Helvetica, sans-serif;
+			background: white;
+			background: rgba(255,255,255,0.8);
+			box-shadow: 0 0 15px rgba(0,0,0,0.2);
+			border-radius: 5px;
+		}
+		.info1 h4 {
+			margin: 0 0 5px;
+			color: #777;
+		}
+		
+		.legend {
+			text-align: left;
+			line-height: 18px;
+			color: #555;
+		}
+		.legend i {
+			width: 18px;
+			height:15px;
+			float: left;
+			margin-right: 8px;
+			opacity: 0.7;
+		}		
+		
+		.info2 {
+			padding: 6px 8px;
+			font: 14px/16px Arial, Helvetica, sans-serif;
+			background: white;
+			background: rgba(255,255,255,0.8);
+			box-shadow: 0 0 15px rgba(0,0,0,0.2);
+			border-radius: 5px;
+		}
+		.info2 h4 {
+			margin: 0 0 5px;
+			color: #777;
+		}
+
+		.legend2 {
+			text-align: left;
+			line-height: 18px;
+			color: #555;
+		}
+		.legend2 i {
+			width: 18px;
+			height:15px;
+			float: left;
+			margin-right: 8px;
+			opacity: 0.7;
+		}
+		
+		html {
+		font-family: sans-serif;
+		}
+		
+		form {
+		width: 380px;
+		margin: 0 auto;
+		}
+		
+		div {
+		margin-bottom: 10px;
+		}
+		
+		fieldset {
+		background: white;
+		border: 2px solid grey;
+		
+		}
+		
+		legend2 {
+		padding: 10px;
+		background: grey;
+		color: white;
+		}
+	
+		</style>
+
+</head>
+<body>
+
+	<header>
+		<h1>Metropolitan Statistical Area and County</h1>
+		
+		
+	
+	</header>
+
+	
+
+	
+
+		<div>
+		
+		
+		</div>
+		</br>
+	
+
+		
+		<div id="map" ></div>
+		
+		<div id="content" style="background-color:white;height:30px;width:320px;float:left;">	
+
+			
+		</br>
+
+<script src="http://leafletjs.com/examples/geojson/sample-geojson.js" type="text/javascript"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js" type="text/javascript"></script>
+
+
+	<script type="text/javascript" src="geojson/MSA.js"></script>
+<script type="text/javascript" src="geojson/county.js"></script>
+	
+<script type="text/javascript">
+
+		var geojson = null;
+		var info    = null;
+		var legend  = null;
+
+		var geojson1 = null;
+		var info1    = null;
+		var legend1  = null;		
+		
+		var geojson2 = null;
+		var info2    = null;
+		var legend2  = null;
+		
+		var geojson3 = null;
+		
+	function style3(feature) {
+		return {
+			weight: 2,
+			opacity: 1,
+			color: 'black',
+			//dashArray: '3',
+			fillOpacity: 0,
+		};
+	}
+
+
+
+	geojson3 = L.geoJson(MSA, {
+		style: style3,
+		//onEachFeature: onEachFeature
+	})//.addTo(map);		
+		
+	var mbAttr = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+			'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+			'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+		mbUrl = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw';
+
+	var grayscale   = L.tileLayer(mbUrl, {id: 'mapbox.light', attribution: mbAttr}),
+		streets  = L.tileLayer(mbUrl, {id: 'mapbox.streets',   attribution: mbAttr});
+
+	var map = L.map('map', {
+		center: [37.8, -96],
+		zoom: 5,
+		layers: [grayscale]
+	});
+
+	var baseLayers = {
+		"Grayscale": grayscale,
+		"Streets": streets
+	};
+	
+	var overlays = {
+		"Metro": geojson3
+	};
+
+	L.control.layers(baseLayers, overlays).addTo(map);	
+
+	
+	var options = {
+    collapsed: true, /* Whether its collapsed or not */
+    position: 'bottomright', /* The position of the control */
+    text: 'Locate', /* The text of the submit button */
+    callback: function (results) {
+        var bbox = results.resourceSets[0].resources[0].bbox,
+            first = new L.LatLng(bbox[0], bbox[1]),
+            second = new L.LatLng(bbox[2], bbox[3]),
+            bounds = new L.LatLngBounds([first, second]);
+            this._map.fitBounds(bounds);
+			this._map.setZoom(7);
+    }
+	};	
+	
+	var bingGeocoder = new L.Control.BingGeocoder('AsaKzgbo2GW8wrcv0mLCyVvEx2Q8V1N54Gpmizw-fzHIKOAjAMMy4TdNfKdS71vs', options);
+	map.addControl(bingGeocoder);
+	
+
+	
+	
+	
+	layerChange();		
+			
+			
+			
+			
+	function style3(feature) {
+		return {
+			weight: 5,
+			opacity: 1,
+			color: 'black',
+			//dashArray: '3',
+			fillOpacity: 0,
+		};
+	}
+
+	
+
+/*
+		function styleRemove(feature) {
+			return {
+				//weight: 2,
+				opacity: 0,
+				color: 'white',
+				//dashArray: '3',
+				fillOpacity: 0,
+				fillColor: 'white'
+			};
+		}
+*/	
+/*
+				var overlayLayers = {
+					'geojson3': geojson3,
+					'geojson2': geojson2,
+					'geojson2': geojson,					
+				};
+
+				var controls = L.control.orderlayers(map, overlayLayers, {collapsed: false, order: 'qgis'});
+        		controls.addTo(map);
+*/
+
+
+function layerChange1() {
+
+	info1 = L.control();
+
+	info1.onAdd = function (map) {
+		this._div = L.DomUtil.create('div', 'info1');
+		this.update();
+		return this._div;
+	};
+
+	info1.update = function (props) {
+		this._div.innerHTML = '<h4>Metropolitan Statistical Area</h4>' +  (props ?
+			'<b>GEOID:</b> ' + props.GEOID + '<br />'+ '<b>AREA NAME: </b> ' + props.NAME 
+			: 'Hover over a state');
+	};
+
+	info1.addTo(map);
+
+
+	// get color depending on population density value
+	function getColor(d) {
+		return d > 1000 ? '#800026' :
+				d > 500  ? '#BD0026' :
+				d > 200  ? '#E31A1C' :
+				d > 100  ? '#FC4E2A' :
+				d > 50   ? '#FD8D3C' :
+				d > 20   ? '#FEB24C' :
+				d > 10   ? '#FED976' :
+							'#FFEDA0';
+	}
+
+	function style(feature) {
+		return {
+			weight: 2,
+			opacity: 1,
+			color: '#000066',
+			dashArray: '3',
+			fillOpacity: 0.2,
+			fillColor: '#99CCFF'
+			//fillColor: getColor(feature.properties.density)
+		};
+	}
+
+	function highlightFeature(e) {
+		var layer = e.target;
+
+		layer.setStyle({
+			weight: 5,
+			color: '#666',
+			dashArray: '',
+			fillOpacity: 0.7
+		});
+
+		if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+			layer.bringToFront();
+		}
+
+		info1.update(layer.feature.properties);
+	}
+
+	//var geojson;
+
+	function resetHighlight(e) {
+		geojson1.resetStyle(e.target);
+		info1.update();
+	}
+
+	function zoomToFeature(e) {
+		map.fitBounds(e.target.getBounds());
+	}
+
+	function onEachFeature(feature, layer) {
+		layer.on({
+			mouseover: highlightFeature,
+			mouseout: resetHighlight,
+			click: zoomToFeature
+		});
+	}
+
+	geojson1 = L.geoJson(MSA, {
+		style: style,
+		onEachFeature: onEachFeature
+	}).addTo(map);
+
+	map.attributionControl.addAttribution('Population data &copy; <a href="http://census.gov/">US Census Bureau</a>');
+
+	
+}
+
+
+function layerChange() {
+
+	info = L.control();
+
+	info.onAdd = function (map) {
+		this._div = L.DomUtil.create('div', 'info');
+		this.update();
+		return this._div;
+	};
+
+	info.update = function (props) {
+		this._div.innerHTML = '<h4>Metropolitan Statistical Area</h4>' +  (props ?
+			'<b>GEOID:</b> ' + props.GEOID + '<br />'+ '<b>AREA NAME: </b> ' + props.NAME 
+			: 'Hover over a state');
+	};
+
+	info.addTo(map);
+
+
+	// get color depending on population density value
+	function getColor(d) {
+		return d > 1000 ? '#800026' :
+				d > 500  ? '#BD0026' :
+				d > 200  ? '#E31A1C' :
+				d > 100  ? '#FC4E2A' :
+				d > 50   ? '#FD8D3C' :
+				d > 20   ? '#FEB24C' :
+				d > 10   ? '#FED976' :
+							'#FFEDA0';
+	}
+
+	function style(feature) {
+		return {
+			weight: 2,
+			opacity: 1,
+			color: '#000066',
+			dashArray: '3',
+			fillOpacity: 0.2,
+			fillColor: '#99CCFF'
+			//fillColor: getColor(feature.properties.density)
+		};
+	}
+
+	function highlightFeature(e) {
+		var layer = e.target;
+
+		layer.setStyle({
+			weight: 5,
+			color: '#666',
+			dashArray: '',
+			fillOpacity: 0.7
+		});
+
+		if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+			layer.bringToFront();
+		}
+
+		info.update(layer.feature.properties);
+	}
+
+	//var geojson;
+
+	function resetHighlight(e) {
+		geojson.resetStyle(e.target);
+		info.update();
+	}
+
+	function zoomToFeature(e) {
+		map.fitBounds(e.target.getBounds());
+	}
+
+	function onEachFeature(feature, layer) {
+		layer.on({
+			mouseover: highlightFeature,
+			mouseout: resetHighlight,
+			click: zoomToFeature
+		});
+	}
+
+	geojson = L.geoJson(MSA, {
+		style: style,
+		onEachFeature: onEachFeature
+	}).addTo(map);
+
+	map.attributionControl.addAttribution('Population data &copy; <a href="http://census.gov/">US Census Bureau</a>');
+
+	
+}
+
+
+	
+
+function layerChange2() {
+
+
+	info2 = L.control();
+
+	info2.onAdd = function (map) {
+		this._div = L.DomUtil.create('div', 'info2');
+		this.update();
+		return this._div;
+	};
+
+	info2.update = function (props) {
+		this._div.innerHTML = '<h4>County</h4>' +  (props ?
+			'<b>COUNTY ID:</b> ' + props.GEOID10 + '<br />'+ '<b>AREA NAME: </b> ' + props.NAME10 
+			: 'Hover over a state');
+	};
+
+	info2.addTo(map);
+
+
+	// get color depending on population density value
+	function getColor(d) {
+		return d > 1000 ? '#800026' :
+				d > 500  ? '#BD0026' :
+				d > 200  ? '#E31A1C' :
+				d > 100  ? '#FC4E2A' :
+				d > 50   ? '#FD8D3C' :
+				d > 20   ? '#FEB24C' :
+				d > 10   ? '#FED976' :
+							'#FFEDA0';
+	}
+
+	function style(feature) {
+		return {
+			weight: 2,
+			opacity: 0.2,
+			color: '#FF3366 ',
+			dashArray: '3',
+			fillOpacity: 0.2,
+			fillColor: '#FFCCFF'
+			//fillColor: getColor(feature.properties.density)
+		};
+	}
+
+	function highlightFeature(e) {
+		var layer = e.target;
+
+		layer.setStyle({
+			weight: 5,
+			color: '#666',
+			dashArray: '',
+			fillOpacity: 0.8
+		});
+
+		if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+			layer.bringToFront();
+		}
+
+		info2.update(layer.feature.properties);
+	}
+
+	//var geojson;
+
+	function resetHighlight(e) {
+		geojson2.resetStyle(e.target);
+		info2.update();
+	}
+
+	function zoomToFeature(e) {
+		map.fitBounds(e.target.getBounds());
+	}
+
+	function onEachFeature(feature, layer) {
+		layer.on({
+			mouseover: highlightFeature,
+			mouseout: resetHighlight,
+			click: zoomToFeature
+		});
+	}
+
+	geojson2 = L.geoJson(COUNTY, {
+		style: style,
+		onEachFeature: onEachFeature
+	}).addTo(map);
+
+	map.attributionControl.addAttribution('Population data &copy; <a href="http://census.gov/">US Census Bureau</a>');
+	if (map.hasLayer(geojson3)) 
+	{
+		//alert();
+		//geojson3.bringToFront();
+	}	
+	
+}
+
+			
+			
+			
+map.on('zoom', function (e) {
+	//alert();
+    zoom_based_layerchange();
+});
+
+map.on('overlayadd ', function (e) {
+	geojson3.bringToBack();
+});
+
+
+function clean_map() {
+    map.eachLayer(function (layer) {
+        if (layer instanceof L.GeoJSON)
+        //Do marker specific actions here
+
+        {
+            map.removeLayer(layer);
+
+        }
+        console.log(layer);
+
+
+    });
+}
+
+function remove(){
+	if (geojson != null) map.removeLayer(geojson);
+	if (info    != null) info.remove(map);
+	if (legend  != null) legend.remove(map);	
+}
+
+
+function remove1(){
+	if (geojson1 != null) {
+		map.removeLayer(geojson1);
+		//geojson2.clearLayers();
+	}
+	if (info1    != null) info1.remove(map);
+	if (legend1  != null) legend1.remove(map);	
+}
+
+function remove2(){
+	if (geojson2 != null) {
+		map.removeLayer(geojson2);
+		//geojson2.clearLayers();
+	}
+	if (info2    != null) info2.remove(map);
+	if (legend2  != null) legend2.remove(map);	
+}
+
+function remove3(){
+	if (geojson3 != null) map.removeLayer(geojson3);	
+}
+
+
+
+function zoom_based_layerchange() {
+ 
+    //console.log(map.getZoom());
+    $("#zoomlevel").html(map.getZoom());
+    var currentZoom = map.getZoom();
+    switch (currentZoom) {
+        case 3:
+		     //remove();	
+			 break		
+        case 4:
+		     //remove();	
+			 break	
+        case 5:
+			remove3();
+		     //remove();
+			 break;
+        case 6:
+			remove3();
+		     //remove();	
+			 //layerChange1();		
+			 break;
+        case 7:
+		     remove();
+		     remove1();			 
+			 remove2();	
+			remove3();			 
+			 layerChange1();
+			 //geojson.addTo(map);
+			 info.update();			 
+			 break;	
+        case 8:
+		     remove();
+			 remove1();
+			 remove2();		
+			 layerChange2();
+			 geojson3.addTo(map);
+			 break;
+        case 9:
+		     remove();
+			 remove1();			 
+			 remove2();;
+			 layerChange2();
+			 geojson3.addTo(map);			 
+			 break;
+        case 10:
+		     remove();
+			 remove1();			 
+			 remove2();;
+			 layerChange2();
+			 geojson3.addTo(map);	
+            break;
+        case 11:
+		     remove();
+			 remove1();			 
+			 remove2();;
+			 layerChange2();
+			 geojson3.addTo(map);	
+            break;
+        case 12:
+		     remove();
+			 remove2();;
+			 layerChange2();
+			 geojson3.addTo(map);			
+            break;
+        case 13:
+            break;
+        default:
+            14
+            break;
+    }
+}
+
+
+    //alert();
+
+
+
+</script>
+
+
+
+</body>
+</html>

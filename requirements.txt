@@ -1,11 +1,16 @@
+pandas
 cython
 geopandas
-libpysal
+hdbscan
 matplotlib
-networkx
-scikit-learn>=0.17
-spenc
-xlrd
-giddy
+scikit-learn
+seaborn
 pyarrow
+libpysal
+mapclassify
+spenc
+giddy
+xlrd
 cenpy
+quilt
+region @ git+https://github.com/pysal/region@master#egg=region
