@@ -76,11 +76,10 @@ def _db_checker(database):
 
 
 #: A dict containing tabular data available to geosnap
-db = Bunch(
-    census_90=census.variables_1990(),
-    census_00=census.variables_2000(),
-    ltdb=_db_checker('ltdb'),
-    ncdb=_db_checker('ncdb'))
+db = Bunch(census_90=census.variables_1990(),
+           census_00=census.variables_2000(),
+           ltdb=_db_checker('ltdb'),
+           ncdb=_db_checker('ncdb'))
 
 # LTDB importer
 
@@ -167,8 +166,9 @@ def read_ltdb(sample, fullcount):
         year=1970,
     )
 
-    fullcount70 = _ltdb_reader(
-        fullcount_zip, "LTDB_Std_1970_fullcount.csv", year=1970)
+    fullcount70 = _ltdb_reader(fullcount_zip,
+                               "LTDB_Std_1970_fullcount.csv",
+                               year=1970)
 
     sample80 = _ltdb_reader(
         sample_zip,
@@ -177,8 +177,9 @@ def read_ltdb(sample, fullcount):
         year=1980,
     )
 
-    fullcount80 = _ltdb_reader(
-        fullcount_zip, "LTDB_Std_1980_fullcount.csv", year=1980)
+    fullcount80 = _ltdb_reader(fullcount_zip,
+                               "LTDB_Std_1980_fullcount.csv",
+                               year=1980)
 
     sample90 = _ltdb_reader(
         sample_zip,
@@ -187,8 +188,9 @@ def read_ltdb(sample, fullcount):
         year=1990,
     )
 
-    fullcount90 = _ltdb_reader(
-        fullcount_zip, "LTDB_Std_1990_fullcount.csv", year=1990)
+    fullcount90 = _ltdb_reader(fullcount_zip,
+                               "LTDB_Std_1990_fullcount.csv",
+                               year=1990)
 
     sample00 = _ltdb_reader(
         sample_zip,
@@ -197,21 +199,23 @@ def read_ltdb(sample, fullcount):
         year=2000,
     )
 
-    fullcount00 = _ltdb_reader(
-        fullcount_zip, "LTDB_Std_2000_fullcount.csv", year=2000)
+    fullcount00 = _ltdb_reader(fullcount_zip,
+                               "LTDB_Std_2000_fullcount.csv",
+                               year=2000)
 
-    sample10 = _ltdb_reader(
-        sample_zip, "ltdb_std_all_sample/ltdb_std_2010_sample.csv", year=2010)
+    sample10 = _ltdb_reader(sample_zip,
+                            "ltdb_std_all_sample/ltdb_std_2010_sample.csv",
+                            year=2010)
 
     # join the sample and fullcount variables into a single df for the year
-    ltdb_1970 = sample70.drop(columns=['year']).join(
-        fullcount70.iloc[:, 7:], how="left")
-    ltdb_1980 = sample80.drop(columns=['year']).join(
-        fullcount80.iloc[:, 7:], how="left")
-    ltdb_1990 = sample90.drop(columns=['year']).join(
-        fullcount90.iloc[:, 7:], how="left")
-    ltdb_2000 = sample00.drop(columns=['year']).join(
-        fullcount00.iloc[:, 7:], how="left")
+    ltdb_1970 = sample70.drop(columns=['year']).join(fullcount70.iloc[:, 7:],
+                                                     how="left")
+    ltdb_1980 = sample80.drop(columns=['year']).join(fullcount80.iloc[:, 7:],
+                                                     how="left")
+    ltdb_1990 = sample90.drop(columns=['year']).join(fullcount90.iloc[:, 7:],
+                                                     how="left")
+    ltdb_2000 = sample00.drop(columns=['year']).join(fullcount00.iloc[:, 7:],
+                                                     how="left")
     ltdb_2010 = sample10
 
     df = pd.concat([ltdb_1970, ltdb_1980, ltdb_1990, ltdb_2000, ltdb_2010],
@@ -304,9 +308,11 @@ def read_ncdb(filepath):
 
     df = df[df.columns[df.columns.isin(names)]]
 
-    df = pd.wide_to_long(
-        df, stubnames=ncdb_vars, i="GEO2010", j="year",
-        suffix="(7|8|9|0|1|2)").reset_index()
+    df = pd.wide_to_long(df,
+                         stubnames=ncdb_vars,
+                         i="GEO2010",
+                         j="year",
+                         suffix="(7|8|9|0|1|2)").reset_index()
 
     df["year"] = df["year"].replace({
         7: 1970,
@@ -557,24 +563,24 @@ class Community(object):
                 plt.title(title, fontsize=20)
             else:
                 if self.name:
-                    plt.title(
-                        self.name + " " + str(year) + '\n' + colname,
-                        fontsize=20)
+                    plt.title(self.name + " " + str(year) + '\n' + colname,
+                              fontsize=20)
                 else:
                     plt.title(colname + " " + str(year), fontsize=20)
             plt.axis("off")
 
         ax.set_aspect("equal")
-        plotme = self.tracts.merge(
-            self.census[self.census.year == year],
-            left_on="geoid",
-            right_index=True)
+        plotme = self.tracts.merge(self.census[self.census.year == year],
+                                   left_on="geoid",
+                                   right_index=True)
         plotme = plotme.dropna(subset=[column])
         plotme.plot(column=column, alpha=0.8, ax=ax, **kwargs)
 
         if plot_counties is True:
-            self.counties.plot(
-                edgecolor="#5c5353", linewidth=0.8, facecolor="none", ax=ax)
+            self.counties.plot(edgecolor="#5c5353",
+                               linewidth=0.8,
+                               facecolor="none",
+                               ax=ax)
 
         return ax
 
@@ -606,3 +612,15 @@ class Community(object):
         self.counties = self.counties.to_crs(crs=crs, epsg=epsg)
         if not inplace:
             return self
+
+
+def get_lehd(dataset='wac', state='dc', year=2015):
+
+    state = state.lower()
+    url = 'https://lehd.ces.census.gov/data/lodes/LODES7/{state}/{dataset}/{state}_{dataset}_S000_JT00_{year}.csv.gz'.format(
+        dataset=dataset, state=state, year=year)
+    df = pd.read_csv(url, converters={'w_geocode': str, 'h_geocode': str})
+    df = df.rename({'w_geocode': 'geoid', 'h_geocode': 'geoid'}, axis=1)
+    df = df.set_index('geoid')
+
+    return df
