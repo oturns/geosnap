@@ -615,7 +615,27 @@ class Community(object):
 
 
 def get_lehd(dataset='wac', state='dc', year=2015):
+    """Grab data from the LODES FTP server as a pandas DataFrame.
 
+    Parameters
+    ----------
+    dataset : str
+        which LODES dataset to collect: "rac" or wac", reffering to either
+        residence area characteristics or workplace area characteristics
+        the default is 'wac').
+    state : str
+        two-digit state abbreviation for example "ca" or "OH"
+    year : str
+        which year to collect. First year avaialable for most states is 2002.
+        Consult the LODES documentation for more details. The default is 2015.
+
+    Returns
+    -------
+    pandas.DataFrame
+        a pandas DataFrame with columns representing census blocks, indexed on
+        the block FIPS code.
+
+    """
     state = state.lower()
     url = 'https://lehd.ces.census.gov/data/lodes/LODES7/{state}/{dataset}/{state}_{dataset}_S000_JT00_{year}.csv.gz'.format(
         dataset=dataset, state=state, year=year)
