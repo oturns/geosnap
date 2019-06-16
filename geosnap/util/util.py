@@ -1,18 +1,53 @@
+"""Utility functions."""
 import pandas as pd
 from shapely import wkb, wkt
 import geopandas as gpd
+import multiprocessing
+
+
+def _deserialize_wkb(str):
+    return wkb.loads(str, hex=True)
+
+
+def _deserialize_wkt(str):
+    return wkt.loads(str)
+
 
 def convert_gdf(df):
+    """Convert DataFrame to GeoDataFrame.
+
+    DataFrame to GeoDataFrame by converting wkt/wkb geometry representation
+    back to Shapely object.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        dataframe with column named either "wkt" or "wkb" that stores
+        geometric information as well-known text or well-known binary,
+        (hex encoded) respectively.
+
+    Returns
+    -------
+    gpd.GeoDataFrame
+        geodataframe with converted `geometry` column.
+
+    """
     df = df.copy()
     df.reset_index(inplace=True, drop=True)
+
     if 'wkt' in df.columns.tolist():
-        df['geometry'] = df.wkt.apply(wkt.loads)
+        with multiprocessing.Pool() as P:
+            df['geometry'] = P.map(_deserialize_wkt, df['wkt'])
         df = df.drop(columns=['wkt'])
+
     else:
-        df['geometry'] = df.wkb.apply(lambda x: wkb.loads(x, hex=True))
+        with multiprocessing.Pool() as P:
+            df['geometry'] = P.map(_deserialize_wkb, df['wkb'])
         df = df.drop(columns=['wkb'])
+
     df = gpd.GeoDataFrame(df)
     df.crs = {"init": "epsg:4326"}
+
     return df
 
 
@@ -50,7 +85,8 @@ def adjust_inflation(df, columns, given_year, base_year=2015):
     inflator[1970] = 63.9
 
     df = df.copy()
-    updated = df[columns].apply(lambda x: x * (inflator[base_year] / inflator[given_year]))
+    updated = df[columns].apply(lambda x: x * (inflator[base_year] / inflator[
+        given_year]))
     df.update(updated)
 
     return df
