@@ -32,7 +32,8 @@ trace = dict(type='scattermapbox',
 app = dash.Dash(external_stylesheets=external_stylesheets)
 
 app.layout = html.Div([
-    html.H1(children='geosnap'),
+    html.H1(children='geosnap variable explorer',
+            style={'textAlign': 'center'}),
     dcc.Dropdown(id='overlay-choice',
                  options=opts,
                  value='n_nonhisp_black_persons'),
@@ -48,12 +49,9 @@ app.layout = html.Div([
                             },
                             step=10),
                  style={
-                     "width": '75%',
-                     "textAlign": "center",
-                     "display": "inline-block",
-                     "margin": "0 auto",
-                     "padding-left": "5%",
-                     "padding-right": "5%"
+                     "padding-left": "10%",
+                     "padding-right": "10%",
+                     "padding-top": "2%"
                  })
     ]),
 ])
