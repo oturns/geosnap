@@ -13,11 +13,12 @@ from geosnap.data import Community
 dc = Community(statefips='11', source='ltdb')
 
 mapbox_access_token = 'pk.eyJ1Ijoia25hYXB0aW1lIiwiYSI6ImlQeUJxazgifQ.35yYbOewGVVf7OkcM64obQ'
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 gdf = dc.tracts[dc.tracts.geoid.str.startswith('11')]
-gdf = gdf.merge(dc.census[dc.census.year == 2010], on='geoid')
+#gdf = gdf.merge(dc.census[dc.census.year == 2010], on='geoid')
 
-opts = [{'label': col.title(), 'value': col} for col in gdf.columns]
+opts = [{'label': col.title(), 'value': col} for col in dc.census.columns]
 
 precomputed_color_ranges = palettable.colorbrewer.sequential.Blues_6.hex_colors
 layers = []
@@ -28,7 +29,7 @@ trace = dict(type='scattermapbox',
              name='DC',
              text=gdf.geoid)
 
-app = dash.Dash()
+app = dash.Dash(external_stylesheets=external_stylesheets)
 
 app.layout = html.Div([
     html.H1(children='geosnap'),
@@ -36,8 +37,25 @@ app.layout = html.Div([
                  options=opts,
                  value='n_nonhisp_black_persons'),
     html.Div([
-        dcc.Graph(id='map-display', style={"height": "100vh"}),
-    ])
+        dcc.Graph(id='map-display', style={"height": "75vh"}),
+        html.Div(dcc.Slider(id='year-slider',
+                            min=dc.census['year'].min(),
+                            max=2010,
+                            value=2010,
+                            marks={
+                                str(year): str(year)
+                                for year in dc.census['year'].unique()
+                            },
+                            step=10),
+                 style={
+                     "width": '75%',
+                     "textAlign": "center",
+                     "display": "inline-block",
+                     "margin": "0 auto",
+                     "padding-left": "5%",
+                     "padding-right": "5%"
+                 })
+    ]),
 ])
 
 map_layout = {
@@ -70,7 +88,7 @@ map_layout = {
                 'lon': gdf.unary_union.centroid.x,
             },
             'style': "light",
-            'zoom': 8.0,
+            'zoom': 10,
             'bearing': 0.0,
             'pitch': 0.0,
         },
@@ -78,14 +96,16 @@ map_layout = {
 }
 
 
-@app.callback(dash.dependencies.Output('map-display', 'figure'),
-              [dash.dependencies.Input('overlay-choice', 'value')])
-def update_map(overlay_choice):
+@app.callback(dash.dependencies.Output('map-display', 'figure'), [
+    dash.dependencies.Input('overlay-choice', 'value'),
+    dash.dependencies.Input('year-slider', 'value')
+])
+def update_map(overlay_choice, year_choice):
 
     tmp = map_layout.copy()
 
     gdf = dc.tracts[dc.tracts.geoid.str.startswith('11')]
-    gdf = gdf.merge(dc.census[dc.census.year == 2010], on='geoid')
+    gdf = gdf.merge(dc.census[dc.census.year == year_choice], on='geoid')
 
     gdf = gdf.assign(
         cl=mapclassify.Equal_Interval(gdf[overlay_choice], k=6).yb)
