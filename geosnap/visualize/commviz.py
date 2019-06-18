@@ -32,18 +32,42 @@ layers = []
 
 trace = dict(type='scattermapbox', autocolorscale=True, name='metro')
 
+navbar = dbc.NavbarSimple(
+    children=[
+        dbc.DropdownMenu(
+            nav=True,
+            in_navbar=True,
+            label="Menu",
+            children=[
+                dbc.DropdownMenuItem("Variable Eplorer"),
+                dbc.DropdownMenuItem("Neighborhood Identification"),
+                dbc.DropdownMenuItem("Temporal Analysis"),
+                dbc.DropdownMenuItem(divider=True),
+                dbc.DropdownMenuItem(
+                    "Github", href="http://github.com/spatialucr/geosnap"),
+                dbc.DropdownMenuItem("Documentation",
+                                     href='http://geosnap.readthedocs.io'),
+            ],
+        ),
+    ],
+    brand="geosnap",
+    brand_href="http://spatial.ucr.edu",
+    sticky="top",
+)
+
 body = dbc.Container(
     [
-        html.H2(children='geosnap variable explorer',
-                style={'textAlign': 'center'}),
+        html.H2(children='Variable Explorer',
+                style={
+                    'textAlign': 'center',
+                    "padding-top": "2%",
+                    "padding-bottom": "4%"
+                }),
         dbc.Row([
             dbc.Col(
                 [
                     html.H5(children='Metropolitan Region',
-                            style={
-                                "padding-top": "2%",
-                                "padding-bottom": "2%"
-                            }),
+                            style={"padding-bottom": "2%"}),
                     dcc.Dropdown(
                         id='metro-choice', options=metro_opts, value='41740'),
                     html.H5(children='Variable',
@@ -75,19 +99,19 @@ body = dbc.Container(
                                  "padding-bottom": "4%"
                              })
                 ],
-                md=4,
+                md=3,
             ),
             dbc.Col([
                 dcc.Graph(id='map-display'),
-            ]),
+            ], md=9),
         ])
     ],
-    className="mt-4",
+    className="mt-auto",
 )
 
 app = dash.Dash(external_stylesheets=external_stylesheets)
 
-app.layout = html.Div([body])
+app.layout = html.Div([navbar, body])
 
 map_layout = {
     'title':
