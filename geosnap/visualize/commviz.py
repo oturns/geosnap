@@ -1,13 +1,9 @@
-# first you have to load the geojson file
-import os
 import dash
-import geopandas as gpd
-import pandas as pd
+
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 
-import mapclassify
 import palettable
 import json
 from geosnap.data import dictionary
@@ -16,12 +12,10 @@ from mapclassify import *
 
 dictionary.variable.tolist()
 mapbox_access_token = 'pk.eyJ1Ijoia25hYXB0aW1lIiwiYSI6ImlQeUJxazgifQ.35yYbOewGVVf7OkcM64obQ'
-external_stylesheets = [dbc.themes.BOOTSTRAP]
-
-#gdf = dc.tracts[dc.tracts.geoid.str.startswith('11')]
+external_stylesheets = [dbc.themes.JOURNAL]
 
 opts = [{'label': col.title(), 'value': col} for col in dictionary.variable]
-k_opts = [{'label': str(k), 'value': k} for k in range(11)]
+k_opts = [{'label': str(k), 'value': k} for k in range(3, 11)]
 data_type = ['sequential', 'diverging', 'qualitative']
 data_opts = [{
     'label': scheme,
@@ -70,112 +64,110 @@ precomputed_color_ranges = palettable.colorbrewer.sequential.Blues_6.hex_colors
 
 trace = dict(type='scattermapbox', autocolorscale=True, name='metro')
 
-navbar = dbc.NavbarSimple(
-    children=[
-        dbc.DropdownMenu(
-            nav=True,
-            in_navbar=True,
-            label="Menu",
-            children=[
-                dbc.DropdownMenuItem("Variable Eplorer"),
-                dbc.DropdownMenuItem("Neighborhood Identification"),
-                dbc.DropdownMenuItem("Temporal Analysis"),
-                dbc.DropdownMenuItem(divider=True),
-                dbc.DropdownMenuItem(
-                    "Github", href="http://github.com/spatialucr/geosnap"),
-                dbc.DropdownMenuItem("Documentation",
-                                     href='http://geosnap.readthedocs.io'),
-            ],
-        ),
-    ],
-    brand="geosnap",
-    brand_href="http://spatial.ucr.edu",
-    sticky="top",
-)
+navbar = dbc.NavbarSimple(children=[
+    dbc.NavItem(dbc.NavLink("CGS", href="http://spatial.ucr.edu")),
+    dbc.DropdownMenu(
+        nav=True,
+        in_navbar=True,
+        label="Menu",
+        children=[
+            dbc.DropdownMenuItem("Explore Variables"),
+            dbc.DropdownMenuItem("Identify Neighborhoods"),
+            dbc.DropdownMenuItem("Model Neighborhood Change"),
+            dbc.DropdownMenuItem(divider=True),
+            dbc.DropdownMenuItem("Docs", href='http://geosnap.readthedocs.io'),
+            dbc.DropdownMenuItem("Github",
+                                 href='http://github.com/spatialucr/geosnap'),
+        ],
+    ),
+],
+                          brand="geosnap",
+                          brand_href="#",
+                          sticky="top",
+                          dark=True,
+                          color='dark')
 
-body = dbc.Container(
-    [
-        html.H2(children='Variable Explorer',
-                style={
-                    'textAlign': 'center',
-                    "padding-top": "2%",
-                    "padding-bottom": "4%"
-                }),
-        dbc.Row([
-            dbc.Col(
-                [
-                    html.H5(children='Metropolitan Region',
-                            style={"padding-bottom": "4%"}),
-                    dcc.Dropdown(id='metro-choice',
-                                 options=metro_opts,
-                                 value='41740',
-                                 style={"padding-bottom": "2%"}),
-                    html.H5(children='Variable',
-                            style={
-                                "padding-top": "2%",
-                                "padding-bottom": "2%"
-                            }),
-                    dcc.Dropdown(id='overlay-choice',
-                                 options=opts,
-                                 value='median_home_value',
-                                 style={"padding-bottom": "2%"}),
-                    html.H5(children='Classification Scheme',
-                            style={
-                                "padding-top": "2%",
-                                "padding-bottom": "2%"
-                            }),
-                    dcc.Dropdown(id='scheme-choice',
-                                 options=scheme_opts,
-                                 value='Equal_Interval',
-                                 style={"padding-bottom": "2%"}),
-                    html.H5(children='Colormap',
-                            style={
-                                "padding-top": "2%",
-                                "padding-bottom": "2%"
-                            }),
-                    dcc.Dropdown(id='cmap-choice',
-                                 options=cmap_opts,
-                                 value='YlOrBr',
-                                 style={"padding-bottom": "2%"}),
-                    html.H5(children='Number of Classes',
-                            style={
-                                "padding-top": "2%",
-                                "padding-bottom": "2%"
-                            }),
-                    dcc.Dropdown(id='k-choice',
-                                 options=k_opts,
-                                 value=6,
-                                 style={"padding-bottom": "2%"}),
-                    html.H5(children='Year',
-                            style={
-                                "padding-top": "2%",
-                                "padding-bottom": "2%"
-                            }),
-                    html.Div(dcc.Slider(id='year-slider',
-                                        min=1970,
-                                        max=2010,
-                                        value=2010,
-                                        marks={
-                                            str(year): str(year)
-                                            for year in range(1970, 2011, 10)
-                                        },
-                                        step=10),
-                             style={
-                                 "padding-left": "5%",
-                                 "padding-right": "5%",
-                                 "padding-top": "2%",
-                                 "padding-bottom": "4%"
-                             })
-                ],
-                md=3,
-            ),
-            dbc.Col([
-                dcc.Graph(id='map-display'),
-            ], md=9),
-        ])
-    ],
-    className="mt-auto",
-)
+body = dbc.Container([
+    html.H2(children='Variable Explorer',
+            style={
+                'textAlign': 'center',
+                "padding-top": "2%",
+                "padding-bottom": "4%"
+            }),
+    dbc.Row([
+        dbc.Col(
+            [
+                html.H5(children='Metropolitan Region',
+                        style={"padding-bottom": "4%"}),
+                dcc.Dropdown(id='metro-choice',
+                             options=metro_opts,
+                             value='41740',
+                             style={"padding-bottom": "2%"}),
+                html.H5(children='Variable',
+                        style={
+                            "padding-top": "2%",
+                            "padding-bottom": "2%"
+                        }),
+                dcc.Dropdown(id='overlay-choice',
+                             options=opts,
+                             value='median_home_value',
+                             style={"padding-bottom": "2%"}),
+                html.H5(children='Classification Scheme',
+                        style={
+                            "padding-top": "2%",
+                            "padding-bottom": "2%"
+                        }),
+                dcc.Dropdown(id='scheme-choice',
+                             options=scheme_opts,
+                             value='Equal_Interval',
+                             style={"padding-bottom": "2%"}),
+                html.H5(children='Colormap',
+                        style={
+                            "padding-top": "2%",
+                            "padding-bottom": "2%"
+                        }),
+                dcc.Dropdown(id='cmap-choice',
+                             options=cmap_opts,
+                             value='YlOrBr',
+                             style={"padding-bottom": "2%"}),
+                html.H5(children='Number of Classes',
+                        style={
+                            "padding-top": "2%",
+                            "padding-bottom": "2%"
+                        }),
+                dcc.Dropdown(id='k-choice',
+                             options=k_opts,
+                             value=6,
+                             style={"padding-bottom": "2%"}),
+                html.H5(children='Year',
+                        style={
+                            "padding-top": "2%",
+                            "padding-bottom": "2%"
+                        }),
+                html.Div(dcc.Slider(id='year-slider',
+                                    min=1970,
+                                    max=2010,
+                                    value=2010,
+                                    marks={
+                                        str(year): str(year)
+                                        for year in range(1970, 2011, 10)
+                                    },
+                                    step=10),
+                         style={
+                             "padding-left": "5%",
+                             "padding-right": "5%",
+                             "padding-top": "2%",
+                             "padding-bottom": "4%"
+                         })
+            ],
+            md=3,
+        ),
+        dbc.Col([
+            dcc.Graph(id='map-display'),
+        ], md=9),
+    ])
+],
+                     className="mt-4")
 
 app = dash.Dash(external_stylesheets=external_stylesheets)
 
@@ -190,7 +182,9 @@ map_layout = {
         'showlegend': True,
         'textposition': 'top',
         'text': "geoid",
-        "mode": "markers+text"
+        "mode": "markers+text",
+        "hoverinfo": 'text',
+        "marker": dict(size=5, color='white', opacity=0)
     }],
     'layout': {
         'autosize': True,
@@ -201,6 +195,7 @@ map_layout = {
             'b': 0,
             't': 0
         },
+        'showlegend': True,
         'mapbox': {
             'accesstoken': mapbox_access_token,
             'center': {
@@ -242,9 +237,17 @@ def update_map(overlay_choice, metro_choice, year_choice, k_choice,
 
     gdf = gdf.dropna(subset=[overlay_choice])
 
-    classes = scheme_dispatch[scheme_choice](gdf[overlay_choice],
-                                             k=k_choice).yb
+    if scheme_choice in [
+            'Max_P_Classifier', 'Maximum_Breaks', 'HeadTail_Breaks'
+    ]:
+        classes = scheme_dispatch[scheme_choice](gdf[overlay_choice]).yb
+    else:
+        classes = scheme_dispatch[scheme_choice](gdf[overlay_choice],
+                                                 k=k_choice).yb
     gdf = gdf.assign(cl=classes)
+
+    if not k_choice:
+        k_choice = len(gdf.cl.unique())
     # Create a layer for each region colored by LEP value
 
     gdf = gdf[['geoid', 'cl', 'geometry']]
@@ -270,7 +273,7 @@ def update_map(overlay_choice, metro_choice, year_choice, k_choice,
         'lon': gdf.unary_union.centroid.x
     }
 
-    tmp['data'][0]['text'] = gdf['geoid'].astype(str)
+    tmp['data'][0]['text'] = gdf['geoid'].tolist()
 
     return tmp
 
