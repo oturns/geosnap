@@ -3,7 +3,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
-
+import webbrowser
 import palettable
 import json
 from geosnap.data import dictionary
@@ -278,6 +278,7 @@ def update_map(overlay_choice, metro_choice, year_choice, k_choice,
     return tmp
 
 
-if __name__ == '__main__':
+def explore():
 
+    webbrowser.open("http://127.0.0.1:8050")
     app.run_server()
