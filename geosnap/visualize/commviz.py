@@ -251,7 +251,7 @@ def update_map(overlay_choice, metro_choice, year_choice, k_choice,
     gdf = gdf.dropna(subset=[overlay_choice])
 
     if scheme_choice in [
-            'Max_P_Classifier', 'Maximum_Breaks', 'HeadTail_Breaks'
+            'Max-P Classifier', 'Maximum Breaks', 'Head-Tail Breaks'
     ]:
         classes = scheme_dispatch[scheme_choice](gdf[overlay_choice]).yb
     else:
