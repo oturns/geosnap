@@ -14,7 +14,20 @@ dictionary.variable.tolist()
 mapbox_access_token = 'pk.eyJ1Ijoia25hYXB0aW1lIiwiYSI6ImlQeUJxazgifQ.35yYbOewGVVf7OkcM64obQ'
 external_stylesheets = [dbc.themes.JOURNAL]
 
-opts = [{'label': col.title(), 'value': col} for col in dictionary.variable]
+opts = []
+for colname in dictionary.variable:
+    val = colname
+    if colname.startswith('n_'):
+        colname = colname[1:]
+    elif colname.startswith('p_'):
+        colname = colname[1:]
+        colname = colname + ' (%)'
+    colname = colname.replace("_", " ")
+    colname = colname.title()
+    opts.append({'label': colname, 'value': val})
+
+#opts = [{'label': col.title(), 'value': col} for col in dictionary.variable]
+
 k_opts = [{'label': str(k), 'value': k} for k in range(3, 11)]
 data_type = ['sequential', 'diverging', 'qualitative']
 data_opts = [{
@@ -23,13 +36,13 @@ data_opts = [{
 } for scheme in data_type]
 
 scheme_dispatch = {
-    'Equal_Interval': Equal_Interval,
-    'Fisher_Jenks': Fisher_Jenks,
-    'HeadTail_Breaks': HeadTail_Breaks,
-    'Jenks_Caspall': Jenks_Caspall,
-    'Max_P_Classifier': Max_P_Classifier,
-    'Maximum_Breaks': Maximum_Breaks,
-    'Natural_Breaks': Natural_Breaks,
+    'Equal Interval': Equal_Interval,
+    'Fisher Jenks': Fisher_Jenks,
+    'Head-Tail Breaks': HeadTail_Breaks,
+    'Jenks Caspall': Jenks_Caspall,
+    'Max-P Classifier': Max_P_Classifier,
+    'Maximum Breaks': Maximum_Breaks,
+    'Natural Breaks': Natural_Breaks,
     'Quantiles': Quantiles,
     'Percentiles': Percentiles
 }
@@ -65,7 +78,7 @@ precomputed_color_ranges = palettable.colorbrewer.sequential.Blues_6.hex_colors
 trace = dict(type='scattermapbox', autocolorscale=True, name='metro')
 
 navbar = dbc.NavbarSimple(children=[
-    dbc.NavItem(dbc.NavLink("CGS", href="http://spatial.ucr.edu")),
+    dbc.NavItem(dbc.NavLink("geosnap", href="http://spatial.ucr.edu")),
     dbc.DropdownMenu(
         nav=True,
         in_navbar=True,
@@ -81,7 +94,7 @@ navbar = dbc.NavbarSimple(children=[
         ],
     ),
 ],
-                          brand="geosnap",
+                          brand="cgs",
                           brand_href="#",
                           sticky="top",
                           dark=True,
@@ -119,7 +132,7 @@ body = dbc.Container([
                         }),
                 dcc.Dropdown(id='scheme-choice',
                              options=scheme_opts,
-                             value='Equal_Interval',
+                             value='Equal Interval',
                              style={"padding-bottom": "2%"}),
                 html.H5(children='Colormap',
                         style={
