@@ -1,6 +1,6 @@
-osnap.data.Community.to\_crs
+geosnap.data.Community.to\_crs
 ============================
 
-.. currentmodule:: osnap.data
+.. currentmodule:: geosnap.data
 
 .. automethod:: Community.to_crs

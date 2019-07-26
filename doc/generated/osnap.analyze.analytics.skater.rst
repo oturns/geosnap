@@ -1,6 +1,6 @@
-osnap.analyze.analytics.skater
+geosnap.analyze.analytics.skater
 ==============================
 
-.. currentmodule:: osnap.analyze.analytics
+.. currentmodule:: geosnap.analyze.analytics
 
 .. autofunction:: skater

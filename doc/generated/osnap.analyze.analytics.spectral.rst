@@ -1,6 +1,6 @@
-osnap.analyze.analytics.spectral
+geosnap.analyze.analytics.spectral
 ================================
 
-.. currentmodule:: osnap.analyze.analytics
+.. currentmodule:: geosnap.analyze.analytics
 
 .. autofunction:: spectral

@@ -1,6 +1,6 @@
-osnap.analyze.analytics.kmeans
+geosnap.analyze.analytics.kmeans
 ==============================
 
-.. currentmodule:: osnap.analyze.analytics
+.. currentmodule:: geosnap.analyze.analytics
 
 .. autofunction:: kmeans

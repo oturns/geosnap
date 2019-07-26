@@ -1,6 +1,6 @@
-osnap.analyze.analytics.max\_p
+geosnap.analyze.analytics.max\_p
 ==============================
 
-.. currentmodule:: osnap.analyze.analytics
+.. currentmodule:: geosnap.analyze.analytics
 
 .. autofunction:: max_p

@@ -1,6 +1,6 @@
-osnap.data.Community.plot
+geosnap.data.Community.plot
 =========================
 
-.. currentmodule:: osnap.data
+.. currentmodule:: geosnap.data
 
 .. automethod:: Community.plot

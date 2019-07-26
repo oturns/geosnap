@@ -1,6 +1,6 @@
-osnap.data.metros
+geosnap.data.metros
 =================
 
-.. currentmodule:: osnap.data
+.. currentmodule:: geosnap.data
 
 .. autodata:: metros

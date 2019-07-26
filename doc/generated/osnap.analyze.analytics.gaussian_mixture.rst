@@ -1,6 +1,6 @@
-osnap.analyze.analytics.gaussian\_mixture
+geosnap.analyze.analytics.gaussian\_mixture
 =========================================
 
-.. currentmodule:: osnap.analyze.analytics
+.. currentmodule:: geosnap.analyze.analytics
 
 .. autofunction:: gaussian_mixture

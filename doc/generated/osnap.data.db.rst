@@ -1,6 +1,6 @@
-osnap.data.db
+geosnap.data.db
 =============
 
-.. currentmodule:: osnap.data
+.. currentmodule:: geosnap.data
 
 .. autodata:: db

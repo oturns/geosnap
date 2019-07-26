@@ -7,11 +7,11 @@ python:
   - "3.5"
   - "3.6"
 
-
 before_install:
-  - wget https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
-  - wget https://www.dropbox.com/s/i2he4wm0pkgg55t/LTDB_Std_All_Sample.zip?dl=1 -O ltdb_sample.zip
-  - wget https://www.dropbox.com/s/np7a9ma5pd6m09p/LTDB_Std_All_fullcount.zip?dl=1 -O ltdb_full.zip
+  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+  - wget -q $LTDB_SAMPLE -O ltdb_sample.zip
+  - wget -q $LTDB_FULLCOUNT -O ltdb_full.zip
+  - wget -q $NCDB -O ncdb.csv
   - chmod +x miniconda.sh
   - ./miniconda.sh -b -p ./miniconda
   - export DLPATH=`pwd`
@@ -21,20 +21,19 @@ before_install:
 install:
   - conda install --yes pip
   - conda env create -f environment.yml python=$TRAVIS_PYTHON_VERSION
-  - source activate osnap
+  - source activate geosnap
   - pip install python-coveralls
   - pip install pytest-cov
 
 
 script:
   - python setup.py sdist >/dev/null
-  - pytest --ignore=examples --ignore=osnap/util  --cov osnap
+  - pytest --ignore=examples --ignore=geosnap/util  --cov geosnap
 
 notifications:
     email:
         recipients:
             - sjsrey@gmail.com
-            - suhanmappingideas@gmail.com
             - weikang9009@gmail.com
             - levi.john.wolf@gmail.com
             - ek@knaaptime.com 

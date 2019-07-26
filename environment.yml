@@ -1,16 +1,13 @@
-name: osnap
+name: geosnap
 channels:
   - defaults
   - conda-forge
 dependencies:
   - pandas
   - cython
-  - jupyterlab
   - geopandas
   - hdbscan
   - matplotlib
-  - notebook
-  - networkx
   - scikit-learn
   - seaborn
   - pyarrow

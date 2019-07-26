@@ -1,6 +1,6 @@
-osnap.analyze.linc
+geosnap.analyze.linc
 ==================
 
-.. currentmodule:: osnap.analyze
+.. currentmodule:: geosnap.analyze
 
 .. autofunction:: linc
