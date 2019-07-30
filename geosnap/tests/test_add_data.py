@@ -16,4 +16,4 @@ def test_store_ltdb():
 def test_store_ncdb():
 
     store_ncdb(path + "/ncdb.csv")
-    assert data.data_store.ncdb().shape == (328633, 77)
+    assert data.data_store.ncdb.shape == (328633, 77)

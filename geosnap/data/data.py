@@ -709,6 +709,31 @@ class Community(object):
 
      """
     def __init__(self, gdf=None, harmonized=None, **kwargs):
+        """initialize Community.
+
+        Parameters
+        ----------
+        gdf : geopandas.GeoDataFrame
+            long-form geodataframe that stores neighborhood-level attributes
+            and geometries for one or more time periods
+        harmonized : bool
+            Whether neighborhood boundaries have been harmonized into
+            consistent units over time
+        **kwargs : type
+            Description of parameter `**kwargs`.
+
+        Returns
+        -------
+        type
+            Description of returned object.
+
+        Examples
+        -------
+        Examples should be written in doctest format, and
+        should illustrate how to use the function/class.
+        >>>
+
+        """
         self.gdf = gdf
         if harmonized:
             self.harmonized = True
