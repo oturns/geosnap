@@ -1,4 +1,4 @@
-from context import analyze, data
+from context import data
 import os
 
 path = os.environ["DLPATH"]

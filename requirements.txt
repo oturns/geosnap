@@ -5,7 +5,7 @@ hdbscan
 matplotlib
 scikit-learn
 seaborn
-pyarrow=0.13
+pyarrow==0.13
 libpysal
 mapclassify
 spenc

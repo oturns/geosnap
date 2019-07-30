@@ -7,7 +7,8 @@ path = os.environ["DLPATH"]
 try:
     ltdb = data.data_store.ltdb
 except KeyError:
-    data.store_ltdb(sample=path + "/ltdb_sample.zip", fullcount=path + "/ltdb_full.zip")
+    data.store_ltdb(sample=path + "/ltdb_sample.zip",
+                    fullcount=path + "/ltdb_full.zip")
 
 
 def test_Community_from_cbsa():
