@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 import seaborn as sns
 import copy
-from os import path
+from os import path, mkdir
 import pandas as pd
 
 class Transition(object):
@@ -414,7 +414,7 @@ class Sequence(object):
 def indexplot_seq(df_traj, clustering,
                   years=["1970", "1980", "1990", "2000", "2010"],
                   k=None, ncols=3, palette= "Set1",
-                  save_fig=False, fig_suffix="50MSAs"):
+                  save_fig=False, fig_suffix="LA"):
     """
     Function for index plot of neighborhood sequences within each cluster.
 
@@ -440,7 +440,7 @@ def indexplot_seq(df_traj, clustering,
     save_fig     : boolean, optional
                    whether to save figure. Default is False.
     fig_suffix   : str, optional
-                   suffix of the saved figure name.
+                   suffix of the saved figure name. Default is "LA".
 
     Examples
     --------
@@ -448,8 +448,8 @@ def indexplot_seq(df_traj, clustering,
     >>> from geosnap.analyze import indexplot_seq
     >>> import matplotlib.pyplot as plt
     >>> df_LA = pd.read_csv("../../examples/data/LA_sequences.csv", converters={'GEO2010': lambda x: str(x)})
-    >>> fig=indexplot_seq(df_LA, clustering="seqC1", palette="pastel", ncols=3)
-    >>> plt.show(fig)
+    >>> indexplot_seq(df_LA, clustering="seqC1", palette="pastel", ncols=3)
+    >>> plt.show()
     """
 
     years = list(years)
@@ -472,7 +472,6 @@ def indexplot_seq(df_traj, clustering,
     color.insert(0, (1, 1, 1))
     cluster_cmap = ListedColormap(color_cluster)
     my_cmap = ListedColormap(color)
-
 
     for p in range(nrows):
         for q in range(ncols):
@@ -519,9 +518,8 @@ def indexplot_seq(df_traj, clustering,
     if save_fig:
         dirName = "figures"
         if not path.exists(dirName):
-            os.mkdir(dirName)
+            mkdir(dirName)
         fig.savefig(dirName+"/%s_%s.png" % (clustering,fig_suffix),
                     dpi=500, bbox_inches='tight')
 
-    return fig
 
