@@ -1,7 +1,3 @@
-import context
-
-context.quilt_check()
-
 from context import data
 import os
 
