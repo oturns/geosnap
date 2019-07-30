@@ -3,88 +3,326 @@
 import os
 import zipfile
 from warnings import warn
-
+from appdirs import user_data_dir
 import matplotlib.pyplot as plt
 import pandas as pd
-import quilt
-
+import quilt3
+from shapely import wkb, wkt
+import geopandas as gpd
+import multiprocessing
 import sys
-sys.path.insert(0,
-                os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from util import adjust_inflation, convert_gdf
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
+# look for local storage and create if missing
 try:
-    from quilt.data.spatialucr import census
+    from quilt3.data.geosnap_data import storage
 except ImportError:
-    warn("Fetching data. This should only happen once")
-    quilt.install("spatialucr/census")
-    quilt.install("spatialucr/census_cartographic")
-    from quilt.data.spatialucr import census
-try:
-    from quilt.data.geosnap_data import data_store
-except ImportError:
-    quilt.build("geosnap_data/data_store")
-    from quilt.data.geosnap_data import data_store
+    storage = quilt3.Package()
 
+appname = "geosnap"
+appauthor = "geosnap"
+data_dir = user_data_dir(appname, appauthor)
+if not os.path.exists(data_dir):
+    os.mkdir(data_dir)
 
-class Bunch(dict):
-    """A dict with attribute-access."""
-
-    def __getattr__(self, key):
-        try:
-            return self.__getitem__(key)
-        except KeyError:
-            raise AttributeError(key)
-
-    def __setattr__(self, key, value):
-        self.__setitem__(key, value)
-
-    def __dir__(self):
-        return self.keys()
-
-
-_package_directory = os.path.dirname(os.path.abspath(__file__))
-_cbsa = pd.read_parquet(os.path.join(_package_directory, 'cbsas.parquet'))
-dictionary = pd.read_csv(os.path.join(_package_directory, "variables.csv"))
-
+# get census data from spatialucr quilt account
 try:  # if any of these aren't found, the user needs to refresh the quilt data package
-    states = census.states()
-    counties = census.counties()
-    tracts = census.tracts_2010
-    metros = convert_gdf(census.msas())
+    from quilt3.data.census import tracts_cartographic, administrative
 except AttributeError:
     warn(
-        'Quilt data is outdated... rebuilding\n'
-        ' You will need to restart your Python kernel once downloading has completed'
+        "Quilt data is outdated... rebuilding\n"
+        " You will need to restart your Python kernel once downloading has completed"
     )
-    quilt.install("spatialucr/census", force=True)
-    quilt.install("spatialucr/census_cartographic", force=True)
+    quilt3.Package.install("census/tracts_cartographic", "s3://quilt-cgs")
+    quilt3.Package.install("census/administrative", "s3://quilt-cgs")
 
 
-def _db_checker(database):
+def _deserialize_wkb(str):
+    return wkb.loads(str, hex=True)
 
-    try:
-        if database == 'ltdb':
-            df = data_store.ltdb()
-        else:
-            df = data_store.ncdb()
-    except AttributeError:
-        df = ''
+
+def _deserialize_wkt(str):
+    return wkt.loads(str)
+
+
+def convert_gdf(df):
+    """Convert DataFrame to GeoDataFrame.
+
+    DataFrame to GeoDataFrame by converting wkt/wkb geometry representation
+    back to Shapely object.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        dataframe with column named either "wkt" or "wkb" that stores
+        geometric information as well-known text or well-known binary,
+        (hex encoded) respectively.
+
+    Returns
+    -------
+    gpd.GeoDataFrame
+        geodataframe with converted `geometry` column.
+
+    """
+    df = df.copy()
+    df.reset_index(inplace=True, drop=True)
+
+    if "wkt" in df.columns.tolist():
+        with multiprocessing.Pool() as P:
+            df["geometry"] = P.map(_deserialize_wkt, df["wkt"])
+        df = df.drop(columns=["wkt"])
+
+    else:
+        with multiprocessing.Pool() as P:
+            df["geometry"] = P.map(_deserialize_wkb, df["wkb"])
+        df = df.drop(columns=["wkb"])
+
+    df = gpd.GeoDataFrame(df)
+    df.crs = {"init": "epsg:4326"}
 
     return df
 
 
-#: A dict containing tabular data available to geosnap
-db = Bunch(census_90=census.variables_1990(),
-           census_00=census.variables_2000(),
-           ltdb=_db_checker('ltdb'),
-           ncdb=_db_checker('ncdb'))
+def adjust_inflation(df, columns, given_year, base_year=2015):
+    """
+    Adjust currency data for inflation.
 
-# LTDB importer
+    Parameters
+    ----------
+    df : DataFrame
+        Dataframe of historical data
+    columns : list-like
+        The columns of the dataframe with currency data
+    given_year: int
+        The year in which the data were collected; e.g. to convert data from
+        the 1990 census to 2015 dollars, this value should be 1990.
+    base_year: int, optional
+        Constant dollar year; e.g. to convert data from the 1990
+        census to constant 2015 dollars, this value should be 2015.
+        Default is 2015.
+
+    Returns
+    -------
+    type
+        DataFrame
+
+    """
+    # get inflation adjustment table from BLS
+    inflation = pd.read_excel(
+        "https://www.bls.gov/cpi/research-series/allitems.xlsx", skiprows=6
+    )
+    inflation.columns = inflation.columns.str.lower()
+    inflation.columns = inflation.columns.str.strip(".")
+    inflation = inflation.dropna(subset=["year"])
+    inflator = inflation.groupby("year")["avg"].first().to_dict()
+    inflator[1970] = 63.9
+
+    df = df.copy()
+    updated = df[columns].apply(
+        lambda x: x * (inflator[base_year] / inflator[given_year])
+    )
+    df.update(updated)
+
+    return df
 
 
-def read_ltdb(sample, fullcount):
+class DataStore(object):
+    """Storage for geosnap data. Currently supports US Census data."""
+
+    def __init__(self):
+        self
+
+    def tracts_1990(self, convert=True):
+        """Nationwide Census Tracts as drawn in 1990 (cartographic 500k).
+
+        Parameters
+        ----------
+        convert : bool
+            if True, return geodataframe, else return dataframe (the default is True).
+
+        Returns
+        -------
+        pandas.DataFrame or geopandas.GeoDataFrame.
+            1990 tracts as a geodataframe or as a dataframe with geometry
+            stored as well-known binary on the 'wkb' column.
+
+        """
+        t = tracts_cartographic["tracts_1990_500k.parquet"]()
+        t["year"] = 1990
+        if convert:
+            return convert_gdf(t)
+        else:
+            return t
+
+    def tracts_2000(self, convert=True):
+        """Nationwide Census Tracts as drawn in 2000 (cartographic 500k).
+
+        Parameters
+        ----------
+        convert : bool
+            if True, return geodataframe, else return dataframe (the default is True).
+
+        Returns
+        -------
+        pandas.DataFrame.
+            2000 tracts as a geodataframe or as a dataframe with geometry
+            stored as well-known binary on the 'wkb' column.
+
+        """
+        t = tracts_cartographic["tracts_2000_500k.parquet"]()
+        t["year"] = 2000
+        if convert:
+            return convert_gdf(t)
+        else:
+            return t
+
+    def tracts_2010(self, convert=True):
+        """Nationwide Census Tracts as drawn in 2010 (cartographic 500k).
+
+        Parameters
+        ----------
+        convert : bool
+            if True, return geodataframe, else return dataframe (the default is True).
+
+        Returns
+        -------
+        pandas.DataFrame.
+            2010 tracts as a geodataframe or as a dataframe with geometry
+            stored as well-known binary on the 'wkb' column.
+
+        """
+        t = tracts_cartographic["tracts_2010_500k.parquet"]()
+        t["year"] = 2010
+        if convert:
+            return convert_gdf(t)
+        else:
+            return t
+
+    def msas(self, convert=True):
+        """Metropolitan Statistical Areas as drawn in 2010.
+
+        Parameters
+        ----------
+        convert : bool
+            if True, return geodataframe, else return dataframe (the default is True).
+
+        Returns
+        -------
+        geopandas.GeoDataFrame.
+            2010 MSAs as a geodataframe or as a dataframe with geometry
+            stored as well-known binary on the 'wkb' column.
+
+        """
+        if convert:
+            return convert_gdf(administrative["msas.parquet"]())
+        else:
+            return administrative["msas.parquet"]()
+
+    def states(self, convert=True):
+        """States.
+
+        Parameters
+        ----------
+        convert : bool
+            if True, return geodataframe, else return dataframe (the default is True).
+
+        Returns
+        -------
+        geopandas.GeoDataFrame.
+            US States as a geodataframe or as a dataframe with geometry
+            stored as well-known binary on the 'wkb' column.
+
+        """
+        if convert:
+            return convert_gdf(administrative["states.parquet"]())
+        else:
+            return administrative["states.parquet"]()
+
+    def counties(self, convert=True):
+        """Nationwide counties as drawn in 2010.
+
+        Parameters
+        ----------
+        convert : bool
+            if True, return geodataframe, else return dataframe (the default is True).
+
+        Returns
+        -------
+        geopandas.GeoDataFrame.
+            2010 counties as a geodataframe or as a dataframe with geometry
+            stored as well-known binary on the 'wkb' column.
+
+        """
+        return convert_gdf(administrative["counties.parquet"]())
+
+    @property
+    def msa_definitions(self):
+        """2010 Metropolitan Statistical Area definitions.
+
+        Returns
+        -------
+        pandas.DataFrame.
+            dataframe that stores state/county --> MSA crosswalk definitions.
+
+        """
+        return administrative["msa_definitions.parquet"]()
+
+    @property
+    def ltdb(self):
+        """Longitudinal Tract Database (LTDB).
+
+        Returns
+        -------
+        pandas.DataFrame or geopandas.GeoDataFrame
+            LTDB as a long-form geo/dataframe
+
+        """
+        try:
+            return storage["ltdb"]()
+        except KeyError:
+            print(
+                "Unable to locate LTDB data. Try saving the data again "
+                "using the `store_ltdb` function"
+            )
+
+    @property
+    def ncdb(self):
+        """Geolytics Neighborhood Change Database (NCDB).
+
+        Returns
+        -------
+        pandas.DataFrarme
+            NCDB as a long-form dataframe
+
+        """
+        try:
+            return storage["ncdb"]()
+        except KeyError:
+            print(
+                "Unable to locate NCDB data. Try saving the data again "
+                "using the `store_ncdb` function"
+            )
+
+    @property
+    def codebook(self):
+        """Codebook.
+
+        Returns
+        -------
+        pandas.DataFrame.
+            codebook that stores variable names, definitions, and formulas.
+
+        """
+        return pd.read_csv(
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), "variables.csv")
+        )
+
+
+data_store = DataStore()
+
+
+def store_ltdb(sample, fullcount):
     """
     Read & store data from Brown's Longitudinal Tract Database (LTDB).
 
@@ -113,10 +351,7 @@ def read_ltdb(sample, fullcount):
         df = pd.read_csv(
             path.open(file),
             na_values=["", " ", 99999, -999],
-            converters={
-                0: str,
-                "placefp10": str
-            },
+            converters={0: str, "placefp10": str},
             low_memory=False,
             encoding="latin1",
         )
@@ -141,12 +376,17 @@ def read_ltdb(sample, fullcount):
         df["year"] = year
 
         inflate_cols = [
-            "mhmval", "mrent", "incpc", "hinc", "hincw", "hincb", "hinch",
-            "hinca"
+            "mhmval",
+            "mrent",
+            "incpc",
+            "hinc",
+            "hincw",
+            "hincb",
+            "hinch",
+            "hinca",
         ]
 
-        inflate_available = list(
-            set(df.columns).intersection(set(inflate_cols)))
+        inflate_available = list(set(df.columns).intersection(set(inflate_cols)))
 
         if len(inflate_available):
             # try:
@@ -166,9 +406,7 @@ def read_ltdb(sample, fullcount):
         year=1970,
     )
 
-    fullcount70 = _ltdb_reader(fullcount_zip,
-                               "LTDB_Std_1970_fullcount.csv",
-                               year=1970)
+    fullcount70 = _ltdb_reader(fullcount_zip, "LTDB_Std_1970_fullcount.csv", year=1970)
 
     sample80 = _ltdb_reader(
         sample_zip,
@@ -177,9 +415,7 @@ def read_ltdb(sample, fullcount):
         year=1980,
     )
 
-    fullcount80 = _ltdb_reader(fullcount_zip,
-                               "LTDB_Std_1980_fullcount.csv",
-                               year=1980)
+    fullcount80 = _ltdb_reader(fullcount_zip, "LTDB_Std_1980_fullcount.csv", year=1980)
 
     sample90 = _ltdb_reader(
         sample_zip,
@@ -188,9 +424,7 @@ def read_ltdb(sample, fullcount):
         year=1990,
     )
 
-    fullcount90 = _ltdb_reader(fullcount_zip,
-                               "LTDB_Std_1990_fullcount.csv",
-                               year=1990)
+    fullcount90 = _ltdb_reader(fullcount_zip, "LTDB_Std_1990_fullcount.csv", year=1990)
 
     sample00 = _ltdb_reader(
         sample_zip,
@@ -199,46 +433,53 @@ def read_ltdb(sample, fullcount):
         year=2000,
     )
 
-    fullcount00 = _ltdb_reader(fullcount_zip,
-                               "LTDB_Std_2000_fullcount.csv",
-                               year=2000)
+    fullcount00 = _ltdb_reader(fullcount_zip, "LTDB_Std_2000_fullcount.csv", year=2000)
 
-    sample10 = _ltdb_reader(sample_zip,
-                            "ltdb_std_all_sample/ltdb_std_2010_sample.csv",
-                            year=2010)
+    sample10 = _ltdb_reader(
+        sample_zip, "ltdb_std_all_sample/ltdb_std_2010_sample.csv", year=2010
+    )
 
     # join the sample and fullcount variables into a single df for the year
-    ltdb_1970 = sample70.drop(columns=['year']).join(fullcount70.iloc[:, 7:],
-                                                     how="left")
-    ltdb_1980 = sample80.drop(columns=['year']).join(fullcount80.iloc[:, 7:],
-                                                     how="left")
-    ltdb_1990 = sample90.drop(columns=['year']).join(fullcount90.iloc[:, 7:],
-                                                     how="left")
-    ltdb_2000 = sample00.drop(columns=['year']).join(fullcount00.iloc[:, 7:],
-                                                     how="left")
+    ltdb_1970 = sample70.drop(columns=["year"]).join(
+        fullcount70.iloc[:, 7:], how="left"
+    )
+    ltdb_1980 = sample80.drop(columns=["year"]).join(
+        fullcount80.iloc[:, 7:], how="left"
+    )
+    ltdb_1990 = sample90.drop(columns=["year"]).join(
+        fullcount90.iloc[:, 7:], how="left"
+    )
+    ltdb_2000 = sample00.drop(columns=["year"]).join(
+        fullcount00.iloc[:, 7:], how="left"
+    )
     ltdb_2010 = sample10
 
-    df = pd.concat([ltdb_1970, ltdb_1980, ltdb_1990, ltdb_2000, ltdb_2010],
-                   sort=True)
+    df = pd.concat([ltdb_1970, ltdb_1980, ltdb_1990, ltdb_2000, ltdb_2010], sort=True)
 
     renamer = dict(
-        zip(dictionary['ltdb'].tolist(), dictionary['variable'].tolist()))
+        zip(
+            data_store.codebook["ltdb"].tolist(),
+            data_store.codebook["variable"].tolist(),
+        )
+    )
 
     df.rename(renamer, axis="columns", inplace=True)
 
     # compute additional variables from lookup table
-    for row in dictionary['formula'].dropna().tolist():
+    for row in data_store.codebook["formula"].dropna().tolist():
         df.eval(row, inplace=True)
 
-    keeps = df.columns[df.columns.isin(dictionary['variable'].tolist() +
-                                       ['year'])]
+    keeps = df.columns[
+        df.columns.isin(data_store.codebook["variable"].tolist() + ["year"])
+    ]
     df = df[keeps]
 
-    data_store._set(['ltdb'], df)
-    quilt.build("geosnap_data/data_store", data_store)
+    df.to_parquet(os.path.join(data_dir, "ltdb.parquet"), compression="brotli")
+    storage.set("ltdb", os.path.join(data_dir, "ltdb.parquet"))
+    storage.build("geosnap_data/storage")
 
 
-def read_ncdb(filepath):
+def store_ncdb(filepath):
     """
     Read & store data from Geolytics's Neighborhood Change Database.
 
@@ -247,18 +488,14 @@ def read_ncdb(filepath):
     filepath : str
         location of the input CSV file extracted from your Geolytics DVD
 
-    Returns
-    -------
-    pandas.DataFrame
-
     """
-    ncdb_vars = dictionary["ncdb"].dropna()[1:].values
+    ncdb_vars = data_store.codebook["ncdb"].dropna()[1:].values
 
     names = []
     for name in ncdb_vars:
-        for suffix in ['7', '8', '9', '0', '1', '2']:
+        for suffix in ["7", "8", "9", "0", "1", "2"]:
             names.append(name + suffix)
-    names.append('GEO2010')
+    names.append("GEO2010")
 
     c = pd.read_csv(filepath, nrows=1).columns
     c = pd.Series(c.values)
@@ -272,7 +509,7 @@ def read_ncdb(filepath):
     df = pd.read_csv(
         filepath,
         usecols=keep,
-        engine='c',
+        engine="c",
         na_values=["", " ", 99999, -999],
         converters={
             "GEO2010": str,
@@ -308,23 +545,16 @@ def read_ncdb(filepath):
 
     df = df[df.columns[df.columns.isin(names)]]
 
-    df = pd.wide_to_long(df,
-                         stubnames=ncdb_vars,
-                         i="GEO2010",
-                         j="year",
-                         suffix="(7|8|9|0|1|2)").reset_index()
+    df = pd.wide_to_long(
+        df, stubnames=ncdb_vars, i="GEO2010", j="year", suffix="(7|8|9|0|1|2)"
+    ).reset_index()
 
-    df["year"] = df["year"].replace({
-        7: 1970,
-        8: 1980,
-        9: 1990,
-        0: 2000,
-        1: 2010,
-        2: 2010
-    })
+    df["year"] = df["year"].replace(
+        {7: 1970, 8: 1980, 9: 1990, 0: 2000, 1: 2010, 2: 2010}
+    )
     df = df.groupby(["GEO2010", "year"]).first()
 
-    mapper = dict(zip(dictionary.ncdb, dictionary.variable))
+    mapper = dict(zip(data_store.codebook.ncdb, data_store.codebook.variable))
 
     df.reset_index(inplace=True)
 
@@ -332,289 +562,26 @@ def read_ncdb(filepath):
 
     df = df.set_index("geoid")
 
-    for row in dictionary['formula'].dropna().tolist():
+    for row in data_store.codebook["formula"].dropna().tolist():
         try:
             df.eval(row, inplace=True)
         except:
-            warn('Unable to compute ' + str(row))
+            warn("Unable to compute " + str(row))
 
-    df = df.round(0)
-
-    keeps = df.columns[df.columns.isin(dictionary['variable'].tolist() +
-                                       ['year'])]
+    keeps = df.columns[
+        df.columns.isin(data_store.codebook["variable"].tolist() + ["year"])
+    ]
 
     df = df[keeps]
 
     df = df.loc[df.n_total_pop != 0]
 
-    data_store._set(['ncdb'], df)
-    quilt.build("geosnap_data/data_store", data_store)
+    df.to_parquet(os.path.join(data_dir, "ncdb.parquet"), compression="brotli")
+    storage.set("ncdb", os.path.join(data_dir, "ncdb.parquet"))
+    storage.build("geosnap_data/storage")
 
 
-# TODO NHGIS reader
-
-
-class Community(object):
-    """Spatial and tabular data for a collection of "neighborhoods".
-
-       A community is a collection of "neighborhoods" represented by spatial
-       boundaries (e.g. census tracts, or blocks in the US), and tabular data
-       which describe the composition of each neighborhood (e.g. data from
-       surveys, sensors, or geocoded misc.). A Community can be large (e.g. a
-       metropolitan region), or small (e.g. a handfull of census tracts) and
-       may have data pertaining to multiple discrete points in time.
-
-    Parameters
-    ----------
-    name : str
-            name or title of dataset.
-    source : str
-            database from which to query attribute data.
-            Must of one of ['ltdb', 'ncdb', 'census', 'external'].
-    statefips : list-like
-            list of two-digit State FIPS codes that define a study region.
-            These will be used to select tracts or blocks that fall within
-            the region.
-    countyfips : list-like
-            list of three-digit County FIPS codes that define a study
-            region. These will be used to select tracts or blocks that
-            fall within the region.
-    cbsafips : str
-            CBSA fips code that defines a study region. This is used to
-            select tracts or blocks that fall within the metropolitan region
-    add_indices : list-like
-            list of additional indices that should be included in the region.
-            This is likely a list of additional tracts that are relevant to the
-            study area but do not fall inside the passed boundary
-    boundary : GeoDataFrame
-            A GeoDataFrame that defines the extent of the boundary in question.
-            If a boundary is passed, it will be used to clip the tracts or
-            blocks that fall within it and the state and county lists will
-            be ignored
-
-    Attributes
-    ----------
-    census : Pandas DataFrame
-            long-form dataframe containing attribute variables for each unit
-            of analysis.
-    name : str
-            name or title of dataset
-    boundary : GeoDataFrame
-            outer boundary of the study area
-    tracts
-            GeoDataFrame containing tract boundaries
-    counties
-            GeoDataFrame containing County boundaries
-    states
-            GeoDataFrame containing State boundaries
-
-    """
-
-    def __init__(self,
-                 source,
-                 statefips=None,
-                 countyfips=None,
-                 cbsafips=None,
-                 add_indices=None,
-                 boundary=None,
-                 name=''):
-        """Instantiate a Community."""
-        # If a boundary is passed, use it to clip out the appropriate tracts
-        tracts = census.tracts_2010().copy()
-        tracts.columns = tracts.columns.str.lower()
-        self.name = name
-        self.states = states.copy()
-        self.tracts = tracts.copy()
-        self.cbsa = metros.copy()[metros.copy().geoid == cbsafips]
-        self.counties = counties.copy()
-        if boundary is not None:
-            self.tracts = convert_gdf(self.tracts)
-            self.boundary = boundary
-            if boundary.crs != self.tracts.crs:
-                if not boundary.crs:
-                    raise ('Boundary must have a CRS to ensure valid spatial \
-                    selection')
-                self.tracts = self.tracts.to_crs(boundary.crs)
-
-            self.tracts = self.tracts[
-                self.tracts.representative_point().within(
-                    self.boundary.unary_union)]
-            self.counties = convert_gdf(self.counties[counties.geoid.isin(
-                self.tracts.geoid.str[0:5])])
-            self.states = convert_gdf(self.states[states.geoid.isin(
-                self.tracts.geoid.str[0:2])])
-            self.counties = self.counties.to_crs(boundary.crs)
-            self.states = self.states.to_crs(boundary.crs)
-
-        # If county and state lists are passed, use them to filter
-        # based on geoid
-        else:
-            assert statefips or countyfips or cbsafips or add_indices
-
-            statelist = []
-            if isinstance(statefips, (list, )):
-                statelist.extend(statefips)
-            else:
-                statelist.append(statefips)
-
-            countylist = []
-            if isinstance(countyfips, (list, )):
-                countylist.extend(countyfips)
-            else:
-                countylist.append(countyfips)
-
-            geo_filter = {'state': statelist, 'county': countylist}
-            fips = []
-            for state in geo_filter['state']:
-                if countyfips is not None:
-                    for county in geo_filter['county']:
-                        fips.append(state + county)
-                else:
-                    fips.append(state)
-
-            self.states = self.states[states.geoid.isin(statelist)]
-            if countyfips is not None:
-                self.counties = self.counties[self.counties.geoid.str[:5].isin(
-                    fips)]
-                self.tracts = self.tracts[self.tracts.geoid.str[:5].isin(fips)]
-            else:
-                self.counties = self.counties[self.counties.geoid.str[:2].isin(
-                    fips)]
-                self.tracts = self.tracts[self.tracts.geoid.str[:2].isin(fips)]
-
-            self.tracts = convert_gdf(self.tracts)
-            self.counties = convert_gdf(self.counties)
-            self.states = convert_gdf(self.states)
-        if source in ['ltdb', 'ncdb']:
-            _df = _db_checker(source)
-            if len(_df) == 0:
-                raise ValueError(
-                    "Unable to locate {source} data. Please import the database with the `read_{source}` function"
-                    .format(source=source))
-        elif source == "external":
-            _df = data
-        else:
-            raise ValueError(
-                "source must be one of 'ltdb', 'ncdb', 'census', 'external'")
-
-        if cbsafips:
-            if not add_indices:
-                add_indices = []
-            add_indices += _cbsa[_cbsa['CBSA Code'] ==
-                                 cbsafips]['stcofips'].tolist()
-        if add_indices:
-            for index in add_indices:
-
-                self.tracts = self.tracts.append(
-                    convert_gdf(tracts[tracts.geoid.str.startswith(index)]))
-                self.counties = self.counties.append(
-                    convert_gdf(counties[counties.geoid.str.startswith(
-                        index[0:5])]))
-        self.tracts = self.tracts[~self.tracts.geoid.duplicated(keep='first')]
-        self.counties = self.counties[~self.counties.geoid.duplicated(
-            keep='first')]
-        self.census = _df[_df.index.isin(self.tracts.geoid)]
-
-    def plot(self,
-             column=None,
-             year=2010,
-             ax=None,
-             plot_counties=True,
-             title=None,
-             **kwargs):
-        """Conveniently plot a choropleth of the Community.
-
-        Parameters
-        ----------
-        column : str
-            The column to be plotted (the default is None).
-        year : str
-            The decennial census year to be plotted (the default is 2010).
-        ax : type
-            matplotlib.axes on which to plot.
-        plot_counties : bool
-            Whether the plot should include county boundaries
-            (the default is True).
-        title: str
-            Title of figure passed to matplotlib.pyplot.title()
-        **kwargs
-
-        Returns
-        -------
-        type
-            Description of returned object.
-
-        """
-        assert column, "You must choose a column to plot"
-        colname = '%s' % column
-        if ax is not None:
-            ax = ax
-        else:
-            fig, ax = plt.subplots(figsize=(15, 15))
-            if colname.startswith('n_'):
-                colname = colname[1:]
-            elif colname.startswith('p_'):
-                colname = colname[1:]
-                colname = colname + ' (%)'
-            colname = colname.replace("_", " ")
-            colname = colname.title()
-
-            if title:
-                plt.title(title, fontsize=20)
-            else:
-                if self.name:
-                    plt.title(self.name + " " + str(year) + '\n' + colname,
-                              fontsize=20)
-                else:
-                    plt.title(colname + " " + str(year), fontsize=20)
-            plt.axis("off")
-
-        ax.set_aspect("equal")
-        plotme = self.tracts.merge(self.census[self.census.year == year],
-                                   left_on="geoid",
-                                   right_index=True)
-        plotme = plotme.dropna(subset=[column])
-        plotme.plot(column=column, alpha=0.8, ax=ax, **kwargs)
-
-        if plot_counties is True:
-            self.counties.plot(edgecolor="#5c5353",
-                               linewidth=0.8,
-                               facecolor="none",
-                               ax=ax)
-
-        return ax
-
-    def to_crs(self, crs=None, epsg=None, inplace=False):
-        """Transform all geometries to a new coordinate reference system.
-
-            Parameters
-            ----------
-            crs : dict or str
-                Output projection parameters as string or in dictionary form.
-            epsg : int
-                EPSG code specifying output projection.
-            inplace : bool, optional, default: False
-                Whether to return a new GeoDataFrame or do the transformation
-                in place.
-
-        """
-        if inplace:
-            self.tracts = self.tracts
-            self.counties = self.counties
-            self.states = self.states
-        else:
-            self.tracts = self.tracts.copy()
-            self.counties = self.counties.copy()
-            self.states = self.states.copy()
-
-        self.tracts = self.tracts.to_crs(crs=crs, epsg=epsg)
-        self.states = self.states.to_crs(crs=crs, epsg=epsg)
-        self.counties = self.counties.to_crs(crs=crs, epsg=epsg)
-        if not inplace:
-            return self
-
-
-def get_lehd(dataset='wac', state='dc', year=2015):
+def get_lehd(dataset="wac", state="dc", year=2015):
     """Grab data from the LODES FTP server as a pandas DataFrame.
 
     Parameters
@@ -637,10 +604,140 @@ def get_lehd(dataset='wac', state='dc', year=2015):
 
     """
     state = state.lower()
-    url = 'https://lehd.ces.census.gov/data/lodes/LODES7/{state}/{dataset}/{state}_{dataset}_S000_JT00_{year}.csv.gz'.format(
-        dataset=dataset, state=state, year=year)
-    df = pd.read_csv(url, converters={'w_geocode': str, 'h_geocode': str})
-    df = df.rename({'w_geocode': 'geoid', 'h_geocode': 'geoid'}, axis=1)
-    df = df.set_index('geoid')
+    url = "https://lehd.ces.census.gov/data/lodes/LODES7/{state}/{dataset}/{state}_{dataset}_S000_JT00_{year}.csv.gz".format(
+        dataset=dataset, state=state, year=year
+    )
+    df = pd.read_csv(url, converters={"w_geocode": str, "h_geocode": str})
+    df = df.rename({"w_geocode": "geoid", "h_geocode": "geoid"}, axis=1)
+    df = df.set_index("geoid")
 
     return df
+
+
+def _fips_filter(
+    state_fips=None, county_fips=None, msa_fips=None, fips=None, data=None
+):
+
+    if isinstance(state_fips, (str,)):
+        state_fips = [state_fips]
+    if isinstance(county_fips, (str,)):
+        county_fips = [county_fips]
+    if isinstance(fips, (str,)):
+        fips = [fips]
+
+    # if counties already present in states, ignore them
+    if county_fips:
+        for i in county_fips:
+            if state_fips and i[:2] in county_fips:
+                county_fips.remove(i)
+    # if any fips present in state or counties, ignore them too
+    if fips:
+        for i in fips:
+            if state_fips and i[:2] in state_fips:
+                fips.remove(i)
+            if county_fips and i[:5] in county_fips:
+                fips.remove(i)
+
+    fips_list = []
+    if fips:
+        fips_list += fips
+    if county_fips:
+        fips_list += county_fips
+    if state_fips:
+        fips_list += state_fips
+
+    if msa_fips:
+        fips_list += data_store.msa_definitions[
+            data_store.msa_definitions["CBSA Code"] == msa_fips
+        ]["stcofips"].tolist()
+
+    dfs = []
+    for index in fips_list:
+        dfs.append(data[data.geoid.str.startswith(index)])
+
+    return pd.concat(dfs)
+
+
+def _from_db(
+    data, state_fips=None, county_fips=None, msa_fips=None, fips=None, years=None
+):
+
+    data = data[data.year.isin(years)]
+    data = data.reset_index()
+
+    df = _fips_filter(
+        state_fips=state_fips,
+        county_fips=county_fips,
+        msa_fips=msa_fips,
+        fips=fips,
+        data=data,
+    )
+
+    # we know we're using 2010, need to drop the year column so no conficts
+    tracts = data_store.tracts_2010(convert=False).drop(columns=["year"])
+    tracts = tracts[tracts.geoid.isin(df.geoid)]
+    tracts = convert_gdf(tracts)
+
+    gdf = df.merge(tracts, on="geoid", how="left").set_index("geoid")
+    gdf = gpd.GeoDataFrame(gdf)
+    return gdf
+
+
+class Community(object):
+    """Spatial and tabular data for a collection of "neighborhoods".
+
+       A community is a collection of "neighborhoods" represented by spatial
+       boundaries (e.g. census tracts, or blocks in the US), and tabular data
+       which describe the composition of each neighborhood (e.g. data from
+       surveys, sensors, or geocoded misc.). A Community can be large (e.g. a
+       metropolitan region), or small (e.g. a handfull of census tracts) and
+       may have data pertaining to multiple discrete points in time.
+
+     """
+
+    def __init__(self, gdf=None, harmonized=None, **kwargs):
+        self.gdf = gdf
+        if harmonized:
+            self.harmonized = True
+
+    @classmethod
+    def from_ltdb(
+        cls,
+        state_fips=None,
+        county_fips=None,
+        msa_fips=None,
+        fips=None,
+        years=[1970, 1980, 1990, 2000, 2010],
+    ):
+
+        gdf = _from_db(
+            data=data_store.ltdb,
+            state_fips=state_fips,
+            county_fips=county_fips,
+            msa_fips=msa_fips,
+            fips=fips,
+            years=years,
+        )
+
+        return cls(gdf=gdf, harmonized=True)
+
+    @classmethod
+    def from_ncdb(
+        cls,
+        state_fips=None,
+        county_fips=None,
+        msa_fips=None,
+        fips=None,
+        years=[1970, 1980, 1990, 2000, 2010],
+    ):
+
+        gdf = _from_db(
+            data=data_store.ltdb,
+            state_fips=state_fips,
+            county_fips=county_fips,
+            msa_fips=msa_fips,
+            fips=fips,
+            years=years,
+        )
+
+        return cls(gdf=gdf, harmonized=True)

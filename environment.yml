@@ -10,7 +10,8 @@ dependencies:
   - matplotlib
   - scikit-learn
   - seaborn
-  - pyarrow
+  - pyarrow =0.13
+  - appdirs
   - pip
   - pip:
     - libpysal
@@ -19,5 +20,5 @@ dependencies:
     - giddy
     - xlrd
     - cenpy
-    - quilt
+    - quilt3
     - git+git://github.com/pysal/region@master

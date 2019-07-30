@@ -14,8 +14,8 @@ Data Module
    
     geosnap.data.db
     geosnap.data.metros
-    geosnap.data.read_ltdb
-    geosnap.data.read_ncdb
+    geosnap.data.store_ltdb
+    geosnap.data.store_ncdb
     geosnap.data.Community
 
 .. _analyze_api:
