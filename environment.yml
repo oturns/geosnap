@@ -4,6 +4,12 @@ channels:
   - defaults
 dependencies:
   - pandas
+  - giddy
+  - libpysal
+  - mapclassify
+  - esda
+  - spenc
+  - cenpy
   - cython
   - geopandas
   - hdbscan
@@ -14,11 +20,6 @@ dependencies:
   - appdirs
   - pip
   - pip:
-    - libpysal
-    - mapclassify
-    - spenc
-    - giddy
     - xlrd
-    - cenpy
     - quilt3
     - git+git://github.com/pysal/region@master
