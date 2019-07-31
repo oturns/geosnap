@@ -38,6 +38,7 @@ except ImportError:
     )
     quilt3.Package.install("census/tracts_cartographic", "s3://quilt-cgs")
     quilt3.Package.install("census/administrative", "s3://quilt-cgs")
+    from quilt3.data.census import tracts_cartographic, administrative
 
 
 def _deserialize_wkb(str):
