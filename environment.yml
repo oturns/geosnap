@@ -6,8 +6,6 @@ dependencies:
   - pandas
   - giddy
   - libpysal
-  - mapclassify
-  - esda
   - spenc
   - cenpy
   - cython
