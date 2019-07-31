@@ -29,3 +29,11 @@ def test_Community_from_indices():
 
     chi = data.Community.from_ncdb(fips=["17031", "17019"])
     assert chi.gdf.shape == (6805, 193)
+
+
+def test_Community_from_boundary():
+    msas = data.data_store.msas
+
+    reno = msas[msas["geoid"] == "39900"]
+    rn = data.Community.from_ltdb(boundary=reno)
+    assert rn.gdf.shape == (555, 194)

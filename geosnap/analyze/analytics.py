@@ -21,29 +21,39 @@ from .cluster import (
 )
 
 
-def cluster(gdf,
-            n_clusters=6,
-            method=None,
-            best_model=False,
-            columns=None,
-            verbose=False,
-            **kwargs):
-    """
-    Create a geodemographic typology by running a cluster analysis on the
-    metro area's neighborhood attributes
+def cluster(
+    gdf,
+    n_clusters=6,
+    method=None,
+    best_model=False,
+    columns=None,
+    verbose=False,
+    **kwargs
+):
+    """Create a geodemographic typology by running a cluster analysis on the
+       study area's neighborhood attributes
 
-     Parameters
+    Parameters
     ----------
+    gdf : pandas.DataFrame
+        long-form (geo)DataFrame containing neighborhood attributes
     n_clusters : int
-        the number of clusters to derive
+        the number of clusters to model. The default is 6).
     method : str
         the clustering algorithm used to identify neighborhood types
+    best_model : bool
+        if using a gaussian mixture model, use BIC to choose the best
+        n_clusters. (the default is False).
     columns : list-like
         subset of columns on which to apply the clustering
+    verbose : bool
+        whether to print warning messages (the default is False).
+    **kwargs
 
     Returns
     -------
-    DataFrame
+    pandas.DataFrame with a column of neighborhood cluster labels appended
+    as a new column. Will overwrite columns of the same name.
     """
     assert columns, "You must provide a subset of columns as input"
     assert method, "You must choose a clustering algorithm to use"
@@ -53,7 +63,8 @@ def cluster(gdf,
     opset = gdf.copy()
     opset = opset[allcols]
     opset[columns] = opset.groupby("year")[columns].apply(
-        lambda x: (x - x.mean()) / x.std(ddof=0))
+        lambda x: (x - x.mean()) / x.std(ddof=0)
+    )
     # option to autoscale the data w/ mix-max or zscore?
     specification = {
         "ward": ward,
@@ -63,17 +74,17 @@ def cluster(gdf,
         "spectral": spectral,
         "hdbscan": hdbscan,
     }
-    model = specification[method](opset[columns],
-                                  n_clusters=n_clusters,
-                                  best_model=best_model,
-                                  verbose=verbose,
-                                  **kwargs)
+    model = specification[method](
+        opset[columns],
+        n_clusters=n_clusters,
+        best_model=best_model,
+        verbose=verbose,
+        **kwargs
+    )
     labels = model.labels_.astype(str)
-    clusters = pd.DataFrame({
-        method: labels,
-        "year": gdf.year.astype(str),
-        "geoid": gdf.geoid
-    })
+    clusters = pd.DataFrame(
+        {method: labels, "year": gdf.year.astype(str), "geoid": gdf.geoid}
+    )
     clusters["key"] = clusters.geoid + clusters.year
     clusters = clusters.drop(columns="year")
     # geoid = gdf.index.copy()
@@ -84,35 +95,48 @@ def cluster(gdf,
     return gdf
 
 
-def cluster_spatial(gdf,
-                    n_clusters=6,
-                    weights_type="rook",
-                    method=None,
-                    best_model=False,
-                    columns=None,
-                    threshold_variable="count",
-                    threshold=10,
-                    **kwargs):
-    """
-
-    Create a *spatial* geodemographic typology by running a cluster
+def cluster_spatial(
+    gdf,
+    n_clusters=6,
+    weights_type="rook",
+    method=None,
+    best_model=False,
+    columns=None,
+    threshold_variable="count",
+    threshold=10,
+    **kwargs
+):
+    """Create a *spatial* geodemographic typology by running a cluster
     analysis on the metro area's neighborhood attributes and including a
     contiguity constraint.
 
     Parameters
     ----------
+    gdf : geopandas.GeoDataFrame
+        long-form geodataframe holding neighborhood attribute and geometry data.
     n_clusters : int
-        the number of clusters to derive
+        the number of clusters to model. The default is 6).
     weights_type : str 'queen' or 'rook'
-        spatial weights matrix specification
+        spatial weights matrix specification` (the default is "rook").
     method : str
         the clustering algorithm used to identify neighborhood types
+    best_model : type
+        Description of parameter `best_model` (the default is False).
     columns : list-like
         subset of columns on which to apply the clustering
+    threshold_variable : str
+        for max-p, which variable should define `p`. The default is "count",
+        which will grow regions until the threshold number of polygons have
+        been aggregated
+    threshold : numeric
+        threshold to use for max-p clustering (the default is 10).
+    **kwargs
+
 
     Returns
     -------
-    DataFrame
+    geopandas.GeoDataFrame with a column of neighborhood cluster labels
+    appended as a new column. Will overwrite columns of the same name.
 
     """
     assert columns, "You must provide a subset of columns as input"
@@ -125,7 +149,8 @@ def cluster_spatial(gdf,
         data = gdf[allcols].copy()
         data = data.dropna(how="any")
         data[columns] = data.groupby("year")[columns].apply(
-            lambda x: (x - x.mean()) / x.std(ddof=0))
+            lambda x: (x - x.mean()) / x.std(ddof=0)
+        )
 
     elif threshold_variable is not None:
         threshold_var = data[threshold_variable]
@@ -133,14 +158,16 @@ def cluster_spatial(gdf,
         data = gdf[allcols].copy()
         data = data.dropna(how="any")
         data[columns] = data.groupby("year")[columns].apply(
-            lambda x: (x - x.mean()) / x.std(ddof=0))
+            lambda x: (x - x.mean()) / x.std(ddof=0)
+        )
 
     else:
         allcols = columns + cols
         data = gdf[allcols].copy()
         data = data.dropna(how="any")
         data[columns] = data.groupby("year")[columns].apply(
-            lambda x: (x - x.mean()) / x.std(ddof=0))
+            lambda x: (x - x.mean()) / x.std(ddof=0)
+        )
 
     def _build_data(data, year, weights_type):
         df = data.loc[data.year == year].copy().dropna(how="any")
@@ -173,26 +200,25 @@ def cluster_spatial(gdf,
             val[1] = attach_islands(val[1], val[2])
 
         elif threshold_variable:
-            threshold_var = threshold_var[threshold.index.isin(
-                val[0].geoid)].values
+            threshold_var = threshold_var[threshold.index.isin(val[0].geoid)].values
             try:
                 val[1] = attach_islands(val[1], val[2])
             except:
                 pass
         else:
             threshold_var = None
-        model = specification[method](val[0][columns],
-                                      w=val[1],
-                                      n_clusters=n_clusters,
-                                      threshold_variable=threshold_var,
-                                      threshold=threshold,
-                                      **kwargs)
+        model = specification[method](
+            val[0][columns],
+            w=val[1],
+            n_clusters=n_clusters,
+            threshold_variable=threshold_var,
+            threshold=threshold,
+            **kwargs
+        )
         labels = model.labels_.astype(str)
-        labels = pd.DataFrame({
-            method: labels,
-            "year": val[0].year,
-            "geoid": val[0].geoid
-        })
+        labels = pd.DataFrame(
+            {method: labels, "year": val[0].year, "geoid": val[0].geoid}
+        )
         clusters.append(labels)
 
     clusters = pd.concat(clusters)
