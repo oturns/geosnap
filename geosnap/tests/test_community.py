@@ -1,3 +1,6 @@
+from context import quilter
+
+quilter()
 from context import data
 
 import os

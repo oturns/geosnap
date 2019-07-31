@@ -1,3 +1,6 @@
+from context import quilter
+
+quilter()
 import context
 import os
 from context import data
@@ -9,8 +12,7 @@ store_ncdb = context.data.store_ncdb
 
 def test_store_ltdb():
 
-    store_ltdb(sample=path + "/ltdb_sample.zip",
-               fullcount=path + "/ltdb_full.zip")
+    store_ltdb(sample=path + "/ltdb_sample.zip", fullcount=path + "/ltdb_full.zip")
     assert data.data_store.ltdb.shape == (330388, 192)
 
 

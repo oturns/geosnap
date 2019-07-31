@@ -13,8 +13,7 @@ import multiprocessing
 import sys
 import importlib
 
-sys.path.insert(0,
-                os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from analyze import cluster as _cluster, cluster_spatial as _cluster_spatial
 
@@ -34,10 +33,7 @@ if not os.path.exists(data_dir):
 try:  # if any of these aren't found, the user needs to refresh the quilt data package
     from quilt3.data.census import tracts_cartographic, administrative
 except ImportError:
-    warn(
-        "Quilt data is outdated... rebuilding\n"
-        " You will need to restart your Python kernel once downloading has completed"
-    )
+    warn("Unable to locate quilt data. Rebuilding\n")
     quilt3.Package.install("census/tracts_cartographic", "s3://quilt-cgs")
     quilt3.Package.install("census/administrative", "s3://quilt-cgs")
     importlib.reload(quilt3)
@@ -116,7 +112,8 @@ def adjust_inflation(df, columns, given_year, base_year=2015):
     """
     # get inflation adjustment table from BLS
     inflation = pd.read_excel(
-        "https://www.bls.gov/cpi/research-series/allitems.xlsx", skiprows=6)
+        "https://www.bls.gov/cpi/research-series/allitems.xlsx", skiprows=6
+    )
     inflation.columns = inflation.columns.str.lower()
     inflation.columns = inflation.columns.str.strip(".")
     inflation = inflation.dropna(subset=["year"])
@@ -124,8 +121,9 @@ def adjust_inflation(df, columns, given_year, base_year=2015):
     inflator[1970] = 63.9
 
     df = df.copy()
-    updated = df[columns].apply(lambda x: x *
-                                (inflator[base_year] / inflator[given_year]))
+    updated = df[columns].apply(
+        lambda x: x * (inflator[base_year] / inflator[given_year])
+    )
     df.update(updated)
 
     return df
@@ -133,6 +131,7 @@ def adjust_inflation(df, columns, given_year, base_year=2015):
 
 class DataStore(object):
     """Storage for geosnap data. Currently supports US Census data."""
+
     def __init__(self):
         self
 
@@ -284,8 +283,10 @@ class DataStore(object):
         try:
             return storage["ltdb"]()
         except KeyError:
-            print("Unable to locate LTDB data. Try saving the data again "
-                  "using the `store_ltdb` function")
+            print(
+                "Unable to locate LTDB data. Try saving the data again "
+                "using the `store_ltdb` function"
+            )
 
     @property
     def ncdb(self):
@@ -300,8 +301,10 @@ class DataStore(object):
         try:
             return storage["ncdb"]()
         except KeyError:
-            print("Unable to locate NCDB data. Try saving the data again "
-                  "using the `store_ncdb` function")
+            print(
+                "Unable to locate NCDB data. Try saving the data again "
+                "using the `store_ncdb` function"
+            )
 
     @property
     def codebook(self):
@@ -314,8 +317,8 @@ class DataStore(object):
 
         """
         return pd.read_csv(
-            os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                         "variables.csv"))
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), "variables.csv")
+        )
 
 
 data_store = DataStore()
@@ -350,10 +353,7 @@ def store_ltdb(sample, fullcount):
         df = pd.read_csv(
             path.open(file),
             na_values=["", " ", 99999, -999],
-            converters={
-                0: str,
-                "placefp10": str
-            },
+            converters={0: str, "placefp10": str},
             low_memory=False,
             encoding="latin1",
         )
@@ -388,8 +388,7 @@ def store_ltdb(sample, fullcount):
             "hinca",
         ]
 
-        inflate_available = list(
-            set(df.columns).intersection(set(inflate_cols)))
+        inflate_available = list(set(df.columns).intersection(set(inflate_cols)))
 
         if len(inflate_available):
             # try:
@@ -409,9 +408,7 @@ def store_ltdb(sample, fullcount):
         year=1970,
     )
 
-    fullcount70 = _ltdb_reader(fullcount_zip,
-                               "LTDB_Std_1970_fullcount.csv",
-                               year=1970)
+    fullcount70 = _ltdb_reader(fullcount_zip, "LTDB_Std_1970_fullcount.csv", year=1970)
 
     sample80 = _ltdb_reader(
         sample_zip,
@@ -420,9 +417,7 @@ def store_ltdb(sample, fullcount):
         year=1980,
     )
 
-    fullcount80 = _ltdb_reader(fullcount_zip,
-                               "LTDB_Std_1980_fullcount.csv",
-                               year=1980)
+    fullcount80 = _ltdb_reader(fullcount_zip, "LTDB_Std_1980_fullcount.csv", year=1980)
 
     sample90 = _ltdb_reader(
         sample_zip,
@@ -431,9 +426,7 @@ def store_ltdb(sample, fullcount):
         year=1990,
     )
 
-    fullcount90 = _ltdb_reader(fullcount_zip,
-                               "LTDB_Std_1990_fullcount.csv",
-                               year=1990)
+    fullcount90 = _ltdb_reader(fullcount_zip, "LTDB_Std_1990_fullcount.csv", year=1990)
 
     sample00 = _ltdb_reader(
         sample_zip,
@@ -442,33 +435,35 @@ def store_ltdb(sample, fullcount):
         year=2000,
     )
 
-    fullcount00 = _ltdb_reader(fullcount_zip,
-                               "LTDB_Std_2000_fullcount.csv",
-                               year=2000)
+    fullcount00 = _ltdb_reader(fullcount_zip, "LTDB_Std_2000_fullcount.csv", year=2000)
 
-    sample10 = _ltdb_reader(sample_zip,
-                            "ltdb_std_all_sample/ltdb_std_2010_sample.csv",
-                            year=2010)
+    sample10 = _ltdb_reader(
+        sample_zip, "ltdb_std_all_sample/ltdb_std_2010_sample.csv", year=2010
+    )
 
     # join the sample and fullcount variables into a single df for the year
-    ltdb_1970 = sample70.drop(columns=["year"]).join(fullcount70.iloc[:, 7:],
-                                                     how="left")
-    ltdb_1980 = sample80.drop(columns=["year"]).join(fullcount80.iloc[:, 7:],
-                                                     how="left")
-    ltdb_1990 = sample90.drop(columns=["year"]).join(fullcount90.iloc[:, 7:],
-                                                     how="left")
-    ltdb_2000 = sample00.drop(columns=["year"]).join(fullcount00.iloc[:, 7:],
-                                                     how="left")
+    ltdb_1970 = sample70.drop(columns=["year"]).join(
+        fullcount70.iloc[:, 7:], how="left"
+    )
+    ltdb_1980 = sample80.drop(columns=["year"]).join(
+        fullcount80.iloc[:, 7:], how="left"
+    )
+    ltdb_1990 = sample90.drop(columns=["year"]).join(
+        fullcount90.iloc[:, 7:], how="left"
+    )
+    ltdb_2000 = sample00.drop(columns=["year"]).join(
+        fullcount00.iloc[:, 7:], how="left"
+    )
     ltdb_2010 = sample10
 
-    df = pd.concat([ltdb_1970, ltdb_1980, ltdb_1990, ltdb_2000, ltdb_2010],
-                   sort=True)
+    df = pd.concat([ltdb_1970, ltdb_1980, ltdb_1990, ltdb_2000, ltdb_2010], sort=True)
 
     renamer = dict(
         zip(
             data_store.codebook["ltdb"].tolist(),
             data_store.codebook["variable"].tolist(),
-        ))
+        )
+    )
 
     df.rename(renamer, axis="columns", inplace=True)
 
@@ -476,8 +471,9 @@ def store_ltdb(sample, fullcount):
     for row in data_store.codebook["formula"].dropna().tolist():
         df.eval(row, inplace=True)
 
-    keeps = df.columns[df.columns.isin(
-        data_store.codebook["variable"].tolist() + ["year"])]
+    keeps = df.columns[
+        df.columns.isin(data_store.codebook["variable"].tolist() + ["year"])
+    ]
     df = df[keeps]
 
     df.to_parquet(os.path.join(data_dir, "ltdb.parquet"), compression="brotli")
@@ -551,20 +547,13 @@ def store_ncdb(filepath):
 
     df = df[df.columns[df.columns.isin(names)]]
 
-    df = pd.wide_to_long(df,
-                         stubnames=ncdb_vars,
-                         i="GEO2010",
-                         j="year",
-                         suffix="(7|8|9|0|1|2)").reset_index()
+    df = pd.wide_to_long(
+        df, stubnames=ncdb_vars, i="GEO2010", j="year", suffix="(7|8|9|0|1|2)"
+    ).reset_index()
 
-    df["year"] = df["year"].replace({
-        7: 1970,
-        8: 1980,
-        9: 1990,
-        0: 2000,
-        1: 2010,
-        2: 2010
-    })
+    df["year"] = df["year"].replace(
+        {7: 1970, 8: 1980, 9: 1990, 0: 2000, 1: 2010, 2: 2010}
+    )
     df = df.groupby(["GEO2010", "year"]).first()
 
     mapper = dict(zip(data_store.codebook.ncdb, data_store.codebook.variable))
@@ -581,8 +570,9 @@ def store_ncdb(filepath):
         except:
             warn("Unable to compute " + str(row))
 
-    keeps = df.columns[df.columns.isin(
-        data_store.codebook["variable"].tolist() + ["year"])]
+    keeps = df.columns[
+        df.columns.isin(data_store.codebook["variable"].tolist() + ["year"])
+    ]
 
     df = df[keeps]
 
@@ -617,7 +607,8 @@ def get_lehd(dataset="wac", state="dc", year=2015):
     """
     state = state.lower()
     url = "https://lehd.ces.census.gov/data/lodes/LODES7/{state}/{dataset}/{state}_{dataset}_S000_JT00_{year}.csv.gz".format(
-        dataset=dataset, state=state, year=year)
+        dataset=dataset, state=state, year=year
+    )
     df = pd.read_csv(url, converters={"w_geocode": str, "h_geocode": str})
     df = df.rename({"w_geocode": "geoid", "h_geocode": "geoid"}, axis=1)
     df = df.set_index("geoid")
@@ -625,17 +616,15 @@ def get_lehd(dataset="wac", state="dc", year=2015):
     return df
 
 
-def _fips_filter(state_fips=None,
-                 county_fips=None,
-                 msa_fips=None,
-                 fips=None,
-                 data=None):
+def _fips_filter(
+    state_fips=None, county_fips=None, msa_fips=None, fips=None, data=None
+):
 
-    if isinstance(state_fips, (str, )):
+    if isinstance(state_fips, (str,)):
         state_fips = [state_fips]
-    if isinstance(county_fips, (str, )):
+    if isinstance(county_fips, (str,)):
         county_fips = [county_fips]
-    if isinstance(fips, (str, )):
+    if isinstance(fips, (str,)):
         fips = [fips]
 
     # if counties already present in states, ignore them
@@ -661,8 +650,8 @@ def _fips_filter(state_fips=None,
 
     if msa_fips:
         fips_list += data_store.msa_definitions[
-            data_store.msa_definitions["CBSA Code"] ==
-            msa_fips]["stcofips"].tolist()
+            data_store.msa_definitions["CBSA Code"] == msa_fips
+        ]["stcofips"].tolist()
 
     dfs = []
     for index in fips_list:
@@ -671,12 +660,9 @@ def _fips_filter(state_fips=None,
     return pd.concat(dfs)
 
 
-def _from_db(data,
-             state_fips=None,
-             county_fips=None,
-             msa_fips=None,
-             fips=None,
-             years=None):
+def _from_db(
+    data, state_fips=None, county_fips=None, msa_fips=None, fips=None, years=None
+):
 
     data = data[data.year.isin(years)]
     data = data.reset_index()
@@ -711,6 +697,7 @@ class Community(object):
        may have data pertaining to multiple discrete points in time.
 
      """
+
     def __init__(self, gdf=None, harmonized=None, **kwargs):
         """initialize Community.
 
@@ -741,48 +728,56 @@ class Community(object):
         if harmonized:
             self.harmonized = True
 
-    def cluster(self,
-                n_clusters=6,
-                method=None,
-                best_model=False,
-                columns=None,
-                verbose=False,
-                **kwargs):
-        self.gdf = _cluster(gdf=self.gdf,
-                            n_clusters=n_clusters,
-                            method=method,
-                            best_model=best_model,
-                            columns=columns,
-                            verbose=verbose,
-                            **kwargs)
+    def cluster(
+        self,
+        n_clusters=6,
+        method=None,
+        best_model=False,
+        columns=None,
+        verbose=False,
+        **kwargs
+    ):
+        self.gdf = _cluster(
+            gdf=self.gdf,
+            n_clusters=n_clusters,
+            method=method,
+            best_model=best_model,
+            columns=columns,
+            verbose=verbose,
+            **kwargs
+        )
 
-    def cluster_spatial(self,
-                        n_clusters=6,
-                        weights_type="rook",
-                        method=None,
-                        best_model=False,
-                        columns=None,
-                        threshold_variable="count",
-                        threshold=10,
-                        **kwargs):
-        self.gdf = _cluster_spatial(gdf=self.gdf,
-                                    n_clusters=n_clusters,
-                                    weights_type=weights_type,
-                                    method=method,
-                                    best_model=best_model,
-                                    columns=columns,
-                                    threshold_variable=threshold_variable,
-                                    threshold=threshold,
-                                    **kwargs)
+    def cluster_spatial(
+        self,
+        n_clusters=6,
+        weights_type="rook",
+        method=None,
+        best_model=False,
+        columns=None,
+        threshold_variable="count",
+        threshold=10,
+        **kwargs
+    ):
+        self.gdf = _cluster_spatial(
+            gdf=self.gdf,
+            n_clusters=n_clusters,
+            weights_type=weights_type,
+            method=method,
+            best_model=best_model,
+            columns=columns,
+            threshold_variable=threshold_variable,
+            threshold=threshold,
+            **kwargs
+        )
 
     @classmethod
     def from_ltdb(
-            cls,
-            state_fips=None,
-            county_fips=None,
-            msa_fips=None,
-            fips=None,
-            years=[1970, 1980, 1990, 2000, 2010],
+        cls,
+        state_fips=None,
+        county_fips=None,
+        msa_fips=None,
+        fips=None,
+        years=[1970, 1980, 1990, 2000, 2010],
     ):
 
         gdf = _from_db(
@@ -798,12 +793,12 @@ class Community(object):
 
     @classmethod
     def from_ncdb(
-            cls,
-            state_fips=None,
-            county_fips=None,
-            msa_fips=None,
-            fips=None,
-            years=[1970, 1980, 1990, 2000, 2010],
+        cls,
+        state_fips=None,
+        county_fips=None,
+        msa_fips=None,
+        fips=None,
+        years=[1970, 1980, 1990, 2000, 2010],
     ):
 
         gdf = _from_db(
