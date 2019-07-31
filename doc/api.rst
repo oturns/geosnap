@@ -12,10 +12,10 @@ Data Module
 .. autosummary::
    :toctree: generated/
    
-    geosnap.data.db
-    geosnap.data.metros
+    geosnap.data.data_store
     geosnap.data.store_ltdb
     geosnap.data.store_ncdb
+    geosnap.data.get_lehd
     geosnap.data.Community
 
 .. _analyze_api:
