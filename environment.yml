@@ -1,7 +1,7 @@
 name: geosnap
 channels:
-  - defaults
   - conda-forge
+  - defaults
 dependencies:
   - pandas
   - cython
@@ -10,7 +10,7 @@ dependencies:
   - matplotlib
   - scikit-learn
   - seaborn
-  - pyarrow =0.13
+  - pyarrow=0.13
   - appdirs
   - pip
   - pip:
