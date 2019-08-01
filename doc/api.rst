@@ -87,3 +87,10 @@ Harmonize Module
 
 Visualize Module
 ----------------
+
+.. currentmodule:: geosnap
+
+.. autosummary::
+   :toctree: generated/
+
+   geosnap.visualize.indexplot_seq
