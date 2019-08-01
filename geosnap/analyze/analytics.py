@@ -28,7 +28,9 @@ def cluster(
     best_model=False,
     columns=None,
     verbose=False,
-    **kwargs
+    time_var="year",
+    id_var="geoid",
+    **kwargs,
 ):
     """Create a geodemographic typology by running a cluster analysis on the
        study area's neighborhood attributes
@@ -48,6 +50,12 @@ def cluster(
         subset of columns on which to apply the clustering
     verbose : bool
         whether to print warning messages (the default is False).
+    time_var: str
+        which column on the dataframe defines time and or sequencing of the
+        long-form data. Default is "year"
+    id_var: str
+        which column on the long-form dataframe identifies the stable units
+        over time. In a wide-form dataset, this would be the unique index
     **kwargs
 
     Returns
@@ -58,11 +66,11 @@ def cluster(
     assert columns, "You must provide a subset of columns as input"
     assert method, "You must choose a clustering algorithm to use"
     gdf = gdf.copy().reset_index()
-    allcols = columns + ["year"]
+    allcols = columns + [time_var]
     gdf = gdf.dropna(how="any", subset=columns)
     opset = gdf.copy()
     opset = opset[allcols]
-    opset[columns] = opset.groupby("year")[columns].apply(
+    opset[columns] = opset.groupby(time_var)[columns].apply(
         lambda x: (x - x.mean()) / x.std(ddof=0)
     )
     # option to autoscale the data w/ mix-max or zscore?
@@ -79,19 +87,18 @@ def cluster(
         n_clusters=n_clusters,
         best_model=best_model,
         verbose=verbose,
-        **kwargs
+        **kwargs,
     )
     labels = model.labels_.astype(str)
     clusters = pd.DataFrame(
-        {method: labels, "year": gdf.year.astype(str), "geoid": gdf.geoid}
+        {method: labels, time_var: gdf[time_var].astype(str), id_var: gdf[id_var]}
     )
-    clusters["key"] = clusters.geoid + clusters.year
-    clusters = clusters.drop(columns="year")
-    # geoid = gdf.index.copy()
-    gdf["key"] = gdf.geoid + gdf.year.astype(str)
-    gdf = gdf.merge(clusters.drop(columns=["geoid"]), on="key", how="left")
+    clusters["key"] = clusters[id_var] + clusters[time_var]
+    clusters = clusters.drop(columns=time_var)
+    gdf["key"] = gdf[id_var] + gdf[time_var].astype(str)
+    gdf = gdf.merge(clusters.drop(columns=[id_var]), on="key", how="left")
     gdf.drop(columns="key", inplace=True)
-    gdf.set_index("geoid", inplace=True)
+    gdf.set_index(id_var, inplace=True)
     return gdf
 
 
@@ -104,7 +111,9 @@ def cluster_spatial(
     columns=None,
     threshold_variable="count",
     threshold=10,
-    **kwargs
+    time_var="year",
+    id_var="geoid",
+    **kwargs,
 ):
     """Create a *spatial* geodemographic typology by running a cluster
     analysis on the metro area's neighborhood attributes and including a
@@ -130,6 +139,12 @@ def cluster_spatial(
         been aggregated
     threshold : numeric
         threshold to use for max-p clustering (the default is 10).
+    time_var: str
+        which column on the dataframe defines time and or sequencing of the
+        long-form data. Default is "year"
+    id_var: str
+        which column on the long-form dataframe identifies the stable units
+        over time. In a wide-form dataset, this would be the unique index
     **kwargs
 
 
@@ -142,13 +157,13 @@ def cluster_spatial(
     assert columns, "You must provide a subset of columns as input"
     assert method, "You must choose a clustering algorithm to use"
     gdf = gdf.copy().reset_index()
-    cols = ["year", "geoid", "geometry"]
+    cols = [time_var, id_var, "geometry"]
 
     if threshold_variable == "count":
         allcols = columns + cols
         data = gdf[allcols].copy()
         data = data.dropna(how="any")
-        data[columns] = data.groupby("year")[columns].apply(
+        data[columns] = data.groupby(time_var)[columns].apply(
             lambda x: (x - x.mean()) / x.std(ddof=0)
         )
 
@@ -157,7 +172,7 @@ def cluster_spatial(
         allcols = list(columns).remove(threshold_variable) + cols
         data = gdf[allcols].copy()
         data = data.dropna(how="any")
-        data[columns] = data.groupby("year")[columns].apply(
+        data[columns] = data.groupby(time_var)[columns].apply(
             lambda x: (x - x.mean()) / x.std(ddof=0)
         )
 
@@ -165,25 +180,25 @@ def cluster_spatial(
         allcols = columns + cols
         data = gdf[allcols].copy()
         data = data.dropna(how="any")
-        data[columns] = data.groupby("year")[columns].apply(
+        data[columns] = data.groupby(time_var)[columns].apply(
             lambda x: (x - x.mean()) / x.std(ddof=0)
         )
 
-    def _build_data(data, year, weights_type):
-        df = data.loc[data.year == year].copy().dropna(how="any")
+    def _build_data(data, time, weights_type):
+        df = data.loc[data[time_var] == time].copy().dropna(how="any")
         weights = {"queen": Queen, "rook": Rook}
-        w = weights[weights_type].from_dataframe(df, idVariable="geoid")
-        knnw = KNN.from_dataframe(df, k=1, ids=df.geoid.tolist())
+        w = weights[weights_type].from_dataframe(df, idVariable=id_var)
+        knnw = KNN.from_dataframe(df, k=1, ids=df[id_var].tolist())
 
         return df, w, knnw
 
-    years = [1980, 1990, 2000, 2010]
+    times = data[time_var].unique().tolist()
     annual = []
-    for year in years:
-        df, w, knnw = _build_data(data, year, weights_type)
+    for time in times:
+        df, w, knnw = _build_data(data, time, weights_type)
         annual.append([df, w, knnw])
 
-    datasets = dict(zip(years, annual))
+    datasets = dict(zip(times, annual))
 
     specification = {
         "azp": azp,
@@ -200,7 +215,7 @@ def cluster_spatial(
             val[1] = attach_islands(val[1], val[2])
 
         elif threshold_variable:
-            threshold_var = threshold_var[threshold.index.isin(val[0].geoid)].values
+            threshold_var = threshold_var[threshold.index.isin(val[0][id_var])].values
             try:
                 val[1] = attach_islands(val[1], val[2])
             except:
@@ -213,22 +228,22 @@ def cluster_spatial(
             n_clusters=n_clusters,
             threshold_variable=threshold_var,
             threshold=threshold,
-            **kwargs
+            **kwargs,
         )
         labels = model.labels_.astype(str)
         labels = pd.DataFrame(
-            {method: labels, "year": val[0].year, "geoid": val[0].geoid}
+            {method: labels, time_var: val[0][time_var], id_var: val[0][id_var]}
         )
         clusters.append(labels)
 
     clusters = pd.concat(clusters)
-    clusters.set_index("geoid")
-    clusters["joinkey"] = clusters.geoid + clusters.year.astype(str)
-    clusters = clusters.drop(columns="year")
-    gdf["joinkey"] = gdf.geoid + gdf.year.astype(str)
+    clusters.set_index(id_var)
+    clusters["joinkey"] = clusters[id_var] + clusters[time_var].astype(str)
+    clusters = clusters.drop(columns=time_var)
+    gdf["joinkey"] = gdf[id_var] + gdf[time_var].astype(str)
     if method in gdf.columns:
         gdf.drop(columns=method, inplace=True)
-    gdf = gdf.merge(clusters.drop(columns=["geoid"]), on="joinkey", how="left")
-    gdf.set_index("geoid", inplace=True)
+    gdf = gdf.merge(clusters.drop(columns=[id_var]), on="joinkey", how="left")
+    gdf.set_index(id_var, inplace=True)
 
     return gdf

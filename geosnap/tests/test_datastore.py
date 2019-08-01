@@ -33,7 +33,7 @@ def test_msas():
 
 
 def test_msa_defs():
-    df = data.data_store.msa_definitions(convert=False)
+    df = data.data_store.msa_definitions
     assert df.shape == (1915, 13)
 
 
