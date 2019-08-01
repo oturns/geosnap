@@ -28,6 +28,7 @@ install:
 
 script:
   - python setup.py sdist >/dev/null
+  - python -c "from geosnap import data"
   - pytest --ignore=examples --ignore=geosnap/util  --cov geosnap
 
 notifications:
