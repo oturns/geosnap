@@ -15,4 +15,4 @@ xlrd
 cenpy
 appdirs
 quilt3
-git+git://github.com/pysal/region.git@master#egg=geosnap
+git://github.com/pysal/region.git@master#egg=region
