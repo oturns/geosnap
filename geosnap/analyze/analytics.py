@@ -1,49 +1,78 @@
 """Tools for the spatial analysis of neighborhood change."""
 
-import copy
 import numpy as np
 import pandas as pd
 from libpysal.weights import attach_islands
 from libpysal.weights.contiguity import Queen, Rook
 from libpysal.weights.distance import KNN
 
-from .cluster import (azp, affinity_propagation, gaussian_mixture, hdbscan, kmeans, max_p,
-                      skater, spectral, spenc, ward, ward_spatial)
+from .cluster import (
+    azp,
+    affinity_propagation,
+    gaussian_mixture,
+    hdbscan,
+    kmeans,
+    max_p,
+    skater,
+    spectral,
+    spenc,
+    ward,
+    ward_spatial,
+)
 
 
-def cluster(dataset,
-            n_clusters=6,
-            method=None,
-            best_model=False,
-            columns=None,
-            verbose=False,
-            **kwargs):
-    """
-    Create a geodemographic typology by running a cluster analysis on the
-    metro area's neighborhood attributes
+def cluster(
+    gdf,
+    n_clusters=6,
+    method=None,
+    best_model=False,
+    columns=None,
+    verbose=False,
+    time_var="year",
+    id_var="geoid",
+    **kwargs,
+):
+    """Create a geodemographic typology by running a cluster analysis on the
+       study area's neighborhood attributes
 
-     Parameters
+    Parameters
     ----------
+    gdf : pandas.DataFrame
+        long-form (geo)DataFrame containing neighborhood attributes
     n_clusters : int
-        the number of clusters to derive
+        the number of clusters to model. The default is 6).
     method : str
         the clustering algorithm used to identify neighborhood types
+    best_model : bool
+        if using a gaussian mixture model, use BIC to choose the best
+        n_clusters. (the default is False).
     columns : list-like
         subset of columns on which to apply the clustering
+    verbose : bool
+        whether to print warning messages (the default is False).
+    time_var: str
+        which column on the dataframe defines time and or sequencing of the
+        long-form data. Default is "year"
+    id_var: str
+        which column on the long-form dataframe identifies the stable units
+        over time. In a wide-form dataset, this would be the unique index
+    **kwargs
 
     Returns
     -------
-    DataFrame
+    pandas.DataFrame with a column of neighborhood cluster labels appended
+    as a new column. Will overwrite columns of the same name.
     """
     assert columns, "You must provide a subset of columns as input"
     assert method, "You must choose a clustering algorithm to use"
-    dataset = copy.deepcopy(dataset)
-    allcols = columns + ["year"]
-    dataset.census = dataset.census.dropna(how='any', subset=columns)
-    opset = copy.deepcopy(dataset)
-    opset.census = opset.census[allcols]
-    opset.census[columns] = opset.census.groupby("year")[columns].apply(
-        lambda x: (x - x.mean()) / x.std(ddof=0))
+    gdf = gdf.copy().reset_index()
+    allcols = columns + [time_var]
+    gdf = gdf.dropna(how="any", subset=columns)
+    opset = gdf.copy()
+    opset = opset[allcols]
+    opset[columns] = opset.groupby(time_var)[columns].apply(
+        lambda x: (x - x.mean()) / x.std(ddof=0)
+    )
     # option to autoscale the data w/ mix-max or zscore?
     specification = {
         "ward": ward,
@@ -51,110 +80,125 @@ def cluster(dataset,
         "affinity_propagation": affinity_propagation,
         "gaussian_mixture": gaussian_mixture,
         "spectral": spectral,
-        "hdbscan": hdbscan
+        "hdbscan": hdbscan,
     }
     model = specification[method](
-        opset.census[columns],
+        opset[columns],
         n_clusters=n_clusters,
         best_model=best_model,
         verbose=verbose,
-        **kwargs)
+        **kwargs,
+    )
     labels = model.labels_.astype(str)
-    clusters = pd.DataFrame({
-        method: labels,
-        "year": dataset.census.year.astype(str),
-        "geoid": dataset.census.index
-    })
-    clusters["key"] = clusters.geoid + clusters.year
-    clusters = clusters.drop(columns="year")
-    geoid = dataset.census.index.copy()
-    dataset.census["key"] = dataset.census.index + dataset.census.year.astype(str)
-    dataset.census = dataset.census.merge(clusters, on="key", how="left")
-    dataset.census["geoid"] = geoid
-    dataset.census.drop(columns='key', inplace=True)
-    dataset.census.set_index("geoid", inplace=True)
-    return dataset
+    clusters = pd.DataFrame(
+        {method: labels, time_var: gdf[time_var].astype(str), id_var: gdf[id_var]}
+    )
+    clusters["key"] = clusters[id_var] + clusters[time_var]
+    clusters = clusters.drop(columns=time_var)
+    gdf["key"] = gdf[id_var] + gdf[time_var].astype(str)
+    gdf = gdf.merge(clusters.drop(columns=[id_var]), on="key", how="left")
+    gdf.drop(columns="key", inplace=True)
+    gdf.set_index(id_var, inplace=True)
+    return gdf
 
 
-def cluster_spatial(dataset,
-                    n_clusters=6,
-                    weights_type="rook",
-                    method=None,
-                    best_model=False,
-                    columns=None,
-                    threshold_variable='count',
-                    threshold=10,
-                    **kwargs):
-    """
-
-    Create a *spatial* geodemographic typology by running a cluster
+def cluster_spatial(
+    gdf,
+    n_clusters=6,
+    weights_type="rook",
+    method=None,
+    best_model=False,
+    columns=None,
+    threshold_variable="count",
+    threshold=10,
+    time_var="year",
+    id_var="geoid",
+    **kwargs,
+):
+    """Create a *spatial* geodemographic typology by running a cluster
     analysis on the metro area's neighborhood attributes and including a
     contiguity constraint.
 
     Parameters
     ----------
+    gdf : geopandas.GeoDataFrame
+        long-form geodataframe holding neighborhood attribute and geometry data.
     n_clusters : int
-        the number of clusters to derive
+        the number of clusters to model. The default is 6).
     weights_type : str 'queen' or 'rook'
-        spatial weights matrix specification
+        spatial weights matrix specification` (the default is "rook").
     method : str
         the clustering algorithm used to identify neighborhood types
+    best_model : type
+        Description of parameter `best_model` (the default is False).
     columns : list-like
         subset of columns on which to apply the clustering
+    threshold_variable : str
+        for max-p, which variable should define `p`. The default is "count",
+        which will grow regions until the threshold number of polygons have
+        been aggregated
+    threshold : numeric
+        threshold to use for max-p clustering (the default is 10).
+    time_var: str
+        which column on the dataframe defines time and or sequencing of the
+        long-form data. Default is "year"
+    id_var: str
+        which column on the long-form dataframe identifies the stable units
+        over time. In a wide-form dataset, this would be the unique index
+    **kwargs
+
 
     Returns
     -------
-    DataFrame
+    geopandas.GeoDataFrame with a column of neighborhood cluster labels
+    appended as a new column. Will overwrite columns of the same name.
 
     """
     assert columns, "You must provide a subset of columns as input"
     assert method, "You must choose a clustering algorithm to use"
-    dataset = copy.deepcopy(dataset)
+    gdf = gdf.copy().reset_index()
+    cols = [time_var, id_var, "geometry"]
 
     if threshold_variable == "count":
-        allcols = columns + ["year"]
-        data = dataset.census[allcols].copy()
+        allcols = columns + cols
+        data = gdf[allcols].copy()
         data = data.dropna(how="any")
-        data[columns] = data.groupby("year")[columns].apply(
-            lambda x: (x - x.mean()) / x.std(ddof=0))
+        data[columns] = data.groupby(time_var)[columns].apply(
+            lambda x: (x - x.mean()) / x.std(ddof=0)
+        )
 
     elif threshold_variable is not None:
         threshold_var = data[threshold_variable]
-        allcols = list(columns).remove(threshold_variable) + ["year"]
-        data = dataset.census[allcols].copy()
+        allcols = list(columns).remove(threshold_variable) + cols
+        data = gdf[allcols].copy()
         data = data.dropna(how="any")
-        data[columns] = data.groupby("year")[columns].apply(
-            lambda x: (x - x.mean()) / x.std(ddof=0))
+        data[columns] = data.groupby(time_var)[columns].apply(
+            lambda x: (x - x.mean()) / x.std(ddof=0)
+        )
 
     else:
-        allcols = columns + ["year"]
-        data = dataset.census[allcols].copy()
+        allcols = columns + cols
+        data = gdf[allcols].copy()
         data = data.dropna(how="any")
-        data[columns] = data.groupby("year")[columns].apply(
-            lambda x: (x - x.mean()) / x.std(ddof=0))
+        data[columns] = data.groupby(time_var)[columns].apply(
+            lambda x: (x - x.mean()) / x.std(ddof=0)
+        )
 
-    tracts = dataset.tracts
-
-    def _build_data(data, tracts, year, weights_type):
-        df = data.loc[data.year == year].copy().dropna(how="any")
-        tracts = tracts.loc[tracts.geoid.isin(df.index)].copy()
+    def _build_data(data, time, weights_type):
+        df = data.loc[data[time_var] == time].copy().dropna(how="any")
         weights = {"queen": Queen, "rook": Rook}
-        w = weights[weights_type].from_dataframe(tracts, idVariable="geoid")
-        # drop islands from dataset and rebuild weights
-        #df.drop(index=w.islands, inplace=True)
-        #tracts.drop(index=w.islands, inplace=True)
-        #w = weights[weights_type].from_dataframe(tracts, idVariable="geoid")
-        knnw = KNN.from_dataframe(tracts, k=1, ids=tracts.geoid.tolist())
+        w = weights[weights_type].from_dataframe(df, idVariable=id_var)
+        knnw = KNN.from_dataframe(df, k=1, ids=df[id_var].tolist())
 
         return df, w, knnw
 
-    years = [1980, 1990, 2000, 2010]
+    times = data[time_var].unique().tolist()
     annual = []
-    for year in years:
-        df, w, knnw = _build_data(data, tracts, year, weights_type)
+    for time in times:
+        df, w, knnw = _build_data(data, time, weights_type)
         annual.append([df, w, knnw])
 
-    datasets = dict(zip(years, annual))
+    datasets = dict(zip(times, annual))
 
     specification = {
         "azp": azp,
@@ -170,9 +214,8 @@ def cluster_spatial(dataset,
             threshold_var = np.ones(len(val[0]))
             val[1] = attach_islands(val[1], val[2])
 
-        elif threshold_variable is not None:
-            threshold_var = threshold_var[threshold.index.isin(
-                val[0].index)].values
+        elif threshold_variable:
+            threshold_var = threshold_var[threshold.index.isin(val[0][id_var])].values
             try:
                 val[1] = attach_islands(val[1], val[2])
             except:
@@ -180,31 +223,27 @@ def cluster_spatial(dataset,
         else:
             threshold_var = None
         model = specification[method](
-            val[0].drop(columns="year"),
+            val[0][columns],
             w=val[1],
             n_clusters=n_clusters,
             threshold_variable=threshold_var,
             threshold=threshold,
-            **kwargs)
+            **kwargs,
+        )
         labels = model.labels_.astype(str)
-        labels = pd.DataFrame({
-            method: labels,
-            "year": val[0].year,
-            "geoid": val[0].index
-        })
+        labels = pd.DataFrame(
+            {method: labels, time_var: val[0][time_var], id_var: val[0][id_var]}
+        )
         clusters.append(labels)
 
     clusters = pd.concat(clusters)
-    clusters.set_index("geoid")
-    clusters["joinkey"] = clusters.geoid + clusters.year.astype(str)
-    clusters = clusters.drop(columns="year")
-    geoid = dataset.census.index
-    dataset.census[
-        "joinkey"] = dataset.census.index + dataset.census.year.astype(str)
-    if method in dataset.census.columns:
-        dataset.census.drop(columns=method, inplace=True)
-    dataset.census = dataset.census.merge(clusters, on="joinkey", how="left")
-    dataset.census["geoid"] = geoid
-    dataset.census.set_index("geoid", inplace=True)
+    clusters.set_index(id_var)
+    clusters["joinkey"] = clusters[id_var] + clusters[time_var].astype(str)
+    clusters = clusters.drop(columns=time_var)
+    gdf["joinkey"] = gdf[id_var] + gdf[time_var].astype(str)
+    if method in gdf.columns:
+        gdf.drop(columns=method, inplace=True)
+    gdf = gdf.merge(clusters.drop(columns=[id_var]), on="joinkey", how="left")
+    gdf.set_index(id_var, inplace=True)
 
-    return dataset
+    return gdf
