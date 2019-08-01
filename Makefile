@@ -4,7 +4,7 @@ container:
 
 # run a shell for our env
 cli:
-	docker run -it -p 8888:8888 -v ${PWD}:/home/jovyan/host geosnap /bin/bash
+	docker run -it -p 8888:8888 -v ${PWD}:/home/jovyan geosnap /bin/bash
 
 dstop:
 	docker stop $(docker ps -aq)
