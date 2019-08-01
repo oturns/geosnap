@@ -32,11 +32,13 @@ if not os.path.exists(data_dir):
 try:  # if any of these aren't found, the user needs to refresh the quilt data package
     from quilt3.data.census import tracts_cartographic, administrative
 except ImportError:
-    warn("Unable to locate quilt data. Rebuilding\n")
+    warn(
+        "Unable to locate quilt data. Rebuilding\n"
+        "You will need to restart your python kernel before you can access "
+        "the data store"
+    )
     quilt3.Package.install("census/tracts_cartographic", "s3://quilt-cgs")
     quilt3.Package.install("census/administrative", "s3://quilt-cgs")
-    importlib.reload(quilt3)
-    from quilt3.data.census import tracts_cartographic, administrative
 
 
 def _deserialize_wkb(str):
@@ -1027,7 +1029,7 @@ class Community(object):
         tracts = []
         for year in years:
             tracts.append(df_dict[year])
-        tracts = pd.concat(tracts)
+        tracts = pd.concat(tracts, sort=True)
 
         if isinstance(boundary, gpd.GeoDataFrame):
             if boundary.crs != tracts.crs:
@@ -1049,32 +1051,23 @@ class Community(object):
 
         return cls(gdf=gdf, harmonized=False)
 
-        @classmethod()
-        def from_geodataframes(cls, gdfs=None, harmonized=False):
-            """Create a new Community from a list of geodataframes.
+    @classmethod
+    def from_geodataframes(cls, gdfs=None):
+        """Create a new Community from a list of geodataframes.
 
-            Parameters
-            ----------
-            gdfs : list-like
-                list of geodataframes that hold attribute and geometry data for
-                a study area. Each geodataframe must have neighborhood
-                attribute data, geometry data, and a time column that defines
-                how the geodataframes are sequenced. The geometries may be
-                stable over time (in which case the dataset is harmonized) or
-                may be unique for each time. If the data are harmonized, the
-                dataframes must also have an ID variable that indexes
-                neighborhood units over time.
-            harmonized : bool
-                Whether the neighborhood boundaries have been harmonized into a
-                set of consistent boundaries that remain stable over time.
-                The default is False.
+        Parameters
+        ----------
+        gdfs : list-like
+            list of geodataframes that hold attribute and geometry data for
+            a study area. Each geodataframe must have neighborhood
+            attribute data, geometry data, and a time column that defines
+            how the geodataframes are sequenced. The geometries may be
+            stable over time (in which case the dataset is harmonized) or
+            may be unique for each time. If the data are harmonized, the
+            dataframes must also have an ID variable that indexes
+            neighborhood units over time.
 
-            """
-            assert harmonized(
-                "You must set the `harmonized` argument to let "
-                "the Community constructor know whether the study area has "
-                "consistent boundaries over time"
-            )
+        """
 
-            gdf = pd.concat(gdfs)
-            return cls(gdf=gdf, harmonized=harmonized)
+        gdf = pd.concat(gdfs, sort=True)
+        return cls(gdf=gdf)

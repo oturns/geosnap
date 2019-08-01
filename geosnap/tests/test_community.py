@@ -1,6 +1,3 @@
-from context import quilter
-
-quilter()
 from context import data
 
 import os
@@ -41,3 +38,13 @@ def test_Community_from_boundary():
 
 def test_Community_from_census():
     assert data.Community.from_census(state_fips="24").gdf.shape == (3758, 195)
+
+
+def test_Community_from_gdfs():
+
+    t90 = data.data_store.tracts_1990()
+    t90 = t90[t90.geoid.str.startswith("11")]
+    t00 = data.data_store.tracts_2000()
+    t00 = t00[t00.geoid.str.startswith("11")]
+
+    assert data.Community.from_geodataframes([t90, t00]).gdf.shape == (380, 192)

@@ -1,6 +1,3 @@
-from context import quilter
-
-quilter()
 import context
 import os
 from context import data

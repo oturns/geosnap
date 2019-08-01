@@ -1,6 +1,3 @@
-from context import quilter
-
-quilter()
 from context import data
 import os
 
@@ -20,7 +17,7 @@ columns = ["median_household_income", "p_poverty_rate", "p_unemployment_rate"]
 def test_gm():
 
     reno.cluster(columns=columns, method="gaussian_mixture", best_model=True)
-    assert len(reno.gdf.gaussian_mixture.unique()) > 7
+    assert len(reno.gdf.gaussian_mixture.unique()) >= 6
 
 
 def test_ward():
