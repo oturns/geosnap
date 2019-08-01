@@ -15,4 +15,4 @@ xlrd
 cenpy
 appdirs
 quilt3
-region @ git+https://github.com/pysal/region@master#egg=region
+git+git://github.com/pysal/region@master
