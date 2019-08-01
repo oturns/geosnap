@@ -79,8 +79,6 @@ Model neighborhood change using optimal-matching algorithms or spatial discrete 
    geosnap.analyze.linc
    geosnap.analyze.Sequence
    geosnap.analyze.Transition
-   geosnap.analyze.indexplot_seq
-
 
 Harmonize Module
 ----------------
