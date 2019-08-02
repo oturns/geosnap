@@ -47,21 +47,6 @@ def setup_package():
     install_reqs.append("region")
     print(install_reqs)
     extras_reqs = reqs
-    # get all file endings and copy whole file names without a file suffix
-    # assumes nested directories are only down one level
-    # example_data_files = set()
-    # for i in os.listdir("libpysal/examples"):
-    #    if i.endswith(('py', 'pyc')):
-    #        continue
-    #    if not os.path.isdir("libpysal/examples/" + i):
-    #        if "." in i:
-    #            glob_name = "examples/*." + i.split(".")[-1]
-    #        else:
-    #            glob_name = "examples/" + i
-    #    else:
-    #        glob_name = "examples/" + i + "/*"
-
-    #    example_data_files.add(glob_name)
 
     setup(
         name="geosnap",
