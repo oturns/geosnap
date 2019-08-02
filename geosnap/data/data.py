@@ -391,10 +391,7 @@ def store_ltdb(sample, fullcount):
             set(df.columns).intersection(set(inflate_cols)))
 
         if len(inflate_available):
-            # try:
             df = adjust_inflation(df, inflate_available, year)
-        # except KeyError:  # half the dfs don't have these variables
-        #     pass
         return df
 
     # read in Brown's LTDB data, both the sample and fullcount files for each

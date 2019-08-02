@@ -405,3 +405,7 @@ class Sequence(object):
                                                                 seq2]]
 
         self.seq_dis_mat = seq_dis_mat + seq_dis_mat.transpose()
+
+
+
+
