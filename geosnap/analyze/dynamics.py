@@ -7,12 +7,7 @@ import numpy as np
 import scipy.spatial.distance as d
 from libpysal.weights.contiguity import Queen, Rook
 from libpysal.weights.distance import KNN, Kernel
-import matplotlib.pyplot as plt
-from matplotlib.colors import ListedColormap
-import seaborn as sns
-import copy
-from os import path, mkdir
-import pandas as pd
+
 
 class Transition(object):
     """
