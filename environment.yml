@@ -17,6 +17,7 @@ dependencies:
   - pyarrow=0.13
   - appdirs
   - pip
+  - tqdm
   - pip:
     - xlrd
     - quilt3
