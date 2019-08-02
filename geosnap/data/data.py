@@ -217,9 +217,10 @@ class DataStore(object):
 
         """
         if convert:
-            return convert_gdf(administrative["msas.parquet"]())
+            return convert_gdf(
+                administrative["msas.parquet"]().sort_values(by='name'))
         else:
-            return administrative["msas.parquet"]()
+            return administrative["msas.parquet"]().sort_values(by='name')
 
     def states(self, convert=True):
         """States.

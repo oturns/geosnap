@@ -16,6 +16,9 @@ dependencies:
   - seaborn
   - pyarrow=0.13
   - appdirs
+  - dash
+  - dash-bootstrap-components
+  - palettable
   - pip
   - pip:
     - xlrd
