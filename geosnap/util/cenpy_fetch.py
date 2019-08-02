@@ -1,18 +1,39 @@
-from cenpy import products
+"""Utility functions for downloading Census data."""
+
 import pandas
-import os
 import sys
 from tqdm.auto import tqdm
-import numpy as np
-from ..data import dictionary
+from geosnap.data import data_store
 from quilt.data.spatialucr.census import states
+from cenpy import products
 
-_variables = dictionary.copy()
+_variables = data_store.codebook.copy()
 
 
 def fetch_acs(level='tract', state='all', year=2017):
-    """
-    use Cenpy to collect the variables defined in `geosnap.data.dictionary` from the Census API
+    """Collect the variables defined in `geosnap.data.dictionary` from the Census API.
+
+    Parameters
+    ----------
+    level : str
+        Census geographic tabulation unit e.g. "block", "tract", or "county"
+        (the default is 'tract').
+    state : str
+        State for which data should be collected, e.g. "Maryland".
+        if 'all' (default) the function will loop through each state and return
+        a combined dataframe.
+    year : int
+        ACS release year to query (the default is 2017).
+
+    Returns
+    -------
+    type
+        pandas.DataFrame
+
+    Examples
+    -------
+    >>> dc = fetch_acs('District of Columbia', year=2015)
+
     """
 
     acsvars = process_columns(_variables['acs'].dropna())

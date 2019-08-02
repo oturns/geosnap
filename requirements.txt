@@ -14,5 +14,9 @@ giddy
 xlrd
 cenpy
 appdirs
+palettable
+dash
+dash-bootstrap-components
 quilt3
+tqdm
 git://github.com/pysal/region.git@master#egg=region
