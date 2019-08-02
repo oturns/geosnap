@@ -4,11 +4,7 @@ import pandas
 import sys
 from tqdm.auto import tqdm
 from geosnap.data import data_store
-from quilt.data.spatialucr.census import states
 from cenpy import products
-
-_variables = data_store.codebook.copy()
-
 
 def fetch_acs(level='tract', state='all', year=2017):
     """Collect the variables defined in `geosnap.data.dictionary` from the Census API.
@@ -35,6 +31,9 @@ def fetch_acs(level='tract', state='all', year=2017):
     >>> dc = fetch_acs('District of Columbia', year=2015)
 
     """
+    states = data_store.states()
+
+    _variables = data_store.codebook.copy()
 
     acsvars = process_columns(_variables['acs'].dropna())
 
