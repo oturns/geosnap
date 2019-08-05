@@ -4,4 +4,5 @@ nose-exclude
 coverage
 coveralls
 matplotlib
+pytest
 pytest-mpl

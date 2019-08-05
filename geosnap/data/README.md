@@ -30,16 +30,16 @@ To import LTDB data into geosnap, proceed with the following:
     - `LTDB_Std_All_Sample.zip` and
     - `LTDB_Std_All_fullcount.zip`
 
-3. Start ipython/jupyter, import geosnap, and call the `read_ltdb` function with the paths of the two zip archives you downloaded from the LTDB project page:
+3. Start ipython/jupyter, import geosnap, and call the `store_ltdb` function with the paths of the two zip archives you downloaded from the LTDB project page:
 
 ```python
-from geosnap.data import read_ltdb
+from geosnap.data import store_ltdb
 
 # if the archives were in my downloads folder, the paths might be something like this
 sample = "~/downloads/LTDB_Std_All_Sample.zip"
 full = "~/downlodas/LTDB_Std_All_fullcount.zip"
 
-read_ltdb(sample=sample, fullcount=full)
+store_ltdb(sample=sample, fullcount=full)
 
 ```
 
@@ -62,14 +62,14 @@ The reader will extract the necessary data from the archives, calculate some add
 
 6. Note the name and location of the CSV you created
 
-7. Start ipython/jupyter, import geosnap, and call the `read_ncdb` function with the path of the CSV:
+7. Start ipython/jupyter, import geosnap, and call the `store_ncdb` function with the path of the CSV:
 
 ```python
-from geosnap.data import read_ncdb
+from geosnap.data import store_ncdb
 
 ncdb = "geolytics_full.csv"
 
-read_ncdb(ncdb)
+store_ncdb(ncdb)
 ```
 
 

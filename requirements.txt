@@ -1,3 +1,4 @@
+numpy
 pandas
 cython
 geopandas
@@ -5,12 +6,17 @@ hdbscan
 matplotlib
 scikit-learn
 seaborn
-pyarrow
+pyarrow==0.13
 libpysal
 mapclassify
 spenc
 giddy
 xlrd
 cenpy
-quilt
-region @ git+https://github.com/pysal/region@master#egg=region
+appdirs
+palettable
+dash
+dash-bootstrap-components
+quilt3
+tqdm
+git://github.com/pysal/region.git@master#egg=region

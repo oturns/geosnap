@@ -1,23 +1,28 @@
 import context
 import os
+from context import data
 
-path = os.environ['DLPATH']
-read_ltdb = context.data.read_ltdb
-read_ncdb = context.data.read_ncdb
-
-
-def test_read_ltdb():
-
-    read_ltdb(
-        sample=path+"/ltdb_sample.zip",
-        fullcount=path+"/ltdb_full.zip",
-    )
-    from quilt.data.geosnap_data import data_store
-    assert data_store.ltdb().shape == (330388, 192)
+path = os.environ["DLPATH"]
+store_ltdb = context.data.store_ltdb
+store_ncdb = context.data.store_ncdb
 
 
-def test_read_ncdb():
+def test_store_ltdb():
 
-    read_ncdb(path+"/ncdb.csv")
-    from quilt.data.geosnap_data import data_store
-    assert data_store.ncdb().shape == (328633, 77)
+    store_ltdb(sample=path + "/ltdb_sample.zip", fullcount=path + "/ltdb_full.zip")
+    assert data.data_store.ltdb.shape == (330388, 192)
+
+
+def test_store_ncdb():
+
+    store_ncdb(path + "/ncdb.csv")
+    assert data.data_store.ncdb.shape == (328633, 77)
+
+
+def test_get_lehd():
+
+    wac = data.get_lehd()
+    rac = data.get_lehd("rac")
+
+    assert wac.shape == (3074, 52)
+    assert rac.shape == (4382, 42)

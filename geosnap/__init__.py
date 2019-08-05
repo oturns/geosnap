@@ -1,4 +1,3 @@
-
 r"""
 
 geosnap: Geospatial Neighborhood Analysis Package.
@@ -26,9 +25,7 @@ __version__ = "0.0.2"
 
 # __version__ has to be define in the first line
 
-
-
 from . import analyze
 from . import data
 from . import util
-from .data import metros
+from . import visualize
