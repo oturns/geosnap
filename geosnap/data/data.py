@@ -10,7 +10,6 @@ from shapely import wkb, wkt
 import geopandas as gpd
 import multiprocessing
 import sys
-import importlib
 import pathlib
 
 sys.path.insert(0,
@@ -30,16 +29,14 @@ data_dir = user_data_dir(appname, appauthor)
 if not os.path.exists(data_dir):
     pathlib.Path(data_dir).mkdir(parents=True, exist_ok=True)
 
-# get census data from spatialucr quilt account
-try:  # if any of these aren't found, the user needs to refresh the quilt data package
+try:  # if any of these aren't found, stream them insteead
     from quilt3.data.census import tracts_cartographic, administrative
 except ImportError:
-    warn("Unable to locate quilt data. Rebuilding\n"
-         "You will need to restart your python kernel before you can access "
-         "the data store")
-    quilt3.Package.install("census/tracts_cartographic", "s3://quilt-cgs")
-    quilt3.Package.install("census/administrative", "s3://quilt-cgs")
-
+    warn("Unable to locate local census data. Streaming instead.\n"
+         "If you plan to use census data repeatedly you can store it locally"
+         "with the data.store_census function for better performance")
+    tracts_cartographic = quilt3.Package.browse("census/tracts_cartographic", "s3://quilt-cgs")
+    administrative = quilt3.Package.browse("census/administrative", "s3://quilt-cgs")
 
 def _deserialize_wkb(str):
     return wkb.loads(str, hex=True)
@@ -320,6 +317,18 @@ class DataStore(object):
 
 data_store = DataStore()
 
+def store_census():
+    """Save census data to the local quilt package storage.
+
+    Returns
+    -------
+    None
+        Data will be available in the geosnap.data.data_store and will be used
+        in place of streaming data for all census queries.
+
+    """
+    quilt3.Package.install("census/tracts_cartographic", "s3://quilt-cgs")
+    quilt3.Package.install("census/administrative", "s3://quilt-cgs")
 
 def store_ltdb(sample, fullcount):
     """
