@@ -1,7 +1,0 @@
-ltdb/*
-geolytics/*
-__pycache__/*
-ltdb.parquet.gzip
-ncdb.parquet.gzip
-ltdb.parquet
-ncdb.parquet
