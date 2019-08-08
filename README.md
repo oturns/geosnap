@@ -31,7 +31,7 @@ neighborhood change using classic and spatial statistical methods.
 It also provides a set of static and interactive visualization tools to help you display
 and understand the critical information at each step of the process.
 
-<span style="font-size:1.2em; font-weight: bold">Batteries Included:</span>
+**Batteries Included:**
 `geosnap` comes packed with 30 years of census data, thanks to [quilt](https://quiltdata.com/), so you
 can get started modeling neighborhoods in the U.S. immediately.
 But you’re not just limited to the data provided with the package. `geosnap`
