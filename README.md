@@ -1,7 +1,8 @@
 <h1 align="center"><code>geosnap</code></h1>
-<img height=100 style="  display: block; margin-left: auto; margin-right: auto;" src="doc/geosnap.png" alt="geosnap"/>
-
-<h2 align="center">The GeoSpatial Neighborhood Analysis Package</h2> 
+<p align="center">
+<img height=100  src="doc/geosnap.png" alt="geosnap"/>
+</p>
+<h2 align="center" style="margin-top:-10px">The GeoSpatial Neighborhood Analysis Package</h2> 
 
 [![Build Status](https://travis-ci.com/spatialucr/geosnap.svg?branch=master)](https://travis-ci.com/spatialucr/geosnap)
 [![Coverage Status](https://coveralls.io/repos/github/spatialucr/geosnap/badge.svg?branch=master)](https://coveralls.io/github/spatialucr/geosnap?branch=master&service=github)
@@ -36,7 +37,9 @@ can get started modeling neighborhoods in the U.S. immediately.
 But you’re not just limited to the data provided with the package. `geosnap`
 works with any data you provide, any place in the world.
 
+<p align="center">
 <img width=75% src='doc/figs/Washington-Arlington-Alexandria_DC-VA-MD-WV.gif' alt='DC Transitions' style=' display: block; margin-left: auto; margin-right: auto;'/>
+</p>
 
 ## Quickstart
 
@@ -234,8 +237,9 @@ classic clustering methods on the `Community`
 dc.cluster(method='kmeans', n_clusters=6, columns=['p_unemployment_rate', 'per_capita_income'] )
 dc.gdf[dc.gdf.year==2000].plot(column='kmeans')
 ```
-
-<img height=250 src="doc/figs/output_6_1.png" style=' display: block; margin-left: auto; margin-right: auto;'/>
+<p align="center">
+<img height=250 src="doc/figs/output_6_1.png"/>
+</p>
 
 you can create a
 [regionalization](https://www.sciencedirect.com/science/article/pii/0038012181900409) using
@@ -245,8 +249,9 @@ spatially-constrained clustering methods on the `Community`
 dc.cluster_spatial(method='spenc', n_clusters=6, columns=['p_unemployment_rate', 'per_capita_income'] )
 dc.gdf[dc.gdf.year==2000].plot('spenc')
 ```
-
-<img height=250 src="doc/figs/output_9_1.png" style=' display: block; margin-left: auto; margin-right: auto;'/>
+<p align="center">
+<img height=250 src="doc/figs/output_9_1.png"/>
+</p>
 
 You can also [harmonize](https://github.com/spatialucr/tobler) `Community` boundaries so that they’re
 consistent over time
