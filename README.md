@@ -1,7 +1,7 @@
 <h1 align="center"><code>geosnap</code></h1>
-<img style="  display: block; margin-left: auto; margin-right: auto;width: 200px;" src="doc/geosnap.png" alt="geosnap"/>
+<img style="  display: block; margin-left: auto; margin-right: auto;width: 250px" src="doc/geosnap.png" alt="geosnap"/>
 
-<h2 style="text-align: center;">The GeoSpatial Neighborhood Analysis Package</h2>
+<h2 align="center">The GeoSpatial Neighborhood Analysis Package</h2>
 <hr>
 
 [![Build Status](https://travis-ci.com/spatialucr/geosnap.svg?branch=master)](https://travis-ci.com/spatialucr/geosnap)
@@ -236,7 +236,7 @@ dc.cluster(method='kmeans', n_clusters=6, columns=['p_unemployment_rate', 'per_c
 dc.gdf[dc.gdf.year==2000].plot(column='kmeans')
 ```
 
-![png](doc/figs/output_6_1.png)
+<img src="doc/figs/output_6_1.png" style=' display: block; margin-left: auto; margin-right: auto;width:350px'/>
 
 you can create a
 [regionalization](https://www.sciencedirect.com/science/article/pii/0038012181900409) using
@@ -247,7 +247,7 @@ dc.cluster_spatial(method='spenc', n_clusters=6, columns=['p_unemployment_rate',
 dc.gdf[dc.gdf.year==2000].plot('spenc')
 ```
 
-![png](doc/figs/output_9_1.png)
+<img src="doc/figs/output_9_1.png" style=' display: block; margin-left: auto; margin-right: auto;width:350px'/>
 
 You can also [harmonize](https://github.com/spatialucr/tobler) `Community` boundaries so that they’re
 consistent over time
@@ -310,5 +310,5 @@ conditions for usage, and a DISCLAIMER OF ALL WARRANTIES.
 
 ## Funding
 
-<img src="../doc/nsf_logo.jpg" width=100 /> This project is supported by NSF Award #1733705,
+<img src="doc/nsf_logo.jpg" width=100 /> This project is supported by NSF Award #1733705,
 [Neighborhoods in Space-Time Contexts](https://www.nsf.gov/awardsearch/showAward?AWD_ID=1733705&HistoricalAwards=false)
