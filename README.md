@@ -1,5 +1,5 @@
-<h1 style="text-align: center; float: center;"><code>geosnap</code></h1>
-<img style="display: block;   margin: auto; text-align: center; float: center; width: 200px;" src="doc/geosnap.png" alt="geosnap"/>
+<h1 align="center"><code>geosnap</code></h1>
+<img style="  display: block; margin-left: auto; margin-right: auto;width: 200px;" src="doc/geosnap.png" alt="geosnap"/>
 
 <h2 style="text-align: center;">The GeoSpatial Neighborhood Analysis Package</h2>
 <hr>
@@ -37,7 +37,7 @@ can get started modeling neighborhoods in the U.S. immediately.
 But you’re not just limited to the data provided with the package. `geosnap`
 works with any data you provide, any place in the world.
 
-<img src='doc/figs/Washington-Arlington-Alexandria_DC-VA-MD-WV.gif' alt='DC Transitions' width='750'/>
+<img src='doc/figs/Washington-Arlington-Alexandria_DC-VA-MD-WV.gif' alt='DC Transitions' style=' display: block; margin-left: auto; margin-right: auto;width:750px'/>
 
 ## Quickstart
 
@@ -63,18 +63,17 @@ dc.gdf.head()
 
 <div>
 <style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
+.dataframe tbody tr th:only-of-type {
+    vertical-align: middle;
+}
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
+.dataframe tbody tr th {
+    vertical-align: top;
+}
 
-    .dataframe thead th {
-        text-align: right;
-    }
-
+.dataframe thead th {
+    text-align: right;
+}
 </style>
 <table border="1" class="dataframe">
   <thead>
