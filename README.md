@@ -1,5 +1,5 @@
 <h1 align="center"><code>geosnap</code></h1>
-<img style="  display: block; margin-left: auto; margin-right: auto;width: 250px" src="doc/geosnap.png" alt="geosnap"/>
+<img style="  display: block; margin-left: auto; margin-right: auto;width: 150px" src="doc/geosnap.png" alt="geosnap"/>
 
 <h2 align="center">The GeoSpatial Neighborhood Analysis Package</h2>
 <hr>
@@ -37,7 +37,7 @@ can get started modeling neighborhoods in the U.S. immediately.
 But you’re not just limited to the data provided with the package. `geosnap`
 works with any data you provide, any place in the world.
 
-<img src='doc/figs/Washington-Arlington-Alexandria_DC-VA-MD-WV.gif' alt='DC Transitions' style=' display: block; margin-left: auto; margin-right: auto;width:750px'/>
+<img src='doc/figs/Washington-Arlington-Alexandria_DC-VA-MD-WV.gif' alt='DC Transitions' style=' display: block; margin-left: auto; margin-right: auto;width:75%'/>
 
 ## Quickstart
 
@@ -236,7 +236,7 @@ dc.cluster(method='kmeans', n_clusters=6, columns=['p_unemployment_rate', 'per_c
 dc.gdf[dc.gdf.year==2000].plot(column='kmeans')
 ```
 
-<img src="doc/figs/output_6_1.png" style=' display: block; margin-left: auto; margin-right: auto;width:350px'/>
+<img src="doc/figs/output_6_1.png" style=' display: block; margin-left: auto; margin-right: auto;width:30%'/>
 
 you can create a
 [regionalization](https://www.sciencedirect.com/science/article/pii/0038012181900409) using
@@ -247,7 +247,7 @@ dc.cluster_spatial(method='spenc', n_clusters=6, columns=['p_unemployment_rate',
 dc.gdf[dc.gdf.year==2000].plot('spenc')
 ```
 
-<img src="doc/figs/output_9_1.png" style=' display: block; margin-left: auto; margin-right: auto;width:350px'/>
+<img src="doc/figs/output_9_1.png" style=' display: block; margin-left: auto; margin-right: auto;width:30%'/>
 
 You can also [harmonize](https://github.com/spatialucr/tobler) `Community` boundaries so that they’re
 consistent over time
