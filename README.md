@@ -1,7 +1,7 @@
 <h1 align="center"><code>geosnap</code></h1>
-<img style="  display: block; margin-left: auto; margin-right: auto;width: 20%" src="doc/geosnap.png" alt="geosnap"/>
+<img style="  display: block; margin-left: auto; margin-right: auto; max-height: 100px;" src="doc/geosnap.png" alt="geosnap"/>
 
-<h2 align="center">The GeoSpatial Neighborhood Analysis Package</h2>
+<h2 align="center">The GeoSpatial Neighborhood Analysis Package</h2> 
 
 [![Build Status](https://travis-ci.com/spatialucr/geosnap.svg?branch=master)](https://travis-ci.com/spatialucr/geosnap)
 [![Coverage Status](https://coveralls.io/repos/github/spatialucr/geosnap/badge.svg?branch=master)](https://coveralls.io/github/spatialucr/geosnap?branch=master&service=github)
@@ -235,7 +235,7 @@ dc.cluster(method='kmeans', n_clusters=6, columns=['p_unemployment_rate', 'per_c
 dc.gdf[dc.gdf.year==2000].plot(column='kmeans')
 ```
 
-<img src="doc/figs/output_6_1.png" style=' display: block; margin-left: auto; margin-right: auto;width:20%'/>
+<img src="doc/figs/output_6_1.png" style=' display: block; margin-left: auto; margin-right: auto;max-height: 250px;'/>
 
 you can create a
 [regionalization](https://www.sciencedirect.com/science/article/pii/0038012181900409) using
@@ -246,7 +246,7 @@ dc.cluster_spatial(method='spenc', n_clusters=6, columns=['p_unemployment_rate',
 dc.gdf[dc.gdf.year==2000].plot('spenc')
 ```
 
-<img src="doc/figs/output_9_1.png" style=' display: block; margin-left: auto; margin-right: auto;width:20%'/>
+<img src="doc/figs/output_9_1.png" style=' display: block; margin-left: auto; margin-right: auto;max-height: 250px;'/>
 
 You can also [harmonize](https://github.com/spatialucr/tobler) `Community` boundaries so that they’re
 consistent over time
