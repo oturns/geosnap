@@ -22,15 +22,15 @@ from .cluster import (
 
 
 def cluster(
-        gdf,
-        n_clusters=6,
-        method=None,
-        best_model=False,
-        columns=None,
-        verbose=False,
-        time_var="year",
-        id_var="geoid",
-        **kwargs,
+    gdf,
+    n_clusters=6,
+    method=None,
+    best_model=False,
+    columns=None,
+    verbose=False,
+    time_var="year",
+    id_var="geoid",
+    **kwargs,
 ):
     """Create a geodemographic typology by running a cluster analysis on the
        study area's neighborhood attributes
@@ -71,7 +71,8 @@ def cluster(
     opset = gdf.copy()
     opset = opset[allcols]
     opset[columns] = opset.groupby(time_var)[columns].apply(
-        lambda x: (x - x.mean()) / x.std(ddof=0))
+        lambda x: (x - x.mean()) / x.std(ddof=0)
+    )
     # option to autoscale the data w/ mix-max or zscore?
     specification = {
         "ward": ward,
@@ -89,11 +90,9 @@ def cluster(
         **kwargs,
     )
     labels = model.labels_.astype(str)
-    clusters = pd.DataFrame({
-        method: labels,
-        time_var: gdf[time_var].astype(str),
-        id_var: gdf[id_var]
-    })
+    clusters = pd.DataFrame(
+        {method: labels, time_var: gdf[time_var].astype(str), id_var: gdf[id_var]}
+    )
     clusters["key"] = clusters[id_var] + clusters[time_var]
     clusters = clusters.drop(columns=time_var)
     gdf["key"] = gdf[id_var] + gdf[time_var].astype(str)
@@ -104,17 +103,17 @@ def cluster(
 
 
 def cluster_spatial(
-        gdf,
-        n_clusters=6,
-        weights_type="rook",
-        method=None,
-        best_model=False,
-        columns=None,
-        threshold_variable="count",
-        threshold=10,
-        time_var="year",
-        id_var="geoid",
-        **kwargs,
+    gdf,
+    n_clusters=6,
+    weights_type="rook",
+    method=None,
+    best_model=False,
+    columns=None,
+    threshold_variable="count",
+    threshold=10,
+    time_var="year",
+    id_var="geoid",
+    **kwargs,
 ):
     """Create a *spatial* geodemographic typology by running a cluster
     analysis on the metro area's neighborhood attributes and including a
@@ -165,7 +164,8 @@ def cluster_spatial(
         data = gdf[allcols].copy()
         data = data.dropna(how="any")
         data[columns] = data.groupby(time_var)[columns].apply(
-            lambda x: (x - x.mean()) / x.std(ddof=0))
+            lambda x: (x - x.mean()) / x.std(ddof=0)
+        )
 
     elif threshold_variable is not None:
         threshold_var = data[threshold_variable]
@@ -173,20 +173,22 @@ def cluster_spatial(
         data = gdf[allcols].copy()
         data = data.dropna(how="any")
         data[columns] = data.groupby(time_var)[columns].apply(
-            lambda x: (x - x.mean()) / x.std(ddof=0))
+            lambda x: (x - x.mean()) / x.std(ddof=0)
+        )
 
     else:
         allcols = columns + cols
         data = gdf[allcols].copy()
         data = data.dropna(how="any")
         data[columns] = data.groupby(time_var)[columns].apply(
-            lambda x: (x - x.mean()) / x.std(ddof=0))
+            lambda x: (x - x.mean()) / x.std(ddof=0)
+        )
 
     def _build_data(data, time, weights_type):
-        df = data.loc[data[time_var] == time].copy().dropna(how="any")
+        df = data[data[time_var] == time].dropna(how="any")
         weights = {"queen": Queen, "rook": Rook}
-        w = weights[weights_type].from_dataframe(df, idVariable=id_var)
-        knnw = KNN.from_dataframe(df, k=1, ids=df[id_var].tolist())
+        w = weights[weights_type].from_dataframe(df)
+        knnw = KNN.from_dataframe(df, k=1)
 
         return df, w, knnw
 
@@ -213,8 +215,7 @@ def cluster_spatial(
             val[1] = attach_islands(val[1], val[2])
 
         elif threshold_variable:
-            threshold_var = threshold_var[threshold.index.isin(
-                val[0][id_var])].values
+            threshold_var = threshold_var[threshold.index.isin(val[0][id_var])].values
             try:
                 val[1] = attach_islands(val[1], val[2])
             except:
@@ -230,11 +231,9 @@ def cluster_spatial(
             **kwargs,
         )
         labels = model.labels_.astype(str)
-        labels = pd.DataFrame({
-            method: labels,
-            time_var: val[0][time_var],
-            id_var: val[0][id_var]
-        })
+        labels = pd.DataFrame(
+            {method: labels, time_var: val[0][time_var], id_var: val[0][id_var]}
+        )
         clusters.append(labels)
 
     clusters = pd.concat(clusters)
