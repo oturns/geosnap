@@ -15,6 +15,7 @@ import pathlib
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from analyze import cluster as _cluster, cluster_spatial as _cluster_spatial
+from harmonize import harmonize as _harmonize
 
 # look for local storage and create if missing
 try:
@@ -767,6 +768,79 @@ class Community(object):
         self.gdf = gdf
         if harmonized:
             self.harmonized = True
+
+    def harmonize(
+        self,
+        target_year_of_reference,
+        weights_method="area",
+        extensive_variables=[],
+        intensive_variables=[],
+        allocate_total=True,
+        raster_path=None,
+        codes=[21, 22, 23, 24],
+        force_crs_match=True,
+    ):
+        """Short summary.
+
+        Parameters
+        ----------
+        target_year: int
+            Polygons from this year will become the target boundaries for
+            spatial interpolation.
+        weights_method : string
+            The method that the harmonization will be conducted. This can be
+            set to:
+                "area"                          : harmonization according to
+                                                  area weights.
+                "land_type_area"                : harmonization according to
+                                                  the Land Types considered
+                                                  'populated' areas.
+                "land_type_Poisson_regression"  : NOT YET INTRODUCED.
+                "land_type_Gaussian_regression" : NOT YET INTRODUCED.
+        extensive_variables : list
+            extensive variables to be used in interpolation.
+        intensive_variables : type
+            intensive variables to be used in interpolation.
+        allocate_total : boolean
+            True if total value of source area should be allocated.
+            False if denominator is area of i. Note that the two cases
+            would be identical when the area of the source polygon is
+            exhausted by intersections. See (3) in Notes for more details
+        raster_path : str
+            path to the raster image that has the types of each pixel in the
+            spatial context. Only taken into consideration for harmonization
+            raster based.
+        codes : list
+            pixel values that should be included in the regression (the default is [21, 22, 23, 24]).
+        force_crs_match : bool
+            whether source and target dataframes should be reprojected to match (the default is True).
+
+        Returns
+        -------
+        None
+            New data are added to the input Community
+
+        Examples
+        -------
+        Examples should be written in doctest format, and
+        should illustrate how to use the function/class.
+        >>>
+
+        """
+        # convert the long-form into a list of dataframes
+        data = [x[1] for x in self.gdf.groupby("year")]
+
+        self.gdf = _harmonize(
+            data,
+            target_year_of_reference,
+            weights_method=weights_method,
+            extensive_variables=extensive_variables,
+            intensive_variables=intensive_variables,
+            allocate_total=allocate_total,
+            raster_path=raster_path,
+            codes=codes,
+            force_crs_match=force_crs_match,
+        )
 
     def cluster(
         self,
