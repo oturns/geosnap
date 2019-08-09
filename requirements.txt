@@ -18,4 +18,5 @@ palettable
 dash
 dash-bootstrap-components
 tqdm
+hdbscan
 git://github.com/spatialucr/tobler.git@master#egg=tobler
