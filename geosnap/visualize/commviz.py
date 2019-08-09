@@ -1,11 +1,11 @@
 from mapclassify import *
 
-mem = {}
-mem["last_metro"] = ""
-mem["last_comm"] = ""
-
 
 def explore(data="census"):
+    mem = {}
+    mem["last_metro"] = ""
+    mem["last_comm"] = ""
+
     import dash
     import dash_core_components as dcc
     import dash_html_components as html
