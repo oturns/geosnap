@@ -42,7 +42,12 @@ except ImportError:
     storage = quilt3.Package()
 
 try:  # if any of these aren't found, stream them insteead
-    from quilt3.data.census import tracts_cartographic, administrative, blocks_2010
+    from quilt3.data.census import (
+        tracts_cartographic,
+        administrative,
+        blocks_2010,
+        blocks_2000,
+    )
 except ImportError:
     warn(
         "Unable to locate local census data. Streaming instead.\n"
@@ -57,6 +62,7 @@ except ImportError:
             "census/administrative", "s3://quilt-cgs"
         )
         blocks_2010 = quilt3.Package.browse("census/blocks_2010", "s3://quilt-cgs")
+        blocks_2000 = quilt3.Package.browse("census/blocks_2000", "s3://quilt-cgs")
 
     except Timeout:
         warn(
@@ -71,8 +77,40 @@ class DataStore(object):
     def __init__(self):
         """Instantiate a new DataStore object."""
 
+    def blocks_2000(self, states=None, convert=True):
+        """Census blocks for 2000.
+
+        Parameters
+        ----------
+        states : list-like
+            list of state fips codes to return as a datafrrame.
+        convert : bool
+        if True, return geodataframe, else return dataframe (the default is True).
+
+        Returns
+        -------
+        type
+        pandas.DataFrame or geopandas.GeoDataFrame.
+            2000 blocks as a geodataframe or as a dataframe with geometry
+            stored as well-known binary on the 'wkb' column.
+
+        """
+        if isinstance(states, (str,)):
+            states = [states]
+        if isinstance(states, (int,)):
+            states = [states]
+        blks = {}
+        for state in states:
+            blks[state] = blocks_2000["{state}.parquet".format(state=state)]()
+            blks[state]["year"] = 2000
+        blocks = list(blks.values())
+        blocks = pd.concat(blocks, sort=True)
+        if convert:
+            return convert_gdf(blocks)
+        return blocks
+
     def blocks_2010(self, states=None, convert=True):
-        """Census blocks for 2010.
+        """Census blocks for 2000.
 
         Parameters
         ----------
@@ -128,6 +166,7 @@ class DataStore(object):
     def __dir__(self):
 
         atts = [
+            "blocks_2000",
             "blocks_2010",
             "codebook",
             "counties",
@@ -1159,6 +1198,9 @@ class Community(object):
             Community with LODES data
 
         """
+        if isinstance(years, (str, int)):
+            years = [years]
+
         msa_states = []
         if msa_fips:
             msa_states += data_store.msa_definitions[
@@ -1174,6 +1216,9 @@ class Community(object):
         states = np.unique(allfips)
         # states = np.unique([i[:2] for i in allfips])
 
+        if any(years) < 2010:
+            gdf00 = data_store.blocks_2000(states=states)
+            gdf00 = gdf00.drop(columns=["year"])
         gdf = data_store.blocks_2010(states=states)
         gdf = gdf.drop(columns=["year"])
 
@@ -1187,14 +1232,16 @@ class Community(object):
         dfs = []
         if isinstance(names, str):
             names = [names]
-        if isinstance(years, (str, int)):
-            years = [years]
         for name in names:
             for year in years:
                 df = get_lehd(dataset=dataset, year=year, state=name)
                 df["year"] = year
+                if year < 2010:
+                    df = gdf00.merge(df, on="geoid", how="left")
+                else:
+                    df = gdf.merge(df, on="geoid", how="left")
                 dfs.append(df)
-        gdf = gdf.merge(pd.concat(dfs), on="geoid", how="right")
+        gdf = pd.concat(dfs)
 
         if isinstance(boundary, gpd.GeoDataFrame):
             if boundary.crs != gdf.crs:
