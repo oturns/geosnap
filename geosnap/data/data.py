@@ -7,6 +7,7 @@ from appdirs import user_data_dir
 import pandas as pd
 import quilt3
 import geopandas as gpd
+import numpy as np
 import sys
 import pathlib
 from requests.exceptions import Timeout
@@ -15,7 +16,12 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 
 from analyze import cluster as _cluster, cluster_spatial as _cluster_spatial
 from harmonize import harmonize as _harmonize
-from .util import adjust_inflation, convert_gdf
+from .util import adjust_inflation, convert_gdf, get_lehd
+
+_fipstable = pd.read_csv(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "stfipstable.csv"),
+    converters={"FIPS Code": str},
+)
 
 appname = "geosnap"
 appauthor = "geosnap"
@@ -36,11 +42,11 @@ except ImportError:
     storage = quilt3.Package()
 
 try:  # if any of these aren't found, stream them insteead
-    from quilt3.data.census import tracts_cartographic, administrative
+    from quilt3.data.census import tracts_cartographic, administrative, blocks_2010
 except ImportError:
     warn(
         "Unable to locate local census data. Streaming instead.\n"
-        "If you plan to use census data repeatedly you can store it locally"
+        "If you plan to use census data repeatedly you can store it locally "
         "with the data.store_census function for better performance"
     )
     try:
@@ -50,6 +56,8 @@ except ImportError:
         administrative = quilt3.Package.browse(
             "census/administrative", "s3://quilt-cgs"
         )
+        blocks_2010 = quilt3.Package.browse("census/blocks_2010", "s3://quilt-cgs")
+
     except Timeout:
         warn(
             "Unable to locate local census data and unable to reach s3 bucket."
@@ -61,9 +69,39 @@ class DataStore(object):
     """Storage for geosnap data. Currently supports US Census data."""
 
     def __init__(self):
-        """Instantiate a new DataStore object
+        """Instantiate a new DataStore object."""
+
+    def blocks_2010(self, states=None, convert=True):
+        """Census blocks for 2010.
+
+        Parameters
+        ----------
+        states : list-like
+            list of state fips codes to return as a datafrrame.
+        convert : bool
+        if True, return geodataframe, else return dataframe (the default is True).
+
+        Returns
+        -------
+        type
+        pandas.DataFrame or geopandas.GeoDataFrame.
+            2010 blocks as a geodataframe or as a dataframe with geometry
+            stored as well-known binary on the 'wkb' column.
+
         """
-        self
+        if isinstance(states, (str,)):
+            states = [states]
+        if isinstance(states, (int,)):
+            states = [states]
+        blks = {}
+        for state in states:
+            blks[state] = blocks_2010["{state}.parquet".format(state=state)]()
+            blks[state]["year"] = 2010
+        blocks = list(blks.values())
+        blocks = pd.concat(blocks, sort=True)
+        if convert:
+            return convert_gdf(blocks)
+        return blocks
 
     def tracts_1990(self, convert=True):
         """Nationwide Census Tracts as drawn in 1990 (cartographic 500k).
@@ -90,6 +128,7 @@ class DataStore(object):
     def __dir__(self):
 
         atts = [
+            "blocks_2010",
             "codebook",
             "counties",
             "ltdb",
@@ -1035,14 +1074,14 @@ class Community(object):
         """
 
         df_dict = {
-            1990: data_store.tracts_1990(),
-            2000: data_store.tracts_2000(),
-            2010: data_store.tracts_2010(),
+            1990: data_store.tracts_1990,
+            2000: data_store.tracts_2000,
+            2010: data_store.tracts_2010,
         }
 
         tracts = []
         for year in years:
-            tracts.append(df_dict[year])
+            tracts.append(df_dict[year]())
         tracts = pd.concat(tracts, sort=True)
 
         if isinstance(boundary, gpd.GeoDataFrame):
@@ -1051,7 +1090,9 @@ class Community(object):
                     "Unable to determine whether boundary CRS is WGS84 "
                     "if this produces unexpected results, try reprojecting"
                 )
-            gdf = tracts[tracts.representative_point().intersects(boundary.unary_union)]
+            tracts = tracts[
+                tracts.representative_point().intersects(boundary.unary_union)
+            ]
 
         else:
 
@@ -1061,6 +1102,105 @@ class Community(object):
                 msa_fips=msa_fips,
                 fips=fips,
                 data=tracts,
+            )
+
+        return cls(gdf=gdf, harmonized=False)
+
+    @classmethod
+    def from_lodes(
+        cls,
+        state_fips=None,
+        county_fips=None,
+        msa_fips=None,
+        fips=None,
+        boundary=None,
+        years=2015,
+        dataset="wac",
+    ):
+        """Create a new Community from Census LEHD/LODES data.
+
+           Instiantiate a new Community from LODES data.
+           Pass lists of states, counties, or any
+           arbitrary FIPS codes to create a community. All fips code arguments
+           are additive, so geosnap will include the largest unique set.
+           Alternatively, you may provide a boundary to use as a clipping
+           feature.
+
+        Parameters
+        ----------
+        state_fips : list or str
+            string or list of strings of two-digit fips codes defining states
+            to include in the study area.
+        county_fips : list or str
+            string or list of strings of five-digit fips codes defining
+            counties to include in the study area.
+        msa_fips : type
+            string or list of strings of fips codes defining
+            MSAs to include in the study area.
+        fips : type
+            string or list of strings of five-digit fips codes defining
+            counties to include in the study area.
+        boundary: geopandas.GeoDataFrame
+            geodataframe that defines the total extent of the study area.
+            This will be used to clip tracts lazily by selecting all
+            `GeoDataFrame.representative_point()`s that intersect the
+            boundary gdf
+        years : list
+            list of years to include in the study data
+            (the default is [1990, 2000, 2010]).
+
+        Returns
+        -------
+        Community
+            Community with LODES data
+
+        """
+        # build a list of states in the dataset
+        allfips = []
+        for i in [state_fips, county_fips, fips]:
+            if i:
+                allfips.append(i[:2])
+        states = np.unique(allfips)
+        # states = np.unique([i[:2] for i in allfips])
+
+        gdf = data_store.blocks_2010(states=states)
+        gdf = gdf.drop(columns=["year"])
+
+        # grab state abbreviations
+        names = (
+            _fipstable[_fipstable["FIPS Code"].isin(states)]["State Abbreviation"]
+            .str.lower()
+            .tolist()
+        )
+
+        dfs = []
+        if isinstance(names, str):
+            names = [names]
+        if isinstance(years, (str, int)):
+            years = [years]
+        for name in names:
+            for year in years:
+                df = get_lehd(dataset=dataset, year=year, state=name)
+                df["year"] = year
+                dfs.append(df)
+        gdf = gdf.merge(pd.concat(dfs), on="geoid", how="right")
+
+        if isinstance(boundary, gpd.GeoDataFrame):
+            if boundary.crs != gdf.crs:
+                warn(
+                    "Unable to determine whether boundary CRS is WGS84 "
+                    "if this produces unexpected results, try reprojecting"
+                )
+            gdf = gdf[gdf.representative_point().intersects(boundary.unary_union)]
+
+        else:
+
+            gdf = _fips_filter(
+                state_fips=state_fips,
+                county_fips=county_fips,
+                msa_fips=msa_fips,
+                fips=fips,
+                data=gdf,
             )
 
         return cls(gdf=gdf, harmonized=False)
