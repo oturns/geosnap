@@ -2,6 +2,8 @@ import pandas as pd
 import multiprocessing
 from shapely import wkb, wkt
 import geopandas as gpd
+from urllib.error import HTTPError
+import os
 
 
 def _deserialize_wkb(str):
@@ -72,12 +74,24 @@ def get_lehd(dataset="wac", state="dc", year=2015):
         the block FIPS code.
 
     """
+    lodes_vars = pd.read_csv(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "lodes.csv")
+    )
+    renamer = dict(zip(lodes_vars["variable"].tolist(), lodes_vars["name"].tolist()))
+
     state = state.lower()
     url = "https://lehd.ces.census.gov/data/lodes/LODES7/{state}/{dataset}/{state}_{dataset}_S000_JT00_{year}.csv.gz".format(
         dataset=dataset, state=state, year=year
     )
-    df = pd.read_csv(url, converters={"w_geocode": str, "h_geocode": str})
+    try:
+        df = pd.read_csv(url, converters={"w_geocode": str, "h_geocode": str})
+    except HTTPError:
+        raise ValueError(
+            "Unable to retrieve LEHD data. Check your internet connection "
+            "and that the state/year combination you specified is available"
+        )
     df = df.rename({"w_geocode": "geoid", "h_geocode": "geoid"}, axis=1)
+    df.rename(renamer, axis="columns", inplace=True)
     df = df.set_index("geoid")
 
     return df

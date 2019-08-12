@@ -8,9 +8,7 @@ dependencies:
   - libpysal
   - spenc
   - cenpy
-  - cython
   - geopandas
-  - hdbscan
   - matplotlib
   - scikit-learn
   - seaborn
