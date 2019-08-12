@@ -1074,15 +1074,15 @@ class Community(object):
         """
 
         df_dict = {
-            1990: data_store.tracts_1990,
-            2000: data_store.tracts_2000,
-            2010: data_store.tracts_2010,
+            1990: data_store.tracts_1990(),
+            2000: data_store.tracts_2000(),
+            2010: data_store.tracts_2010(),
         }
 
         tracts = []
         for year in years:
-            tracts.append(df_dict[year]())
-        tracts = pd.concat(tracts, sort=True)
+            tracts.append(df_dict[year])
+        tracts = pd.concat(tracts, sort=False)
 
         if isinstance(boundary, gpd.GeoDataFrame):
             if boundary.crs != tracts.crs:
@@ -1148,6 +1148,10 @@ class Community(object):
         years : list
             list of years to include in the study data
             (the default is [1990, 2000, 2010]).
+        dataset: str
+            which LODES dataset should be used to create the Community.
+            Options are 'wac' for workplace area characteristics or 'rac' for
+            residence area characteristics.
 
         Returns
         -------
@@ -1155,9 +1159,16 @@ class Community(object):
             Community with LODES data
 
         """
+        msa_states = []
+        if msa_fips:
+            msa_states += data_store.msa_definitions[
+                data_store.msa_definitions["CBSA Code"] == msa_fips
+            ]["stcofips"].tolist()
+        msa_states = [i[:2] for i in msa_states]
+
         # build a list of states in the dataset
         allfips = []
-        for i in [state_fips, county_fips, fips]:
+        for i in [state_fips, county_fips, fips, msa_states]:
             if i:
                 allfips.append(i[:2])
         states = np.unique(allfips)
