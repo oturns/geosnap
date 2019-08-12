@@ -17,6 +17,7 @@ appdirs
 palettable
 dash
 dash-bootstrap-components
+quilt3
 tqdm
-hdbscan
+git://github.com/pysal/region.git@master#egg=region
 git://github.com/spatialucr/tobler.git@master#egg=tobler
