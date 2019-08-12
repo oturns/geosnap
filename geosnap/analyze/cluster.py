@@ -1,12 +1,16 @@
 from warnings import warn
 
 import numpy as np
-from hdbscan import HDBSCAN
 from region.max_p_regions.heuristics import MaxPRegionsHeu
 from region.p_regions.azp import AZP
 from region.skater.skater import Spanning_Forest
-from sklearn.cluster import (AffinityPropagation, AgglomerativeClustering,
-                             KMeans, MiniBatchKMeans, SpectralClustering)
+from sklearn.cluster import (
+    AffinityPropagation,
+    AgglomerativeClustering,
+    KMeans,
+    MiniBatchKMeans,
+    SpectralClustering,
+)
 from sklearn.mixture import GaussianMixture
 from spenc import SPENC
 
@@ -30,24 +34,26 @@ def ward(X, n_clusters=5, **kwargs):
     model: sklearn AgglomerativeClustering instance
 
     """
-    model = AgglomerativeClustering(n_clusters=n_clusters, linkage='ward')
+    model = AgglomerativeClustering(n_clusters=n_clusters, linkage="ward")
     model.fit(X)
     return model
 
 
-def kmeans(X,
-           n_clusters,
-           init='k-means++',
-           n_init=10,
-           max_iter=300,
-           tol=0.0001,
-           verbose=0,
-           random_state=None,
-           copy_x=True,
-           n_jobs=None,
-           algorithm='auto',
-           precompute_distances='auto',
-           **kwargs):
+def kmeans(
+    X,
+    n_clusters,
+    init="k-means++",
+    n_init=10,
+    max_iter=300,
+    tol=0.0001,
+    verbose=0,
+    random_state=None,
+    copy_x=True,
+    n_jobs=None,
+    algorithm="auto",
+    precompute_distances="auto",
+    **kwargs
+):
     """K-Means clustering.
 
     Parameters
@@ -72,11 +78,12 @@ def kmeans(X,
             max_iter=max_iter,
             tol=tol,
             verbose=verbose,
-            random_state=random_state)
+            random_state=random_state,
+        )
     else:
         model = KMeans(
             n_clusters=n_clusters,
-            init='k-means++',
+            init="k-means++",
             n_init=n_init,
             max_iter=max_iter,
             tol=tol,
@@ -85,21 +92,24 @@ def kmeans(X,
             random_state=random_state,
             copy_x=copy_x,
             n_jobs=n_jobs,
-            algorithm=algorithm)
+            algorithm=algorithm,
+        )
 
     model.fit(X)
     return model
 
 
-def affinity_propagation(X,
-                         damping=0.8,
-                         preference=-1000,
-                         max_iter=500,
-                         convergence_iter=15,
-                         copy=True,
-                         affinity='euclidean',
-                         verbose=False,
-                         **kwargs):
+def affinity_propagation(
+    X,
+    damping=0.8,
+    preference=-1000,
+    max_iter=500,
+    convergence_iter=15,
+    copy=True,
+    affinity="euclidean",
+    verbose=False,
+    **kwargs
+):
     """Clustering with Affinity Propagation.
 
     Parameters
@@ -132,26 +142,29 @@ def affinity_propagation(X,
         convergence_iter=convergence_iter,
         copy=copy,
         affinity=affinity,
-        verbose=verbose)
+        verbose=verbose,
+    )
     model.fit(X)
     return model
 
 
-def spectral(X,
-             n_clusters,
-             eigen_solver=None,
-             random_state=None,
-             n_init=10,
-             gamma=1.0,
-             affinity='rbf',
-             n_neighbors=10,
-             eigen_tol=0.0,
-             assign_labels='kmeans',
-             degree=3,
-             coef0=1,
-             kernel_params=None,
-             n_jobs=-1,
-             **kwargs):
+def spectral(
+    X,
+    n_clusters,
+    eigen_solver=None,
+    random_state=None,
+    n_init=10,
+    gamma=1.0,
+    affinity="rbf",
+    n_neighbors=10,
+    eigen_tol=0.0,
+    assign_labels="kmeans",
+    degree=3,
+    coef0=1,
+    kernel_params=None,
+    n_jobs=-1,
+    **kwargs
+):
     """Short summary.
 
     Parameters
@@ -206,18 +219,21 @@ def spectral(X,
         degree=degree,
         coef0=coef0,
         kernel_params=kernel_params,
-        n_jobs=n_jobs)
+        n_jobs=n_jobs,
+    )
     model.fit(X)
     return model
 
 
-def gaussian_mixture(X,
-                     n_clusters=5,
-                     covariance_type="full",
-                     best_model=False,
-                     max_clusters=10,
-                     random_state=None,
-                     **kwargs):
+def gaussian_mixture(
+    X,
+    n_clusters=5,
+    covariance_type="full",
+    best_model=False,
+    max_clusters=10,
+    random_state=None,
+    **kwargs
+):
     """Clustering with Gaussian Mixture Model
 
 
@@ -251,9 +267,11 @@ def gaussian_mixture(X,
 
     """
     if random_state is None:
-        warn("Note: Gaussian Mixture Clustering is probabilistic--\
+        warn(
+            "Note: Gaussian Mixture Clustering is probabilistic--\
 cluster labels may be different for different runs. If you need consistency,\
-you should set the `random_state` parameter")
+you should set the `random_state` parameter"
+        )
 
     if best_model is True:
 
@@ -263,14 +281,15 @@ you should set the `random_state` parameter")
         bic = []
         maxn = max_clusters + 1
         n_components_range = range(1, maxn)
-        cv_types = ['spherical', 'tied', 'diag', 'full']
+        cv_types = ["spherical", "tied", "diag", "full"]
         for cv_type in cv_types:
             for n_components in n_components_range:
                 # Fit a Gaussian mixture with EM
                 gmm = GaussianMixture(
                     n_components=n_components,
                     random_state=random_state,
-                    covariance_type=cv_type)
+                    covariance_type=cv_type,
+                )
                 gmm.fit(X)
                 bic.append(gmm.bic(X))
                 if bic[-1] < lowest_bic:
@@ -284,7 +303,8 @@ you should set the `random_state` parameter")
         model = GaussianMixture(
             n_components=n_clusters,
             random_state=random_state,
-            covariance_type=covariance_type)
+            covariance_type=covariance_type,
+        )
     model.fit(X)
     model.labels_ = model.predict(X)
     return model
@@ -309,6 +329,12 @@ def hdbscan(X, min_cluster_size=5, gen_min_span_tree=True, **kwargs):
     model: hdbscan HDBSCAN instance
 
     """
+    try:
+        from hdbscan import HDBSCAN
+    except ImportError:
+        raise ImportError(
+            "You must have the hdbscan package installed to use this function"
+        )
 
     model = HDBSCAN(min_cluster_size=min_cluster_size)
     model.fit(X)
@@ -341,7 +367,8 @@ def ward_spatial(X, w, n_clusters=5, **kwargs):
     """
 
     model = AgglomerativeClustering(
-        n_clusters=n_clusters, connectivity=w.sparse, linkage='ward')
+        n_clusters=n_clusters, connectivity=w.sparse, linkage="ward"
+    )
     model.fit(X)
     return model
 
@@ -377,13 +404,9 @@ def spenc(X, w, n_clusters=5, gamma=1, **kwargs):
     return model
 
 
-def skater(X,
-           w,
-           n_clusters=5,
-           floor=-np.inf,
-           trace=False,
-           islands='increase',
-           **kwargs):
+def skater(
+    X, w, n_clusters=5, floor=-np.inf, trace=False, islands="increase", **kwargs
+):
     """SKATER spatial clustering algorithm.
 
     Parameters
