@@ -1235,11 +1235,11 @@ class Community(object):
         for name in names:
             for year in years:
                 df = get_lehd(dataset=dataset, year=year, state=name)
-                df["year"] = year
                 if year < 2010:
                     df = gdf00.merge(df, on="geoid", how="left")
                 else:
                     df = gdf.merge(df, on="geoid", how="left")
+                df["year"] = year
                 dfs.append(df)
         gdf = pd.concat(dfs)
 
