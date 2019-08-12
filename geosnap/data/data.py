@@ -36,44 +36,41 @@ except ImportError:
     storage = quilt3.Package()
 
 
+try:  # if any of these aren't found, stream them insteead
+    from quilt3.data.census import (
+        tracts_cartographic,
+        administrative,
+        blocks_2010,
+        blocks_2000,
+    )
+except ImportError:
+    warn(
+        "Unable to locate local census data. Streaming instead.\n"
+        "If you plan to use census data repeatedly you can store it locally "
+        "with the data.store_census function for better performance"
+    )
+    try:
+        tracts_cartographic = quilt3.Package.browse(
+            "census/tracts_cartographic", "s3://quilt-cgs"
+        )
+        administrative = quilt3.Package.browse(
+            "census/administrative", "s3://quilt-cgs"
+        )
+        blocks_2010 = quilt3.Package.browse("census/blocks_2010", "s3://quilt-cgs")
+        blocks_2000 = quilt3.Package.browse("census/blocks_2000", "s3://quilt-cgs")
+
+    except Timeout:
+        warn(
+            "Unable to locate local census data and unable to reach s3 bucket."
+            "You will be unable to use built-in data during this session."
+        )
+
+
 class DataStore(object):
     """Storage for geosnap data. Currently supports US Census data."""
 
     def __init__(self):
         """Instantiate a new DataStore object."""
-
-        try:  # if any of these aren't found, stream them insteead
-            from quilt3.data.census import (
-                tracts_cartographic,
-                administrative,
-                blocks_2010,
-                blocks_2000,
-            )
-        except ImportError:
-            warn(
-                "Unable to locate local census data. Streaming instead.\n"
-                "If you plan to use census data repeatedly you can store it locally "
-                "with the data.store_census function for better performance"
-            )
-            try:
-                tracts_cartographic = quilt3.Package.browse(
-                    "census/tracts_cartographic", "s3://quilt-cgs"
-                )
-                administrative = quilt3.Package.browse(
-                    "census/administrative", "s3://quilt-cgs"
-                )
-                blocks_2010 = quilt3.Package.browse(
-                    "census/blocks_2010", "s3://quilt-cgs"
-                )
-                blocks_2000 = quilt3.Package.browse(
-                    "census/blocks_2000", "s3://quilt-cgs"
-                )
-
-            except Timeout:
-                warn(
-                    "Unable to locate local census data and unable to reach s3 bucket."
-                    "You will be unable to use built-in data during this session."
-                )
 
     def blocks_2000(self, states=None, convert=True):
         """Census blocks for 2000.
