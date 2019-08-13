@@ -36,37 +36,37 @@ except ImportError:
     storage = quilt3.Package()
 
 
-try:  # if any of these aren't found, stream them insteead
-    from quilt3.data.census import tracts_cartographic, administrative
-except ImportError:
-    warn(
-        "Unable to locate local census data. Streaming instead.\n"
-        "If you plan to use census data repeatedly you can store it locally "
-        "with the data.store_census function for better performance"
-    )
-    try:
-        tracts_cartographic = quilt3.Package.browse(
-            "census/tracts_cartographic", "s3://quilt-cgs"
-        )
-        administrative = quilt3.Package.browse(
-            "census/administrative", "s3://quilt-cgs"
-        )
-
-    except Timeout:
-        warn(
-            "Unable to locate local census data and unable to reach s3 bucket."
-            "You will be unable to use built-in data during this session. "
-            "If you need these data, please try downloading a local copy "
-            "with the data.store_census function, then restart your "
-            "python kernel and try again."
-        )
-
-
 class DataStore(object):
     """Storage for geosnap data. Currently supports US Census data."""
 
     def __init__(self):
         """Instantiate a new DataStore object."""
+        try:  # if any of these aren't found, stream them insteead
+            from quilt3.data.census import tracts_cartographic, administrative
+        except ImportError:
+            warn(
+                "Unable to locate local census data. Streaming instead.\n"
+                "If you plan to use census data repeatedly you can store it locally "
+                "with the data.store_census function for better performance"
+            )
+            try:
+                tracts_cartographic = quilt3.Package.browse(
+                    "census/tracts_cartographic", "s3://quilt-cgs"
+                )
+                administrative = quilt3.Package.browse(
+                    "census/administrative", "s3://quilt-cgs"
+                )
+
+            except Timeout:
+                warn(
+                    "Unable to locate local census data and unable to reach s3 bucket."
+                    "You will be unable to use built-in data during this session. "
+                    "If you need these data, please try downloading a local copy "
+                    "with the data.store_census function, then restart your "
+                    "python kernel and try again."
+                )
+        self.tracts_cartographic = tracts_cartographic
+        self.administrative = administrative
 
     def blocks_2000(self, states=None, convert=True):
         """Census blocks for 2000.
@@ -189,7 +189,7 @@ class DataStore(object):
             stored as well-known binary on the 'wkb' column.
 
         """
-        t = tracts_cartographic["tracts_1990_500k.parquet"]()
+        t = self.tracts_cartographic["tracts_1990_500k.parquet"]()
         t["year"] = 1990
         if convert:
             return convert_gdf(t)
@@ -230,7 +230,7 @@ class DataStore(object):
             stored as well-known binary on the 'wkb' column.
 
         """
-        t = tracts_cartographic["tracts_2000_500k.parquet"]()
+        t = self.tracts_cartographic["tracts_2000_500k.parquet"]()
         t["year"] = 2000
         if convert:
             return convert_gdf(t)
@@ -252,7 +252,7 @@ class DataStore(object):
             stored as well-known binary on the 'wkb' column.
 
         """
-        t = tracts_cartographic["tracts_2010_500k.parquet"]()
+        t = self.tracts_cartographic["tracts_2010_500k.parquet"]()
         t["year"] = 2010
         if convert:
             return convert_gdf(t)
@@ -275,9 +275,11 @@ class DataStore(object):
 
         """
         if convert:
-            return convert_gdf(administrative["msas.parquet"]().sort_values(by="name"))
+            return convert_gdf(
+                self.administrative["msas.parquet"]().sort_values(by="name")
+            )
         else:
-            return administrative["msas.parquet"]().sort_values(by="name")
+            return self.adminis["msas.parquet"]().sort_values(by="name")
 
     def states(self, convert=True):
         """States.
@@ -295,9 +297,9 @@ class DataStore(object):
 
         """
         if convert:
-            return convert_gdf(administrative["states.parquet"]())
+            return convert_gdf(self.administrative["states.parquet"]())
         else:
-            return administrative["states.parquet"]()
+            return self.adminis["states.parquet"]()
 
     def counties(self, convert=True):
         """Nationwide counties as drawn in 2010.
@@ -314,7 +316,7 @@ class DataStore(object):
             stored as well-known binary on the 'wkb' column.
 
         """
-        return convert_gdf(administrative["counties.parquet"]())
+        return convert_gdf(self.administrative["counties.parquet"]())
 
     @property
     def msa_definitions(self):
@@ -326,7 +328,7 @@ class DataStore(object):
             dataframe that stores state/county --> MSA crosswalk definitions.
 
         """
-        return administrative["msa_definitions.parquet"]()
+        return self.administrative["msa_definitions.parquet"]()
 
     @property
     def ltdb(self):
