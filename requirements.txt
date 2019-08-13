@@ -2,7 +2,6 @@ numpy
 pandas
 cython
 geopandas
-hdbscan
 matplotlib
 scikit-learn
 seaborn
@@ -17,5 +16,4 @@ appdirs
 palettable
 dash
 dash-bootstrap-components
-quilt3
 tqdm

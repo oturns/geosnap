@@ -13,4 +13,8 @@ cli2:
 
 # run a shell with two mount points and an environment variable for our tests
 cli2e:
-	docker run -it -p 8888:8888 -e "DLPATH=/home/jovyan/.local/share/geosnap/data" -v ${PWD}:/home/jovyan/geosnap -v ${HOME}/.local:/home/jovyan/.local geosnap /bin/bash
+	docker run -it -p 8888:8888 -e "DLPATH=/home/jovyan/.local/share/geosnap/data" -v ${PWD}:/home/jovyan -v ${HOME}/.local:/home/jovyan/.local geosnap /bin/bash
+
+
+cli2s:
+	docker run -it -p 8888:8888 -e "DLPATH=/home/jovyan/.local/share/geosnap/data" -v ${PWD}:/home/jovyan -v ${HOME}/.local:/home/jovyan/.local geosnap sh -c "/home/jovyan/develop.sh && /bin/bash"
