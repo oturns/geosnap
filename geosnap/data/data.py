@@ -851,12 +851,6 @@ class Community(object):
         None
             New data are added to the input Community
 
-        Examples
-        -------
-        Examples should be written in doctest format, and
-        should illustrate how to use the function/class.
-        >>>
-
         """
         # convert the long-form into a list of dataframes
         data = [x[1] for x in self.gdf.groupby("year")]
