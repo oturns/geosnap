@@ -291,7 +291,7 @@ class DataStore(object):
                 self.administrative["msas.parquet"]().sort_values(by="name")
             )
         else:
-            return self.adminis["msas.parquet"]().sort_values(by="name")
+            return self.administrative["msas.parquet"]().sort_values(by="name")
 
     def states(self, convert=True):
         """States.
@@ -311,7 +311,7 @@ class DataStore(object):
         if convert:
             return convert_gdf(self.administrative["states.parquet"]())
         else:
-            return self.adminis["states.parquet"]()
+            return self.administrative["states.parquet"]()
 
     def counties(self, convert=True):
         """Nationwide counties as drawn in 2010.
@@ -1194,6 +1194,10 @@ class Community(object):
             if i:
                 allfips.append(i[:2])
         states = np.unique(allfips)
+
+        # if using a boundary there will be no fips, so reset states to None
+        if len(states) == 0:
+            states = None
 
         df_dict = {
             1990: data_store.tracts_1990(states=states),
