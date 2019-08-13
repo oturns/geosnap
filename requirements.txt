@@ -1,11 +1,9 @@
 numpy
 pandas
-cython
 geopandas
 matplotlib
 scikit-learn
 seaborn
-pyarrow==0.13
 libpysal
 mapclassify
 spenc
@@ -17,3 +15,4 @@ palettable
 dash
 dash-bootstrap-components
 tqdm
+quilt
