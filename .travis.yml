@@ -33,7 +33,6 @@ install:
   - pip install -e . --no-deps --force-reinstall
 
 script:
-  - export $DLPATH=
   - python -c "from geosnap import data"
   - if [[ $TRAVIS_JOB_NAME == python-* ]]; then
       travis_wait 45 pytest --ignore=examples --ignore=geosnap/util  --cov geosnap ;
