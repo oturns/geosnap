@@ -16,7 +16,9 @@ before_install:
   # Install miniconda and create TEST env.
   - |
     wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-    bash miniconda.sh -b -p $HOME/miniconda
+    wget -q $LTDB_SAMPLE -O ltdb_sample.zip
+    wget -q $LTDB_FULLCOUNT -O ltdb_full.zip
+    wget -q $NCDB -O ncdb.csvbash miniconda.sh -b -p $HOME/miniconda
     export PATH="$HOME/miniconda/bin:$PATH"
     export DLPATH=`pwd`
     conda config --set always_yes yes --set changeps1 no --set show_channel_urls true
