@@ -55,7 +55,10 @@ except ImportError:
     except Timeout:
         warn(
             "Unable to locate local census data and unable to reach s3 bucket."
-            "You will be unable to use built-in data during this session."
+            "You will be unable to use built-in data during this session. "
+            "If you need these data, please try downloading a local copy "
+            "with the data.store_census function, then restart your "
+            "python kernel and try again."
         )
 
 
@@ -100,7 +103,9 @@ class DataStore(object):
             except Timeout:
                 warn(
                     "Unable to locate local census data and unable to reach s3 bucket."
-                    "You will be unable to use built-in data during this session."
+                    "You will be unable to use built-in data during this session. "
+                    "Try downloading a local copy with the data.store_blocks_2000 function,"
+                    "then restart your python kernel and try again."
                 )
 
         if isinstance(states, (str,)):
@@ -118,7 +123,7 @@ class DataStore(object):
         return blocks
 
     def blocks_2010(self, states=None, convert=True):
-        """Census blocks for 2000.
+        """Census blocks for 2010.
 
         Parameters
         ----------
@@ -151,12 +156,13 @@ class DataStore(object):
             except Timeout:
                 warn(
                     "Unable to locate local census data and unable to reach s3 bucket."
-                    "You will be unable to use built-in data during this session."
+                    "You will be unable to use built-in data during this session. "
+                    "If you need these data, please try downloading a local copy "
+                    "with the data.store_blocks_2010 function, then restart your "
+                    "python kernel and try again."
                 )
 
-        if isinstance(states, (str,)):
-            states = [states]
-        if isinstance(states, (int,)):
+        if isinstance(states, (str, int)):
             states = [states]
         blks = {}
         for state in states:
