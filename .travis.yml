@@ -18,6 +18,7 @@ before_install:
     wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
     bash miniconda.sh -b -p $HOME/miniconda
     export PATH="$HOME/miniconda/bin:$PATH"
+    export DLPATH=`pwd`
     conda config --set always_yes yes --set changeps1 no --set show_channel_urls true
     conda update --quiet conda
     conda config --add channels conda-forge --force
@@ -32,6 +33,7 @@ install:
   - pip install -e . --no-deps --force-reinstall
 
 script:
+  - export $DLPATH=
   - python -c "from geosnap import data"
   - if [[ $TRAVIS_JOB_NAME == python-* ]]; then
       travis_wait 45 pytest --ignore=examples --ignore=geosnap/util  --cov geosnap ;
