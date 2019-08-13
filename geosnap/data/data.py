@@ -1344,7 +1344,3 @@ class Community(object):
 
         gdf = pd.concat(gdfs, sort=True)
         return cls(gdf=gdf)
-
-
-if __name__ == "__main__":
-    adjust_inflation()
