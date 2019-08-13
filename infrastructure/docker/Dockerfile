@@ -14,5 +14,6 @@ RUN conda install cenpy
 RUN pip install quilt3
 RUN pip install spenc
 RUN pip install https://github.com/pysal/region/archive/master.zip
+RUN pip install https://github.com/spatialucr/tobler/archive/master.zip
 RUN conda install pytest
 RUN conda install nose nose-progressive coverage coveralls pytest-cov pytest-mpl
