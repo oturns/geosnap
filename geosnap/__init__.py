@@ -29,3 +29,4 @@ from . import analyze
 from . import data
 from . import util
 from . import visualize
+from . import harmonize
