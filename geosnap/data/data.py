@@ -68,6 +68,25 @@ class DataStore(object):
         self.tracts_cartographic = tracts_cartographic
         self.administrative = administrative
 
+    def __dir__(self):
+
+        atts = [
+            "blocks_2000",
+            "blocks_2010",
+            "codebook",
+            "counties",
+            "ltdb",
+            "msa_definitions",
+            "msas",
+            "ncdb",
+            "states",
+            "tracts_1990",
+            "tracts_2000",
+            "tracts_2010",
+        ]
+
+        return atts
+
     def blocks_2000(self, states=None, convert=True):
         """Census blocks for 2000.
 
@@ -174,11 +193,13 @@ class DataStore(object):
             return convert_gdf(blocks)
         return blocks
 
-    def tracts_1990(self, convert=True):
+    def tracts_1990(self, states=None, convert=True):
         """Nationwide Census Tracts as drawn in 1990 (cartographic 500k).
 
         Parameters
         ----------
+        states : list-like
+            list of state fips to subset the national dataframe
         convert : bool
             if True, return geodataframe, else return dataframe (the default is True).
 
@@ -190,36 +211,21 @@ class DataStore(object):
 
         """
         t = self.tracts_cartographic["tracts_1990_500k.parquet"]()
+        if states:
+            t = t[t.geoid.str[:2].isin(states)]
         t["year"] = 1990
         if convert:
             return convert_gdf(t)
         else:
             return t
 
-    def __dir__(self):
-
-        atts = [
-            "blocks_2000",
-            "blocks_2010",
-            "codebook",
-            "counties",
-            "ltdb",
-            "msa_definitions",
-            "msas",
-            "ncdb",
-            "states",
-            "tracts_1990",
-            "tracts_2000",
-            "tracts_2010",
-        ]
-
-        return atts
-
-    def tracts_2000(self, convert=True):
+    def tracts_2000(self, states=None, convert=True):
         """Nationwide Census Tracts as drawn in 2000 (cartographic 500k).
 
         Parameters
         ----------
+        states : list-like
+            list of state fips to subset the national dataframe
         convert : bool
             if True, return geodataframe, else return dataframe (the default is True).
 
@@ -231,17 +237,21 @@ class DataStore(object):
 
         """
         t = self.tracts_cartographic["tracts_2000_500k.parquet"]()
+        if states:
+            t = t[t.geoid.str[:2].isin(states)]
         t["year"] = 2000
         if convert:
             return convert_gdf(t)
         else:
             return t
 
-    def tracts_2010(self, convert=True):
+    def tracts_2010(self, states=None, convert=True):
         """Nationwide Census Tracts as drawn in 2010 (cartographic 500k).
 
         Parameters
         ----------
+        states : list-like
+            list of state fips to subset the national dataframe
         convert : bool
             if True, return geodataframe, else return dataframe (the default is True).
 
@@ -253,6 +263,8 @@ class DataStore(object):
 
         """
         t = self.tracts_cartographic["tracts_2010_500k.parquet"]()
+        if states:
+            t = t[t.geoid.str[:2].isin(states)]
         t["year"] = 2010
         if convert:
             return convert_gdf(t)
@@ -1166,11 +1178,27 @@ class Community(object):
             Community with unharmonized census data
 
         """
+        if isinstance(years, (str, int)):
+            years = [years]
+
+        msa_states = []
+        if msa_fips:
+            msa_states += data_store.msa_definitions[
+                data_store.msa_definitions["CBSA Code"] == msa_fips
+            ]["stcofips"].tolist()
+        msa_states = [i[:2] for i in msa_states]
+
+        # build a list of states in the dataset
+        allfips = []
+        for i in [state_fips, county_fips, fips, msa_states]:
+            if i:
+                allfips.append(i[:2])
+        states = np.unique(allfips)
 
         df_dict = {
-            1990: data_store.tracts_1990(),
-            2000: data_store.tracts_2000(),
-            2010: data_store.tracts_2010(),
+            1990: data_store.tracts_1990(states=states),
+            2000: data_store.tracts_2000(states=states),
+            2010: data_store.tracts_2010(states=states),
         }
 
         tracts = []
