@@ -19,7 +19,8 @@ dependencies:
   - palettable
   - pip
   - tqdm
+  - quilt
+  - xlrd
   - pip:
-    - xlrd
-    - quilt3
     - git+git://github.com/pysal/region@master
+    - git+git://github.com/pysal/tobler@master

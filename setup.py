@@ -53,6 +53,7 @@ def setup_package():
         version=VERSION,
         description="Geospatial Neighborhood Analysis Package.",
         long_description=long_description,
+        long_description_content_type="text/markdown",
         maintainer="geosnap Developers",
         maintainer_email="pysal-dev@googlegroups.com",
         url="http://geosnap.cloud",
