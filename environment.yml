@@ -21,5 +21,6 @@ dependencies:
   - tqdm
   - quilt
   - xlrd
-  - git+git://github.com/pysal/region@master
-  - git+git://github.com/pysal/tobler@master
+  - pip:
+    - git+git://github.com/pysal/region@master
+    - git+git://github.com/pysal/tobler@master
