@@ -30,6 +30,7 @@ def cluster(
     verbose=False,
     time_var="year",
     id_var="geoid",
+    return_model=False,
     **kwargs,
 ):
     """Create a geodemographic typology by running a cluster analysis on the
@@ -99,6 +100,8 @@ def cluster(
     gdf = gdf.merge(clusters.drop(columns=[id_var]), on="key", how="left")
     gdf.drop(columns="key", inplace=True)
     gdf.set_index(id_var, inplace=True)
+    if return_model:
+        return gdf, model
     return gdf
 
 
@@ -113,6 +116,7 @@ def cluster_spatial(
     threshold=10,
     time_var="year",
     id_var="geoid",
+    return_model=False,
     **kwargs,
 ):
     """Create a *spatial* geodemographic typology by running a cluster
@@ -245,5 +249,8 @@ def cluster_spatial(
         gdf.drop(columns=method, inplace=True)
     gdf = gdf.merge(clusters.drop(columns=[id_var]), on="joinkey", how="left")
     gdf.set_index(id_var, inplace=True)
+
+    if return_model:
+        return gdf, model
 
     return gdf
