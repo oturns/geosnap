@@ -917,7 +917,7 @@ class Community(object):
         as a new column. Will overwrite columns of the same name.
         """
         harmonized = self.harmonized
-        if self.return_model:
+        if return_model:
             gdf, model = _cluster(
                 gdf=self.gdf.copy(),
                 n_clusters=n_clusters,
