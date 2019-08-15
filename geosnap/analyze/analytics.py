@@ -107,7 +107,7 @@ def cluster(
         {method: labels, time_var: data[time_var], id_var: data[id_var]}
     )
     clusters.set_index([time_var, id_var], inplace=True)
-    gdf = gdf.join(clusters)
+    gdf = gdf.join(clusters, how="left")
     gdf = gdf.reset_index()
     if return_model:
         return gdf, model
@@ -236,7 +236,7 @@ def cluster_spatial(
             {method: labels, time_var: df[time_var], id_var: df[id_var]}
         )
         clusters.set_index([time_var, id_var], inplace=True)
-        dfs.append(gdf.loc[time].join(clusters))
+        dfs.append(gdf.loc[time].join(clusters, how="left"))
     gdf = pd.concat(dfs).reset_index()
     if return_model:
         return gdf, model

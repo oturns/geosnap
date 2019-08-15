@@ -23,25 +23,25 @@ def test_gm():
 def test_ward():
 
     r = reno.cluster(columns=columns, method="ward")
-    assert len(r.gdf.ward.unique()) == 6
+    assert len(r.gdf.ward.unique()) == 7
 
 
 def test_spectral():
 
     r = reno.cluster(columns=columns, method="spectral")
-    assert len(r.gdf.spectral.unique()) == 6
+    assert len(r.gdf.spectral.unique()) == 7
 
 
 def test_kmeans():
 
     r = reno.cluster(columns=columns, method="kmeans")
-    assert len(r.gdf.kmeans.unique()) == 6
+    assert len(r.gdf.kmeans.unique()) == 7
 
 
 def test_aff_prop():
 
     r = reno.cluster(columns=columns, method="affinity_propagation", preference=-100)
-    assert len(r.gdf.affinity_propagation.unique()) == 3
+    assert len(r.gdf.affinity_propagation.unique()) == 4
 
 
 def test_hdbscan():
@@ -62,7 +62,7 @@ def test_spenc():
 def test_maxp():
 
     r = reno.cluster_spatial(columns=columns, method="max_p", initial=10)
-    assert len(r.gdf.max_p.unique()) > 10
+    assert len(r.gdf.max_p.unique()) >= 10
 
 
 def test_ward_spatial():
