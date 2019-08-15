@@ -945,13 +945,14 @@ class Community(object):
     def cluster_spatial(
         self,
         n_clusters=6,
-        weights_type="rook",
+        spatial_weights="rook",
         method=None,
         best_model=False,
         columns=None,
         threshold_variable="count",
         threshold=10,
         return_model=False,
+        scaler=None,
         **kwargs
     ):
         """Create a *spatial* geodemographic typology by running a cluster
@@ -993,7 +994,7 @@ class Community(object):
             gdf, model = _cluster_spatial(
                 gdf=self.gdf.copy(),
                 n_clusters=n_clusters,
-                weights_type=weights_type,
+                spatial_weights=spatial_weights,
                 method=method,
                 best_model=best_model,
                 columns=columns,
@@ -1007,7 +1008,7 @@ class Community(object):
             gdf = _cluster_spatial(
                 gdf=self.gdf.copy(),
                 n_clusters=n_clusters,
-                weights_type=weights_type,
+                spatial_weights=spatial_weights,
                 method=method,
                 best_model=best_model,
                 columns=columns,
