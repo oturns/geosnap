@@ -809,8 +809,7 @@ class Community(object):
 
         """
         self.gdf = gdf
-        if harmonized:
-            self.harmonized = True
+        self.harmonized = harmonized
 
     def harmonize(
         self,
@@ -867,7 +866,7 @@ class Community(object):
         # convert the long-form into a list of dataframes
         data = [x[1] for x in self.gdf.groupby("year")]
 
-        self.gdf = _harmonize(
+        gdf = _harmonize(
             data,
             target_year_of_reference,
             weights_method=weights_method,
@@ -878,6 +877,7 @@ class Community(object):
             codes=codes,
             force_crs_match=force_crs_match,
         )
+        return Community(gdf, harmonized=True)
 
     def cluster(
         self,
@@ -886,6 +886,7 @@ class Community(object):
         best_model=False,
         columns=None,
         verbose=False,
+        return_model=False,
         **kwargs
     ):
         """Create a geodemographic typology by running a cluster analysis on
@@ -906,22 +907,40 @@ class Community(object):
             subset of columns on which to apply the clustering
         verbose : bool
             whether to print warning messages (the default is False).
-        **kwargs
+        return_model : bool
+            whether to return the underlying cluster model instance for further
+            analysis
 
         Returns
         -------
         pandas.DataFrame with a column of neighborhood cluster labels appended
         as a new column. Will overwrite columns of the same name.
         """
-        self.gdf = _cluster(
-            gdf=self.gdf,
-            n_clusters=n_clusters,
-            method=method,
-            best_model=best_model,
-            columns=columns,
-            verbose=verbose,
-            **kwargs
-        )
+        harmonized = self.harmonized
+        if return_model:
+            gdf, model = _cluster(
+                gdf=self.gdf.copy(),
+                n_clusters=n_clusters,
+                method=method,
+                best_model=best_model,
+                columns=columns,
+                verbose=verbose,
+                return_model=return_model,
+                **kwargs
+            )
+            return Community(gdf, harmonized=harmonized), model
+        else:
+            gdf = _cluster(
+                gdf=self.gdf.copy(),
+                n_clusters=n_clusters,
+                method=method,
+                best_model=best_model,
+                columns=columns,
+                verbose=verbose,
+                return_model=return_model,
+                **kwargs
+            )
+            return Community(gdf, harmonized=harmonized)
 
     def cluster_spatial(
         self,
@@ -932,6 +951,7 @@ class Community(object):
         columns=None,
         threshold_variable="count",
         threshold=10,
+        return_model=False,
         **kwargs
     ):
         """Create a *spatial* geodemographic typology by running a cluster
@@ -958,25 +978,45 @@ class Community(object):
             been aggregated
         threshold : numeric
             threshold to use for max-p clustering (the default is 10).
-        **kwargs
-
+        return_model : bool
+            whether to return the underlying cluster model instance for further
+            analysis
 
         Returns
         -------
         geopandas.GeoDataFrame with a column of neighborhood cluster labels
         appended as a new column. Will overwrite columns of the same name.
         """
-        self.gdf = _cluster_spatial(
-            gdf=self.gdf,
-            n_clusters=n_clusters,
-            weights_type=weights_type,
-            method=method,
-            best_model=best_model,
-            columns=columns,
-            threshold_variable=threshold_variable,
-            threshold=threshold,
-            **kwargs
-        )
+        harmonized = self.harmonized
+
+        if return_model:
+            gdf, model = _cluster_spatial(
+                gdf=self.gdf.copy(),
+                n_clusters=n_clusters,
+                weights_type=weights_type,
+                method=method,
+                best_model=best_model,
+                columns=columns,
+                threshold_variable=threshold_variable,
+                threshold=threshold,
+                return_model=return_model,
+                **kwargs
+            )
+            return Community(gdf, harmonized=True), model
+        else:
+            gdf = _cluster_spatial(
+                gdf=self.gdf.copy(),
+                n_clusters=n_clusters,
+                weights_type=weights_type,
+                method=method,
+                best_model=best_model,
+                columns=columns,
+                threshold_variable=threshold_variable,
+                threshold=threshold,
+                return_model=return_model,
+                **kwargs
+            )
+            return Community(gdf, harmonized=harmonized)
 
     @classmethod
     def from_ltdb(

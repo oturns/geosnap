@@ -16,38 +16,38 @@ columns = ["median_household_income", "p_poverty_rate", "p_unemployment_rate"]
 
 def test_gm():
 
-    reno.cluster(columns=columns, method="gaussian_mixture", best_model=True)
-    assert len(reno.gdf.gaussian_mixture.unique()) >= 6
+    r = reno.cluster(columns=columns, method="gaussian_mixture", best_model=True)
+    assert len(r.gdf.gaussian_mixture.unique()) >= 6
 
 
 def test_ward():
 
-    reno.cluster(columns=columns, method="ward")
-    assert len(reno.gdf.ward.unique()) == 6
+    r = reno.cluster(columns=columns, method="ward")
+    assert len(r.gdf.ward.unique()) == 6
 
 
 def test_spectral():
 
-    reno.cluster(columns=columns, method="spectral")
-    assert len(reno.gdf.spectral.unique()) == 6
+    r = reno.cluster(columns=columns, method="spectral")
+    assert len(r.gdf.spectral.unique()) == 6
 
 
 def test_kmeans():
 
-    reno.cluster(columns=columns, method="kmeans")
-    assert len(reno.gdf.kmeans.unique()) == 6
+    r = reno.cluster(columns=columns, method="kmeans")
+    assert len(r.gdf.kmeans.unique()) == 6
 
 
 def test_aff_prop():
 
-    reno.cluster(columns=columns, method="affinity_propagation", preference=-100)
-    assert len(reno.gdf.affinity_propagation.unique()) == 3
+    r = reno.cluster(columns=columns, method="affinity_propagation", preference=-100)
+    assert len(r.gdf.affinity_propagation.unique()) == 3
 
 
 def test_hdbscan():
 
-    reno.cluster(columns=columns, method="hdbscan")
-    assert len(reno.gdf.hdbscan.unique()) > 27
+    r = reno.cluster(columns=columns, method="hdbscan")
+    assert len(r.gdf.hdbscan.unique()) > 27
 
 
 # Spatial Clusters
@@ -55,28 +55,28 @@ def test_hdbscan():
 
 def test_spenc():
 
-    reno.cluster_spatial(columns=columns, method="spenc")
-    assert len(reno.gdf.spenc.unique()) == 6
+    r = reno.cluster_spatial(columns=columns, method="spenc")
+    assert len(r.gdf.spenc.unique()) == 7
 
 
 def test_maxp():
 
-    reno.cluster_spatial(columns=columns, method="max_p", initial=10)
-    assert len(reno.gdf.max_p.unique()) > 9
+    r = reno.cluster_spatial(columns=columns, method="max_p", initial=10)
+    assert len(r.gdf.max_p.unique()) > 10
 
 
 def test_ward_spatial():
 
-    reno.cluster_spatial(columns=columns, method="ward_spatial", n_clusters=7)
-    assert len(reno.gdf.ward_spatial.unique()) == 7
+    r = reno.cluster_spatial(columns=columns, method="ward_spatial", n_clusters=7)
+    assert len(r.gdf.ward_spatial.unique()) == 8
 
 
 def test_skater():
 
-    reno.cluster_spatial(columns=columns, method="skater", n_clusters=10)
-    assert len(reno.gdf.skater.unique()) == 10
+    r = reno.cluster_spatial(columns=columns, method="skater", n_clusters=10)
+    assert len(r.gdf.skater.unique()) == 11
 
 
 def test_azp():
-    reno.cluster_spatial(columns=columns, method="azp", n_clusters=7)
-    assert len(reno.gdf.azp.unique()) == 7
+    r = reno.cluster_spatial(columns=columns, method="azp", n_clusters=7)
+    assert len(r.gdf.azp.unique()) == 8
