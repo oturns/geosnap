@@ -248,6 +248,7 @@ def cluster_spatial(
     if method in gdf.columns:
         gdf.drop(columns=method, inplace=True)
     gdf = gdf.merge(clusters.drop(columns=[id_var]), on="joinkey", how="left")
+    gdf = gdf.drop(columns=["joinkey"])
     gdf.set_index(id_var, inplace=True)
 
     if return_model:
