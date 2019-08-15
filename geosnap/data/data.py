@@ -887,7 +887,8 @@ class Community(object):
         columns=None,
         verbose=False,
         return_model=False,
-        **kwargs
+        scaler=None,
+        **kwargs,
     ):
         """Create a geodemographic typology by running a cluster analysis on
         the study area's neighborhood attributes
@@ -910,6 +911,9 @@ class Community(object):
         return_model : bool
             whether to return the underlying cluster model instance for further
             analysis
+        scaler: str or sklearn.preprocessing.Scaler
+            a scikit-learn preprocessing class that will be used to rescale the
+            data. Defaults to StandardScaler
 
         Returns
         -------
@@ -926,7 +930,7 @@ class Community(object):
                 columns=columns,
                 verbose=verbose,
                 return_model=return_model,
-                **kwargs
+                **kwargs,
             )
             return Community(gdf, harmonized=harmonized), model
         else:
@@ -938,7 +942,7 @@ class Community(object):
                 columns=columns,
                 verbose=verbose,
                 return_model=return_model,
-                **kwargs
+                **kwargs,
             )
             return Community(gdf, harmonized=harmonized)
 
@@ -953,7 +957,7 @@ class Community(object):
         threshold=10,
         return_model=False,
         scaler=None,
-        **kwargs
+        **kwargs,
     ):
         """Create a *spatial* geodemographic typology by running a cluster
         analysis on the metro area's neighborhood attributes and including a
@@ -982,6 +986,9 @@ class Community(object):
         return_model : bool
             whether to return the underlying cluster model instance for further
             analysis
+        scaler: str or sklearn.preprocessing.Scaler
+            a scikit-learn preprocessing class that will be used to rescale the
+            data. Defaults to StandardScaler
 
         Returns
         -------
@@ -1001,7 +1008,7 @@ class Community(object):
                 threshold_variable=threshold_variable,
                 threshold=threshold,
                 return_model=return_model,
-                **kwargs
+                **kwargs,
             )
             return Community(gdf, harmonized=True), model
         else:
@@ -1015,7 +1022,7 @@ class Community(object):
                 threshold_variable=threshold_variable,
                 threshold=threshold,
                 return_model=return_model,
-                **kwargs
+                **kwargs,
             )
             return Community(gdf, harmonized=harmonized)
 

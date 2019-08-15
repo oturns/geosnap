@@ -60,8 +60,8 @@ def cluster(
         which column on the long-form dataframe identifies the stable units
         over time. In a wide-form dataset, this would be the unique index
     scaler: str or sklearn.preprocessing.Scaler
-        
-    **kwargs
+        a scikit-learn preprocessing class that will be used to rescale the
+        data. Defaults to StandardScaler
 
     Returns
     -------
@@ -156,8 +156,9 @@ def cluster_spatial(
     id_var: str
         which column on the long-form dataframe identifies the stable units
         over time. In a wide-form dataset, this would be the unique index
-    **kwargs
-
+    scaler: str or sklearn.preprocessing.Scaler
+        a scikit-learn preprocessing class that will be used to rescale the
+        data. Defaults to StandardScaler
 
     Returns
     -------
