@@ -5,6 +5,7 @@ import pandas as pd
 from libpysal.weights import attach_islands
 from libpysal.weights.contiguity import Queen, Rook
 from libpysal.weights.distance import KNN
+from sklearn.preprocessing import StandardScaler
 
 from .cluster import (
     azp,
@@ -31,6 +32,7 @@ def cluster(
     time_var="year",
     id_var="geoid",
     return_model=False,
+    scaler=None,
     **kwargs,
 ):
     """Create a geodemographic typology by running a cluster analysis on the
@@ -66,15 +68,21 @@ def cluster(
     """
     assert columns, "You must provide a subset of columns as input"
     assert method, "You must choose a clustering algorithm to use"
-    gdf = gdf.copy().reset_index()
-    allcols = columns + [time_var]
-    gdf = gdf.dropna(how="any", subset=columns)
-    opset = gdf.copy()
-    opset = opset[allcols]
-    opset[columns] = opset.groupby(time_var)[columns].apply(
-        lambda x: (x - x.mean()) / x.std(ddof=0)
-    )
-    # option to autoscale the data w/ mix-max or zscore?
+
+    times = gdf[time_var].unique()
+    gdf = gdf.set_index([time_var, id_var])
+
+    data = gdf.copy()[columns]
+    data = data.dropna(how="any", subset=columns)
+
+    if not scaler:
+        scaler = StandardScaler()
+    for time in times:
+        data.loc[time] = scaler.fit_transform(data.loc[time].values)
+    # the rescalar can create NaNs
+    data = data.fillna(0)
+    # opset.reset_index(inplace=True, drop=True)
+
     specification = {
         "ward": ward,
         "kmeans": kmeans,
@@ -84,22 +92,16 @@ def cluster(
         "hdbscan": hdbscan,
     }
     model = specification[method](
-        opset[columns],
-        n_clusters=n_clusters,
-        best_model=best_model,
-        verbose=verbose,
-        **kwargs,
+        data, n_clusters=n_clusters, best_model=best_model, verbose=verbose, **kwargs
     )
     labels = model.labels_.astype(str)
+    data = data.reset_index()
     clusters = pd.DataFrame(
-        {method: labels, time_var: gdf[time_var].astype(str), id_var: gdf[id_var]}
+        {method: labels, time_var: data[time_var], id_var: data[id_var]}
     )
-    clusters["key"] = clusters[id_var] + clusters[time_var]
-    clusters = clusters.drop(columns=time_var)
-    gdf["key"] = gdf[id_var] + gdf[time_var].astype(str)
-    gdf = gdf.merge(clusters.drop(columns=[id_var]), on="key", how="left")
-    gdf.drop(columns="key", inplace=True)
-    gdf.set_index(id_var, inplace=True)
+    clusters.set_index([time_var, id_var], inplace=True)
+    gdf = gdf.join(clusters)
+    gdf = gdf.reset_index()
     if return_model:
         return gdf, model
     return gdf
@@ -170,6 +172,7 @@ def cluster_spatial(
         data[columns] = data.groupby(time_var)[columns].apply(
             lambda x: (x - x.mean()) / x.std(ddof=0)
         )
+        data[columns] = data[columns].fillna(0)
 
     elif threshold_variable is not None:
         threshold_var = data[threshold_variable]
@@ -179,6 +182,7 @@ def cluster_spatial(
         data[columns] = data.groupby(time_var)[columns].apply(
             lambda x: (x - x.mean()) / x.std(ddof=0)
         )
+        data[columns] = data[columns].fillna(0)
 
     else:
         allcols = columns + cols
@@ -187,6 +191,7 @@ def cluster_spatial(
         data[columns] = data.groupby(time_var)[columns].apply(
             lambda x: (x - x.mean()) / x.std(ddof=0)
         )
+        data[columns] = data[columns].fillna(0)
 
     def _build_data(data, time, weights_type):
         df = data[data[time_var] == time].dropna(how="any")
