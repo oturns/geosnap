@@ -56,7 +56,7 @@ def test_hdbscan():
 def test_spenc():
 
     r = reno.cluster_spatial(columns=columns, method="spenc")
-    assert len(r.gdf.spenc.unique()) == 7
+    assert len(r.gdf.spenc.unique()) == 6
 
 
 def test_maxp():
@@ -68,15 +68,15 @@ def test_maxp():
 def test_ward_spatial():
 
     r = reno.cluster_spatial(columns=columns, method="ward_spatial", n_clusters=7)
-    assert len(r.gdf.ward_spatial.unique()) == 8
+    assert len(r.gdf.ward_spatial.unique()) == 7
 
 
 def test_skater():
 
     r = reno.cluster_spatial(columns=columns, method="skater", n_clusters=10)
-    assert len(r.gdf.skater.unique()) == 11
+    assert len(r.gdf.skater.unique()) == 10
 
 
 def test_azp():
     r = reno.cluster_spatial(columns=columns, method="azp", n_clusters=7)
-    assert len(r.gdf.azp.unique()) == 8
+    assert len(r.gdf.azp.unique()) == 7
