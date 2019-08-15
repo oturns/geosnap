@@ -1100,7 +1100,7 @@ class Community(object):
                 years=years,
             )
 
-        return cls(gdf=gdf, harmonized=True)
+        return cls(gdf=gdf.reset_index(), harmonized=True)
 
     @classmethod
     def from_ncdb(
@@ -1175,7 +1175,7 @@ class Community(object):
                 years=years,
             )
 
-        return cls(gdf=gdf, harmonized=True)
+        return cls(gdf=gdf.reset_index(), harmonized=True)
 
     @classmethod
     def from_census(
