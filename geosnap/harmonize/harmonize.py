@@ -1,6 +1,5 @@
 import pandas as pd
 import geopandas as gpd
-from warnings import warn
 from tobler.area_weighted import (
     area_interpolate_binning,
     area_tables_raster,
