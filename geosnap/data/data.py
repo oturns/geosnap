@@ -813,10 +813,10 @@ class Community(object):
 
     def harmonize(
         self,
-        target_year_of_reference,
+        target_year=None,
         weights_method="area",
-        extensive_variables=[],
-        intensive_variables=[],
+        extensive_variables=None,
+        intensive_variables=None,
         allocate_total=True,
         raster_path=None,
         codes=[21, 22, 23, 24],
@@ -864,11 +864,11 @@ class Community(object):
 
         """
         # convert the long-form into a list of dataframes
-        data = [x[1] for x in self.gdf.groupby("year")]
+        # data = [x[1] for x in self.gdf.groupby("year")]
 
         gdf = _harmonize(
-            data,
-            target_year_of_reference,
+            self.gdf,
+            target_year=target_year,
             weights_method=weights_method,
             extensive_variables=extensive_variables,
             intensive_variables=intensive_variables,
