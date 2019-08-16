@@ -5,6 +5,7 @@ import pandas as pd
 from libpysal.weights import attach_islands
 from libpysal.weights.contiguity import Queen, Rook
 from libpysal.weights.distance import KNN
+from sklearn.preprocessing import StandardScaler
 
 from .cluster import (
     azp,
@@ -30,6 +31,8 @@ def cluster(
     verbose=False,
     time_var="year",
     id_var="geoid",
+    return_model=False,
+    scaler=None,
     **kwargs,
 ):
     """Create a geodemographic typology by running a cluster analysis on the
@@ -56,24 +59,35 @@ def cluster(
     id_var: str
         which column on the long-form dataframe identifies the stable units
         over time. In a wide-form dataset, this would be the unique index
-    **kwargs
+    scaler: str or sklearn.preprocessing.Scaler
+        a scikit-learn preprocessing class that will be used to rescale the
+        data. Defaults to StandardScaler
 
     Returns
     -------
     pandas.DataFrame with a column of neighborhood cluster labels appended
     as a new column. Will overwrite columns of the same name.
     """
-    assert columns, "You must provide a subset of columns as input"
-    assert method, "You must choose a clustering algorithm to use"
-    gdf = gdf.copy().reset_index()
-    allcols = columns + [time_var]
-    gdf = gdf.dropna(how="any", subset=columns)
-    opset = gdf.copy()
-    opset = opset[allcols]
-    opset[columns] = opset.groupby(time_var)[columns].apply(
-        lambda x: (x - x.mean()) / x.std(ddof=0)
-    )
-    # option to autoscale the data w/ mix-max or zscore?
+    if not columns:
+        raise ValueError("You must provide a subset of columns as input")
+    if not method:
+        raise ValueError("You must choose a clustering algorithm to use")
+
+    times = gdf[time_var].unique()
+    gdf = gdf.set_index([time_var, id_var])
+
+    # this is the dataset we'll operate on
+    data = gdf.copy()[columns]
+    data = data.dropna(how="any", subset=columns)
+
+    # if the user doesn't specify, use the standard scalar
+    if not scaler:
+        scaler = StandardScaler()
+    for time in times:
+        data.loc[time] = scaler.fit_transform(data.loc[time].values)
+    # the rescalar can create nans if a column has no variance, so fill with 0
+    data = data.fillna(0)
+
     specification = {
         "ward": ward,
         "kmeans": kmeans,
@@ -82,37 +96,36 @@ def cluster(
         "spectral": spectral,
         "hdbscan": hdbscan,
     }
+
+    # run the cluster model then join the labels back to the original data
     model = specification[method](
-        opset[columns],
-        n_clusters=n_clusters,
-        best_model=best_model,
-        verbose=verbose,
-        **kwargs,
+        data, n_clusters=n_clusters, best_model=best_model, verbose=verbose, **kwargs
     )
     labels = model.labels_.astype(str)
+    data = data.reset_index()
     clusters = pd.DataFrame(
-        {method: labels, time_var: gdf[time_var].astype(str), id_var: gdf[id_var]}
+        {method: labels, time_var: data[time_var], id_var: data[id_var]}
     )
-    clusters["key"] = clusters[id_var] + clusters[time_var]
-    clusters = clusters.drop(columns=time_var)
-    gdf["key"] = gdf[id_var] + gdf[time_var].astype(str)
-    gdf = gdf.merge(clusters.drop(columns=[id_var]), on="key", how="left")
-    gdf.drop(columns="key", inplace=True)
-    gdf.set_index(id_var, inplace=True)
+    clusters.set_index([time_var, id_var], inplace=True)
+    gdf = gdf.join(clusters, how="left")
+    gdf = gdf.reset_index()
+    if return_model:
+        return gdf, model
     return gdf
 
 
 def cluster_spatial(
     gdf,
     n_clusters=6,
-    weights_type="rook",
+    spatial_weights="rook",
     method=None,
-    best_model=False,
     columns=None,
     threshold_variable="count",
     threshold=10,
     time_var="year",
     id_var="geoid",
+    return_model=False,
+    scaler=None,
     **kwargs,
 ):
     """Create a *spatial* geodemographic typology by running a cluster
@@ -129,8 +142,6 @@ def cluster_spatial(
         spatial weights matrix specification` (the default is "rook").
     method : str
         the clustering algorithm used to identify neighborhood types
-    best_model : type
-        Description of parameter `best_model` (the default is False).
     columns : list-like
         subset of columns on which to apply the clustering
     threshold_variable : str
@@ -145,8 +156,9 @@ def cluster_spatial(
     id_var: str
         which column on the long-form dataframe identifies the stable units
         over time. In a wide-form dataset, this would be the unique index
-    **kwargs
-
+    scaler: str or sklearn.preprocessing.Scaler
+        a scikit-learn preprocessing class that will be used to rescale the
+        data. Defaults to StandardScaler
 
     Returns
     -------
@@ -154,51 +166,23 @@ def cluster_spatial(
     appended as a new column. Will overwrite columns of the same name.
 
     """
-    assert columns, "You must provide a subset of columns as input"
-    assert method, "You must choose a clustering algorithm to use"
-    gdf = gdf.copy().reset_index()
-    cols = [time_var, id_var, "geometry"]
+    if not columns:
+        raise ValueError("You must provide a subset of columns as input")
+    if not method:
+        raise ValueError("You must choose a clustering algorithm to use")
 
-    if threshold_variable == "count":
-        allcols = columns + cols
-        data = gdf[allcols].copy()
-        data = data.dropna(how="any")
-        data[columns] = data.groupby(time_var)[columns].apply(
-            lambda x: (x - x.mean()) / x.std(ddof=0)
-        )
+    times = gdf[time_var].unique()
+    gdf = gdf.set_index([time_var, id_var])
 
-    elif threshold_variable is not None:
-        threshold_var = data[threshold_variable]
-        allcols = list(columns).remove(threshold_variable) + cols
-        data = gdf[allcols].copy()
-        data = data.dropna(how="any")
-        data[columns] = data.groupby(time_var)[columns].apply(
-            lambda x: (x - x.mean()) / x.std(ddof=0)
-        )
+    # this is the dataset we'll operate on
+    data = gdf.copy()[columns + ["geometry"]]
 
+    contiguity_weights = {"queen": Queen, "rook": Rook}
+
+    if spatial_weights in contiguity_weights.keys():
+        W = contiguity_weights[spatial_weights]
     else:
-        allcols = columns + cols
-        data = gdf[allcols].copy()
-        data = data.dropna(how="any")
-        data[columns] = data.groupby(time_var)[columns].apply(
-            lambda x: (x - x.mean()) / x.std(ddof=0)
-        )
-
-    def _build_data(data, time, weights_type):
-        df = data[data[time_var] == time].dropna(how="any")
-        weights = {"queen": Queen, "rook": Rook}
-        w = weights[weights_type].from_dataframe(df)
-        knnw = KNN.from_dataframe(df, k=1)
-
-        return df, w, knnw
-
-    times = data[time_var].unique().tolist()
-    annual = []
-    for time in times:
-        df, w, knnw = _build_data(data, time, weights_type)
-        annual.append([df, w, knnw])
-
-    datasets = dict(zip(times, annual))
+        W = spatial_weights
 
     specification = {
         "azp": azp,
@@ -208,42 +192,52 @@ def cluster_spatial(
         "max_p": max_p,
     }
 
-    clusters = []
-    for _, val in datasets.items():
-        if threshold_variable == "count":
-            threshold_var = np.ones(len(val[0]))
-            val[1] = attach_islands(val[1], val[2])
+    # if the user doesn't specify, use the standard scalar
+    if not scaler:
+        scaler = StandardScaler()
 
-        elif threshold_variable:
-            threshold_var = threshold_var[threshold.index.isin(val[0][id_var])].values
-            try:
-                val[1] = attach_islands(val[1], val[2])
-            except:
-                pass
+    ws = {}
+    clusters = []
+    dfs = []
+    # loop over each time period, standardize the data and build a weights matrix
+    for time in times:
+        df = data.loc[time].dropna(how="any", subset=columns).reset_index()
+        df[time_var] = time
+        df[columns] = scaler.fit_transform(df[columns].values)
+        w0 = W.from_dataframe(df)
+        w1 = KNN.from_dataframe(df, k=1)
+        ws = [w0, w1]
+        # the rescalar can create nans if a column has no variance, so fill with 0
+        df = df.fillna(0)
+
+        if threshold_variable and threshold_variable != "count":
+            data[threshold_variable] = gdf[threshold_variable]
+            threshold_var = data.threshold_variable.values
+            ws[0] = attach_islands(ws[0], ws[1])
+
+        elif threshold_variable == "count":
+            threshold_var = np.ones(len(data.loc[time]))
+            ws[0] = attach_islands(ws[0], ws[1])
+
         else:
             threshold_var = None
+
         model = specification[method](
-            val[0][columns],
-            w=val[1],
+            df[columns],
+            w=ws[0],
             n_clusters=n_clusters,
             threshold_variable=threshold_var,
             threshold=threshold,
             **kwargs,
         )
+
         labels = model.labels_.astype(str)
-        labels = pd.DataFrame(
-            {method: labels, time_var: val[0][time_var], id_var: val[0][id_var]}
+        clusters = pd.DataFrame(
+            {method: labels, time_var: df[time_var], id_var: df[id_var]}
         )
-        clusters.append(labels)
-
-    clusters = pd.concat(clusters)
-    clusters.set_index(id_var)
-    clusters["joinkey"] = clusters[id_var] + clusters[time_var].astype(str)
-    clusters = clusters.drop(columns=time_var)
-    gdf["joinkey"] = gdf[id_var] + gdf[time_var].astype(str)
-    if method in gdf.columns:
-        gdf.drop(columns=method, inplace=True)
-    gdf = gdf.merge(clusters.drop(columns=[id_var]), on="joinkey", how="left")
-    gdf.set_index(id_var, inplace=True)
-
+        clusters.set_index([time_var, id_var], inplace=True)
+        dfs.append(gdf.loc[time].join(clusters, how="left"))
+    gdf = pd.concat(dfs).reset_index()
+    if return_model:
+        return gdf, model
     return gdf

@@ -810,8 +810,7 @@ class Community(object):
 
         """
         self.gdf = gdf
-        if harmonized:
-            self.harmonized = True
+        self.harmonized = harmonized
 
     def harmonize(
         self,
@@ -868,7 +867,7 @@ class Community(object):
         # convert the long-form into a list of dataframes
         data = [x[1] for x in self.gdf.groupby("year")]
 
-        self.gdf = _harmonize(
+        gdf = _harmonize(
             data,
             target_year_of_reference,
             weights_method=weights_method,
@@ -879,6 +878,7 @@ class Community(object):
             codes=codes,
             force_crs_match=force_crs_match,
         )
+        return Community(gdf, harmonized=True)
 
     def cluster(
         self,
@@ -887,7 +887,9 @@ class Community(object):
         best_model=False,
         columns=None,
         verbose=False,
-        **kwargs
+        return_model=False,
+        scaler=None,
+        **kwargs,
     ):
         """Create a geodemographic typology by running a cluster analysis on
         the study area's neighborhood attributes
@@ -907,33 +909,56 @@ class Community(object):
             subset of columns on which to apply the clustering
         verbose : bool
             whether to print warning messages (the default is False).
-        **kwargs
+        return_model : bool
+            whether to return the underlying cluster model instance for further
+            analysis
+        scaler: str or sklearn.preprocessing.Scaler
+            a scikit-learn preprocessing class that will be used to rescale the
+            data. Defaults to StandardScaler
 
         Returns
         -------
         pandas.DataFrame with a column of neighborhood cluster labels appended
         as a new column. Will overwrite columns of the same name.
         """
-        self.gdf = _cluster(
-            gdf=self.gdf,
-            n_clusters=n_clusters,
-            method=method,
-            best_model=best_model,
-            columns=columns,
-            verbose=verbose,
-            **kwargs
-        )
+        harmonized = self.harmonized
+        if return_model:
+            gdf, model = _cluster(
+                gdf=self.gdf.copy(),
+                n_clusters=n_clusters,
+                method=method,
+                best_model=best_model,
+                columns=columns,
+                verbose=verbose,
+                return_model=return_model,
+                **kwargs,
+            )
+            return Community(gdf, harmonized=harmonized), model
+        else:
+            gdf = _cluster(
+                gdf=self.gdf.copy(),
+                n_clusters=n_clusters,
+                method=method,
+                best_model=best_model,
+                columns=columns,
+                verbose=verbose,
+                return_model=return_model,
+                **kwargs,
+            )
+            return Community(gdf, harmonized=harmonized)
 
     def cluster_spatial(
         self,
         n_clusters=6,
-        weights_type="rook",
+        spatial_weights="rook",
         method=None,
         best_model=False,
         columns=None,
         threshold_variable="count",
         threshold=10,
-        **kwargs
+        return_model=False,
+        scaler=None,
+        **kwargs,
     ):
         """Create a *spatial* geodemographic typology by running a cluster
         analysis on the metro area's neighborhood attributes and including a
@@ -959,25 +984,48 @@ class Community(object):
             been aggregated
         threshold : numeric
             threshold to use for max-p clustering (the default is 10).
-        **kwargs
-
+        return_model : bool
+            whether to return the underlying cluster model instance for further
+            analysis
+        scaler: str or sklearn.preprocessing.Scaler
+            a scikit-learn preprocessing class that will be used to rescale the
+            data. Defaults to StandardScaler
 
         Returns
         -------
         geopandas.GeoDataFrame with a column of neighborhood cluster labels
         appended as a new column. Will overwrite columns of the same name.
         """
-        self.gdf = _cluster_spatial(
-            gdf=self.gdf,
-            n_clusters=n_clusters,
-            weights_type=weights_type,
-            method=method,
-            best_model=best_model,
-            columns=columns,
-            threshold_variable=threshold_variable,
-            threshold=threshold,
-            **kwargs
-        )
+        harmonized = self.harmonized
+
+        if return_model:
+            gdf, model = _cluster_spatial(
+                gdf=self.gdf.copy(),
+                n_clusters=n_clusters,
+                spatial_weights=spatial_weights,
+                method=method,
+                best_model=best_model,
+                columns=columns,
+                threshold_variable=threshold_variable,
+                threshold=threshold,
+                return_model=return_model,
+                **kwargs,
+            )
+            return Community(gdf, harmonized=True), model
+        else:
+            gdf = _cluster_spatial(
+                gdf=self.gdf.copy(),
+                n_clusters=n_clusters,
+                spatial_weights=spatial_weights,
+                method=method,
+                best_model=best_model,
+                columns=columns,
+                threshold_variable=threshold_variable,
+                threshold=threshold,
+                return_model=return_model,
+                **kwargs,
+            )
+            return Community(gdf, harmonized=harmonized)
 
     def transition(self, cluster_col, time_var="year", id_var="geoid",
                w_type=None, permutations=0):
@@ -1140,7 +1188,7 @@ class Community(object):
                 years=years,
             )
 
-        return cls(gdf=gdf, harmonized=True)
+        return cls(gdf=gdf.reset_index(), harmonized=True)
 
     @classmethod
     def from_ncdb(
@@ -1215,7 +1263,7 @@ class Community(object):
                 years=years,
             )
 
-        return cls(gdf=gdf, harmonized=True)
+        return cls(gdf=gdf.reset_index(), harmonized=True)
 
     @classmethod
     def from_census(
