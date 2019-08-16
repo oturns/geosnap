@@ -15,7 +15,7 @@ def harmonize(
     extensive_variables=None,
     intensive_variables=None,
     allocate_total=True,
-    raster_path=None,
+    raster="nlcd_2011",
     codes=[21, 22, 23, 24],
     force_crs_match=True,
     index="geoid",
@@ -55,7 +55,7 @@ def harmonize(
         would be identical when the area of the source polygon is
         exhausted by intersections. See (3) in Notes for more details.
 
-    raster_path : str
+    raster : str
         the path to the associated raster image that has the types of
         each pixel in the spatial context.
         Only taken into consideration for harmonization raster based.
@@ -142,7 +142,7 @@ def harmonize(
             area_tables_raster_fitted = area_tables_raster(
                 source_df,
                 target_df.copy(),
-                raster_path=raster_path,
+                raster_path=raster,
                 codes=codes,
                 force_crs_match=force_crs_match,
             )
@@ -160,11 +160,11 @@ def harmonize(
             raise ValueError('weights_method must of one of ["area", "land_type_area"]')
 
         profiles = []
-        if len(extensive_variables) > 0:
+        if extensive_variables:
             profile = pd.DataFrame(interpolation[0], columns=extensive_variables)
             profiles.append(profile)
 
-        if len(intensive_variables) > 0:
+        if intensive_variables:
             profile = pd.DataFrame(interpolation[1], columns=intensive_variables)
             profiles.append(profile)
 

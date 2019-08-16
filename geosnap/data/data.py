@@ -403,7 +403,8 @@ def store_census():
     -------
     None
         Data will be available in the geosnap.data.data_store and will be used
-        in place of streaming data for all census queries.
+        in place of streaming data for all census queries. The raster package
+        is 3.05 GB.
 
     """
     quilt3.Package.install("census/tracts_cartographic", "s3://quilt-cgs")
@@ -818,7 +819,7 @@ class Community(object):
         extensive_variables=None,
         intensive_variables=None,
         allocate_total=True,
-        raster_path=None,
+        raster="nlcd_2011",
         codes=[21, 22, 23, 24],
         force_crs_match=True,
     ):
@@ -873,7 +874,7 @@ class Community(object):
             extensive_variables=extensive_variables,
             intensive_variables=intensive_variables,
             allocate_total=allocate_total,
-            raster_path=raster_path,
+            raster=raster,
             codes=codes,
             force_crs_match=force_crs_match,
         )
