@@ -17,6 +17,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 from analyze import cluster as _cluster, cluster_spatial as _cluster_spatial
 from harmonize import harmonize as _harmonize
 from .util import adjust_inflation, convert_gdf, get_lehd
+from analyze import transition as _transition, sequence as _sequence
 
 _fipstable = pd.read_csv(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), "stfipstable.csv"),
@@ -977,6 +978,93 @@ class Community(object):
             threshold=threshold,
             **kwargs
         )
+
+    def transition(self, cluster_col, time_var="year", id_var="geoid",
+               w_type=None, permutations=0):
+        """
+        (Spatial) Markov approach to transitional dynamics of neighborhoods.
+
+        The transitional dynamics approach should be adopted after
+        neighborhood segmentation since the column name of neighborhood
+        labels is a required input.
+
+        Parameters
+        ----------
+        cluster_col     : string or int
+                          Column name for the neighborhood segmentation, such as
+                          "ward", "kmeans", etc.
+        time_var        : string, optional
+                          Column defining time and or sequencing of the long-form data.
+                          Default is "year".
+        id_var          : string, optional
+                          Column identifying the unique id of spatial units.
+                          Default is "geoid".
+        w_type          : string, optional
+                          Type of spatial weights type ("rook", "queen", "knn" or
+                          "kernel") to be used for spatial structure. Default is
+                          None, if non-spatial Markov transition rates are desired.
+        permutations    : int, optional
+                          number of permutations for use in randomization based
+                          inference (the default is 0).
+
+        Return
+        ------
+        mar             : object
+                          if w_type=None, return a giddy.markov.Markov instance;
+                          if w_type is given, return a
+                          giddy.markov.Spatial_Markov instance.
+        """
+
+        mar = _transition(self.gdf, cluster_col,
+                                time_var=time_var, id_var=id_var,
+                                w_type=w_type, permutations=permutations)
+        return mar
+
+    def sequence(self, cluster_col, subs_mat=None, dist_type=None, indel=None,
+             time_var="year", id_var="geoid"):
+        """
+        Pairwise sequence analysis to evaluate the distance/dissimilarity
+        between every two neighborhood sequences.
+
+        The sequence approach should be adopted after
+        neighborhood segmentation since the column name of neighborhood
+        labels is a required input.
+
+        Parameters
+        ----------
+        cluster_col     : string or int
+                          Column name for the neighborhood segmentation, such as
+                          "ward", "kmeans", etc.
+        subs_mat        : array
+                          (k,k), substitution cost matrix. Should be hollow (
+                          0 cost between the same type), symmetric and non-negative.
+        dist_type       : string
+                          "hamming": hamming distance (substitution only
+                          and its cost is constant 1) from sklearn.metrics;
+                          "markov": utilize empirical transition
+                          probabilities to define substitution costs;
+                          "interval": differences between states are used
+                          to define substitution costs, and indel=k-1;
+                          "arbitrary": arbitrary distance if there is not a
+                          strong theory guidance: substitution=0.5, indel=1.
+                          "tran": transition-oriented optimal matching. Sequence of
+                          transitions. Based on :cite:`Biemann:2011`.
+        indel           : float, optional
+                          insertion/deletion cost.
+        time_var        : string, optional
+                          Column defining time and or sequencing of the long-form data.
+                          Default is "year".
+
+        Return
+        ------
+        seq_dis_mat     : array
+                          (n,n), distance/dissimilarity matrix for each pair of
+                          sequences
+        """
+        seq_dis_mat = _sequence(self.gdf, cluster_col, subs_mat=subs_mat,
+                              dist_type=dist_type, indel=indel,
+                              time_var=time_var, id_var=id_var)
+        return seq_dis_mat
 
     @classmethod
     def from_ltdb(
