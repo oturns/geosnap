@@ -1,15 +1,17 @@
 """Transition and sequence analysis of neighborhood change."""
 
-import itertools
-from itertools import combinations
+# import itertools
+# from itertools import combinations
 from giddy.markov import Markov, Spatial_Markov
+from giddy.sequence import Sequence
 import numpy as np
-import scipy.spatial.distance as d
+# import scipy.spatial.distance as d
 from libpysal.weights.contiguity import Queen, Rook
 from libpysal.weights.distance import KNN, Kernel
 
 
-def transition(dataset, cluster_col, w_type=None, permutations=0):
+def transition(gdf, cluster_col, time_var="year", id_var="geoid",
+               w_type=None, permutations=0):
     """
     (Spatial) Markov approach to transitional dynamics of neighborhoods.
 
@@ -18,9 +20,15 @@ def transition(dataset, cluster_col, w_type=None, permutations=0):
     gdf             : pandas.DataFrame
                       Long-form (geo)DataFrame containing neighborhood
                       attributes with a column defining neighborhood clusters.
-    cluster_col     : string
+    cluster_col     : string or int
                       Column name for the neighborhood segmentation, such as
                       "ward", "kmeans", etc.
+    time_var        : string, optional
+                      Column defining time and or sequencing of the long-form data.
+                      Default is "year".
+    id_var          : string, optional
+                      Column identifying the unique id of spatial units.
+                      Default is "geoid".
     w_type          : string, optional
                       Type of spatial weights type ("rook", "queen", "knn" or
                       "kernel") to be used for spatial structure. Default is
@@ -31,60 +39,68 @@ def transition(dataset, cluster_col, w_type=None, permutations=0):
 
     Return
     ------
-                    : giddy.markov.Markov instance or
-                    giddy.markov.SpatialMarkov instance
-                      (k, k), transition probability matrix for a-spatial
-                      Markov.
-    transitions     : matrix
-                      (k, k), counts of transitions between each neighborhood type
-                       i and j for a-spatial Markov.
-    T               : matrix
-                      (k, k, k), counts of transitions for each conditional
-                      Markov.  T[0] is the matrix of transitions for
-                      observations with categorical spatial lags of 0; T[k-1] is
-                      the transitions for the observations with lags of k-1.
-    P               : matrix
-                      (k, k, k), transition probability matrix for spatial
-                      Markov. First dimension is the conditioned on the
-                      categorical spatial lag.
+    mar             : object
+                      if w_type=None, return a giddy.markov.Markov instance;
+                      if w_type is given, return a
+                      giddy.markov.Spatial_Markov instance.
+
+    Examples
+    --------
+    >>> from geosnap.data import Community
+    >>> columbus = Community.from_ltdb(msa_fips=columbusfips)
+    >>> columbus.cluster(columns=['median_household_income',
+    ... 'p_poverty_rate', 'p_edu_college_greater', 'p_unemployment_rate'],
+    ... method='ward', n_clusters=6)
+    >>> gdf = columbus.gdf
+    >>> a = transition(gdf, "ward", w_type="rook")
+    >>> a.p
+    array([[0.79189189, 0.00540541, 0.0027027 , 0.13243243, 0.06216216,
+        0.00540541],
+       [0.0203252 , 0.75609756, 0.10569106, 0.11382114, 0.        ,
+        0.00406504],
+       [0.00917431, 0.20183486, 0.75229358, 0.01834862, 0.        ,
+        0.01834862],
+       [0.1959799 , 0.18341709, 0.00251256, 0.61809045, 0.        ,
+        0.        ],
+       [0.32307692, 0.        , 0.        , 0.        , 0.66153846,
+        0.01538462],
+       [0.09375   , 0.0625    , 0.        , 0.        , 0.        ,
+        0.84375   ]])
+    >>> a.P[0]
+    array([[0.82119205, 0.        , 0.        , 0.10927152, 0.06622517,
+        0.00331126],
+       [0.14285714, 0.57142857, 0.14285714, 0.14285714, 0.        ,
+        0.        ],
+       [0.5       , 0.        , 0.5       , 0.        , 0.        ,
+        0.        ],
+       [0.21428571, 0.14285714, 0.        , 0.64285714, 0.        ,
+        0.        ],
+       [0.18918919, 0.        , 0.        , 0.        , 0.78378378,
+        0.02702703],
+       [0.28571429, 0.        , 0.        , 0.        , 0.        ,
+        0.71428571]])
     """
 
-    def __init__(self,
-                 dataset,
-                 w_type,
-                 w_kwds=None,
-                 permutations=0,
-                 cluster_type=None):
-
-        y = dataset.census.copy().reset_index()
-        y = y[['geoid', 'year', cluster_type]]
-        y = y.groupby(['geoid', 'year']).first().unstack()
-        y = y.dropna()
-
-        tracts = dataset.tracts.copy().merge(
-            y.reset_index(), on='geoid', how='right')
+    gdf_temp = gdf.copy().reset_index()
+    df = gdf_temp[[id_var, time_var, cluster_col]]
+    df_wide = df.pivot(index=id_var, columns=time_var,
+                       values=cluster_col).dropna().astype("int")
+    y = df_wide.values
+    if w_type is None:
+        mar = Markov(y)  # class markov modeling
+    else:
+        gdf_one = gdf_temp.drop_duplicates([id_var])
+        gdf_wide = df_wide.merge(gdf_one, left_index=True, right_on=id_var)
         w_dict = {'rook': Rook, 'queen': Queen, 'knn': KNN, 'kernel': Kernel}
-        w = w_dict[w_type].from_dataframe(tracts)
-        y = y.astype(int)
-
-        sm = Spatial_Markov(
-            y,
-            w,
-            permutations=permutations,
-            discrete=True,
-            variable_name=cluster_type)
-        self.p = sm.p
-        self.transitions = sm.transitions
-        self.P = sm.P
-        self.T = sm.T
-        self.summary = sm.summary
-        self.cluster_type = cluster_type
-        # keep the spatial markov instance here in case that users want to
-        # estimate steady state distribution etc
-        self.sm = sm
+        w = w_dict[w_type].from_dataframe(gdf_wide)
+        w.transform = "r"
+        mar = Spatial_Markov(y, w, permutations=permutations, discrete=True,
+                             variable_name=cluster_col)
+    return mar
 
 
-class Sequence(object):
+def sequence(gdf, cluster_col, seq_clusters=5, subs_mat=None, dist_type=None,
+             indel=None, time_var="year", id_var="geoid"):
     """
     Pairwise sequence analysis.
 
@@ -92,12 +108,13 @@ class Sequence(object):
 
     Parameters
     ----------
-    y               : array
-                      one row per sequence of neighborhood types for each
-                      spatial unit. Sequences could be of varying lengths.
-    subs_mat        : array
-                      (k,k), substitution cost matrix. Should be hollow (
-                      0 cost between the same type), symmetric and non-negative.
+    gdf             : pandas.DataFrame
+                      Long-form (geo)DataFrame containing neighborhood
+                      attributes with a column defining neighborhood clusters.
+    cluster_col     : string or int
+                      Column name for the neighborhood segmentation, such as
+                      "ward", "kmeans", etc.
+
     dist_type       : string
                       "hamming": hamming distance (substitution only
                       and its cost is constant 1) from sklearn.metrics;
@@ -109,34 +126,47 @@ class Sequence(object):
                       strong theory guidance: substitution=0.5, indel=1.
                       "tran": transition-oriented optimal matching. Sequence of
                       transitions. Based on :cite:`Biemann:2011`.
-    indel           : float
+    subs_mat        : array
+                      (k,k), substitution cost matrix. Should be hollow (
+                      0 cost between the same type), symmetric and non-negative.
+    indel           : float, optional
                       insertion/deletion cost.
-    cluster_type    : string
-                      cluster algorithm (specification) used to generate
-                      neighborhood types, such as "ward", "kmeans", etc.
+    time_var        : string, optional
+                      Column defining time and or sequencing of the long-form data.
+                      Default is "year".
 
-    Attributes
-    ----------
+    Return
+    ------
     seq_dis_mat     : array
                       (n,n), distance/dissimilarity matrix for each pair of
                       sequences
-    classes         : array
-                      (k, ), unique classes
-    k               : int
-                      number of unique classes
-    label_dict      : dict
-                      dictionary - {input label: int value between 0 and k-1 (k
-                      is the number of unique classes for the pooled data)}
 
     Examples
     --------
-    >>> import numpy as np
+    >>> from geosnap.data import Community
+    >>> columbus = Community.from_ltdb(msa_fips=columbusfips)
+    >>> columbus.cluster(columns=['median_household_income',
+    ... 'p_poverty_rate', 'p_edu_college_greater', 'p_unemployment_rate'],
+    ... method='ward', n_clusters=6)
+    >>> gdf = columbus.gdf
+    >>> seq_hamming = Sequence(q5, dist_type="hamming")
+    >>> seq_hamming.seq_dis_mat[:5, :5]
+    array([[0., 3., 4., 5., 5.],
+           [3., 0., 3., 3., 3.],
+           [4., 3., 0., 2., 2.],
+           [5., 3., 2., 0., 0.],
+           [5., 3., 2., 0., 0.]])
 
     """
 
-    def __init__(self, y, subs_mat=None, dist_type=None,
-                 indel=None, cluster_type=None):
-        y=y
+    gdf_temp = gdf.copy().reset_index()
+    df = gdf_temp[[id_var, time_var, cluster_col]]
+    df_wide = df.pivot(index=id_var, columns=time_var,
+                       values=cluster_col).dropna().astype("int")
+    y = df_wide.values
+    seq = Sequence(y, subs_mat=subs_mat, dist_type=dist_type,
+                 indel=indel, cluster_type=cluster_col)
+    return seq.seq_dis_mat
 
 
 
