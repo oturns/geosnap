@@ -9,8 +9,10 @@ from libpysal.weights.contiguity import Queen, Rook
 from libpysal.weights.distance import KNN, Kernel
 from sklearn.cluster import AgglomerativeClustering
 
-def transition(gdf, cluster_col, time_var="year", id_var="geoid",
-               w_type=None, permutations=0):
+
+def transition(
+    gdf, cluster_col, time_var="year", id_var="geoid", w_type=None, permutations=0
+):
     """
     (Spatial) Markov approach to transitional dynamics of neighborhoods.
 
@@ -82,24 +84,36 @@ def transition(gdf, cluster_col, time_var="year", id_var="geoid",
 
     gdf_temp = gdf.copy().reset_index()
     df = gdf_temp[[id_var, time_var, cluster_col]]
-    df_wide = df.pivot(index=id_var, columns=time_var,
-                       values=cluster_col).dropna().astype("int")
+    df_wide = (
+        df.pivot(index=id_var, columns=time_var, values=cluster_col)
+        .dropna()
+        .astype("int")
+    )
     y = df_wide.values
     if w_type is None:
         mar = Markov(y)  # class markov modeling
     else:
         gdf_one = gdf_temp.drop_duplicates([id_var])
         gdf_wide = df_wide.merge(gdf_one, left_index=True, right_on=id_var)
-        w_dict = {'rook': Rook, 'queen': Queen, 'knn': KNN, 'kernel': Kernel}
+        w_dict = {"rook": Rook, "queen": Queen, "knn": KNN, "kernel": Kernel}
         w = w_dict[w_type].from_dataframe(gdf_wide)
         w.transform = "r"
-        mar = Spatial_Markov(y, w, permutations=permutations, discrete=True,
-                             variable_name=cluster_col)
+        mar = Spatial_Markov(
+            y, w, permutations=permutations, discrete=True, variable_name=cluster_col
+        )
     return mar
 
 
-def sequence(gdf, cluster_col, seq_clusters=5, subs_mat=None, dist_type=None,
-             indel=None, time_var="year", id_var="geoid"):
+def sequence(
+    gdf,
+    cluster_col,
+    seq_clusters=5,
+    subs_mat=None,
+    dist_type=None,
+    indel=None,
+    time_var="year",
+    id_var="geoid",
+):
     """
     Pairwise sequence analysis and sequence clustering.
 
@@ -173,21 +187,19 @@ def sequence(gdf, cluster_col, seq_clusters=5, subs_mat=None, dist_type=None,
 
     gdf_temp = gdf.copy().reset_index()
     df = gdf_temp[[id_var, time_var, cluster_col]]
-    df_wide = df.pivot(index=id_var, columns=time_var,
-                       values=cluster_col).dropna().astype("int")
+    df_wide = (
+        df.pivot(index=id_var, columns=time_var, values=cluster_col)
+        .dropna()
+        .astype("int")
+    )
     y = df_wide.values
-    seq_dis_mat = Sequence(y, subs_mat=subs_mat, dist_type=dist_type,
-                 indel=indel, cluster_type=cluster_col).seq_dis_mat
+    seq_dis_mat = Sequence(
+        y, subs_mat=subs_mat, dist_type=dist_type, indel=indel, cluster_type=cluster_col
+    ).seq_dis_mat
     model = AgglomerativeClustering(n_clusters=seq_clusters).fit(seq_dis_mat)
-    name_seq = dist_type+"_%d"%(seq_clusters)
+    name_seq = dist_type + "_%d" % (seq_clusters)
     df_wide[name_seq] = model.labels_
-    gdf_temp = gdf_temp.merge(df_wide[[name_seq]], left_on=id_var,
-                              right_index=True)
+    gdf_temp = gdf_temp.merge(df_wide[[name_seq]], left_on=id_var, right_index=True)
     gdf_temp = gdf_temp.reset_index()
 
     return gdf_temp, df_wide, seq_dis_mat
-
-
-
-
-

@@ -1027,8 +1027,9 @@ class Community(object):
             )
             return Community(gdf, harmonized=harmonized)
 
-    def transition(self, cluster_col, time_var="year", id_var="geoid",
-               w_type=None, permutations=0):
+    def transition(
+        self, cluster_col, time_var="year", id_var="geoid", w_type=None, permutations=0
+    ):
         """
         (Spatial) Markov approach to transitional dynamics of neighborhoods.
 
@@ -1063,14 +1064,26 @@ class Community(object):
                           giddy.markov.Spatial_Markov instance.
         """
 
-        mar = _transition(self.gdf, cluster_col,
-                                time_var=time_var, id_var=id_var,
-                                w_type=w_type, permutations=permutations)
+        mar = _transition(
+            self.gdf,
+            cluster_col,
+            time_var=time_var,
+            id_var=id_var,
+            w_type=w_type,
+            permutations=permutations,
+        )
         return mar
 
-    def sequence(self, cluster_col, seq_clusters=5, subs_mat=None,
-                 dist_type=None, indel=None,
-                 time_var="year", id_var="geoid"):
+    def sequence(
+        self,
+        cluster_col,
+        seq_clusters=5,
+        subs_mat=None,
+        dist_type=None,
+        indel=None,
+        time_var="year",
+        id_var="geoid",
+    ):
         """
         Pairwise sequence analysis to evaluate the distance/dissimilarity
         between every two neighborhood sequences.
@@ -1124,11 +1137,16 @@ class Community(object):
                           (n,n), distance/dissimilarity matrix for each pair of
                           sequences
         """
-        gdf_temp, df_wide, seq_dis_mat= _sequence(self.gdf, cluster_col,
-                                                  seq_clusters=seq_clusters,
-                                subs_mat=subs_mat,
-                              dist_type=dist_type, indel=indel,
-                              time_var=time_var, id_var=id_var)
+        gdf_temp, df_wide, seq_dis_mat = _sequence(
+            self.gdf,
+            cluster_col,
+            seq_clusters=seq_clusters,
+            subs_mat=subs_mat,
+            dist_type=dist_type,
+            indel=indel,
+            time_var=time_var,
+            id_var=id_var,
+        )
         gdf_new = Community(gdf_temp)
         return gdf_new, df_wide, seq_dis_mat
 
