@@ -2,7 +2,7 @@
 import numpy as np
 from context import data
 import os
-from ..analyze import sequence, transition
+from geosnap.analyze import sequence, transition
 
 path = os.environ["DLPATH"]
 
