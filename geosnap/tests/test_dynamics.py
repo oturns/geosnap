@@ -1,7 +1,5 @@
 # from context import analyze
 import numpy as np
-import pytest
-
 from context import data
 import os
 from ..analyze import sequence, transition
