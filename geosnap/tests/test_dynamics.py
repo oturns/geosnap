@@ -3,7 +3,7 @@ import numpy as np
 from context import data
 import os
 from geosnap.analyze import sequence, transition
-
+RTOL = 0.00001
 path = os.environ["DLPATH"]
 
 if not os.path.exists(
@@ -43,24 +43,30 @@ def test_transition():
             [0.00917431, 0.20183486, 0.75229358, 0.01834862, 0.0, 0.01834862],
             [0.1959799, 0.18341709, 0.00251256, 0.61809045, 0.0, 0.0],
             [0.32307692, 0.0, 0.0, 0.0, 0.66153846, 0.01538462],
-            [0.09375, 0.0625, 0.0, 0.0, 0.0, 0.84375],
+            [0.09375, 0.0625, 0.0, 0.0, 0.0, 0.84375]
         ]
     )
-    assert all([a == b for a, b in zip(m.p.flatten(), mp.flatten())])
+    np.testing.assert_allclose(m.p, mp, RTOL)
 
     # 2. Spatial Markov modeling
     sm = transition(columbus1.gdf, cluster_col="ward", w_type="queen")
     smp = np.array(
         [
-            [0.82068966, 0.0, 0.0, 0.10689655, 0.07241379, 0.0],
-            [0.14285714, 0.57142857, 0.14285714, 0.14285714, 0.0, 0.0],
-            [0.5, 0.0, 0.5, 0.0, 0.0, 0.0],
-            [0.21428571, 0.0952381, 0.0, 0.69047619, 0.0, 0.0],
-            [0.22222222, 0.0, 0.0, 0.0, 0.75, 0.02777778],
-            [0.16666667, 0.0, 0.0, 0.0, 0.0, 0.83333333],
+            [0.82352941, 0., 0., 0.10726644, 0.06920415,
+             0.],
+            [0.25, 0.5, 0.125, 0.125, 0.,
+             0.],
+            [0.5, 0., 0.5, 0., 0.,
+             0.],
+            [0.23255814, 0.09302326, 0., 0.6744186, 0.,
+             0.],
+            [0.22222222, 0., 0., 0., 0.75,
+             0.02777778],
+            [0.16666667, 0., 0., 0., 0.,
+             0.83333333]
         ]
     )
-    assert all([a == b for a, b in zip(sm.P[0].flatten(), smp.flatten())])
+    np.testing.assert_allclose(sm.P[0], smp, RTOL)
 
 
 def test_sequence():
@@ -73,13 +79,13 @@ def test_sequence():
         columbus1.gdf, seq_clusters=5, dist_type="tran", cluster_col="ward"
     )
 
-    values = np.array([3, 3, 0, 2, 3, 2])
-    assert all([a == b for a, b in zip(values, output[1].values[0])])
+    values = np.array([3, 3, 0, 2, 3, 1])
+    np.testing.assert_allclose(output[1].values[0], values, RTOL)
 
     # 2. Hamming distance
 
     output = sequence(
         columbus1.gdf, seq_clusters=5, dist_type="hamming", cluster_col="ward"
     )
-    values = np.array([3, 3, 0, 2, 3, 4])
-    assert all([a == b for a, b in zip(values, output[1].values[0])])
+    values = np.array([3, 3, 0, 2, 3, 2])
+    np.testing.assert_allclose(output[1].values[0], values, RTOL)
