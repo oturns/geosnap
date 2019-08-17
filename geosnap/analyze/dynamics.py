@@ -1,10 +1,7 @@
 """Transition and sequence analysis of neighborhood change."""
 
-# import itertools
-# from itertools import combinations
 from giddy.markov import Markov, Spatial_Markov
 from giddy.sequence import Sequence
-import numpy as np
 from libpysal.weights.contiguity import Queen, Rook
 from libpysal.weights.distance import KNN, Kernel
 from sklearn.cluster import AgglomerativeClustering

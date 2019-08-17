@@ -69,17 +69,17 @@ def test_sequence():
     """
 
     # 1. Transition-orientied optimal matching
-    gdf_new, df_wide, seq_dis_mat = sequence(
+    output = sequence(
         columbus1.gdf, seq_clusters=5, dist_type="tran", cluster_col="ward"
     )
 
     values = np.array([3, 3, 0, 2, 3, 2])
-    assert all([a == b for a, b in zip(values, df_wide.values[0])])
+    assert all([a == b for a, b in zip(values, output[1].values[0])])
 
     # 2. Hamming distance
 
-    gdf_new, df_wide, seq_dis_mat = sequence(
+    output = sequence(
         columbus1.gdf, seq_clusters=5, dist_type="hamming", cluster_col="ward"
     )
     values = np.array([3, 3, 0, 2, 3, 4])
-    assert all([a == b for a, b in zip(values, df_wide.values[0])])
+    assert all([a == b for a, b in zip(values, output[1].values[0])])
