@@ -1068,8 +1068,9 @@ class Community(object):
                                 w_type=w_type, permutations=permutations)
         return mar
 
-    def sequence(self, cluster_col, subs_mat=None, dist_type=None, indel=None,
-             time_var="year", id_var="geoid"):
+    def sequence(self, cluster_col, seq_clusters=5, subs_mat=None,
+                 dist_type=None, indel=None,
+                 time_var="year", id_var="geoid"):
         """
         Pairwise sequence analysis to evaluate the distance/dissimilarity
         between every two neighborhood sequences.
@@ -1109,10 +1110,13 @@ class Community(object):
                           (n,n), distance/dissimilarity matrix for each pair of
                           sequences
         """
-        seq_dis_mat = _sequence(self.gdf, cluster_col, subs_mat=subs_mat,
+        gdf_temp, df_wide, seq_dis_mat= _sequence(self.gdf, cluster_col,
+                                                  seq_clusters=seq_clusters,
+                                subs_mat=subs_mat,
                               dist_type=dist_type, indel=indel,
                               time_var=time_var, id_var=id_var)
-        return seq_dis_mat
+        gdf_new = Community(gdf_temp)
+        return gdf_new, df_wide, seq_dis_mat
 
     @classmethod
     def from_ltdb(
