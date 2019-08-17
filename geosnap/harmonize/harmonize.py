@@ -10,12 +10,12 @@ from tobler.util.util import _check_presence_of_crs
 
 def harmonize(
     raw_community,
-    target_year,
+    target_year=None,
     weights_method="area",
     extensive_variables=None,
     intensive_variables=None,
     allocate_total=True,
-    raster_path=None,
+    raster="nlcd_2011",
     codes=[21, 22, 23, 24],
     force_crs_match=True,
     index="geoid",
@@ -55,7 +55,7 @@ def harmonize(
         would be identical when the area of the source polygon is
         exhausted by intersections. See (3) in Notes for more details.
 
-    raster_path : str
+    raster : str
         the path to the associated raster image that has the types of
         each pixel in the spatial context.
         Only taken into consideration for harmonization raster based.
@@ -114,16 +114,8 @@ def harmonize(
             "You must pass a set of extensive and/or intensive variables to interpolate"
         )
 
-    for i in raw_community:
-        _check_presence_of_crs(i)
-
-    if not all(i.crs == raw_community[0].crs for i in raw_community):
-        raise ValueError(
-            "There is, at least, one pairwise difference in the Coordinate "
-            "Reference System (CRS) of the GeoDataFrames of raw_community. "
-            "All of them must be the same."
-        )
-    dfs = pd.concat(raw_community)
+    _check_presence_of_crs(raw_community)
+    dfs = raw_community.copy()
     times = dfs[time_col].unique()
 
     target_df = dfs[dfs[time_col] == target_year].reset_index()
@@ -145,12 +137,12 @@ def harmonize(
                 allocate_total=allocate_total,
             )
 
-        if weights_method == "land_type_area":
+        elif weights_method == "land_type_area":
 
             area_tables_raster_fitted = area_tables_raster(
                 source_df,
                 target_df.copy(),
-                raster_path,
+                raster_path=raster,
                 codes=codes,
                 force_crs_match=force_crs_match,
             )
@@ -158,19 +150,21 @@ def harmonize(
             # In area_interpolate, the resulting variable has same lenght as target_df
             interpolation = area_interpolate(
                 source_df,
-                target_df,
+                target_df.copy(),
                 extensive_variables=extensive_variables,
                 intensive_variables=intensive_variables,
                 allocate_total=allocate_total,
                 tables=area_tables_raster_fitted,
             )
+        else:
+            raise ValueError('weights_method must of one of ["area", "land_type_area"]')
 
         profiles = []
-        if len(extensive_variables) > 0:
+        if extensive_variables:
             profile = pd.DataFrame(interpolation[0], columns=extensive_variables)
             profiles.append(profile)
 
-        if len(intensive_variables) > 0:
+        if intensive_variables:
             profile = pd.DataFrame(interpolation[1], columns=intensive_variables)
             profiles.append(profile)
 
