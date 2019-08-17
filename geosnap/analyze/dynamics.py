@@ -16,7 +16,7 @@ def transition(gdf, cluster_col, time_var="year", id_var="geoid",
 
     Parameters
     ----------
-    gdf             : pandas.DataFrame
+    gdf             : (geo)DataFrame
                       Long-form (geo)DataFrame containing neighborhood
                       attributes with a column defining neighborhood clusters.
     cluster_col     : string or int
@@ -101,13 +101,13 @@ def transition(gdf, cluster_col, time_var="year", id_var="geoid",
 def sequence(gdf, cluster_col, seq_clusters=5, subs_mat=None, dist_type=None,
              indel=None, time_var="year", id_var="geoid"):
     """
-    Pairwise sequence analysis.
+    Pairwise sequence analysis and sequence clustering.
 
     Dynamic programming if optimal matching.
 
     Parameters
     ----------
-    gdf             : pandas.DataFrame
+    gdf             : (geo)DataFrame
                       Long-form (geo)DataFrame containing neighborhood
                       attributes with a column defining neighborhood clusters.
     cluster_col     : string or int
@@ -136,11 +136,14 @@ def sequence(gdf, cluster_col, seq_clusters=5, subs_mat=None, dist_type=None,
     time_var        : string, optional
                       Column defining time and or sequencing of the long-form data.
                       Default is "year".
+    id_var          : string, optional
+                      Column identifying the unique id of spatial units.
+                      Default is "geoid".
 
     Return
     ------
-    gdf_new         : Community instance
-                      New Community instance with a new column for sequence
+    gdf_temp        : (geo)DataFrame
+                      (geo)DataFrame with a new column for sequence
                       labels.
     df_wide         : pandas.DataFrame
                       Wide-form DataFrame with k (k is the number of periods)
