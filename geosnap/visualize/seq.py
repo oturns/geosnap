@@ -55,12 +55,15 @@ def indexplot_seq(df_traj, clustering,
     >>> plt.show()
     """
 
-    years = list(years)
+    df_traj.columns = df_traj.columns.astype(str)
+    years = list(np.array(years).astype(str))
     n_years = len(years)
     if k is None:
         k = len(np.unique(df_traj[years].values))
 
-    m = len(df_traj[clustering].unique())
+    neighborhood = np.sort(np.unique(df_traj[years].values))
+    traj_label = np.sort(df_traj[clustering].unique())
+    m = len(traj_label)
     nrows = int(np.ceil(m / ncols))
 
     fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(15, 5 * nrows))
@@ -72,7 +75,7 @@ def indexplot_seq(df_traj, clustering,
     dtype = list(zip(years, [int] * n_years))
     color_cluster = sns.color_palette(palette, n_colors=k)
     color = copy.copy(color_cluster)
-    color.insert(0, (1, 1, 1))
+    color.append((1, 1, 1))
     cluster_cmap = ListedColormap(color_cluster)
     my_cmap = ListedColormap(color)
 
@@ -82,13 +85,13 @@ def indexplot_seq(df_traj, clustering,
                 ax = axes[q]
             else:
                 ax = axes[p, q]
-            i = p * ncols + q + 1
-            if i > m:
+            i = p * ncols + q
+            if i >= m:
                 ax.set_axis_off()
                 continue
-            ax.set_title("Neighborhood Sequence Cluster " + str(i),
+            ax.set_title("Neighborhood Sequence Cluster " + str(traj_label[i]),
                          fontsize=15)
-            cluster_i = traj[traj[clustering] == i][years].values
+            cluster_i = traj[traj[clustering] == traj_label[i]][years].values
             cluster_i_temp = np.array(list(map(tuple, cluster_i)), dtype=dtype)
             cluster_i_temp_sort = np.sort(cluster_i_temp, order=years)
             cluster_i_temp_sort = np.array(list(map(list, cluster_i_temp_sort)))
@@ -97,8 +100,9 @@ def indexplot_seq(df_traj, clustering,
                 continue
             elif cluster_i_temp_sort.shape[0] < max_cluster:
                 diff_n = max_cluster - cluster_i_temp_sort.shape[0]
+                bigger = np.unique(cluster_i_temp_sort).max()+1
                 cluster_i_temp_sort = np.append(cluster_i_temp_sort, np.zeros(
-                    (diff_n, cluster_i_temp_sort.shape[1])), axis=0)
+                    (diff_n, cluster_i_temp_sort.shape[1]))+bigger, axis=0)
             df_cluster_i_temp_sort = pd.DataFrame(cluster_i_temp_sort,
                                                   columns=years)
 
@@ -108,9 +112,8 @@ def indexplot_seq(df_traj, clustering,
                                  cbar_kws={"orientation": "horizontal"},
                                  cbar_ax=cbar_ax)
                 colorbar = ax.collections[0].colorbar
-                colorbar.set_cmap(cluster_cmap)
-                colorbar.set_ticks(np.linspace(1.4, k-0.4, k))
-                colorbar.set_ticklabels(np.arange(k) + 1)
+                colorbar.set_ticks(np.linspace(min(neighborhood) + 0.5, max(neighborhood) - 0.5, k))
+                colorbar.set_ticklabels(neighborhood)
             else:
                 ax = sns.heatmap(df_cluster_i_temp_sort, ax=ax, cmap=my_cmap,
                                  cbar=False)
