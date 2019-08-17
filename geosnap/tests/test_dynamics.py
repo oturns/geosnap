@@ -50,6 +50,7 @@ def test_transition():
     np.testing.assert_allclose(m.p, mp, RTOL)
 
     # 2. Spatial Markov modeling
+    np.random.seed(5)
     sm = transition(columbus1.gdf, cluster_col="ward", w_type="queen")
     smp = np.array(
         [
