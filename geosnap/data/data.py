@@ -1084,6 +1084,10 @@ class Community(object):
         cluster_col     : string or int
                           Column name for the neighborhood segmentation, such as
                           "ward", "kmeans", etc.
+        seq_clusters    : int, optional
+                          Number of neighborhood sequence clusters. Agglomerative
+                          Clustering with Ward linkage is now used for clustering
+                          the sequences. Default is 5.
         subs_mat        : array
                           (k,k), substitution cost matrix. Should be hollow (
                           0 cost between the same type), symmetric and non-negative.
@@ -1103,9 +1107,19 @@ class Community(object):
         time_var        : string, optional
                           Column defining time and or sequencing of the long-form data.
                           Default is "year".
+        id_var          : string, optional
+                          Column identifying the unique id of spatial units.
+                          Default is "geoid".
 
         Return
         ------
+        gdf_new         : Community instance
+                          New Community instance with attribute "gdf" having
+                          a new column for sequence labels.
+        df_wide         : pandas.DataFrame
+                          Wide-form DataFrame with k (k is the number of periods)
+                          columns of neighborhood types and 1 column of sequence
+                          labels.
         seq_dis_mat     : array
                           (n,n), distance/dissimilarity matrix for each pair of
                           sequences
