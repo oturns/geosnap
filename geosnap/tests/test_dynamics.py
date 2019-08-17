@@ -26,7 +26,7 @@ def test_transition():
 
 
     # 1. Markov modeling
-    m = transition(columbus1.gdf, columbus, cluster_col="ward")
+    m = transition(columbus1.gdf, cluster_col="ward")
     mp = np.array([[0.79189189, 0.00540541, 0.0027027 , 0.13243243, 0.06216216,
         0.00540541],
        [0.0203252 , 0.75609756, 0.10569106, 0.11382114, 0.        ,
@@ -43,7 +43,7 @@ def test_transition():
                                        mp.flatten())])
 
     # 2. Spatial Markov modeling
-    sm = transition(columbus1.gdf, columbus, cluster_col="ward", w_type="queen")
+    sm = transition(columbus1.gdf, cluster_col="ward", w_type="queen")
     smp = np.array([[0.82068966, 0.        , 0.        , 0.10689655, 0.07241379,
          0.        ],
         [0.14285714, 0.57142857, 0.14285714, 0.14285714, 0.        ,
