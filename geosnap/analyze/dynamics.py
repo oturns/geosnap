@@ -5,10 +5,9 @@
 from giddy.markov import Markov, Spatial_Markov
 from giddy.sequence import Sequence
 import numpy as np
-# import scipy.spatial.distance as d
 from libpysal.weights.contiguity import Queen, Rook
 from libpysal.weights.distance import KNN, Kernel
-
+from sklearn.cluster import AgglomerativeClustering
 
 def transition(gdf, cluster_col, time_var="year", id_var="geoid",
                w_type=None, permutations=0):
@@ -48,10 +47,10 @@ def transition(gdf, cluster_col, time_var="year", id_var="geoid",
     --------
     >>> from geosnap.data import Community
     >>> columbus = Community.from_ltdb(msa_fips=columbusfips)
-    >>> columbus.cluster(columns=['median_household_income',
+    >>> columbus1 = columbus.cluster(columns=['median_household_income',
     ... 'p_poverty_rate', 'p_edu_college_greater', 'p_unemployment_rate'],
     ... method='ward', n_clusters=6)
-    >>> gdf = columbus.gdf
+    >>> gdf = columbus1.gdf
     >>> a = transition(gdf, "ward", w_type="rook")
     >>> a.p
     array([[0.79189189, 0.00540541, 0.0027027 , 0.13243243, 0.06216216,
@@ -114,7 +113,10 @@ def sequence(gdf, cluster_col, seq_clusters=5, subs_mat=None, dist_type=None,
     cluster_col     : string or int
                       Column name for the neighborhood segmentation, such as
                       "ward", "kmeans", etc.
-
+    seq_clusters    : int, optional
+                      Number of neighborhood sequence clusters. Agglomerative
+                      Clustering with Ward linkage is now used for clustering
+                      the sequences. Default is 5.
     dist_type       : string
                       "hamming": hamming distance (substitution only
                       and its cost is constant 1) from sklearn.metrics;
@@ -137,6 +139,13 @@ def sequence(gdf, cluster_col, seq_clusters=5, subs_mat=None, dist_type=None,
 
     Return
     ------
+    gdf_new         : Community instance
+                      New Community instance with a new column for sequence
+                      labels.
+    df_wide         : pandas.DataFrame
+                      Wide-form DataFrame with k (k is the number of periods)
+                      columns of neighborhood types and 1 column of sequence
+                      labels.
     seq_dis_mat     : array
                       (n,n), distance/dissimilarity matrix for each pair of
                       sequences
@@ -145,11 +154,11 @@ def sequence(gdf, cluster_col, seq_clusters=5, subs_mat=None, dist_type=None,
     --------
     >>> from geosnap.data import Community
     >>> columbus = Community.from_ltdb(msa_fips=columbusfips)
-    >>> columbus.cluster(columns=['median_household_income',
+    >>> columbus1 = columbus.cluster(columns=['median_household_income',
     ... 'p_poverty_rate', 'p_edu_college_greater', 'p_unemployment_rate'],
     ... method='ward', n_clusters=6)
-    >>> gdf = columbus.gdf
-    >>> seq_hamming = Sequence(q5, dist_type="hamming")
+    >>> gdf = columbus1.gdf
+    >>> gdf_new, df_wide, seq_hamming = Sequence(gdf, dist_type="hamming")
     >>> seq_hamming.seq_dis_mat[:5, :5]
     array([[0., 3., 4., 5., 5.],
            [3., 0., 3., 3., 3.],
@@ -164,9 +173,16 @@ def sequence(gdf, cluster_col, seq_clusters=5, subs_mat=None, dist_type=None,
     df_wide = df.pivot(index=id_var, columns=time_var,
                        values=cluster_col).dropna().astype("int")
     y = df_wide.values
-    seq = Sequence(y, subs_mat=subs_mat, dist_type=dist_type,
-                 indel=indel, cluster_type=cluster_col)
-    return seq.seq_dis_mat
+    seq_dis_mat = Sequence(y, subs_mat=subs_mat, dist_type=dist_type,
+                 indel=indel, cluster_type=cluster_col).seq_dis_mat
+    model = AgglomerativeClustering(n_clusters=seq_clusters).fit(seq_dis_mat)
+    name_seq = dist_type+"_%d"%(seq_clusters)
+    df_wide[name_seq] = model.labels_
+    gdf_temp = gdf_temp.merge(df_wide[[name_seq]], left_on=id_var,
+                              right_index=True)
+    gdf_temp = gdf_temp.reset_index()
+
+    return gdf_temp, df_wide, seq_dis_mat
 
 
 
