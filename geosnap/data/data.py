@@ -404,7 +404,8 @@ def store_census():
     -------
     None
         Data will be available in the geosnap.data.data_store and will be used
-        in place of streaming data for all census queries.
+        in place of streaming data for all census queries. The raster package
+        is 3.05 GB.
 
     """
     quilt3.Package.install("census/tracts_cartographic", "s3://quilt-cgs")
@@ -814,12 +815,12 @@ class Community(object):
 
     def harmonize(
         self,
-        target_year_of_reference,
+        target_year=None,
         weights_method="area",
-        extensive_variables=[],
-        intensive_variables=[],
+        extensive_variables=None,
+        intensive_variables=None,
         allocate_total=True,
-        raster_path=None,
+        raster="nlcd_2011",
         codes=[21, 22, 23, 24],
         force_crs_match=True,
     ):
@@ -865,16 +866,16 @@ class Community(object):
 
         """
         # convert the long-form into a list of dataframes
-        data = [x[1] for x in self.gdf.groupby("year")]
+        # data = [x[1] for x in self.gdf.groupby("year")]
 
         gdf = _harmonize(
-            data,
-            target_year_of_reference,
+            self.gdf,
+            target_year=target_year,
             weights_method=weights_method,
             extensive_variables=extensive_variables,
             intensive_variables=intensive_variables,
             allocate_total=allocate_total,
-            raster_path=raster_path,
+            raster=raster,
             codes=codes,
             force_crs_match=force_crs_match,
         )
