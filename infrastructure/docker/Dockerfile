@@ -8,7 +8,7 @@ RUN conda config --set safety_checks disabled
 RUN conda install scipy>=1.3.0
 RUN conda install geopandas
 RUN conda install mapclassify
-RUN conda install giddy
+RUN conda install giddy>=2.2.1
 RUN conda install scikit-learn
 RUN conda install cenpy
 RUN conda install spenc
