@@ -7,7 +7,7 @@ seaborn
 libpysal
 mapclassify
 spenc
-giddy
+giddy>=2.2.1
 xlrd
 cenpy
 appdirs
