@@ -1,5 +1,5 @@
 [run]
 omit = 
     *tests*
-    geosnap/util/
-    geosnap/visualize/
+    geosnap/util/*
+    geosnap/visualize/*
