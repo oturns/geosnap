@@ -36,7 +36,7 @@ install:
   - pip install -e . --no-deps --force-reinstall
 
 script:
-  - python -c "from geosnap import data"
+  - python -c "from tobler.data import store_rasters; store_rasters()"
   - if [[ $TRAVIS_JOB_NAME == python-* ]]; then
       travis_wait 45 pytest --ignore=examples --ignore=geosnap/util  --cov geosnap ;
     fi
