@@ -2,3 +2,4 @@
 omit = 
     *tests*
     geosnap/util/
+    geosnap/visualize/

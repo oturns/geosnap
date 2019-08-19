@@ -48,3 +48,8 @@ def test_Community_from_gdfs():
     t00 = t00[t00.geoid.str.startswith("11")]
 
     assert data.Community.from_geodataframes([t90, t00]).gdf.shape == (380, 192)
+
+
+def test_Community_from_lodes():
+    dc = data.Community.from_lodes(state_fips="11", years=[2010, 2015])
+    assert dc.gdf.shape == (13014, 57)
