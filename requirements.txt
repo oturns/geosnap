@@ -15,4 +15,4 @@ palettable
 dash
 dash-bootstrap-components
 tqdm
-quilt
+quilt3
