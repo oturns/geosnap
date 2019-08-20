@@ -38,7 +38,7 @@ install:
 script:
   - python -c "from tobler.data import store_rasters; store_rasters()"
   - if [[ $TRAVIS_JOB_NAME == python-* ]]; then
-      travis_wait 45 pytest --ignore=examples --ignore=geosnap/util  --cov geosnap ;
+      travis_wait 45 pytest --ignore=examples/ --ignore=geosnap/util/  --ignore=geosnap/visualize/ --cov geosnap ;
     fi
 
   - if [[ $TRAVIS_JOB_NAME == 'tarball' ]]; then
