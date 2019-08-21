@@ -13,19 +13,19 @@ except KeyError:
 def test_Community_from_cbsa():
 
     la = data.Community.from_ltdb(msa_fips="31080")
-    assert la.gdf.shape == (14617, 193)
+    assert la.gdf.shape == (14617, 194)
 
 
 def test_Community_from_stcofips():
 
     mn = data.Community.from_ltdb(state_fips="27", county_fips=["053", "055"])
-    assert mn.gdf.shape == (5719, 193)
+    assert mn.gdf.shape == (5719, 194)
 
 
 def test_Community_from_indices():
 
     chi = data.Community.from_ncdb(fips=["17031", "17019"])
-    assert chi.gdf.shape == (6797, 78)
+    assert chi.gdf.shape == (6797, 79)
 
 
 def test_Community_from_boundary():
@@ -33,7 +33,7 @@ def test_Community_from_boundary():
 
     reno = msas[msas["geoid"] == "39900"]
     rn = data.Community.from_ltdb(boundary=reno)
-    assert rn.gdf.shape == (555, 194)
+    assert rn.gdf.shape == (555, 195)
 
 
 def test_Community_from_census():
@@ -48,3 +48,8 @@ def test_Community_from_gdfs():
     t00 = t00[t00.geoid.str.startswith("11")]
 
     assert data.Community.from_geodataframes([t90, t00]).gdf.shape == (380, 192)
+
+
+def test_Community_from_lodes():
+    dc = data.Community.from_lodes(state_fips="11", years=[2010, 2015])
+    assert dc.gdf.shape == (13014, 57)

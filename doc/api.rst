@@ -77,8 +77,8 @@ Model neighborhood change using optimal-matching algorithms or spatial discrete 
    :toctree: generated/
    
    geosnap.analyze.linc
-   geosnap.analyze.Sequence
-   geosnap.analyze.Transition
+   geosnap.analyze.sequence
+   geosnap.analyze.transition
 
 Harmonize Module
 ----------------

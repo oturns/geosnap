@@ -4,24 +4,23 @@ channels:
   - defaults
 dependencies:
   - pandas
-  - giddy
+  - giddy >=2.2.1
   - libpysal
   - spenc
   - cenpy
-  - cython
   - geopandas
-  - hdbscan
   - matplotlib
   - scikit-learn
   - seaborn
-  - pyarrow=0.13
+  - pyarrow =0.13
   - appdirs
   - dash
   - dash-bootstrap-components
   - palettable
   - pip
   - tqdm
+  - quilt3
+  - xlrd
   - pip:
-    - xlrd
-    - quilt3
     - git+git://github.com/pysal/region@master
+    - git+git://github.com/pysal/tobler@master

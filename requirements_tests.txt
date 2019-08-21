@@ -6,3 +6,6 @@ coveralls
 matplotlib
 pytest
 pytest-mpl
+pytest-cov
+hdbscan
+twine
