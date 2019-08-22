@@ -109,7 +109,7 @@ def harmonize(
         w_{i,j} = a_{i,j} / \sum_k a_{k,j}
 
     """
-    if len(extensive_variables) == 0 and len(intensive_variables) == 0:
+    if extensive_variables is None and intensive_variables is None:
         raise (
             "You must pass a set of extensive and/or intensive variables to interpolate"
         )
