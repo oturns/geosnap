@@ -1,0 +1,421 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Leaflet Sync Demo</title>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+
+    <style type="text/css">
+        html, body { width: 100%; height: 100%; margin: 0;     font: 15px arial, sans-serif; }
+        #map1, #map2 { width: 49.5%; height: 90%; }
+        #map1 { float: left; }
+        #map2 { float: right; }
+		#input_area_left {
+			width: 50.5%;
+			height:10%;;
+			background-color:#ffffff;
+			float: left;
+			font-size: 120%;
+		}
+		#input_area_right {
+			width: 49.5%;
+			height:10%;;
+			background-color:#ffffff;
+			float: right; 
+			font-size: 120%;
+		}
+		.info {
+			padding: 6px 8px;
+			font: 14px/16px Arial, Helvetica, sans-serif;
+			background: white;
+			background: rgba(255,255,255,0.8);
+			box-shadow: 0 0 15px rgba(0,0,0,0.2);
+			border-radius: 5px;
+		}
+		.info h4 {
+			margin: 0 0 5px;
+			color: #777;
+		}
+
+		.legend {
+			text-align: left;
+			line-height: 18px;
+			color: #555;
+		}
+		.legend i {
+			width: 18px;
+			height:15px;
+			float: left;
+			margin-right: 8px;
+			opacity: 0.7;
+		}		
+    </style>
+</head>
+
+<body>
+
+
+	<div id="input_area_left">
+		<br/>
+		<div id="menu_L1" style="background-color:#ffffff;height:30px;width:320px;float:left;">
+			<form name="ConditionSelect" action="">
+				<span id="condition_change">Cancer Type: </span>
+				<select name="condition" onChange="layerChange()">
+					<option value="Bladder Cancer">Bladder Cancer</option>
+					<option value="Brain Cancer">Brain Cancer</option>
+					<option value="Cervical Cancer">Cervical Cancer</option>
+					<option value="Colorectal Cancer">Colorectal Cancer</option>
+					<option value="Esophageal Cancer">Esophageal Cancer</option>
+					<option value="Female Breast Cancer">Female Breast Cancer </option>
+					<option value="Hodgkins Disease">Hodgkins Disease</option>
+					<option value="Kidney Cancer">Kidney Cancer</option>
+					<option value="Laryngeal Cancer">Laryngeal Cancer</option>
+					<option value="Leukemia">Leukemia</option>
+					<option value="Liver Cancer">Liver Cancer</option>
+					<option value="Lung Cancer">Lung Cancer</option>
+					<option value="Non-Hodgkins Lymphoma">Non-Hodgkins Lymphoma</option>
+					<option value="Oral Cancer">Oral Cancer/option>
+					<option value="Other Cancer">Other Cancer </option>
+					<option value="Ovarian Cancer">Ovarian Cancer </option>
+					<option value="Overall Cancer">Overall Cancer</option>
+					<option value="Pancreatic Cancer">Pancreatic Cancer</option>
+					<option value="Prostate Cancer">Prostate Cancer</option>
+					<option value="Skin Cancer">Skin Cancer</option>
+					<option value="Stomach Cancer">Stomach Cancer</option>
+					<option value="Thyroid Cancer">Thyroid Cancer</option>
+					<option value="Uterine Cancer">Uterine Cancer</option>
+					
+				</select>
+			</form>
+		</div>
+		
+		<div id="menu_L2" style="background-color:#ffffff;height:30px;width:150px;float:left;">
+			<form name="YearSelect" action="">
+				<span id="year_change">Year: </span>
+				<select name="year" onChange="layerChange()">
+					<option value="average">average</option>				
+					<option value="2010">2010</option>
+					<option value="2011">2011</option>
+					<option value="2012">2012</option>
+					<option value="2013">2013</option>					
+				</select>
+			</form>
+		</div>
+		
+		<div id="menu_L3" style="background-color:#ffffff;height:30px;width:230px;float:left;">
+			<form name="OutcomeSelect" action="">
+				<span id="outcome_change">Outcome: </span>
+				<select name="outcome" onChange="layerChange()">				
+					<option value="Death">Death</option>
+					<option value="Hospitalization">Hospitalization</option>
+					<option value="ED Discharge">ED Discharge</option>				
+				</select>
+			</form>
+		</div>
+		
+		<div id="menu_L4" style="background-color:#ffffff;height:30px;width:350px;float:left;">
+			<form name="CaseSelect" action="">
+				<span id="case_change">Case: </span>
+				<select name="case" onChange="layerChange()">			
+					<option value="Total_Cases">Total_Cases</option>
+					<option value="Total_Rate">Total_Rate</option>
+					<option value="Age_Adjusted_Rate">Age_Adjusted_Rate</option>				
+				</select>
+			</form>
+		</div>		
+		
+	</div>	
+	
+	<div id="input_area_right">
+		<br/>
+		<div id="menu_R1" style="background-color:#ffffff;height:30px;width:600px;float:left;">
+			<form name="layerSelect" action="">
+				<span id="layer_change">Socioeconomic and Demographic Variables: </span>
+				<select name="ACSdata" onChange="layerChange()">
+					<option value="A0">Age 0-4</option>
+					<option value="A1">Age 5-14</option>
+					<option value="A2">Age 15-24</option>
+					<option value="A3">Age 25-44</option>
+					<option value="A4">Age 45-64 </option>
+					<option value="A5">Age 65+ </option>
+					<option value="A6">Males</option>
+					<option value="A7">Females</option>
+					<option value="A8">White</option>
+					<option value="A9">Hispanic</option>
+					<option value="A10">Black</option>
+					<option value="A11">Asian/Pacific Islander</option>
+					<option value="A12">Other Race/Ethnicity</option>
+					<option value="A13">Total Population</option>				
+				</select>
+			</form>
+		</div>
+		
+		<div id="menu_R2" style="background-color:#ffffff;height:30px;width:250px;float:right;">	
+			<form name="classSelect" action="">
+				<span id="class_change">Select: </span>
+				<select name="classified" onChange="layerChange()">
+					<option value="equal">Equal Classification</option>
+					<option value="quantile">Quantile Classification</option>	
+				</select>
+			</form>	
+		</div>		
+	
+	</div>
+
+    <div id="map1"></div>
+		
+		
+    <div id="map2"></div>
+		
+
+	
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet-src.js"></script>
+    <script src="../L.Map.Sync.js"></script>
+	<script type="text/javascript" src="census_2013.js"></script>
+	<script type="text/javascript" src="census_2013.js"></script>	
+    <script type="text/javascript">
+	
+		var firstTime = true;
+		var geojson = null;
+		var info    = null;
+		var legend  = null;	
+         
+		var center = [33.0, -116.9]; //
+
+        var stamenOptions = {
+            attribution:
+                'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ' +
+                '<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; ' +
+                'Map data OpenStreetmap',
+            subdomains: 'abcd',
+            minZoom: 0,
+            maxZoom: 20
+        };		 
+		 
+        var layer1 = L.tileLayer('http://{s}.tile.stamen.com/toner-lite/{z}/{x}/{y}.png', stamenOptions);
+
+        var layer2 = L.tileLayer('http://{s}.tile.stamen.com/toner-lite/{z}/{x}/{y}.png', stamenOptions);
+
+        var map1 = L.map('map1', {
+            layers: [layer1],
+            center: center,
+            zoom: 10
+        });
+
+        map1.attributionControl.setPrefix('');
+
+        var map2 = L.map('map2', {
+            layers: [layer2],
+            center: center,
+            zoom: 10,
+            zoomControl: false
+        });
+
+        map1.sync(map2);
+        map2.sync(map1);
+
+
+		var layersControl = new L.Control.Layers({
+			'CloudMade': cloudmade
+		}, {
+			//'Some marker': marker,
+			//'vector layer': geojson
+		});	
+
+		map2.addControl(layersControl);		   // 왜 위에는 묶었는데..?
+
+
+
+		
+function remove(){
+	if (geojson != null) map2.removeLayer(geojson);
+	if (info    != null) info.removeFrom(map2);
+	if (legend  != null) legend.removeFrom(map2);	
+}
+/*
+		function styleRemove(feature) {
+			return {
+				//weight: 2,
+				opacity: 0,
+				color: 'white',
+				//dashArray: '3',
+				fillOpacity: 0,
+				fillColor: 'white'
+			};
+		}
+*/		
+
+function layerChange() {
+
+  	var selectedLayer  = document.layerSelect.ACSdata.value;
+	var classification = document.classSelect.classified.value;  
+		
+	if (classification == "equal") {
+	
+		var min = Number.MAX_VALUE; 
+		var max = Number.MIN_VALUE;
+		for (var i=0; i<CA.features.length; i++){
+			if (CA.features[i].properties[selectedLayer] == -999) continue;
+			if (min > CA.features[i].properties[selectedLayer]) min = CA.features[i].properties[selectedLayer];
+			if (max < CA.features[i].properties[selectedLayer]) max = CA.features[i].properties[selectedLayer];
+		}
+		//alert(selectedLayer + " " + min + " " + max);
+		
+		var range = max - min;
+		var interval = range / 8;
+		var intervals = new Array();
+		intervals[0] = Math.round(min);
+		for (var i=1; i<8; i++) {
+			intervals[i] = Math.round(intervals[i-1] + interval);
+		}
+		//alert(intervals[0]+" "+intervals[1]+" "+intervals[2]+" "+intervals[3]+" "+intervals[4]+" "+intervals[5]+" "+intervals[6]+" "+intervals[7]);
+		ACSdata_render(selectedLayer, intervals);
+	}
+	
+	if (classification == "quantile") {
+			
+		var values = new Array();
+		var j=0;
+		for (var i=0; i<CA.features.length; i++) {
+			if (CA.features[i].properties[selectedLayer] == -999) continue;
+			values[j++] = CA.features[i].properties[selectedLayer];
+		}
+		values.sort(function(a,b){return a-b});
+		var interval = values.length / 8;
+		
+		var intervals = new Array();
+		var next_interval = 0;
+		intervals[0] = Math.round(values[0]);
+		for (var i=1; i<8; i++) {
+			next_interval += interval;
+			j = Math.round(next_interval);
+			intervals[i] = values[j];
+		}
+		//alert(selectedLayer+"  "+intervals[0]+" "+intervals[1]+" "+intervals[2]+" "+intervals[3]+" "+intervals[4]+" "+intervals[5]+" "+intervals[6]+" "+intervals[7]);
+		ACSdata_render(selectedLayer, intervals);
+	}
+
+	
+}
+
+function ACSdata_render(item, intervals) {
+
+        // clear a layer and two controls
+		remove();
+		
+		// control that shows state info on hover
+		 info = L.control();
+
+		info.onAdd = function (map2) {
+			this._div = L.DomUtil.create('div', 'info');
+			this.update();
+			return this._div;
+		};
+
+		info.update = function (props) {
+			this._div.innerHTML = document.layerSelect.ACSdata.value + '<b><br/>'  + (props ?
+				'<b>'  + '</b>'  + props[item] + '<br/><br/>'
+				+'<h4>area</h4>'
+				+ props.NAME
+				: 'Hover over an area');
+		};
+
+		info.addTo(map2);
+
+
+		// get color depending on population density value
+		function getColor1(d) {
+			var color = ["#FFEDA0","#FED976","#FEB24C","#FD8D3C","#FC4E2A","#E31A1C","#BD0026","#800026"];
+			for (var i=color.length-1; i>=0; i--) {
+				if (d > intervals[i]) return color[i];
+			}
+			
+		}
+		
+		function style1(feature) {
+			return {
+				weight: 2,
+				opacity: 1,
+				color: 'white',
+				dashArray: '3',
+				fillOpacity: 0.5,
+				fillColor: getColor1(feature.properties[item])
+			};
+		}
+
+		
+		
+		function highlightFeature(e) {
+			var layer = e.target;
+
+			layer.setStyle({
+				weight: 5,
+				color: '#666',
+				dashArray: '',
+				fillOpacity: 0.7
+			});
+
+			if (!L.Browser.ie) {
+				layer.bringToFront();
+			}
+
+			info.update(layer.feature.properties);
+		}
+
+		
+
+		function resetHighlight(e) {
+			geojson.resetStyle(e.target);
+			info.update();
+		}
+
+		function zoomToFeature(e) {
+			map2.fitBounds(e.target.getBounds());
+		}
+
+		function onEachFeature(feature, layer) {
+			layer.on({
+				mouseover: highlightFeature,
+				mouseout: resetHighlight,
+				click: zoomToFeature
+				//click: highlightFeature
+			});
+		}
+
+		geojson = L.geoJson(CA, {
+			style: style1,
+			onEachFeature: onEachFeature
+		}).addTo(map2);
+
+		map2.attributionControl.addAttribution('Population data &copy; <a href="http://census.gov/">US Census Bureau</a>');
+
+
+		 legend = L.control({position: 'bottomright'});
+
+		legend.onAdd = function (map2) {
+
+			var div = L.DomUtil.create('div', 'info legend'),
+				//grades = [0, 13559    , 27118    , 40677    , 54236   , 67795   , 81354   , 94913  ],     // var
+				grades = intervals,
+				labels = [],
+				from, to;
+
+			for (var i = 0; i < grades.length; i++) {
+				from = grades[i];
+				to = grades[i + 1];
+
+				labels.push(
+					'<i style="background:' + getColor1(from + 1) + '"></i> ' +
+					from + (to ? '&ndash;' + to : '+'));
+			}
+			
+			div.innerHTML = labels.join('<br>');
+			return div;
+		};
+
+		legend.addTo(map2);
+}
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,2125 @@
+<!DOCTYPE html> 
+<html>
+<head>
+	<title>Longitudinal Neighborhood Analysis</title>
+	
+	<script src="jQuery/jquery-3.3.1.js"></script>
+	<script src="d3/d3.min.js"></script>
+	<script src="moment/moment.min.js"></script>
+	<link rel="stylesheet" href="leaflet/leaflet.css" />
+	<!--link rel="stylesheet" href="leaflet-loader-master/example/example.css" /-->
+	<!--link rel="stylesheet" href="leaflet-loader-master/dist/leaflet.loader.css" /-->
+	<script src="leaflet/leaflet.js"></script>
+	<!--script src="leaflet-loader-master/dist/leaflet.loader.js"></script-->
+	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+	<!--link rel="stylesheet" href="dist/leaflet.css" /-->
+	<!--[if lte IE 8]><link rel="stylesheet" href="../../dist/leaflet.ie.css" /><![endif]-->
+	<link rel="stylesheet" href="css/screen.css" />
+
+	<style>
+		//#map0 {
+		//	width: 1200px;
+		//	height: 800px;
+		//}
+		//html, body { width: 2550px; height: 100%; margin: 0; }
+		#mapContainer {   height: 600px; width: 100%;  }
+		.mapArea { width: 500px; height: 100%; float: left;  }
+		.map { width: 500px; height: 500px; }
+        //.syncbutton {
+        //    background-color: white;
+        //    width: 30px;
+        //    height: 30px;
+        //    align-items: center;
+        //    justify-content: center;
+		//	position: relative;
+		//	z-index: 999;   
+		//	left:10px;
+		//	top: 460px;
+        //}
+		.MapBetween { width: 10px; height: 100%; float: left; background-color: white; }
+		header {background:white; color:black; height:50px;}
+		//input_year {background: red;color:black; height:50px;}
+		//input_state {background: red;color:black; height:50px;}			
+		//section {background: green; height:820px; }
+		//section {background: white; height:820px; }
+		//footer {background:red; height:820px;}
+		footer {background:white; height:680px;}
+		.info {
+			padding: 6px 8px;
+			font: 14px/16px Arial, Helvetica, sans-serif;
+			background: white;
+			background: rgba(255,255,255,0.8);
+			box-shadow: 0 0 15px rgba(0,0,0,0.2);
+			border-radius: 5px;
+		}
+		.info h4 {
+			margin: 0 0 5px;
+			color: #777;
+		}
+
+		.legend {
+			text-align: left;
+			line-height: 18px;
+			color: #555;
+		}
+		.legend i {
+			width: 18px;
+			height:15px;
+			float: left;
+			margin-right: 8px;
+			opacity: 0.7;
+		}
+		
+		html {
+		font-family: sans-serif;
+		}
+		
+		//form {
+		//width: 280px;
+		//margin: 0 auto;
+		//}
+		
+		//div {
+		//margin-bottom: 10px;
+		//}
+		
+		fieldset {
+		background: white;
+		border: 2px solid grey;
+		}
+		
+		legend {
+			padding: 10px;
+			font-size:medium;
+			background: grey;
+			color: white;
+		}
+
+		.quadrbox{
+			width: 310px;
+			margin: 0 auto;
+		}
+		
+		#input_area_box1 {
+			width: 320px;
+			//height:760px;
+			//background-color:#FFFACD;
+			margin-bottom: 10px;
+			font-size:small;
+			float: left;
+		}
+		#input_area_box2 {
+			width: 320px;
+			//height:760px;
+			//background-color:#F0FFFF;
+			margin-bottom: 10px;
+			font-size:small;
+			float: left;
+		}
+		#input_area_box3 {
+			width: 320px;
+			//height:760px;
+			//background-color:#D8BFD8;
+			margin-bottom: 10px;
+			font-size:small;
+			float: left;
+		}	
+		#input_area_box4 {
+			width: 320px;
+			//height:760px;
+			//background-color:#FFFACD;
+			margin-bottom: 10px;
+			font-size:small;
+			float: left;
+		}
+
+		#ajaxBusy {
+			display: none;
+			margin: 0px 0px 0px -50px; /* left margin is half width of the div, to centre it */
+			padding: 30px 10px 10px 10px;
+			position: absolute;
+			left: 30%;
+			top: 325px;
+			width: 500px;
+			height: 500px;
+			text-align: center;
+			//background-color:#9ACD32;
+			//background: #e8e8e8 url(images/ajax-loader.gif) no-repeat center center;
+			background: url(images/ajax_loader_blue_350.gif) no-repeat center center;
+			border: 0px solid #000;
+		}
+
+		#ajaxBusy2 {
+			display: none;
+			margin: 0px 0px 0px -50px; /* left margin is half width of the div, to centre it */
+			padding: 30px 10px 10px 10px;
+			position: absolute;
+			left: 30%;
+			top: 1225px;
+			width: 500px;
+			height: 500px;
+			text-align: center;
+			//background-color:#9ACD32;
+			//background: #e8e8e8 url(images/ajax-loader.gif) no-repeat center center;
+			background: url(images/ajax_loader_blue_350.gif) no-repeat center center;
+			border: 0px solid #000;
+		}
+		
+		.borderMaps{
+			border-color: blue;
+			border-width: 3px;
+			border-style: solid;
+		}
+		
+		.line_through{
+			text-decoration: line-through;
+			color: grey;
+		}
+		
+		.line_none{
+			text-decoration: none;
+			color: blue;
+		}
+
+		.clearfix:after { contnt:"."; display:block; visibility:hidden; height:0; clear:both; }
+		.clearfix { display: inline-block; }
+
+	</style>
+
+	<!--script src="debug/leaflet-include.js"></script-->
+</head>
+
+
+<body>
+
+	<header>
+		<h1>Longitudinal Neighborhood Analysis</h1>		
+	</header>
+	
+	</br></br>
+	<section class="clearfix">
+	<div id="input_year" style="width:150px; height:20px; padding:10px; float:left; background-color:white; ">
+		<form name="YearSelect" action="">
+			<span>Select Year: </span>
+			<select name="year">			
+				<option value="1970">1970</option>
+				<option value="1980">1980</option>
+				<option value="1990">1990</option>
+				<option value="2000">2000</option>
+				<option value="2010">2010</option>				
+			</select>
+		</form>
+	</div>	
+	
+	<div id="input_state" style="width:210px;height:20px; padding:10px;float:left; background-color:white;">
+		<form name="state_select" action="">
+			<span>State:</span>
+			<select name="state">			
+				<option value="01 AL">ALABAMA</option>
+				<option value="02 AK">ALASKA</option>
+				<option value="04 AZ">ARIZONA</option>
+				<option value="05 AR">ARKANSAS</option>
+				<option value="06 CA">CALIFORNIA</option>
+				<option value="08 CO">COLORADO</option>
+				<option value="09 CT">CONNECTICUT</option>
+				<option value="10 DE">DELAWARE</option>
+				<option value="11 DC">DC</option>
+				<option value="12 FL">FLORIDA</option>
+				<option value="13 GA">GEORGIA</option>
+				<option value="15 HI">HAWAII</option>
+				<option value="16 ID">IDAHO</option>
+				<option value="17 IL">ILLINOIS</option>
+				<option value="18 IN">INDIANA</option>
+				<option value="19 IA">IOWA</option>
+				<option value="20 KS">KANSAS</option>
+				<option value="21 KY">KENTUCKY</option>
+				<option value="22 LA">LOUISIANA</option>
+				<option value="23 ME">MAINE</option>
+				<option value="24 MD">MARYLAND</option>
+				<option value="25 MA">MASSACHUESTTS</option>
+				<option value="26 MI">MICHIGAN</option>
+				<option value="27 MN">MINNESOTA</option>
+				<option value="28 MS">MISSISSIPPI</option>
+				<option value="29 MO">MISSOURI</option>
+				<option value="30 MT">MONTANA</option>
+				<option value="31 NE">NEBRASKA</option>
+				<option value="32 NV">NEVADA</option>
+				<option value="33 NH">NEW HAMPSHIRE</option>
+				<option value="34 NJ">NEW JERSEY</option>
+				<option value="35 NM">NEW MEXICO</option>
+				<option value="36 NY">NEW YORK</option>
+				<option value="37 NC">NORTH CAROLINA</option>
+				<option value="38 ND">NORTH DAKOTA</option>
+				<option value="39 OH">OHIO</option>
+				<option value="40 OK">OKLAHOMA</option>
+				<option value="41 OR">OREGON</option>
+				<option value="42 PA">PENNSYLVANIA</option>
+				<option value="44 RI">RHODE ISLAND</option>
+				<option value="45 SC">SOUTH CAROLINA</option>
+				<option value="46 SD">SOUTH DAKAOTA</option>
+				<option value="47 TN">TENNESSEE</option>
+				<option value="48 TX">TEXAS</option>
+				<option value="49 UT">UTAH</option>
+				<option value="50 VT">VERMONT</option>
+				<option value="51 VA">VIRGINIA</option>
+				<option value="53 WA">WASHINGTON</option>
+				<option value="54 WV">WEST VIRGINIA</option>
+				<option value="55 WI">WISCONSIN</option>
+				<option value="56 WY">WYOMING</option>
+				<option value="72 PR">PR</option>				
+			</select>
+		</form>
+	</div>
+
+	<div id="option-2nd" style="background-color:white;width:800px;height:40px; float:left; border: 1px solid #99CCFF; border-radius: 5px; ">
+		<div id="input_metro" style="width:400px;height:20px; padding:10px;float:left; background-color:transparent;">
+			<form name="metro_select" action="">
+				<span>Metro Area:  </span>
+				<select name="metro">			
+					<option value="ALL">All county of ALABAMA</option>
+					<option value="10700">Albertville</option>
+					<option value="11500">Anniston-Oxford-Jacksonville</option>
+					<option value="12220">Auburn-Opelika</option>
+					<option value="13820">Birmingham-Hoover</option>
+					<option value="17980">Columbus</option>
+					<option value="18980">Cullman</option>
+					<option value="19300">Daphne-Fairhope-Foley</option>
+					<option value="19460">Decatur</option>
+					<option value="20020">Dothan</option>
+					<option value="21460">Enterprise</option>
+					<option value="22520">Florence-Muscle Shoals</option>
+					<option value="23460">Gadsden</option>
+					<option value="26620">Huntsville</option>
+					<option value="33660">Mobile</option>
+					<option value="33860">Montgomery</option>
+					<option value="37120">Ozark</option>
+					<option value="42460">Scottsboro</option>
+					<option value="42820">Selma</option>
+					<option value="45180">Talladega-Sylacauga</option>
+					<option value="45980">Troy</option>
+					<option value="46220">Tuscaloosa</option>
+					<option value="46740">Valley</option>
+				</select>
+			</form>
+		</div>
+
+		<div id="input_county" style="width:300px;height:20px; padding:10px;float:left; background-color:transparent;">
+			<form name="county_select" action="" >
+				<span>County: </span>
+				<select name="county">	
+					<option value="ALL" >ALL</option>				
+					<option value="01007" >Bibb</option>
+					<option value="01009" >Blount</option>
+					<option value="01021" >Chilton</option>
+					<option value="01073" >Jefferson</option>
+					<option value="01115" >St. Clair</option>
+					<option value="01117" >Shelby</option>
+					<option value="01127" >Walker</option>					
+				</select>
+			</form>
+		</div> 
+
+		<div id="help" style="width:20px;height:20px; padding:10px;float:left; background-color:transparent;">
+			<a href= "http://sarasen.asuscomm.com/neighborhood/pick_POI.html" target="_blank">help?</a>
+		</div>
+		
+	</div>	
+	</section>
+
+	</br></br></br>	
+	<section class="clearfix">
+		<div id="input_area_box1">
+			<form class=quadrbox>
+			<fieldset id="input_area_fieldset1">
+			<legend>Race, Age by Race</legend>
+				<div id="input_area_items1">
+				<div>
+					<input type="checkbox" id="input_area1_check0" name="input_area1__checkboxes" value="ALL">
+					<label for="input_area1_check0"> ALL</label></div>
+				<div>
+					<input type="checkbox" id="input_area1_check1" name="input_area1_checkboxes" value="1-01 nhwhtXX">
+					<label for="input_area1_check1"> % white, non-Hispanic</label></div>
+				<div>
+					<input type="checkbox" id="input_area1_check2" name="input_area1_checkboxes" value="1-02 nhblkXX">
+					<label for="input_area1_check2"> % black, non-Hispanic</label></div>
+				<div>
+					<input type="checkbox" id="input_area1_check3" name="input_area1_checkboxes" value="1-03 hispXX">
+					<label for="input_area1_check3"> % black, non-Hispanic</label></div>
+				
+				</div>	
+			</fieldset>
+			</form>
+		</div>
+	
+		<div id="input_area_box2">
+			<form class=quadrbox>
+			<fieldset id="input_area_fieldset2">
+			<legend>Ethnicity and Immigration</legend>
+				<div id="input_area_items2">
+				<div>
+					<input type="checkbox" id="input_area2_check0" name="input_area2_checkboxes" value="ALL">
+					<label for="input_area1_check0"> ALL</label></div>
+				<div>
+					<input type="checkbox" id="input_area2_check1" name="input_area2_checkboxes" value="2-01 mexXX">
+					<label for="input_area2_check1"> % Mexican birth/ethnicity</label></div>
+				<div>
+					<input type="checkbox" id="input_area2_check2" name="input_area2_checkboxes" value="2-02 cubanXX">
+					<label for="input_area2_check2"> % Cuban birth/ethnicity</label></div>
+				<div>
+					<input type="checkbox" id="input_area2_check3" name="input_area2_checkboxes" value="2-03 prXX">
+					<label for="input_area2_check3"> #% Puerto Rican birth/ethnicity</label></div>
+					
+				</div>			
+			</fieldset>
+			</form>
+		</div>
+		
+		<div id="input_area_box3">
+			<form class=quadrbox>
+			<fieldset id="input_area_fieldset3">
+			<legend>Socioeconomic Status</legend>
+				<div id="input_area_items3">
+				<div>
+					<input type="checkbox" id="input_area3_check0" name="input_area3_checkboxes" value="ALL">
+					<label for="input_area1_check0"> ALL</label></div>
+				<div>
+					<input type="checkbox" id="input_area3_check1" name="input_area3_checkboxes" value="3-01 hsXX">
+					<label for="input_area3_check1"> % with high school degree or less</label></div>
+				<div>
+					<input type="checkbox" id="input_area3_check2" name="input_area3_checkboxes" value="3-02 colXX">
+					<label for="input_area3_check2"> % with 4-year college degree or more</label></div>
+				<div>
+					<input type="checkbox" id="input_area3_check3" name="input_area3_checkboxes" value="3-03 unempXX">
+					<label for="input_area3_check3"> % unemployed</label></div>
+	
+				</div>			
+			</fieldset>
+			</form>
+		</div>
+
+		<div id="input_area_box4">
+			<form class=quadrbox>
+			<fieldset id="input_area_fieldset4">
+			<legend>Housing, Age, and Marital Status</legend>
+				<div id="input_area_items4">
+				<div>
+					<input type="checkbox" id="input_area4_check0" name="input_area4_checkboxes" value="ALL">
+					<label for="input_area1_check0"> ALL</label></div>
+				<div>
+					<input type="checkbox" id="input_area4_check1" name="input_area4_checkboxes" value="4-01 vacXX">
+					<label for="input_area4_check1"> % vacant units</label></div>
+				<div>
+					<input type="checkbox" id="input_area4_check2" name="input_area4_checkboxes" value="4-02 ownXX">
+					<label for="input_area4_check2"> % owner-occupied units</label></div>
+				<div>
+					<input type="checkbox" id="input_area4_check3" name="input_area4_checkboxes" value="4-03 multiXX">
+					<label for="input_area4_check3"> % multi-family units</label></div>
+	
+				</div>
+			</fieldset>
+			</form>
+		</div>
+
+	</section>
+	
+	<br><br>
+	<section>
+	<!--div id="buttons" style="background-color:#ffffff;height:30px;widthx:0px;float:left;">
+		<button type="submit" style="float:left">Submit form</button>
+		<button id="downloadCSV" type="submit" style="float:left">Download CSV</button>
+	</div-->
+	<div style="float:left; height:40px;background-color:transparent; width:1270px;">
+		<span>
+			<button type="submit" id="submitForm" style="margin:10px 10px 10px 0px; float:left">Submit form</button>
+			<!--span style="float:left"> &nbsp; &nbsp;</span-->
+		</span>
+		<button type="submit" id="initFiveMaps" style="margin:10px 10px 10px 0px; float:left" hidden>Initialize all maps</button>
+		<div id="global-selection" style="margin:5px 0px 5px 50px; float:left; height:30px; border: 1px solid #99CCFF; border-radius: 5px;" hidden>
+			<div id="global_selection" style="margin:2px 10px 2px 40px; font-weight:bold; float:left">Global Selection</div>
+			<div id="global_year" style="margin:2px 0px 2px 30px; float:left">global_year</div>
+			<div id="global_layer" style="margin:2px 0px 2px 30px; float:left">global_layer</div>
+			<div id="global_class" style="margin:2px 50px 2px 30px; float:right;">global_class</div>
+		</div>
+		<button type="submit" id="downloadCSV" style="margin:10px 0px 10px 10px; float:right">Download CSV</button>
+	</div>
+	<br>
+	<div id="input_selected" style=" width:1270px;background-color:transparent"></div>
+
+	</section>
+	
+	<br><br>
+	<section>
+	</section>
+	<div id="mapContainer">
+		<div id="map0" class="mapArea">
+			<div>
+				<div id="map_year" style="height:25px;float:left"></div>
+				<div id="map_layer" style="height:25px;float:right"></div>
+			</div>
+			<div>
+				<div id="map_class" style="height:25px;float:left;clear:both" hidden></div>
+				<div id="map_sync" style="height:25px;float:right"></div>
+			</div>
+			<div class="map"></div>
+		</div>
+		<div class="MapBetween"></div>
+		<div id="map1" class="mapArea"></div><div class="MapBetween"></div>
+		<div id="map2" class="mapArea"></div><div class="MapBetween"></div>
+		<div id="map3" class="mapArea"></div><div class="MapBetween"></div>
+		<div id="map4" class="mapArea"></div><div class="MapBetween"></div>
+    </div>
+	<br><br>
+	<footer>
+		<div>
+		
+		
+		</div>
+		</br>
+	
+	<br><br><br><br>	
+	<div id="example_map" style=" width:1270px;background-color:transparent"></div>			
+			
+		</br>
+		<!--div id="map0"></div-->
+ 	</footer>         		
+
+
+	<script type="text/javascript" src="js/CA_ACS11.js"></script>
+	<script type="text/javascript" src="js/Poverty70.js"></script>	
+	<script type="text/javascript">
+		
+//global varible
+var app={
+	m: 5,                                        // number of maps in a web page shown
+	years: ["1970","1980","1990","2000","2010"], // five years
+	year: null,                                  // global variable for the selected year from the user
+	state: null,                                 // global variable for the selected state from the user
+	metro: null,                                 // global variable for the selected metro from the user
+	county: null,                                // global variable for the selected county from the user
+	states: null,                                // global area for the contents of states table from server
+	groups: null,                                // global area for the contents of groups table from server
+	codebook: null,                              // global area for the contents of codebook table from server
+	title: null,                                 // global area for the header of result message from server
+	receivedGeoJSON: null,                       // global area for full GeoJSON data from the server
+	selectedGeoJSON: null,                       // global area for selected GeoJSON data from full GeoJSON data
+	maps: {map: null, bounds: null, geojson: null, info: null, legend: null, layers: null, layerscontrol:null },
+	map0: {map: null, bounds: null, geojson: null, info: null, legend: null, layers: null, layerscontrol:null },
+	map1: {map: null, bounds: null, geojson: null, info: null, legend: null, layers: null, layerscontrol:null },
+	map2: {map: null, bounds: null, geojson: null, info: null, legend: null, layers: null, layerscontrol:null },
+	map3: {map: null, bounds: null, geojson: null, info: null, legend: null, layers: null, layerscontrol:null },
+	map4: {map: null, bounds: null, geojson: null, info: null, legend: null, layers: null, layerscontrol:null },
+};
+
+	var mbAttr = '' +
+			'' +
+			'',
+		mbUrl = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw';
+
+
+	var FakeBaseLayers = {
+	};	
+	
+	//var layerscontrol;
+	
+function draw_basemap(mIDX) {
+
+	//console.log(app[mIDX].map);
+	if (app[mIDX].map) {
+		app[mIDX].map.remove();
+		app[mIDX] = $.extend(true, {}, app["maps"]);        // deep copy  ->  all clear mapN global variable
+	}
+	var selected_mapdiv = document.getElementById(mIDX).getElementsByClassName("map")[0];
+	//console.log(selected_mapdiv);
+	//app[mIDX].map = L.map(selected_mapdiv).setView([37.09024, -95.712891], 4);
+
+/*	
+	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+		maxZoom: 20,
+		attribution:'<a href="http://spatial.ucr.edu/">Center for Geospatial Sciences</a>, ',
+		id: 'mapbox.light'
+	}).addTo(app[mIDX].map);
+*/
+	var	grayscale   = L.tileLayer(mbUrl, {id: 'mapbox.light'});
+	var	streets  = L.tileLayer(mbUrl, {id: 'mapbox.streets'});	
+	
+	app[mIDX].map = L.map(selected_mapdiv, {
+		center: [37.09024, -95.712891],
+		zoom: 4,
+		maxZoom: 14,
+		layers: [grayscale]
+	});
+
+	var baseLayers = {
+		"Grayscale": grayscale,
+		"Streets": streets
+	};	
+
+	//L.control.layers(baseLayers).addTo(app[mIDX].map);
+}	
+
+function draw_titlemap(mIDX, year) {
+
+	// set drop-down list of 'Year:' 
+	var html_year = 'Year: <select name="yearSelect" onChange="yearChange(\'' + mIDX + '\')">' +
+					'<option value="1970" class="line_none">1970</option>' +
+					'<option value="1980" class="line_none">1980</option>' +
+					'<option value="1990" class="line_none">1990</option>' +
+					'<option value="2000" class="line_none">2000</option>' +
+					'<option value="2010" class="line_none">2010</option>' +
+					'</select>';	
+	$("#"+mIDX+" .map_year").html(html_year);
+	$("#"+mIDX+" select[name=yearSelect]").val(year);
+	
+	// set drop-down list of 'Layer:' 
+	var html_layer = 'Layer: <select name="ACSdata" onChange="headerChange(\'' + mIDX + '\')">';
+	$.each(app.groups, function(gIdx, gRow) {
+		group_id = gRow[0];
+		group_name = gRow[1];
+		$("input[name=input_area" + group_id + "_checkboxes]").each(function() {
+			if (!this.checked) return true;
+			//var codeYY = this.value.substring(0,this.value.length-2) + year.substring(2,4)
+			//console.log(codeYY)
+			//if (app.title.indexOf(codeYY) >= 5)
+			//html_layer += '<option value="' + this.value + '">' + $($(this).prop('labels')).text() + '</option>';
+			var label = $($(this).prop('labels')).text();
+			var codeYY = this.value.substring(0,this.value.length-2) + year.substring(2,4)
+			if (app.title.indexOf(codeYY) >= 5) {
+				html_layer += '<option value="' + this.value + '" class="line_none">' + label + '</option>';
+			} else {
+				html_layer += '<option value="' + this.value + '" class="line_through">' + label + '</option>';
+			}
+		});
+	});
+	if (html_layer.length < 100) 
+	html_layer += '<option value="None">No Data</option>';
+	html_layer += '</select>' 
+	$("#"+mIDX+" .map_layer").html(html_layer);
+	
+	// set drop-down list of 'Class:' 
+	var html_class = 'Class: <select name="classified" onChange="headerChange(\'' + mIDX + '\')">' +
+					//'<option value="equal">Equal Classification</option>' +
+					//'<option value="quantile" selected>Quantile Classification</option>' + 
+					'<option value="equal">Equal</option>' +
+					'<option value="quantile" selected>Quantile</option>' + 
+					'</select>';	
+	$("#"+mIDX+" .map_class").html(html_class);
+	
+	// set sync radio & button
+	var html_syncbtn = '';
+	html_syncbtn += '<span id="'+mIDX+'_nPolygon" style="font-size: 90%;"></span>';
+	html_syncbtn += '<span style="font-size: 90%;">&nbsp;&nbsp;</span>';
+	html_syncbtn += '<span style="font-size: 90%;">';
+	html_syncbtn += '  <input id="'+mIDX+'_auto" type="radio" value="auto" name="'+mIDX+'-radio">';
+	html_syncbtn += '  <label for="'+mIDX+'_auto">Create a group</label>';
+	html_syncbtn += '</span>';
+	html_syncbtn += '<span style="font-size: 90%;">&nbsp;&nbsp;</span>';
+	html_syncbtn += '<span style="font-size: 90%;" hidden>';
+	html_syncbtn += '  <input id="'+mIDX+'_manual" type="radio" value="manual" name="'+mIDX+'-radio" checked="checked">';
+	html_syncbtn += '  <label for="'+mIDX+'_manual">Leave the group</label>';
+	html_syncbtn += '</span>';
+	html_syncbtn += '<span style="font-size: 90%;">&nbsp;&nbsp;&nbsp;&nbsp;</span>';
+	html_syncbtn += '<button id="'+mIDX+'_syncbtn" type="button">Sync</button>'
+	$("#"+mIDX+" .map_sync").html(html_syncbtn);
+	//console.log(html_syncbtn)
+	
+	$('input[type=radio][name="'+mIDX+'-radio"]').on('change', function() {
+		var sync = $(this).val();
+		console.log(moment().format('HH:mm:ss.SSS'), mIDX+' sync: ', sync, 'clicked');
+		var msec = CA.features.length;
+		if (msec < 500) msec = 500;
+		// drawMode ->  1: draw normal,  2: draw when auto, manual selected,  3: draw all maps force
+		if (sync == 'manual') {
+			$("#"+mIDX+"_manual").parent().hide();
+			$("label[for="+mIDX+"_auto]").html('Join the group');    // Create a group -> Joined or Join the group
+			$("#"+mIDX+" .map").removeClass('borderMaps');
+		}
+		if (sync == 'auto') {
+			$("#"+mIDX+"_manual").parent().show();
+			$("label[for="+mIDX+"_auto]").text('Joined');            // Create a group or Join the group -> Joined
+			$("#"+mIDX+" .map").addClass('borderMaps');
+		}
+		// get autoLabels in the five maps, hasJoined, baseBounts
+		var autoLabels = new Array();
+		var hasJoined = false;
+		var baseBounds = null;                   // the map bounds of already joined map
+		for (i=0; i<app.m; i++) {
+			var mapN = "map" + i;
+			var label = $("label[for="+mapN+"_auto]").text();
+			autoLabels.push(label);
+			if (label == 'Joined') {
+				hasJoined = true;
+				if (mIDX != mapN) {
+					baseBounds = app[mapN].map.getBounds();
+					//console.log(mapN + ' baseBounds: ', baseBounds);
+				}
+			}
+		}
+		console.log(moment().format('HH:mm:ss.SSS'), 'hasJoined: '+hasJoined, autoLabels);
+		// maintain the labels:  create a group  ->  Join the map
+		for (i=0; i<app.m; i++) {
+			var mapN = "map" + i;
+			var nPolygon = $("#"+mapN+"_nPolygon").text();
+			if (hasJoined) {
+				if ($("label[for="+mapN+"_auto]").text() != 'Joined') {
+					$("label[for="+mapN+"_auto]").text('Join the group');
+				}
+				$("label[for='"+mapN+"_auto']").css('text-decoration', 'none');
+			} else {
+				$("label[for="+mapN+"_auto]").text('Create a group');
+				if (nPolygon > 1000) $("label[for='"+mapN+"_auto']").css('text-decoration', 'line-through');
+			}
+		}
+		//console.log('baseBounds: ', baseBounds);
+		//if (sync == 'manual') redraw_maps(mIDX, 2);
+		//if (sync == 'auto') redraw_maps(mIDX, 2, baseBounds);	
+		//mapOn_moveend_off(); setTimeout(function() { redraw_maps("map0", 1); mapOn_moveend_set(); }, 100); 
+		if (sync == 'manual') {
+			//redraw_maps(mIDX, 2);
+			mapOn_moveend_off();
+			//setTimeout(function() { redraw_maps(mIDX, 2); mapOn_moveend_set(); }, 100);
+			setTimeout(function() { 
+				redraw_maps(mIDX, 2); 
+				setTimeout(function() { mapOn_moveend_set(); }, msec );
+			}, 100);
+		}
+		if (sync == 'auto') {
+			//redraw_maps(mIDX, 2, baseBounds);
+			mapOn_moveend_off();
+			setTimeout(function() { 
+				redraw_maps(mIDX, 2, baseBounds);
+				setTimeout(function() { mapOn_moveend_set(); }, msec );
+			}, 100);
+		}
+		
+	});
+
+
+/*
+			if (count > 1000 && $("label[for="+mapN+"_auto]").text() == 'Create a group') {
+					$("label[for='"+mapN+"_auto']").css('text-decoration', 'line-through');
+				} else {
+					$("label[for='"+mapN+"_auto']").css('text-decoration', 'none');
+				}
+*/
+
+	
+	$("#"+mIDX+"_syncbtn").on('click', function() {
+		console.log(moment().format('HH:mm:ss.SSS'), mIDX+"_syncbtn clicked");
+		var msec = CA.features.length;
+		if (msec < 500) msec = 500;
+		//if (msec > 3000)
+		swal({
+			title: "Please wait...",
+			text: "All maps will be ready in "+(msec/1000).toFixed(1)+" seconds.",
+			timer: msec,
+			//timer: 5000,
+			icon: "info",
+			buttons: false,
+		}).then(() => {
+			console.log(moment().format('HH:mm:ss.SSS'), mIDX+'['+app[mIDX].map._containerId+'] sweet alert ended');
+			//mapOn_moveend_set();
+		});
+		//redraw_maps(mIDX, 3);
+		//setTimeout(function () {redraw_maps(mIDX, 3);}, 500);
+		setTimeout(function () {
+			mapOn_moveend_off();
+			//setTimeout(function() { redraw_maps(mIDX, 3); mapOn_moveend_set(); }, 100);
+			setTimeout(function() { 
+				redraw_maps(mIDX, 3); 
+				setTimeout(function() { mapOn_moveend_set(); }, msec );
+			}, 100);
+		}, 500);
+	});
+}
+
+// get years from #mapN .map_year
+function getYearsfromMaps() {
+	var years = new Array();
+	for (i=0; i<app.m; i++) {
+		var mapN = "map" + i;
+	    var year = $("#"+mapN+" select[name=yearSelect]").val();
+		years.push(year);
+	}
+	console.log(moment().format('HH:mm:ss.SSS'), 'years from maps:', years);
+	return years;
+}
+
+// get layers from #mapN .map_layer
+function getLayersfromMaps() {
+	var layers = new Array();
+	for (i=0; i<app.m; i++) {
+		var mapN = "map" + i;
+	    var layer = $("#"+mapN+" select[name=ACSdata]").val();
+		layers.push(layer);
+	}
+	console.log(moment().format('HH:mm:ss.SSS'), 'layers from maps:', layers);
+	return layers;
+}
+
+// get global year from #mapN .map_year
+function getGlobalYearfromMaps() {
+	var years = Array.from(new Set(getYearsfromMaps()));        // get unique years from #mapN .map_year
+	console.log(moment().format('HH:mm:ss.SSS'), 'unique years from maps:', years);
+	var year = "each";
+	if (years.length == 5) year = "every";
+	if (years.length == 1) year = years[0];
+	console.log(moment().format('HH:mm:ss.SSS'), 'global_year:', year);
+	return year;
+}
+
+// get global layer from #mapN .map_layer
+function getGlobalLayerfromMaps() {
+	var layers = new Array();
+	for (i=0; i<app.m; i++) {
+		var mapN = "map" + i;
+	    var layer = $("#"+mapN+" select[name=ACSdata]").val();
+		if (layers.indexOf(layer) == -1) layers.push(layer);
+	}
+	console.log(moment().format('HH:mm:ss.SSS'), 'layers:', layers);
+	var layer = "each";
+	if (layers.length == 1) layer = layers[0];
+	console.log(moment().format('HH:mm:ss.SSS'), 'global_year:', layer);
+	return layer;
+}
+
+// draw global selection menu
+function draw_globalSelection() {
+
+	// set drop-down list of 'global_Year' 
+	var html_year = 'Year: <select name="globalYear" style="color:red;">' +
+					'<option value="each" class="line_none">each</option>' +
+					'<option value="every" class="line_none">every</option>' +
+					'<option value="1970" class="line_none">1970</option>' +
+					'<option value="1980" class="line_none">1980</option>' +
+					'<option value="1990" class="line_none">1990</option>' +
+					'<option value="2000" class="line_none">2000</option>' +
+					'<option value="2010" class="line_none">2010</option>' +
+					'</select>';	
+	$("#global_year").html(html_year);
+	$("#global_year select[name=globalYear]").val(getGlobalYearfromMaps());
+	
+	// set drop-down list of 'global_layer' 
+	var html_layer = 'Layer: <select name="globalLayer" style="color:red;">';
+	html_layer += '<option value="each" class="line_none">each</option>';
+	$.each(app.groups, function(gIdx, gRow) {
+		group_id = gRow[0];
+		group_name = gRow[1];
+		$("input[name=input_area" + group_id + "_checkboxes]").each(function() {
+			if (!this.checked) return true;
+			var label = $($(this).prop('labels')).text();
+			html_layer += '<option value="' + this.value + '" class="line_none">' + label + '</option>';
+		});
+	});
+	if (html_layer.length < 100) 
+	html_layer += '<option value="None">No Data</option>';
+	html_layer += '</select>' 
+	$("#global_layer").html(html_layer);
+	$("#global_layer select[name=globalLayer]").val(getGlobalLayerfromMaps());
+
+	// set drop-down list of 'global_class' 
+	var html_layer = 'Classification: <select name="globalClass" style="color:red;">' +
+					'<option value="equal" class="line_none">Equal</option>' +
+					'<option value="quantile" class="line_none" selected>Quantile</option>' + 
+					'</select>';
+	$("#global_class").html(html_layer);
+	
+	$("#global-selection").show();
+	
+	$("#global_year select[name=globalYear]").change(function(){
+		var globalYear = $(this).val();                // save year to global variable, if changed
+		console.log(moment().format('HH:mm:ss.SSS'), "globalYear changed:", globalYear)
+		if (globalYear == "each") return;
+		var prvYears = getYearsfromMaps();
+		//console.log(moment().format('HH:mm:ss.SSS'), "prvYears:", prvYears);
+		for (i=0; i<app.m; i++) {
+			var mapN = "map" + i;
+			var year = app.years[i];
+			if (globalYear != "every") year = globalYear;
+			$("#"+mapN+" select[name=yearSelect]").val(year);
+		}
+		var nowYears = getYearsfromMaps();
+		//console.log(moment().format('HH:mm:ss.SSS'), "nowYears:", nowYears);
+		var yearChangedMaps = [];
+		for (i=0; i<app.m; i++) {
+			var mapN = "map" + i;
+			if (nowYears[i] != prvYears[i]) yearChangedMaps.push(mapN);
+		}
+		console.log(moment().format('HH:mm:ss.SSS'), "yearChangedMaps:", yearChangedMaps);
+		for (i=0; i<yearChangedMaps.length; i++) {
+			var mIDX = yearChangedMaps[i];
+			headerChange(mIDX);
+		}
+	});
+	
+	$("#global_layer select[name=globalLayer]").change(function(){
+		var globalLayer = $(this).val();                // save layer to global variable, if changed
+		console.log(moment().format('HH:mm:ss.SSS'), "globalLayer changed:", globalLayer)
+		if (globalLayer == "each") return;
+		var prvLayers = getLayersfromMaps();
+		console.log(moment().format('HH:mm:ss.SSS'), "prvLayers:", prvLayers);
+		for (i=0; i<app.m; i++) {
+			var mapN = "map" + i;
+			$("#"+mapN+" select[name=ACSdata]").val(globalLayer);
+		}
+		var nowLayers = getLayersfromMaps();
+		console.log(moment().format('HH:mm:ss.SSS'), "nowLayers:", nowLayers);
+		var layerChangedMaps = [];
+		for (i=0; i<app.m; i++) {
+			var mapN = "map" + i;
+			if (nowLayers[i] != prvLayers[i]) layerChangedMaps.push(mapN);
+		}
+		console.log(moment().format('HH:mm:ss.SSS'), "layerChangedMaps:", layerChangedMaps);
+		for (i=0; i<layerChangedMaps.length; i++) {
+			var mIDX = layerChangedMaps[i];
+			headerChange(mIDX);
+		}
+	});
+}
+
+function yearChange(mIDX) { 
+
+	var year  = $("#"+mIDX+" select[name=yearSelect]").val();
+	var prvLayer  = $("#"+mIDX+" select[name=ACSdata]").val();
+	
+	// set global_year
+	$("#global_year select[name=globalYear]").val(getGlobalYearfromMaps());
+
+	// set drop-down list of 'Layer:' 
+	var html_layer = 'Layer: <select name="ACSdata" onChange="headerChange(\'' + mIDX + '\')">';
+	$.each(app.groups, function(gIdx, gRow) {
+		group_id = gRow[0];
+		group_name = gRow[1];
+		$("input[name=input_area" + group_id + "_checkboxes]").each(function() {
+			if (!this.checked) return true;
+			var label = $($(this).prop('labels')).text();
+			var codeYY = this.value.substring(0,this.value.length-2) + year.substring(2,4)
+			if (app.title.indexOf(codeYY) >= 5) {
+				html_layer += '<option value="' + this.value + '" class="line_none">' + label + '</option>';
+			} else {
+				html_layer += '<option value="' + this.value + '" class="line_through">' + label + '</option>';
+			}
+		});
+	});
+	if (html_layer.length < 100) 
+	html_layer += '<option value="None">No Data</option>';
+	html_layer += '</select>'
+	//console.log('html_layer: '+html_layer);
+	$("#"+mIDX+" .map_layer").html(html_layer);
+	
+	// set previous layer as selected
+	$("#"+mIDX+" select[name=ACSdata]").val(prvLayer).prop('selected', true);
+
+	headerChange(mIDX);
+}
+
+function headerChange(mIDX) {
+	setTimeout(function() { 
+		mapOn_moveend_off(); 
+		setTimeout(function() { 
+			//redraw_maps("map0", 1); setTimeout(function() { mapOn_moveend_set(); }, 500);
+			redraw_maps(mIDX, 2); setTimeout(function() { mapOn_moveend_set(); }, 500); 
+		}, 100); 
+	}, 100);
+};
+
+// clear info, legend, layers in the map
+function clear_map(mIDX) {
+	if (app[mIDX].info) {
+		app[mIDX].info.remove();
+		app[mIDX].info = null;
+	}
+	if (app[mIDX].legend) {
+		app[mIDX].legend.remove();
+		app[mIDX].legend = null;
+	}
+	if (app[mIDX].layerscontrol) {
+		app[mIDX].layerscontrol.remove();
+		app[mIDX].layerscontrol = null;
+	}
+	if (app[mIDX].map.hasLayer(app[mIDX].geojson)) {
+		app[mIDX].map.removeLayer(app[mIDX].geojson);
+		app[mIDX].geojson = null;
+	}
+}
+
+
+function classification_equal(layers) {
+	// layers = [nhwht10] or [nhwht10, nhwht70, .....]
+	
+	var min = Number.MAX_VALUE; 
+	var max = Number.MIN_VALUE;
+	for (var l=0; l<layers.length; l++) {
+		layer = layers[l];
+		for (var i=0; i<CA.features.length; i++){
+			if (!(layer in CA.features[i].properties)) continue;
+			if (CA.features[i].properties[layer] == -9999) continue;
+			if (min > CA.features[i].properties[layer]) min = CA.features[i].properties[layer];
+			if (max < CA.features[i].properties[layer]) max = CA.features[i].properties[layer];
+		}
+	}
+	if (min == Number.MAX_VALUE && max == Number.MIN_VALUE) {
+		return null;
+	}
+	
+	var range = max - min;
+	var interval = range / 8.0;
+	
+	var intervals = new Array();
+	//intervals[0] = (min.toFixed(2) - 0.01).toFixed(2) * 1.0;
+	//intervals[0] = ((min < 0.01) ? 0.0 : min - 0.01).toFixed(2) * 1.0;
+	intervals[0] = min;
+	for (var i=1; i<8; i++) {
+		intervals[i] = intervals[i-1] + interval;
+	}
+	//for (var i=0; i<intervals.length; i++) {
+	//	intervals[i] = intervals[i].toFixed(2) * 1.0;
+	//}
+	
+	return intervals;
+}
+
+function classification_quantile(layers) {
+	// layers = [nhwht10] or [nhwht10, nhwht70, .....]
+	
+	var values = new Array();
+	var j=0;
+	for (var l=0; l<layers.length; l++) {
+		layer = layers[l];
+		for (var i=0; i<CA.features.length; i++) {
+			if (!(layer in CA.features[i].properties)) continue;
+			if (CA.features[i].properties[layer] == -9999) continue;
+			values[j++] = CA.features[i].properties[layer];
+		}
+	}
+	if (values.length == 0) {
+		return null;
+	}
+	var maxInterval = 8;
+	if (maxInterval > values.length) maxInterval = values.length;
+	
+	values.sort(function(a,b){return a-b});
+	var interval = values.length / (maxInterval * 1.0);
+	
+	var intervals = new Array();
+	var next_interval = 0;
+	//intervals[0] = Math.round(values[0]);
+	//intervals[0] = (values[0] - 0.01).toFixed(2) * 1.0;
+	//console.log(values);
+	//intervals[0] = ((values[0] < 0.01) ? 0.00 : values[0] - 0.01).toFixed(2) * 1.0;
+	intervals[0] = values[0];
+	var p = -1;
+	for (var i=1; i<maxInterval; i++) {
+		next_interval += interval;
+		j = Math.round(next_interval);
+		//if (!values[j]) continue;
+		//intervals[i] = values[j].toFixed(2) * 1.0;
+		intervals[i] = values[j];
+	}
+	
+	return intervals;
+}
+
+function layerChange(mIDX, drawMode) { 
+	// drawMode ->  1: draw normal,  2: draw when auto, manual selected,  3: draw all maps force
+	if (!drawMode) drawMode = 1;
+
+	var map = app[mIDX].map;
+
+	var selectedYear  = $("#"+mIDX+" select[name=yearSelect]").val();
+	var selectedLayer  = $("#"+mIDX+" select[name=ACSdata]").val();
+	var classification = $("#"+mIDX+" select[name=classified]").val();
+	var selectedLayerIndex  = $("#"+mIDX+" select[name=ACSdata]").prop('selectedIndex');
+
+	//console.log(mIDX, selectedYear, selectedLayerIndex, selectedLayer, classification);
+	selectedLayer = selectedLayer.substring(0, selectedLayer.length-2) + selectedYear.substring(2,4);
+	console.log(moment().format('HH:mm:ss.SSS'), mIDX+'['+app[mIDX].map._containerId+']', selectedYear, 
+		' ['+selectedLayerIndex+':', '"'+selectedLayer+'"] ', classification, ' layerChange started');
+	
+	// change labels to line-through using polygons count
+	var count = CA.features.length;	
+	$("#"+mIDX+"_nPolygon").text(count + ' Polygons');        // Polygons
+	if (count > 1000 && $("label[for="+mIDX+"_auto]").text() == 'Create a group') {
+		$("label[for='"+mIDX+"_auto']").css('text-decoration', 'line-through');
+	} else {
+		$("label[for='"+mIDX+"_auto']").css('text-decoration', 'none');
+	}
+	
+	var layers = new Array();
+	var this_sync = $('input[type=radio][name="'+mIDX+'-radio"]:checked').val();
+	for (var i=0; i<app.m; i++) {
+		var div_id = "map" + i;
+		var that_sync = $('input[type=radio][name="'+div_id+'-radio"]:checked').val();
+		//console.log(i+'  '+mIDX+' sync: '+this_sync+'  '+div_id+' sync: '+that_sync);
+		if (drawMode != 3) {
+			if (div_id != mIDX && (this_sync == 'auto' && that_sync == 'manual')) continue;
+			if (div_id != mIDX && (this_sync == 'manual')) continue;
+		}
+		var sYear  = $("#"+div_id+" select[name=yearSelect]").val();
+		var sLayer  = $("#"+div_id+" select[name=ACSdata]").val();
+		layers.push(sLayer.substring(0, sLayer.length-2) + sYear.substring(2,4));
+	}
+	console.log(moment().format('HH:mm:ss.SSS'), mIDX+'['+app[mIDX].map._containerId+'] interval layers: ', layers);
+		
+	if (classification == "equal") {
+		var intervals = classification_equal(layers);
+		console.log(moment().format('HH:mm:ss.SSS'), mIDX+'['+app[mIDX].map._containerId+'] equal intervals: ', intervals);
+		if (!intervals) {
+			//if ($("#"+mIDX+" select[name=ACSdata]").val() != "None")
+			//alert("No data for '" + $("#"+mIDX+" select[name=ACSdata] option:selected").text() + "' in " + 
+			//	$("#"+mIDX+" select[name=yearSelect] option:selected").text() + ".");
+			$("#"+mIDX+"_nPolygon").text("No Data");
+			clear_map(mIDX);
+			return;
+		}
+		ACSdata_render(selectedLayer, intervals, mIDX);
+	}
+	
+	if (classification == "quantile") {
+		var intervals = classification_quantile(layers);
+		console.log(moment().format('HH:mm:ss.SSS'), mIDX+'['+app[mIDX].map._containerId+'] quantile intervals: ', intervals);
+		if (!intervals) {
+			//if ($("#"+mIDX+" select[name=ACSdata]").val() != "None")
+			//alert("No data for '" + $("#"+mIDX+" select[name=ACSdata] option:selected").text() + "' in " + 
+			//	$("#"+mIDX+" select[name=yearSelect] option:selected").text() + ".");
+			$("#"+mIDX+"_nPolygon").text("No Data");
+			clear_map(mIDX);
+			return;
+		}
+		ACSdata_render(selectedLayer, intervals, mIDX);
+	}
+
+	
+}
+
+function ACSdata_render(item, intervals, mIDX) {
+		//var layerscontrol = app[mIDX].layerscontrol; 
+		var map = app[mIDX].map;
+		
+		// control that shows state info on hover
+		if (app[mIDX].info != null) app[mIDX].info.remove();
+		app[mIDX].info = L.control();
+		app[mIDX].info.onAdd = function (map) {
+			this._div = L.DomUtil.create('div', 'info');
+			this.update();
+			return this._div;
+		};
+		app[mIDX].info.update = function (props) {
+			//if (props && props[item]) console.log(typeof props[item]);
+			var v = (props && props[item] && props[item] != -9999) ? props[item] : "No Data";
+			this._div.innerHTML = '<h4></h4>' +  (props ?
+				'<b>' + ' ' + v + '</b><br/>'
+				+ props.county + '<br/>'
+				+'tract id : '
+				//+ props.tractid.substring(0,5) + ' ' + props.tractid.substring(5)
+				+ props.tractid.substring(5)
+				: 'Hover over an area');
+		};
+		app[mIDX].info.addTo(map);
+
+		// get color depending on selected layer's value
+		function getOpacity1(feature) {
+			var bounds = d3.geoBounds(feature);
+			return 0.7;
+		}
+
+		// get color depending on selected layer's value
+		function getColor1(d) {
+			var color = ["#FFEDA0","#FED976","#FEB24C","#FD8D3C","#FC4E2A","#E31A1C","#BD0026","#800026"];
+			for (var i=color.length-1; i>=0; i--) {
+				//if (d >= intervals[i]) return color[i];
+				if (d == "-9999") return "#5E5E5E";
+				if (d >= intervals[i]) {
+					//alert(d+" color["+i+"]="+color[i]);
+					return color[i];
+				}
+			}	
+		}
+		
+		function style1(feature) {
+			return {
+				weight: 0.5,
+				opacity: 1,
+				color: 'white',
+				dashArray: '1',
+				fillOpacity: getOpacity1(feature),
+				fillColor: getColor1(feature.properties[item])
+			};
+		}
+
+		function highlightFeature(e) {
+			var layer = e.target;
+			//console.log(e);
+			var layerid = layer._leaflet_id;
+			var tractid = layer.feature.properties.tractid;
+			//console.log(layerid, layer);
+			//console.log(mIDX, app[mIDX].geojson._layers[layerid]);
+			//console.log('map4', app['map4'].geojson._layers[app['map4'].layers[tractid]]);
+			layer.setStyle({
+				weight: 3,
+				color: '#00ffff',
+				dashArray: '',
+				fillOpacity: 0.9
+			});
+			for (i=0; i<app.m; i++) {
+				var mapN = "map" + i;
+				if (mIDX == mapN) continue;
+				if (!app[mapN].geojson) continue;
+				var layerN = app[mapN].geojson._layers[app[mapN].layers[tractid]];
+				if (!layerN) continue;
+				layerN.setStyle({
+					weight: 3,
+					color: '#666',
+					dashArray: '',
+					fillOpacity: 0.9
+				});
+			}
+			if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+				//layer.bringToFront();
+				for (i=0; i<app.m; i++) {
+					var mapN = "map" + i;
+					//if (mIDX == mapN) continue;
+					if (!app[mapN].geojson) continue;
+					//console.log(mapN, 'geojson', app[mapN].geojson);
+					var layerN = app[mapN].geojson._layers[app[mapN].layers[tractid]];
+					if (!layerN) continue;
+					layerN.bringToFront();
+				}
+			}
+			//app[mIDX].info.update(layer.feature.properties);
+			if (app["map0"].info) app["map0"].info.update(layer.feature.properties);
+			if (app["map1"].info) app["map1"].info.update(layer.feature.properties);
+			if (app["map2"].info) app["map2"].info.update(layer.feature.properties);
+			if (app["map3"].info) app["map3"].info.update(layer.feature.properties);
+			if (app["map4"].info) app["map4"].info.update(layer.feature.properties);
+		}
+
+		function resetHighlight(e) {
+			var layer = e.target;
+			var tractid = layer.feature.properties.tractid;
+			//app[mIDX].geojson.resetStyle(layer);
+			for (i=0; i<app.m; i++) {
+				var mapN = "map" + i;
+				//if (mIDX == mapN) continue;
+				if (!app[mapN].geojson) continue;
+				var layerN = app[mapN].geojson._layers[app[mapN].layers[tractid]];
+				if (!layerN) {
+					//console.log(' ');
+					//console.log(moment().format('HH:mm:ss.SSS'), mIDX, "resetHighlight layer{"+mapN+"} not found.", ' tractid: ', tractid);
+					continue;
+				}
+				app[mapN].geojson.resetStyle(layerN);
+			}
+			//app[mIDX].info.update();
+			if (app["map0"].info) app["map0"].info.update();
+			if (app["map1"].info) app["map1"].info.update();
+			if (app["map2"].info) app["map2"].info.update();
+			if (app["map3"].info) app["map3"].info.update();
+			if (app["map4"].info) app["map4"].info.update();
+		}
+
+		function zoomToFeature(e) {
+			//var mapBounds = e.target.getBounds();
+			//console.log(mapBounds);
+			map.fitBounds(e.target.getBounds());
+		}
+
+		function onEachFeature(feature, layer) {
+			layer.on({
+				mouseover: highlightFeature,
+				mouseout: resetHighlight,
+				//click: zoomToFeature
+				//click: highlightFeature
+			});
+		}
+		
+		
+		// layer that shows data
+		if (map.hasLayer(app[mIDX].geojson)){
+			//layerscontrol.remove(app[mIDX].geojson);
+			//app[mIDX].layerscontrol.remove();
+			map.removeLayer(app[mIDX].geojson);	
+			
+		}	
+		app[mIDX].geojson = L.geoJson(CA, {
+			style: style1,
+			onEachFeature: onEachFeature
+		}).addTo(map);
+	
+
+		
+		var overlays = {
+			//app[mIDX].geojson
+			"layer": app[mIDX].geojson
+		};
+		
+
+		// Create layercontrol. Before create, remove layercontrol if it exists
+		if (app[mIDX].layerscontrol ) {
+			app[mIDX].layerscontrol.remove();
+			//app[mIDX].layerscontrol = null;			
+		}	
+	    app[mIDX].layerscontrol = L.control.layers(FakeBaseLayers, overlays, {
+			position: 'bottomleft', // 'topleft', 'bottomleft', 'bottomright'
+			collapsed: false, // true
+			//autoZIndex: false
+		}).addTo(app[mIDX].map);
+		//app[mIDX].layerscontrol.addTo(app[mIDX].map);
+//console.log('8888888888888888888888888888888888888888888888888888888888888888888888888888888888')
+//console.log(app[mIDX].geojson)		
+		
+		
+		app[mIDX].layers = {};
+		app[mIDX].geojson.eachLayer(function(layer) {
+			//console.log(layer._leaflet_id);
+			layerid = layer._leaflet_id;
+			tractid = layer.feature.properties.tractid;
+			//console.log("mIDX: ", mIDX, "  tractid: ", tractid, "  layerid: ", layerid, layer)
+			app[mIDX].layers[tractid] = layerid;
+		})
+		//console.log(moment().format('HH:mm:ss.SSS'), mIDX+'['+app[mIDX].map._containerId+'] GeoJSON loading ended.');
+		//mapOn_moveend_set(mIDX);
+
+		//map.attributionControl.addAttribution('Population data &copy; <a href="http://census.gov/">US Census Bureau</a>');
+
+		// control that shows legend
+		if (app[mIDX].legend != null) app[mIDX].legend.remove();
+		app[mIDX].legend = L.control({position: 'bottomright'});
+
+		app[mIDX].legend.onAdd = function (map) {
+			//console.log(intervals);
+			var div = L.DomUtil.create('div', 'info legend'),
+				//grades = [0, 13559    , 27118    , 40677    , 54236   , 67795   , 81354   , 94913  ],     // var
+				grades = intervals,
+				labels = [],
+				from, to;
+
+			for (var i = 0; i < grades.length; i++) {
+				from = grades[i].toFixed(2);
+				to = grades[i + 1] ? grades[i + 1].toFixed(2) : null;
+
+				labels.push(
+					'<i style="background:' + getColor1(grades[i] * 1.0) + '"></i> ' +
+					from + (to ? '&ndash;' + to : '+'));
+			}
+			labels.push(    // last legend is always 'No Data'
+					'<i style="background:' + getColor1(-9999) + '"></i> ' +
+					'No Data');				
+			div.innerHTML = labels.join('<br>');
+			return div;
+		};
+
+		app[mIDX].legend.addTo(map);
+}
+
+
+$( document ).ready(function() {
+	// Set up the AJAX indicator
+    $('body').append('<div id="ajaxBusy"><p id="ajaxBusyMsg">Please wait...</p></div>');
+	
+	app.year = $("select[name=year]").val();     // save year to global variable
+	$("select[name=year]").change(function(){
+		app.year = $(this).val();                // save year to global variable, if changed
+		console.log(moment().format('HH:mm:ss.SSS'), "app.year changed: " + app.year)
+		$("#initFiveMaps").hide();
+		$("#global-selection").hide();
+		$("#submitForm").parent().show();
+		changeLabelColor_quadrbox();
+	});
+	
+	app.state = $("select[name=state]").val();  // save state to global variable
+	$("select[name=state]").change(function(){
+		app.state = $(this).val();               // save state to global variable, if changed
+		console.log(moment().format('HH:mm:ss.SSS'), "app.state changed: " + app.state)
+		$("#initFiveMaps").hide();
+		$("#global-selection").hide();
+		$("#submitForm").parent().show();
+		set_metro_options();
+	});
+	
+	app.metro = $("select[name=metro]").val();  // save metro to global variable
+	$("select[name=metro]").change(function(){
+		app.metro = $(this).val();              // save metro to global variable, if changed
+		console.log(moment().format('HH:mm:ss.SSS'), "app.metro changed: " + app.metro)
+		$("#initFiveMaps").hide();
+		$("#global-selection").hide();
+		$("#submitForm").parent().show();
+		set_county_options()
+	});
+	
+	app.county = $("select[name=county]").val();  // save county to global variable
+	$("select[name=county]").change(function(){
+		app.county = $(this).val();              // save county to global variable, if changed
+		console.log(moment().format('HH:mm:ss.SSS'), "app.county changed: " + app.county)
+		$("#initFiveMaps").hide();
+		$("#global-selection").hide();
+		$("#submitForm").parent().show();
+	});
+	
+	$("#ajaxBusy").show();
+	$.getJSON('python/getCodebook.py', {}, function(msg) {
+		$("#ajaxBusy").hide();
+		document.documentElement.scrollTop = 0;
+		
+		app.states = msg['states']               // save states table to global variable
+		app.groups = msg['groups']               // save groups table to global variable
+		app.codebook = msg['codebook']           // save codebook to global variable
+		
+		// process states table from server
+		var html = '';
+		// row: ["06", "CA", null]  ->  <option value="06 CA">CA or California</option>
+		$.each(app.states, function(idx, row) {  
+			var stateid = row[0];
+			var state = row[1];
+			var statename = row[2];
+			var text = (statename) ? statename : state
+			html += '<option value="' + stateid + ' ' + state + '">' + text + '</option>';
+		});
+		$("select[name=state]").html(html);
+		
+		set_metro_options();
+		
+		// process groups and codebook table from server
+		var p_serial = app.codebook[0].indexOf('serial');
+		var p_code = app.codebook[0].indexOf('code');
+		var p_descritpion = app.codebook[0].indexOf('descritpion');
+		var p_year1970 = app.codebook[0].indexOf('year1970');
+		var p_year1980 = app.codebook[0].indexOf('year1980');
+		var p_year1990 = app.codebook[0].indexOf('year1990');
+		var p_year2000 = app.codebook[0].indexOf('year2000');
+		var p_year2010 = app.codebook[0].indexOf('year2010');
+		var p_year2012 = app.codebook[0].indexOf('year2012');
+		var p_groupid = app.codebook[0].indexOf('groupid');
+		var p_web_system = app.codebook[0].indexOf('web_system');
+		var p_description_short_name = app.codebook[0].indexOf('description_short_name');
+		var p_description_full_name = app.codebook[0].indexOf('description_full_name');
+		var p_denominator1970 = app.codebook[0].indexOf('denominator1970');
+		var p_denominator1980 = app.codebook[0].indexOf('denominator1980');
+		var p_denominator1990 = app.codebook[0].indexOf('denominator1990');
+		var p_denominator2000 = app.codebook[0].indexOf('denominator2000');
+		var p_denominator2010 = app.codebook[0].indexOf('denominator2010');
+		var p_denominator2012 = app.codebook[0].indexOf('denominator2012');
+		
+		$.each(app.groups, function(gIdx, gRow) {
+			group_id = gRow[0];
+			group_name = gRow[1];
+			$("#input_area_fieldset" + group_id + " legend").html('&nbsp;' + group_name + '&nbsp;');
+			
+			var html = '';
+			html += '<div>';
+			html += '<input type="checkbox" id="input_area' + group_id + '_check0" name="input_area' + group_id + '_checkall" value="ALL">';
+			html +=	'<label for="input_area1_check0"> ALL</label>';
+			html += '</div>';
+			seq = 0;
+			$.each(app.codebook, function(idx, row) {
+				if (idx == 0) return true;        // continue
+				//if (idx > 5) return false;        // break
+				serial = row[p_serial];
+				code = row[p_code];
+				groupid = row[p_groupid];
+				web_system = row[p_web_system];
+				description_short_name = row[p_description_short_name];
+				if (groupid != group_id) return true;        // continue
+				if (web_system != 1) return true;        // continue
+				seq += 1;
+				seq00 = zeroPad(seq, 2);
+				//console.log(serial, groupid+'-'+seq00, code, web_system, description_short_name);
+				html += '<div>';
+				html += '<input type="checkbox" id="input_area' + group_id + '_check' + seq + '" name="input_area' + group_id + '_checkboxes" value="' + group_id+'-'+seq00 + ' ' + code + '">';
+				//html +=	'<label style="color:black" for="input_area' + group_id + '_check' + seq + '"> ' + description_short_name + '</label>';
+				html +=	'<label for="input_area' + group_id + '_check' + seq + '"> ' + description_short_name + '</label>';
+				html += '</div>';
+				//console.log(description_short_name);
+			});
+			//console.log(html);
+			$("#input_area_items" + group_id).html(html);
+			
+			$("#input_area" + group_id + "_check0").change(function(){     // ALL
+				//console.log(this.id);
+				checkboxes = this.id.replace("_check0", "_checkboxes");    // input_area1_check0 -> input_area1_checkboxes
+				if($(this).is(':checked')) {
+					$("input[name=" + checkboxes + "]").prop("checked", true);
+				} else {
+					$("input[name=" + checkboxes + "]").prop("checked", false);
+				}
+				$("#initFiveMaps").hide();
+				$("#global-selection").hide();
+				$("#submitForm").parent().show();
+			});
+			
+			$("input[name=input_area" + group_id + "_checkboxes]").change(function(){
+				$("#initFiveMaps").hide();
+				$("#global-selection").hide();
+				$("#submitForm").parent().show();
+			});
+		});
+		changeLabelColor_quadrbox();
+	});
+	//}).error(function(error) { console.log(error.responseText); });
+	
+	//<button id="downloadCSV" type="submit" style="float:right">Download CSV</button>	
+	$("#downloadCSV").click(function() {
+		params = "";
+		$.each(app.groups, function(gIdx, gRow) {
+			group_id = gRow[0];
+			group_name = gRow[1];
+			$("input[name=input_area" + group_id + "_checkboxes]").each(function() {
+				if (this.checked) {
+					params += this.value + ',';
+					//console.log(this.value);
+				}
+			});
+		});
+		//console.log(params);
+		if (params.length == 0) {
+			swal({
+				title: "Attention!",
+				text: "You have not selected any of socioeconomic and demographic variables. Please select at least one check box.",
+				icon: "warning",
+				button: "GO BACK",
+			});
+			return;
+		} else params = params.substring(0, params.length-1);
+		
+		app.year = $("select[name=year]").val();           // save year to global variable
+		app.state = $("select[name=state]").val();         // save state to global variable
+		app.metro = $("select[name=metro]").val();         // save metro to global variable
+		app.county = $("select[name=county]").val();       // save county to global variable
+		var statename = $("select[name=state] option:selected").text();
+		var metroname = $("select[name=metro] option:selected").text();
+		var countyame = $("select[name=county] option:selected").text();
+		//console.log(statename);
+		
+		$("#ajaxBusy").show();
+		$.getJSON('python/getLNAnalysis.py', {'year':app.year, 'state':app.state, 'metro':app.metro, 'county':app.county, 
+			'codes':params, 'statename':statename, 'metroname':metroname, 'countyame':countyame}, function(msg) {
+			$("#ajaxBusy").hide();
+			var filename = msg['filename'];
+			var result = msg['result'];
+			//csv = 'data:text/csv;charset=utf-8,';
+			csv = '';
+			$.each(result, function(rIdx, row) {
+				$.each(row, function(cIdx, col) {
+					csv += '"' + col + '",';
+				});
+				csv += '\n';
+			});
+			//console.log("CSV Download started: "+filename);
+			
+			var data = encodeURI(csv);
+			downloadFile(csv, filename)
+			//console.log(data);
+			//var link = document.createElement('a');
+			//link.setAttribute('href', data);
+			//link.setAttribute('download', filename);
+			//link.click();
+			//document.body.removeChild(link);
+		}); 
+	});
+	
+	$("#submitForm").click(function() {		
+	
+		var statename = $("select[name=state] option:selected").text();
+		var metroname = $("select[name=metro] option:selected").text();
+		var countyame = $("select[name=county] option:selected").text();
+
+		/*console.log(app.metro);
+		if (app.metro == "ALL") 
+		{
+			swal({
+				title: "Attention!",
+				text: "Please select a metro area. Your map will be drawn within the selected metro area.",
+				icon: "warning",
+				button: "GO BACK",
+			});		
+			return;
+        }*/
+		
+		// count checked params from four groups
+		params = "";
+		$.each(app.groups, function(gIdx, gRow) {
+			group_id = gRow[0];
+			group_name = gRow[1];
+			$("input[name=input_area" + group_id + "_checkboxes]").each(function() {
+				if (this.checked) {
+					params += this.value + ',';					
+				}
+			});
+		});
+		if (params.length == 0) 
+		{
+			swal({
+				title: "Attention!",
+				text: "You have not selected any of socioeconomic and demographic variables. Please select at least one check box.",
+				icon: "warning",
+				button: "GO BACK",
+			});
+			return;
+		} else params = params.substring(0, params.length-1);	
+			
+		console.log(moment().format('HH:mm:ss.SSS'), 'year: '+app.year);
+		console.log(moment().format('HH:mm:ss.SSS'), 'state: '+app.state);
+		console.log(moment().format('HH:mm:ss.SSS'), 'metro: '+app.metro);
+		console.log(moment().format('HH:mm:ss.SSS'), 'county: '+app.county);
+		console.log(moment().format('HH:mm:ss.SSS'), 'codes: '+params);
+		console.log(moment().format('HH:mm:ss.SSS'), 'statename: '+statename);
+		console.log(moment().format('HH:mm:ss.SSS'), 'metroname: '+metroname);
+		console.log(moment().format('HH:mm:ss.SSS'), 'countyame: '+countyame);
+
+		// request to server
+		$("#ajaxBusy").show();
+		$.getJSON('python/map5LNAnalysis.py', {'year':app.year, 'state':app.state, 'metro':app.metro, 'county':app.county, 
+			'codes':params, 'statename':statename, 'metroname':metroname, 'countyame':countyame}, function(msg) {
+			
+			var filename = msg['filename'];
+			var result = msg['result'];
+			console.log(moment().format('HH:mm:ss.SSS'), result)
+			
+			app.title = result[0];
+			app.receivedGeoJSON = {"type":"FeatureCollection", "features":[]}
+			$.each(result, function(rIdx, row) {
+				if (rIdx == 0) return true;                // skip title's row
+				//console.log(row[0], row[1], row[2], row[3], row[4].substring(0,5));
+				tractid = row[0];
+				county = row[2];
+				geojson = JSON.parse(row[4]);
+				//console.log(geojson)
+				var feature = {"type":"Feature","geometry":{},"properties":{}};
+				feature["geometry"] = geojson["geometry"]
+				properties = feature["properties"];
+				properties["tractid"] = tractid;
+				properties["county"] = county;
+				$.each(row, function(cIdx, col) {
+					if (cIdx < 5) return true;
+					var value = row[cIdx] * 1.0;
+					if (value == -999) value = -9999;
+					properties[app.title[cIdx]] = value;
+				});
+				//console.log(feature);
+				app.receivedGeoJSON["features"].push(feature);
+			});
+			console.log(moment().format('HH:mm:ss.SSS'), app.receivedGeoJSON);
+			
+			CA = app.receivedGeoJSON;			
+
+			var msec = CA.features.length;
+			if (msec < 500) msec = 500;
+			//if (msec > 3000)
+			swal({
+				title: "Please wait...",
+				text: "All maps will be ready in "+(msec/1000).toFixed(1)+" seconds.",
+				timer: msec,
+				//timer: 10000,
+				//onOpen: () => { swal.showLoading() },
+				icon: "info",
+				buttons: false,
+			}).then((value) => {
+				console.log(moment().format('HH:mm:ss.SSS'), "Inititaize all maps ended in "+(msec/1000).toFixed(1)+" seconds.");
+			});
+
+			setTimeout(function () {draw_all_maps();}, 500);
+			
+			$("#initFiveMaps").show();
+			$("#submitForm").parent().hide();
+
+			$("#ajaxBusy").hide();
+			document.documentElement.scrollTop = 750;
+
+		}); 	
+	});
+	
+	// redraw all five maps using received GeoJSON
+	$("#initFiveMaps").click(function() {
+
+		CA = app.receivedGeoJSON;
+		
+		var msec = CA.features.length;
+		if (msec < 500) msec = 500;
+		//if (msec > 3000)
+		swal({
+			title: "Please wait...",
+			text: "All maps will be ready in "+(msec/1000).toFixed(1)+" seconds.",
+			timer: msec,
+			//timer: 10000,
+			icon: "info",
+			buttons: false,
+		});
+
+		setTimeout(function () {draw_all_maps();}, 500);
+	});
+});
+
+// draw all five maps
+function draw_all_maps() {
+
+	// draw titles area
+	var map_html = '';
+	map_html += '<div>';
+	map_html += '	<div class="map_year" style="height:25px;float:left"></div>';
+	map_html += '	<div class="map_layer" style="height:25px;float:right"></div>';
+	map_html += '</div>';
+	map_html += '<div>';
+	map_html += '	<div class="map_class" style="height:25px;float:left;clear:both" hidden></div>';
+	map_html += '	<div class="map_sync" style="height:25px;float:right"></div>';
+	map_html += '</div>';
+	map_html += '<div class="map"></div>';
+	for (var i=0; i<app.m; i++) {
+		var mapN = "map" + i;
+		document.getElementById(mapN).innerHTML = map_html;
+	}
+	
+	// draw each base map
+	for (var i=0; i<app.m; i++) {
+		var mapN = "map" + i;
+		draw_basemap(mapN);
+	}
+
+	// draw titles of each map
+	for (var i=0; i<app.m; i++) {
+		var mapN = "map" + i;
+		draw_titlemap(mapN, app.years[i]);
+	}
+	
+	draw_globalSelection();
+
+	// set map bounds using geo bounds in d3 function
+	var geoBounds = d3.geoBounds(CA);
+	//console.log(geoBounds);
+	if (geoBounds[0][1] && geoBounds[0][0] && geoBounds[1][1] && geoBounds[1][0]) {
+		//var nLon = geoBounds[1][0] - geoBounds[0][0]
+		//var nLat = geoBounds[1][1] - geoBounds[0][1]
+		//dLon = nLon * 0.1;               // shrink the geoBounds of longitude 20% (10% + 10%)
+		//dLat = nLat * 0.1;               // shrink the geoBounds of latitude  20% (10% + 10%)
+		//fitBounds = [[geoBounds[0][1]+dLat, geoBounds[0][0]+dLon], [geoBounds[1][1]-dLat, geoBounds[1][0]-dLon]]
+		var fitBounds = [[geoBounds[0][1], geoBounds[0][0]], [geoBounds[1][1], geoBounds[1][0]]]
+		//console.log(fitBounds);
+		for (var i=0; i<app.m; i++) {
+			var mapN = "map" + i;
+			console.log(moment().format('HH:mm:ss.SSS'), mapN+'['+app[mapN].map._containerId+'] fitBounds: ', fitBounds);
+			app[mapN].map.fitBounds(fitBounds);
+			app[mapN].bounds = app[mapN].map.getBounds();        // need check...
+		}
+	}
+
+	// draw each maps
+	for (var i=0; i<app.m; i++) {
+		var mapN = "map" + i;
+		layerChange(mapN);
+	}	
+	
+	// set event of move end each map
+	var msec = CA.features.length;
+	if (msec < 500) msec = 500;
+	setTimeout(function () {mapOn_moveend_set();}, msec);
+
+}
+
+function mapOn_moveend_set(mIDX) {
+	var pIDX = (mIDX) ? mIDX : "ALL "
+	
+	//if (!mIDX || mIDX == "map0") app["map0"].map.once('moveend', function(e) { redraw_maps("map0", 1);}, "map0" );
+	//if (!mIDX || mIDX == "map1") app["map1"].map.once('moveend', function(e) { redraw_maps("map1", 1);}, "map1" );
+	//if (!mIDX || mIDX == "map2") app["map2"].map.once('moveend', function(e) { redraw_maps("map2", 1);}, "map2" );
+	//if (!mIDX || mIDX == "map3") app["map3"].map.once('moveend', function(e) { redraw_maps("map3", 1);}, "map3" );
+	//if (!mIDX || mIDX == "map4") app["map4"].map.once('moveend', function(e) { redraw_maps("map4", 1);}, "map4" );
+	
+	console.log(moment().format('HH:mm:ss.SSS'), pIDX, 'START mapOn_moveend_set  moveend envent count: ', [count_moveend_event("map0"), count_moveend_event("map1"), count_moveend_event("map2"), count_moveend_event("map3"), count_moveend_event("map4")]);
+
+	if (count_moveend_event("map0") == 0 && (!mIDX || mIDX == "map0")) app["map0"].map.on('moveend', mapON_moveend_map0, "map0");
+	if (count_moveend_event("map1") == 0 && (!mIDX || mIDX == "map1")) app["map1"].map.on('moveend', mapON_moveend_map1, "map1");
+	if (count_moveend_event("map2") == 0 && (!mIDX || mIDX == "map2")) app["map2"].map.on('moveend', mapON_moveend_map2, "map2");
+	if (count_moveend_event("map3") == 0 && (!mIDX || mIDX == "map3")) app["map3"].map.on('moveend', mapON_moveend_map3, "map3");
+	if (count_moveend_event("map4") == 0 && (!mIDX || mIDX == "map4")) app["map4"].map.on('moveend', mapON_moveend_map4, "map4");
+	
+	setTimeout(function () {
+		console.log(moment().format('HH:mm:ss.SSS'), pIDX, 'ENDED mapOn_moveend_set  moveend envent count: ', [count_moveend_event("map0"), count_moveend_event("map1"), count_moveend_event("map2"), count_moveend_event("map3"), count_moveend_event("map4")]);
+	}, 100);
+	
+	//console.log(moment().format('HH:mm:ss.SSS'), 'The moveend event setting completed.  ', ((mIDX) ? mIDX : "mapN all maps"));
+}
+
+function mapOn_moveend_off(mIDX) {
+	var pIDX = (mIDX) ? mIDX : "ALL "
+
+	console.log(moment().format('HH:mm:ss.SSS'), pIDX, 'START mapOn_moveend_off  moveend envent count: ', [count_moveend_event("map0"), count_moveend_event("map1"), count_moveend_event("map2"), count_moveend_event("map3"), count_moveend_event("map4")]);
+
+	if (count_moveend_event("map0") != 0 && (!mIDX || mIDX == "map0")) app["map0"].map.off('moveend', mapON_moveend_map0, "map0");
+	if (count_moveend_event("map1") != 0 && (!mIDX || mIDX == "map1")) app["map1"].map.off('moveend', mapON_moveend_map1, "map1");
+	if (count_moveend_event("map2") != 0 && (!mIDX || mIDX == "map2")) app["map2"].map.off('moveend', mapON_moveend_map2, "map2");
+	if (count_moveend_event("map3") != 0 && (!mIDX || mIDX == "map3")) app["map3"].map.off('moveend', mapON_moveend_map3, "map3");
+	if (count_moveend_event("map4") != 0 && (!mIDX || mIDX == "map4")) app["map4"].map.off('moveend', mapON_moveend_map4, "map4");
+	
+	setTimeout(function () {
+		console.log(moment().format('HH:mm:ss.SSS'), pIDX, 'ENDED mapOn_moveend_off  moveend envent count: ', [count_moveend_event("map0"), count_moveend_event("map1"), count_moveend_event("map2"), count_moveend_event("map3"), count_moveend_event("map4")]);
+	}, 100);
+	
+}
+//event moveend detected
+//console.log(moment().format('HH:mm:ss.SSS'), 'map0['+app["map0"].map._containerId+'] event moveend detected');
+function mapON_moveend_map0(e) { setTimeout(function() { console.log(moment().format('HH:mm:ss.SSS'), 'map0['+app["map0"].map._containerId+'] event moveend detected'); mapOn_moveend_off(); setTimeout(function() { redraw_maps("map0", 1); setTimeout(function() { mapOn_moveend_set(); }, 500); }, 100); }, 100); };
+function mapON_moveend_map1(e) { setTimeout(function() { console.log(moment().format('HH:mm:ss.SSS'), 'map1['+app["map1"].map._containerId+'] event moveend detected'); mapOn_moveend_off(); setTimeout(function() { redraw_maps("map1", 1); setTimeout(function() { mapOn_moveend_set(); }, 500); }, 100); }, 100); };
+function mapON_moveend_map2(e) { setTimeout(function() { console.log(moment().format('HH:mm:ss.SSS'), 'map2['+app["map2"].map._containerId+'] event moveend detected'); mapOn_moveend_off(); setTimeout(function() { redraw_maps("map2", 1); setTimeout(function() { mapOn_moveend_set(); }, 500); }, 100); }, 100); };
+function mapON_moveend_map3(e) { setTimeout(function() { console.log(moment().format('HH:mm:ss.SSS'), 'map3['+app["map3"].map._containerId+'] event moveend detected'); mapOn_moveend_off(); setTimeout(function() { redraw_maps("map3", 1); setTimeout(function() { mapOn_moveend_set(); }, 500); }, 100); }, 100); };
+function mapON_moveend_map4(e) { setTimeout(function() { console.log(moment().format('HH:mm:ss.SSS'), 'map4['+app["map4"].map._containerId+'] event moveend detected'); mapOn_moveend_off(); setTimeout(function() { redraw_maps("map4", 1); setTimeout(function() { mapOn_moveend_set(); }, 500); }, 100); }, 100); };
+
+// count 'moveend' event registered in the map 
+function count_moveend_event(mIDX, e) {
+	var moveevents = app[mIDX].map._events["moveend"];
+	if (e) moveevents = e.target._events["moveend"];
+	if (!moveevents) return 0;
+	var count = 0;
+	$.each(moveevents, function(idx, row) {
+		var ctx = row['ctx'];
+		//console.log(mIDX, idx, ctx, e);
+		if (typeof ctx === 'string' && ctx.startsWith(mIDX)) count += 1;
+	});
+	return count;
+}
+
+
+// redraw maps launcher
+//function redraw_maps(mIDX, drawMode, baseBounds) {
+//	mapOn_moveend_off(); 
+//	setTimeout(function() { redraw_maps_body(mIDX, drawMode, baseBounds); mapOn_moveend_set(); }, 100);
+//}
+	
+// redraw a map and related maps
+function redraw_maps(mIDX, drawMode, baseBounds) {
+
+	if (mIDX != 'map0' && mIDX != 'map1' && mIDX != 'map2' && mIDX != 'map3' && mIDX != 'map4') {
+		swal({
+			title: "Attention!",
+			text: "Internal error.\n\nmIDX = '"+mIDX+"'\n\nPlease report this message to your IT people.",
+			icon: "warning",
+			button: "GO BACK",
+		});
+		return;
+	}
+	
+	// drawMode ->  1: draw normal,  2: draw when auto, manual selected,  3: draw all maps force
+	console.log(moment().format('HH:mm:ss.SSS'), mIDX+'['+app[mIDX].map._containerId+'] redraw_maps start', 
+			'  drawMode: '+drawMode, '  baseBounds: ', baseBounds);
+			
+	//console.log('map0['+app["map0"].map._containerId+'] On_moveend: ' + count_moveend_event("map0"));
+	//console.log('map1['+app["map1"].map._containerId+'] On_moveend: ' + count_moveend_event("map1"));
+	//console.log('map2['+app["map2"].map._containerId+'] On_moveend: ' + count_moveend_event("map2"));
+	//console.log('map3['+app["map3"].map._containerId+'] On_moveend: ' + count_moveend_event("map3"));
+	//console.log('map4['+app["map4"].map._containerId+'] On_moveend: ' + count_moveend_event("map4"));
+	
+	var mapBounds = app[mIDX].map.getBounds();
+	if (baseBounds) mapBounds = baseBounds;        // auto clicked, join the group aleady existed
+	var prvBounds = app[mIDX].bounds;
+	console.log(moment().format('HH:mm:ss.SSS'), mIDX+'['+app[mIDX].map._containerId+'] prvBounds: ', prvBounds);
+	app[mIDX].bounds = mapBounds;
+	if (drawMode == 1 && 
+		prvBounds &&
+		mapBounds.equals(prvBounds)) {
+		console.log(moment().format('HH:mm:ss.SSS'), mIDX+'['+app[mIDX].map._containerId+'] event moveend ignored when mapBounds = prvBounds');
+		return;
+	}
+	console.log(moment().format('HH:mm:ss.SSS'), mIDX+'['+app[mIDX].map._containerId+'] mapBounds: ', mapBounds);
+
+	// build selectedGeoJSON from receivedGeoJSON
+	var count = 0;
+	app.selectedGeoJSON = {"type":"FeatureCollection", "features":[]}
+	$.each(app.receivedGeoJSON.features, function(rIdx, feature) {
+		var geoBounds = d3.geoBounds(feature);
+		if (geoBounds[0][0] > mapBounds.getEast() ||
+			geoBounds[1][0] < mapBounds.getWest() ||
+			geoBounds[0][1] > mapBounds.getNorth() ||
+			geoBounds[1][1] < mapBounds.getSouth()) return true;
+		count += 1;
+		app.selectedGeoJSON.features.push(feature);
+	});
+	console.log(moment().format('HH:mm:ss.SSS'), mIDX+'['+app[mIDX].map._containerId+'] selected features count in mapBounds: '+count);
+
+	var this_sync = $('input[type=radio][name="'+mIDX+'-radio"]:checked').val();
+	
+	// determine witch maps need to fitBounds
+	var refitBoundableMaps = (!mapBounds.equals(app[mIDX].map.getBounds())) ? [mIDX] : [];
+	for (i=0; i<app.m; i++) {
+		var mapN = "map" + i;
+		if (mapN == mIDX) continue;
+		var that_sync = $('input[type=radio][name="'+mapN+'-radio"]:checked').val();
+		if (drawMode != 3) {
+			if (this_sync == 'auto' && that_sync == 'manual') continue;
+			if (this_sync == 'manual') continue;
+		}
+		if (!mapBounds.equals(app[mapN].map.getBounds())) {
+			refitBoundableMaps.push(mapN);
+		}
+	}
+	console.log(moment().format('HH:mm:ss.SSS'), mIDX+'['+app[mIDX].map._containerId+'] refitBoundableMaps', refitBoundableMaps);
+/*	
+	// set this map bounds to the other maps bounds
+	var this_sync = $('input[type=radio][name="'+mIDX+'-radio"]:checked').val();
+	if (!mapBounds.equals(app[mIDX].map.getBounds())) {
+		//console.log(moment().format('HH:mm:ss.SSS'), mIDX+'['+app[mIDX].map._containerId+'] off moveend event');
+		//app[mIDX].map.off('moveend', function(e) { }, mIDX);
+		console.log(moment().format('HH:mm:ss.SSS'), mIDX+'['+app[mIDX].map._containerId+'] fit mapBounds: ', mapBounds);
+		app[mIDX].map.fitBounds(mapBounds);
+	}
+	for (i=0; i<app.m; i++) {
+		var mapN = "map" + i;
+		if (mapN == mIDX) continue;
+		var that_sync = $('input[type=radio][name="'+mapN+'-radio"]:checked').val();
+		if (drawMode != 3) {
+			if (this_sync == 'auto' && that_sync == 'manual') continue;
+			//if (this_sync == 'manual' && that_sync == 'manual') continue;
+			if (this_sync == 'manual') continue;
+		}
+		if (!mapBounds.equals(app[mapN].map.getBounds())) {
+			//app[mapN].map.off('moveend', function(e) { }, mapN);
+			console.log(moment().format('HH:mm:ss.SSS'), mapN+'['+app[mapN].map._containerId+'] fit mapBounds: ', mapBounds);
+			app[mapN].map.fitBounds(mapBounds);
+		}
+	}
+*/	
+	// check need redrawing or not
+	var needDrawing = true;
+	if (drawMode == 1 && count < 1) {        // 10  ->  1
+		console.log(moment().format('HH:mm:ss.SSS'), mIDX+'['+app[mIDX].map._containerId+'] redrawing map ignored when count < 1');
+		needDrawing = false;
+	}
+	if (CA.features.length == app.selectedGeoJSON.features.length) {
+		var isEqual = true;
+		for (f=0; f<CA.features.length; f++) {
+			var prvFeature = CA.features[f];
+			var newFeature = app.selectedGeoJSON.features[f];
+			if (prvFeature.properties.tractid != newFeature.properties.tractid) {
+				isEqual = false;
+				break;
+			}
+		}
+		if (drawMode == 1 && isEqual) {
+			console.log(moment().format('HH:mm:ss.SSS'), mIDX+'['+app[mIDX].map._containerId+'] redrawing map ignored when prvGeoJSON = selectedGeoJSON');
+			needDrawing = false;
+		}
+	}
+	
+	// determine witch maps need to redraw
+	var redrawableMaps = [mIDX];
+	var autoCount = (this_sync == 'auto') ? 1 : 0;
+	for (i=0; i<app.m; i++) {
+		var mapN = "map" + i;
+		if (mapN == mIDX) continue;
+		var that_sync = $('input[type=radio][name="'+mapN+'-radio"]:checked').val();
+		if (that_sync == 'auto') autoCount += 1;
+		var needRedraw = false;
+		if (drawMode == 1 && this_sync == 'auto' && that_sync == 'auto') needRedraw = true;
+		if (drawMode == 2 && that_sync == 'auto') needRedraw = true;
+		if (drawMode == 3) needRedraw = true;
+		if (needRedraw) redrawableMaps.push(mapN);
+	}
+	if (drawMode == 2 && this_sync == 'auto' && redrawableMaps.length == 1) redrawableMaps = [];
+	console.log(moment().format('HH:mm:ss.SSS'), mIDX+'['+app[mIDX].map._containerId+'] redrawableMaps', redrawableMaps);
+	
+	// sweet alert during redrqwing the maps
+	if (this_sync == 'auto' && autoCount > 1 ||
+		this_sync == 'manual' && autoCount > 1) {
+		//var msec = CA.features.length;
+		var msec = app.selectedGeoJSON.features.length;
+		if (msec < 500) msec = 500;
+		if (needDrawing && msec > 2000) {
+			console.log(moment().format('HH:mm:ss.SSS'), mIDX+'['+app[mIDX].map._containerId+'] sweet alert start ', (msec/1000).toFixed(1)+" seconds.");
+			swal({
+				title: "Please wait...",
+				text: "All maps will be ready in "+(msec/1000).toFixed(1)+" seconds.",
+				timer: msec,
+				//timer: 5000,
+				icon: "info",
+				buttons: false,
+			}).then(() => {
+				console.log(moment().format('HH:mm:ss.SSS'), mIDX+'['+app[mIDX].map._containerId+'] sweet alert ended', (msec/1000).toFixed(1)+" seconds.");
+			});
+		}
+	}
+	
+	// fitBounds and redraw maps
+	setTimeout(function () {
+		// fitBounds
+		for (i=0; i<refitBoundableMaps.length; i++) {
+			var mapN = refitBoundableMaps[i];
+			console.log(moment().format('HH:mm:ss.SSS'), mapN+'['+app[mapN].map._containerId+'] fit mapBounds: ', mapBounds);
+			app[mapN].map.fitBounds(mapBounds);
+		}
+		
+		// redraw maps
+		if (needDrawing) {
+			CA = {};
+			CA = $.extend(true, {}, app.selectedGeoJSON);          // deep copy
+			for (i=0; i<redrawableMaps.length; i++) {
+				var mapN = redrawableMaps[i];
+				console.log(moment().format('HH:mm:ss.SSS'), mapN+'['+app[mapN].map._containerId+'] drawing map started.');
+				layerChange(mapN, drawMode);
+			}
+		}
+	}, 100);
+/*
+	console.log(moment().format('HH:mm:ss.SSS'), mIDX+'['+app[mIDX].map._containerId+'] drawing map started.');
+	layerChange(mIDX, drawMode);
+	// redraw the orther four maps with selectedGeoJSON
+	for (i=0; i<app.m; i++) {
+		var mapN = "map" + i;
+		if (mapN == mIDX) continue;
+		var that_sync = $('input[type=radio][name="'+mapN+'-radio"]:checked').val();
+
+		//if (drawMode != 3) {
+		//	if (this_sync == 'auto' && that_sync == 'manual') continue;
+		//	if (this_sync == 'manual' && that_sync == 'manual') continue;
+		//	//if (this_sync == 'manual') continue;
+		//}
+		
+		var needRedraw = false;
+		if (drawMode == 1 && this_sync == 'auto' && that_sync == 'auto') needRedraw = true;
+		if (drawMode == 2 && that_sync == 'auto') needRedraw = true;
+		if (drawMode == 3) needRedraw = true;
+		if (needRedraw == false) continue;
+		
+		console.log(moment().format('HH:mm:ss.SSS'), mapN+'['+app[mapN].map._containerId+'] drawing map started.');
+		layerChange(mapN, drawMode);
+	}
+*/
+}
+
+// set options items in select name="metro"
+function set_metro_options() {
+	var state = $("select[name=state]").val();            // get selected state from document
+	var statid = state.substring(0,2);
+	//console.log($("select[name=state] option:selected").text());
+	$.getJSON('python/getMetro.py', {stateid: statid}, function(msg) {
+		var metros = msg['metros']
+		//html = '<option value="ALL">All county of ' + $("select[name=state] option:selected").text() + '</option>';
+		html = '<option value="ALL">All</option>';
+		$.each(metros, function(idx, row) {  
+			var stateid = row[0];
+			var metroid = row[1];
+			var state = row[2];
+			var metroname = row[3];
+			html += '<option value="' + metroid + '">' + metroname + '</option>';
+		});
+		$("select[name=metro]").html(html);
+		app.metro = 'ALL';
+		set_county_options();
+	});
+}
+
+
+// set options items in select name="county"
+function set_county_options() {
+	var state = $("select[name=state]").val();            // get selected state from document
+	var statid = state.substring(0,2);
+	var metroid = $("select[name=metro]").val();           // get selected state from document
+	//console.log($("select[name=state] option:selected").text());
+	$.getJSON('python/getCounty.py', {stateid: statid, metroid: metroid}, function(msg) {
+		var counties = msg['counties']
+		html = '';
+		//if (counties.length > 1) 
+		html = '<option value="ALL">All</option>';
+		$.each(counties, function(idx, row) {  
+			var countyid = row[0];
+			var countyname = row[1];
+			html += '<option value="' + countyid + '">' + countyname + '</option>';
+		});
+		$("select[name=county]").html(html);
+		app.county = 'ALL';
+	});
+	
+}
+
+
+// function to download large CSV. Worked in IE/Firefox/Chrome
+function downloadFile(data, filename) {
+    var csvData = data;
+    var blob = new Blob([ csvData ], {
+        type : "application/csv;charset=utf-8;"
+    });
+
+    if (window.navigator.msSaveBlob) {           // FOR IE BROWSER
+        navigator.msSaveBlob(blob, filename);
+    } else {                                     // FOR OTHER BROWSERS    
+        var link = document.createElement("a");
+        var csvUrl = URL.createObjectURL(blob);
+        link.href = csvUrl;
+        link.style = "visibility:hidden";
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+}
+
+
+// Change label color of quadrbox by year
+function changeLabelColor_quadrbox() {
+	if (!app.year || !app.groups || !app.codebook) return;
+	//console.log($(this).style());
+	
+	var p_serial = app.codebook[0].indexOf('serial');
+	var p_code = app.codebook[0].indexOf('code');
+	var p_descritpion = app.codebook[0].indexOf('descritpion');
+	var p_year1970 = app.codebook[0].indexOf('year1970');
+	var p_year1980 = app.codebook[0].indexOf('year1980');
+	var p_year1990 = app.codebook[0].indexOf('year1990');
+	var p_year2000 = app.codebook[0].indexOf('year2000');
+	var p_year2010 = app.codebook[0].indexOf('year2010');
+	var p_year2012 = app.codebook[0].indexOf('year2012');
+	var p_groupid = app.codebook[0].indexOf('groupid');
+	var p_web_system = app.codebook[0].indexOf('web_system');
+	var p_description_short_name = app.codebook[0].indexOf('description_short_name');
+	var p_description_full_name = app.codebook[0].indexOf('description_full_name');
+	var p_denominator1970 = app.codebook[0].indexOf('denominator1970');
+	var p_denominator1980 = app.codebook[0].indexOf('denominator1980');
+	var p_denominator1990 = app.codebook[0].indexOf('denominator1990');
+	var p_denominator2000 = app.codebook[0].indexOf('denominator2000');
+	var p_denominator2010 = app.codebook[0].indexOf('denominator2010');
+	var p_denominator2012 = app.codebook[0].indexOf('denominator2012');
+	
+	$.each(app.groups, function(gIdx, gRow) {
+		group_id = gRow[0];
+		group_name = gRow[1];
+		
+		// Reset all of the label color to black
+		$("input[name='input_area" + group_id + "_checkboxes']").each(function(index) {
+			$("label[for='" + $(this).attr('id') + "']").css('text-decoration', 'none');
+		});
+		
+		// Change the label color to gray, if the numerator not found in the year
+		p = ["1970", "1980", "1990", "2000", "2010", "2012"].indexOf(app.year) + p_year1970;
+		
+		//console.log(app.codebook[10][p]);
+		seq = 0;
+		$.each(app.codebook, function(idx, row) {
+			if (idx == 0) return true;        // continue
+			//if (idx > 5) return false;        // break
+			serial = row[p_serial];
+			code = row[p_code];
+			groupid = row[p_groupid];
+			web_system = row[p_web_system];
+			description_short_name = row[p_description_short_name];
+			if (groupid != group_id) return true;        // continue
+			if (web_system != 1) return true;        // continue
+			seq += 1;
+			seq00 = zeroPad(seq, 2);
+			//console.log(serial, code, groupid, row[p]);
+			if (row[p]) return true;        // continue
+			
+			var id = "input_area"+group_id+"_check" + seq;    // input_area1_check1
+			//console.log('"'+description_short_name+'"');
+			//console.log('"'+$("label[for='"+id+"']").text().trim()+'"');
+			if (description_short_name != $("label[for='"+id+"']").text().trim()) return true;
+			//console.log(serial, code, groupid+'-'+seq, description_short_name);
+			$("label[for='"+id+"']").css('text-decoration', 'line-through');
+		});
+		
+	});
+}
+
+
+// Pading a value with leading zeors
+function zeroPad(num, places) {
+  var zero = places - num.toString().length + 1;
+  return Array(+(zero > 0 && zero)).join("0") + num;
+}
+	</script>
+</body>
+</html>
