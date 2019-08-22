@@ -1,23 +1,26 @@
 name: geosnap
 channels:
-  - defaults
   - conda-forge
+  - defaults
 dependencies:
   - pandas
-  - cython
+  - giddy >=2.2.1
+  - libpysal
+  - spenc
+  - cenpy
   - geopandas
-  - hdbscan
   - matplotlib
   - scikit-learn
   - seaborn
-  - pyarrow
+  - pyarrow =0.13
+  - appdirs
+  - dash
+  - dash-bootstrap-components
+  - palettable
   - pip
+  - tqdm
+  - quilt3
+  - xlrd
   - pip:
-    - libpysal
-    - mapclassify
-    - spenc
-    - giddy
-    - xlrd
-    - cenpy
-    - quilt
     - git+git://github.com/pysal/region@master
+    - git+git://github.com/pysal/tobler@master

@@ -1,0 +1,43 @@
+name,variable,type,description
+total_employees,C000,Num ,Total number of jobs 
+employees_under_30,CA01,Num ,Number of jobs for workers age 29 or younger14 
+employees_30_54,CA02,Num ,Number of jobs for workers age 30 to 5414 
+employees_55plus,CA03,Num ,Number of jobs for workers age 55 or older14 
+earnings_under_1250,CE01,Num ,Number of jobs with earnings $1250/month or less 
+earnings_1251_3333,CE02,Num ,Number of jobs with earnings $1251/month to $3333/month 
+earnings_over_3333,CE03,Num ,Number of jobs with earnings greater than $3333/month 
+naics_11,CNS01,Num ,"Number of jobs in NAICS sector 11 (Agriculture, Forestry, Fishing and Hunting) "
+naics_21,CNS02,Num ,"Number of jobs in NAICS sector 21 (Mining, Quarrying, and Oil and Gas Extraction) "
+naics_22,CNS03,Num ,Number of jobs in NAICS sector 22 (Utilities) 
+naics_23,CNS04,Num ,Number of jobs in NAICS sector 23 (Construction) 
+naics_31_33,CNS05,Num ,Number of jobs in NAICS sector 31-33 (Manufacturing) 
+naics_42,CNS06,Num ,Number of jobs in NAICS sector 42 (Wholesale Trade) 
+naics_44_45,CNS07,Num ,Number of jobs in NAICS sector 44-45 (Retail Trade) 
+naics_48_89,CNS08,Num ,Number of jobs in NAICS sector 48-49 (Transportation and Warehousing) 
+naics_51,CNS09,Num ,Number of jobs in NAICS sector 51 (Information) 
+naics_52,CNS10,Num ,Number of jobs in NAICS sector 52 (Finance and Insurance) 
+naics_53,CNS11,Num ,Number of jobs in NAICS sector 53 (Real Estate and Rental and Leasing) 
+naics_54,CNS12,Num ,"Number of jobs in NAICS sector 54 (Professional, Scientific, and Technical Services) "
+naics_55,CNS13,Num ,Number of jobs in NAICS sector 55 (Management of Companies and Enterprises) 
+naics_56,CNS14,Num ,Number of jobs in NAICS sector 56 (Administrative and Support and Waste Management and Remediation Services) 
+naics_61,CNS15,Num ,Number of jobs in NAICS sector 61 (Educational Services) 
+naics_62,CNS16,Num ,Number of jobs in NAICS sector 62 (Health Care and Social Assistance) 
+naics_71,CNS17,Num ,"Number of jobs in NAICS sector 71 (Arts, Entertainment, and Recreation) "
+naics_72,CNS18,Num ,Number of jobs in NAICS sector 72 (Accommodation and Food Services) 
+naics_81,CNS19,Num ,Number of jobs in NAICS sector 81 (Other Services [except Public Administration]) 
+naics_90,CNS20,Num ,Number of jobs in NAICS sector 92 (Public Administration) 
+employees_white,CR01,Num ,"Number of jobs for workers with Race: White, Alone15 "
+employees_black,CR02,Num ,"Number of jobs for workers with Race: Black or African American,  Alone"
+employees_native_american,CR03,Num ,Number of jobs for workers with Race: American Indian or Alaska Native Alone15 
+employees_asian,CR04,Num ,Number of jobs for workers with Race: Asian Alone15 
+employees_hawaiian_pi,CR05,Num ,Number of jobs for workers with Race: Native Hawaiian or Other Pacific Islander Alone15 
+employees_twoplus_races,CR07,Num ,Number of jobs for workers with Race: Two or More Race Groups15 
+employees_not_hispanic,CT01,Num ,Number of jobs for workers with Ethnicity: Not Hispanic or Latino15 
+employees_hispanic,CT02,Num ,Number of jobs for workers with Ethnicity: Hispanic or Latino15 
+education_lths,CD01,Num ,"Number of jobs for workers with Educational Attainment: Less than high school15,16 "
+education_hs,CD02,Num ,"Number of jobs for workers with Educational Attainment: High school or equivalent, no college15,16 "
+education_some_college,CD03,Num ,"Number of jobs for workers with Educational Attainment: Some college or Associate degree15,16 "
+education_bachelors,CD04,Num ,"Number of jobs for workers with Educational Attainment: Bachelor's degree or advanced degree15,16 "
+employees_male,CS01,Num ,Number of jobs for workers with Sex: Male15 
+employees_female,CS02,Num ,Number of jobs for workers with Sex: Female15 
+create_date,createdate,Char8 ,"Date on which data was created, formatted as YYYYMMDD "

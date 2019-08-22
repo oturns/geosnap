@@ -1,8 +1,10 @@
 .ropeproject/*
+**/.ipynb_checkpoints/*
 .ipynb_checkpoints/*
 */.ipynb_checkpoints/*
 __pycache__/*
 */__pycache__/*
+**/__pycache__/*
 */*/__pycache__/*
 .mypy_cache/*
 .eggs
@@ -11,3 +13,7 @@ geosnap.egg-info
 .pytest*
 docs/_build/
 snap/tests/.ipynb_checkpoints/
+**/.bash_history
+**/.jupyter
+**/.ipython
+**/.local

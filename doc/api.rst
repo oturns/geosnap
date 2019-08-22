@@ -12,10 +12,10 @@ Data Module
 .. autosummary::
    :toctree: generated/
    
-    geosnap.data.db
-    geosnap.data.metros
-    geosnap.data.read_ltdb
-    geosnap.data.read_ncdb
+    geosnap.data.data_store
+    geosnap.data.store_ltdb
+    geosnap.data.store_ncdb
+    geosnap.data.get_lehd
     geosnap.data.Community
 
 .. _analyze_api:
@@ -77,11 +77,18 @@ Model neighborhood change using optimal-matching algorithms or spatial discrete 
    :toctree: generated/
    
    geosnap.analyze.linc
-   geosnap.analyze.Sequence
-   geosnap.analyze.Transition
+   geosnap.analyze.sequence
+   geosnap.analyze.transition
 
 Harmonize Module
 ----------------
 
 Visualize Module
 ----------------
+
+.. currentmodule:: geosnap
+
+.. autosummary::
+   :toctree: generated/
+
+   geosnap.visualize.indexplot_seq
