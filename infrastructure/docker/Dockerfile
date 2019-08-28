@@ -19,4 +19,5 @@ RUN conda install pytest
 RUN conda install nose nose-progressive coverage coveralls pytest-cov pytest-mpl
 RUN pip install dash dash-bootstrap-components
 RUN pip install -U statsmodels==0.10.0rc2 --pre
+RUN conda install descartes
 COPY develop.sh /home/jovyan/develop.sh
