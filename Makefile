@@ -1,6 +1,5 @@
 # Linux specific Docker file for geosnap
 
-TOBLER = "../tobler"
 container:
 	docker build -t geosnap ./infrastructure/docker/
 
@@ -22,7 +21,7 @@ cli2s:
 	docker run -it -p 8888:8888 -e "DLPATH=/home/jovyan/.local/share/geosnap/data" -v ${PWD}:/home/jovyan -v ${HOME}/.local:/home/jovyan/.local geosnap sh -c "/home/jovyan/develop.sh && /bin/bash"
 
 cli2tg:
-	docker run -it -p 8888:8888 -e "DLPATH=/home/jovyan/.local/share/geosnap/data" -v ${PWD}:/home/jovyan -v ${TOBLER}:/home/jovyan/tobler -v ${HOME}/.local:/home/jovyan/.local geosnap sh -c "/home/jovyan/develop.sh && /bin/bash"
+	docker run -it -p 8888:8888 -e "DLPATH=/home/jovyan/.local/share/geosnap/data" -v ${PWD}:/home/jovyan -v $(subst geosnap,tobler, ${PWD}):/home/jovyan/tobler -v ${HOME}/.local:/home/jovyan/.local geosnap sh -c "/home/jovyan/develop.sh && /bin/bash"
 
 
 test:
