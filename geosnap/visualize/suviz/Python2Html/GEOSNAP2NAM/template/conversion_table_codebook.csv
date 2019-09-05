@@ -56,7 +56,7 @@ seq,code,variable,short_name,full_name
 3-17,n65povXX,p_poverty_rate_over_65,"% in poverty, 65+",percentage of 65 years and older in poverty
 3-18,nfmpovXX,p_poverty_rate_children,"% in poverty, families with children",percentage of families with children in poverty
 3-19,nwpovXX,p_poverty_rate_white,"% in poverty, whites",percentage of whites in poverty
-3-20,nbpovXX,p_poverty_rate_white,"% in poverty, African Americans",percentage of whites in poverty
+3-20,nbpovXX,p_poverty_rate_black,"% in poverty, African Americans",percentage of blacks  in poverty
 3-21,nhpovXX,p_poverty_rate_hispanic,"% in poverty, Hispanics",percentage of Hispanics in poverty
 3-22,nnapovXX,p_poverty_rate_native,"% in poverty, Native Americans",percentage of Native Americans in poverty
 3-23,napovXX,p_poverty_rate_asian,"% in poverty, Asian/ Pacific Islanders",percentage of Asian and Pacific Islanders in poverty
