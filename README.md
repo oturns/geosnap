@@ -1,6 +1,6 @@
 <h1 align="center"><code>geosnap</code></h1>
 <p align="center">
-<img height=100  src="doc/geosnap.png" alt="geosnap"/>
+<img height=100  src="/Users/knaaptime/Dropbox/docs/Images/logos/geosnap.svg" alt="geosnap"/>
 </p>
 <h2 align="center" style="margin-top:-10px">The GeoSpatial Neighborhood Analysis Package</h2> 
 
