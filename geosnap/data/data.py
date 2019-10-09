@@ -1392,6 +1392,7 @@ class Community(object):
             tracts = tracts[
                 tracts.representative_point().intersects(boundary.unary_union)
             ]
+            gdf = tracts.copy()
 
         else:
 
