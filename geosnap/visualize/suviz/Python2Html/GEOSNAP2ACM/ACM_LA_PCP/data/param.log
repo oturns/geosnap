@@ -1,0 +1,15 @@
+2019-09-25 23:40:30
+  {'chart': 'Parallel Coordinates Plot',
+   'county_fips': None,
+   'filename_suffix': 'LA_PCP',
+   'label': 'short_name',
+   'msa_fips': '31080',
+   'state_fips': None,
+   'title': 'Adaptive Choropleth Mapper: Parallel Coordinate Plot',
+   'variables': ['p_nonhisp_white_persons',
+                 'p_nonhisp_black_persons',
+                 'p_hispanic_persons',
+                 'p_native_persons',
+                 'p_asian_persons',
+                 'p_hawaiian_persons'],
+   'year': 2000}

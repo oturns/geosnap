@@ -1,0 +1,17 @@
+2019-10-08 20:00:23
+  {'Maps_of_neighborhood': True,
+   'Sequence': False,
+   'Temporal_change_in_neighborhoods': True,
+   'county_fips': None,
+   'filename_suffix': 'SD_neighborhood',
+   'method': 'kmeans',
+   'msa_fips': '41740',
+   'nClusters': 8,
+   'state_fips': None,
+   'title': 'Neighborhood Analysis: Kmeans, San Diego',
+   'variables': ['p_nonhisp_white_persons',
+                 'p_nonhisp_black_persons',
+                 'p_hispanic_persons',
+                 'p_native_persons',
+                 'p_asian_persons'],
+   'years': [1980, 1990, 2000, 2010]}
