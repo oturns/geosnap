@@ -11,7 +11,10 @@ var InitialLayers = [];
 /* It shows the change in the number of polygons belonging to each class intervals in different 
    It appears only when the map extent and the class intervals of all maps are same.
    To make all maps have the same map extent and class intervals, enable "Grouping All" or click "Sync" on one of maps   */
-var Stacked_Chart = true;                                  // true or false
+var Stacked_Chart = false;
+var Correlogram = false;
+var Scatter_Plot = false;
+var Parallel_Coordinates_Plot = false;
 
 // The number of digit after the decial point.
 var Num_Of_Decimal_Places = 4;                             // default = 1 
