@@ -76,6 +76,7 @@ def write_GEO_CONFIG_js(param):
 			InitialLayers.append(str(year)+' '+param['labels'][0])
 	else:
 		NumOfMaps = len(param['labels'])
+		if ('NumOfMaps' in param): NumOfMaps = param['NumOfMaps']
 		if (NumOfMaps > 15): NumOfMaps = 15
 		for i, variable in enumerate(param['labels']):
 			InitialLayers.append(str(param['years'][0])+' '+variable)
@@ -412,22 +413,28 @@ if __name__ == '__main__':
 		#	"per_capita_income",
 		#],
 		
-		# Parallel Coordinates Plot time
-		'chart': "Parallel Coordinates Plot",
-		'years': [1980,1990,2000,2010],
-		'variable': "p_nonhisp_white_persons",
-		
-		## Parallel Coordinates Plot
+		## Parallel Coordinates Plot time
 		#'chart': "Parallel Coordinates Plot",
-		#'year': 2000,
-		#'variables': [
-		#	"p_nonhisp_white_persons",
-		#	"p_nonhisp_black_persons", 
-		#	"p_hispanic_persons", 
-		#	"p_native_persons", 
-		#	"p_asian_persons",
-		#	"p_hawaiian_persons",
-		#],
+		#'years': [1980,1990,2000,2010],
+		#'variable': "p_nonhisp_white_persons",
+		
+		# Parallel Coordinates Plot
+		'chart': "Parallel Coordinates Plot",
+		'year': 2000,
+		'NumOfMaps': 6,
+		'variables': [
+			"p_nonhisp_white_persons",
+			"p_nonhisp_black_persons", 
+			"p_hispanic_persons", 
+			"p_native_persons", 
+			"p_asian_persons",
+			"p_hawaiian_persons",
+			"median_household_income",
+			"median_income_whitehh",
+			"median_income_blackhh",
+			"median_income_hispanichh",
+			"median_income_asianhh",
+		],
 		
 		'label': "short_name",                                       # variable, short_name or full_name
 	}
