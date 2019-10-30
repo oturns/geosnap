@@ -1,0 +1,7 @@
+geosnap.analyze.dynamics module
+===============================
+
+.. automodule:: geosnap.analyze.dynamics
+   :members:
+   :undoc-members:
+   :show-inheritance:

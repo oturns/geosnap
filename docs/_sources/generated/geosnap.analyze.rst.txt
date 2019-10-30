@@ -1,0 +1,20 @@
+geosnap.analyze package
+=======================
+
+Submodules
+----------
+
+.. toctree::
+
+   geosnap.analyze.analytics
+   geosnap.analyze.cluster
+   geosnap.analyze.dynamics
+   geosnap.analyze.incs
+
+Module contents
+---------------
+
+.. automodule:: geosnap.analyze
+   :members:
+   :undoc-members:
+   :show-inheritance:

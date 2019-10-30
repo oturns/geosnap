@@ -1,0 +1,28 @@
+geosnap.data.Community
+======================
+
+.. currentmodule:: geosnap.data
+
+.. autoclass:: Community
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Community.__init__
+      ~Community.cluster
+      ~Community.cluster_spatial
+      ~Community.from_census
+      ~Community.from_geodataframes
+      ~Community.from_ltdb
+      ~Community.from_ncdb
+   
+   
+
+   
+   
+   

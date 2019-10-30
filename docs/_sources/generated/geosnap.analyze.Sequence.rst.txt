@@ -1,0 +1,22 @@
+geosnap.analyze.Sequence
+========================
+
+.. currentmodule:: geosnap.analyze
+
+.. autoclass:: Sequence
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Sequence.__init__
+   
+   
+
+   
+   
+   

@@ -1,0 +1,7 @@
+geosnap.data.data module
+========================
+
+.. automodule:: geosnap.data.data
+   :members:
+   :undoc-members:
+   :show-inheritance:

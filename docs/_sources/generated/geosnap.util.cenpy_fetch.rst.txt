@@ -1,0 +1,7 @@
+geosnap.util.cenpy\_fetch module
+================================
+
+.. automodule:: geosnap.util.cenpy_fetch
+   :members:
+   :undoc-members:
+   :show-inheritance:

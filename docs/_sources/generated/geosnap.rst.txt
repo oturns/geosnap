@@ -1,0 +1,20 @@
+geosnap package
+===============
+
+Subpackages
+-----------
+
+.. toctree::
+
+   geosnap.analyze
+   geosnap.data
+   geosnap.util
+   geosnap.visualize
+
+Module contents
+---------------
+
+.. automodule:: geosnap
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,6 @@
+geosnap.data.data.store\_ncdb
+=============================
+
+.. currentmodule:: geosnap.data.data
+
+.. autofunction:: store_ncdb
