@@ -1,0 +1,6 @@
+geosnap.data.store\_census
+==========================
+
+.. currentmodule:: geosnap.data
+
+.. autofunction:: store_census

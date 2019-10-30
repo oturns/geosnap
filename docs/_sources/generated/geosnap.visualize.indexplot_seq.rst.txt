@@ -1,0 +1,6 @@
+geosnap.visualize.indexplot\_seq
+================================
+
+.. currentmodule:: geosnap.visualize
+
+.. autofunction:: indexplot_seq

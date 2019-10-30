@@ -1,6 +1,6 @@
 <h1 align="center"><code>geosnap</code></h1>
 <p align="center">
-<img height=100  src="doc/geosnap.svg" alt="geosnap"/>
+<img height=100  src="docs/geosnap.png" alt="geosnap"/>
 </p>
 <h2 align="center" style="margin-top:-10px">The GeoSpatial Neighborhood Analysis Package</h2> 
 
@@ -38,7 +38,7 @@ But you’re not just limited to the data provided with the package. `geosnap`
 works with any data you provide, any place in the world.
 
 <p align="center">
-<img width=75% src='doc/figs/Washington-Arlington-Alexandria_DC-VA-MD-WV.gif' alt='DC Transitions' style=' display: block; margin-left: auto; margin-right: auto;'/>
+<img width=75% src='docs/figs/Washington-Arlington-Alexandria_DC-VA-MD-WV.gif' alt='DC Transitions' style=' display: block; margin-left: auto; margin-right: auto;'/>
 </p>
 
 ## Quickstart
@@ -225,7 +225,7 @@ dc.cluster(method='kmeans', n_clusters=6, columns=['p_unemployment_rate', 'per_c
 dc.gdf[dc.gdf.year==2000].plot(column='kmeans')
 ```
 <p align="center">
-<img height=250 src="doc/figs/output_6_1.png"/>
+<img height=250 src="docs/figs/output_6_1.png"/>
 </p>
 
 you can create a
@@ -237,7 +237,7 @@ dc.cluster_spatial(method='spenc', n_clusters=6, columns=['p_unemployment_rate',
 dc.gdf[dc.gdf.year==2000].plot('spenc')
 ```
 <p align="center">
-<img height=250 src="doc/figs/output_9_1.png"/>
+<img height=250 src="docs/figs/output_9_1.png"/>
 </p>
 
 You can also [harmonize](https://github.com/spatialucr/tobler) `Community` boundaries so that they’re
@@ -301,5 +301,5 @@ conditions for usage, and a DISCLAIMER OF ALL WARRANTIES.
 
 ## Funding
 
-<img src="doc/nsf_logo.jpg" width=100 /> This project is supported by NSF Award #1733705,
+<img src="docs/nsf_logo.jpg" width=100 /> This project is supported by NSF Award #1733705,
 [Neighborhoods in Space-Time Contexts](https://www.nsf.gov/awardsearch/showAward?AWD_ID=1733705&HistoricalAwards=false)

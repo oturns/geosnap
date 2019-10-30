@@ -1,0 +1,148 @@
+.. _api_ref:
+
+.. currentmodule:: geosnap
+
+API reference
+=============
+
+.. _data_api:
+
+Data Module
+--------------
+
+geosnap provides contructors for several common datasets 
+
+.. currentmodule:: geosnap.data
+
+.. autosummary::
+   :toctree: generated/
+
+    data.data_store
+    data.store_ltdb
+    data.store_ncdb
+    data.get_lehd
+
+
+The Community Class
+-----------------------
+
+The `Community` is the central construct in geonap used to hold spatiotemporal neighborhood data.
+The most common way to interact with geosnap is by instantiating a Community using a constructor method,
+then using analytical methods upon the community
+
+.. currentmodule:: geosnap.data
+
+.. autosummary::
+   :toctree: generated/
+   
+   geosnap.data.Community
+   
+Community Constructors
+''''''''''''''''''''''''''''
+.. currentmodule:: geosnap.data
+
+.. autosummary::
+   :toctree: generated/
+  
+   Community.from_census
+   Community.from_geodataframes
+   Community.from_lodes
+   Community.from_ltdb
+   Community.from_ncdb
+  
+.. _analyze_api:
+
+
+Community Analytics
+'''''''''''''''''''''''''
+.. currentmodule:: geosnap.data
+
+.. autosummary::
+   :toctree: generated/
+   
+   Community.cluster
+   Community.cluster_spatial
+   Community.harmonize
+   Community.sequence
+   Community.transition
+
+   
+Analyze Module
+----------------
+
+Neighborhood Clustering Methods
+``````````````````````````````````
+Model neighborhood differentiation using multivariate clustering algorithms
+
+.. autosummary::
+   :toctree: generated/
+   
+    geosnap.analyze.cluster
+    geosnap.analyze.cluster_spatial
+
+Clustering algorithms
+'''''''''''''''''''''''
+The following algorithms may be passed to `geosnap.analyze.cluster` or `geosnap.analyze.cluster_spatial` but they should not be called directly
+
+Classic (aspatial) Clustering
+""""""""""""""""""""""""""""""
+
+.. currentmodule:: geosnap.analyze.analytics
+
+.. autosummary::
+   :toctree: generated/
+
+    affinity_propagation
+    gaussian_mixture
+    hdbscan
+    kmeans
+    spectral
+    ward
+
+Spatial Clustering
+""""""""""""""""""
+
+.. currentmodule:: geosnap.analyze.analytics
+
+.. autosummary::
+   :toctree: generated/
+
+    azp
+    max_p
+    skater
+    spenc
+    ward_spatial    
+
+    
+Neighborhod Dynamics Methods
+````````````````````````````````
+Model neighborhood change using optimal-matching algorithms or spatial discrete markov chains
+
+.. currentmodule:: geosnap
+
+.. autosummary::
+   :toctree: generated/
+   
+   geosnap.analyze.linc
+   geosnap.analyze.sequence
+   geosnap.analyze.transition
+
+Harmonize Module
+----------------
+.. currentmodule:: geosnap.data.Community
+
+.. autosummary::
+   :toctree: generated/
+
+   Community.harmonize
+
+Visualize Module
+----------------
+
+.. currentmodule:: geosnap.visualize
+
+.. autosummary::
+   :toctree: generated/
+
+   visualize.indexplot_seq
+   visualize.explore

@@ -1,0 +1,17 @@
+geosnap.data package
+====================
+
+Submodules
+----------
+
+.. toctree::
+
+   geosnap.data.data
+
+Module contents
+---------------
+
+.. automodule:: geosnap.data
+   :members:
+   :undoc-members:
+   :show-inheritance:

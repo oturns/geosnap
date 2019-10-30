@@ -1,0 +1,17 @@
+geosnap.util package
+====================
+
+Submodules
+----------
+
+.. toctree::
+
+   geosnap.util.cenpy_fetch
+
+Module contents
+---------------
+
+.. automodule:: geosnap.util
+   :members:
+   :undoc-members:
+   :show-inheritance:
