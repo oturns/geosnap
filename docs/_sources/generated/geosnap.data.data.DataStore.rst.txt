@@ -1,0 +1,39 @@
+geosnap.data.data.DataStore
+===========================
+
+.. currentmodule:: geosnap.data.data
+
+.. autoclass:: DataStore
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DataStore.__init__
+      ~DataStore.blocks_2000
+      ~DataStore.blocks_2010
+      ~DataStore.counties
+      ~DataStore.msas
+      ~DataStore.states
+      ~DataStore.tracts_1990
+      ~DataStore.tracts_2000
+      ~DataStore.tracts_2010
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DataStore.codebook
+      ~DataStore.ltdb
+      ~DataStore.msa_definitions
+      ~DataStore.ncdb
+   
+   

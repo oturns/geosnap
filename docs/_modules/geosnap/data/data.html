@@ -152,10 +152,10 @@
     <span class="n">storage</span> <span class="o">=</span> <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="DataStore"><a class="viewcode-back" href="../../../generated/geosnap.data.data.html#geosnap.data.DataStore">[docs]</a><span class="k">class</span> <span class="nc">DataStore</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="DataStore"><a class="viewcode-back" href="../../../generated/geosnap.data.data.DataStore.html#geosnap.data.DataStore">[docs]</a><span class="k">class</span> <span class="nc">DataStore</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Storage for geosnap data. Currently supports US Census data.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="DataStore.__init__"><a class="viewcode-back" href="../../../generated/geosnap.data.data.DataStore.html#geosnap.data.DataStore.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Instantiate a new DataStore object.&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>  <span class="c1"># if any of these aren&#39;t found, stream them insteead</span>
             <span class="kn">from</span> <span class="nn">quilt3.data.census</span> <span class="k">import</span> <span class="n">tracts_cartographic</span><span class="p">,</span> <span class="n">administrative</span>
@@ -182,7 +182,7 @@
                     <span class="s2">&quot;python kernel and try again.&quot;</span>
                 <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tracts_cartographic</span> <span class="o">=</span> <span class="n">tracts_cartographic</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">administrative</span> <span class="o">=</span> <span class="n">administrative</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">administrative</span> <span class="o">=</span> <span class="n">administrative</span></div>
 
     <span class="k">def</span> <span class="nf">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
@@ -449,6 +449,10 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">msa_definitions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;2010 Metropolitan Statistical Area definitions.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -461,6 +465,10 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ltdb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Longitudinal Tract Database (LTDB).</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -479,6 +487,10 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ncdb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Geolytics Neighborhood Change Database (NCDB).</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -498,6 +510,10 @@
     <span class="k">def</span> <span class="nf">codebook</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Codebook.</span>
 
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        pandas.DataFrame.</span>
@@ -515,6 +531,10 @@
 <div class="viewcode-block" id="store_census"><a class="viewcode-back" href="../../../generated/geosnap.data.store_census.html#geosnap.data.store_census">[docs]</a><span class="k">def</span> <span class="nf">store_census</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Save census data to the local quilt package storage.</span>
 
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    None</span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    None</span>
@@ -527,8 +547,12 @@
     <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="s2">&quot;census/administrative&quot;</span><span class="p">,</span> <span class="s2">&quot;s3://quilt-cgs&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="store_blocks_2000"><a class="viewcode-back" href="../../../generated/geosnap.data.data.html#geosnap.data.store_blocks_2000">[docs]</a><span class="k">def</span> <span class="nf">store_blocks_2000</span><span class="p">():</span>
+<div class="viewcode-block" id="store_blocks_2000"><a class="viewcode-back" href="../../../generated/geosnap.data.data.store_blocks_2000.html#geosnap.data.store_blocks_2000">[docs]</a><span class="k">def</span> <span class="nf">store_blocks_2000</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Save census 2000 census block data to the local quilt package storage.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    None</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -540,8 +564,12 @@
     <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="s2">&quot;census/blocks_2000&quot;</span><span class="p">,</span> <span class="s2">&quot;s3://quilt-cgs&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="store_blocks_2010"><a class="viewcode-back" href="../../../generated/geosnap.data.data.html#geosnap.data.store_blocks_2010">[docs]</a><span class="k">def</span> <span class="nf">store_blocks_2010</span><span class="p">():</span>
+<div class="viewcode-block" id="store_blocks_2010"><a class="viewcode-back" href="../../../generated/geosnap.data.data.store_blocks_2010.html#geosnap.data.store_blocks_2010">[docs]</a><span class="k">def</span> <span class="nf">store_blocks_2010</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Save census 2010 census block data to the local quilt package storage.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    None</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -553,7 +581,7 @@
     <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="s2">&quot;census/blocks_2010&quot;</span><span class="p">,</span> <span class="s2">&quot;s3://quilt-cgs&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="store_ltdb"><a class="viewcode-back" href="../../../generated/osnap.data.read_ltdb.html#geosnap.data.store_ltdb">[docs]</a><span class="k">def</span> <span class="nf">store_ltdb</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">fullcount</span><span class="p">):</span>
+<div class="viewcode-block" id="store_ltdb"><a class="viewcode-back" href="../../../generated/geosnap.data.store_ltdb.html#geosnap.data.store_ltdb">[docs]</a><span class="k">def</span> <span class="nf">store_ltdb</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">fullcount</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Read &amp; store data from Brown&#39;s Longitudinal Tract Database (LTDB).</span>
 
@@ -707,7 +735,7 @@
     <span class="n">storage</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="s2">&quot;geosnap_data/storage&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="store_ncdb"><a class="viewcode-back" href="../../../generated/osnap.data.read_ncdb.html#geosnap.data.store_ncdb">[docs]</a><span class="k">def</span> <span class="nf">store_ncdb</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+<div class="viewcode-block" id="store_ncdb"><a class="viewcode-back" href="../../../generated/geosnap.data.store_ncdb.html#geosnap.data.store_ncdb">[docs]</a><span class="k">def</span> <span class="nf">store_ncdb</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Read &amp; store data from Geolytics&#39;s Neighborhood Change Database.</span>
 
@@ -879,7 +907,7 @@
     <span class="k">return</span> <span class="n">gdf</span>
 
 
-<div class="viewcode-block" id="Community"><a class="viewcode-back" href="../../../generated/osnap.data.Community.html#geosnap.data.Community">[docs]</a><span class="k">class</span> <span class="nc">Community</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Community"><a class="viewcode-back" href="../../../generated/geosnap.data.data.html#geosnap.data.Community">[docs]</a><span class="k">class</span> <span class="nc">Community</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Spatial and tabular data for a collection of &quot;neighborhoods&quot;.</span>
 
 <span class="sd">       A community is a collection of &quot;neighborhoods&quot; represented by spatial</span>
@@ -910,7 +938,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Community.__init__"><a class="viewcode-back" href="../../../generated/osnap.data.Community.html#geosnap.data.Community.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gdf</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">harmonized</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Community.__init__"><a class="viewcode-back" href="../../../generated/geosnap.data.Community.html#geosnap.data.Community.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gdf</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">harmonized</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialize a new Community.</span>
 
 <span class="sd">        Parameters</span>
