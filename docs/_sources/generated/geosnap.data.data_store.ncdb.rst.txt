@@ -1,0 +1,6 @@
+geosnap.data.data\_store.ncdb
+=============================
+
+.. currentmodule:: geosnap.data
+
+.. autoattribute:: data_store.ncdb

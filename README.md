@@ -1,6 +1,6 @@
 <h1 align="center"><code>geosnap</code></h1>
 <p align="center">
-<img height=100  src="docs/geosnap.png" alt="geosnap"/>
+<img height=100  src="docs/figs/geosnap.svg" alt="geosnap"/>
 </p>
 <h2 align="center" style="margin-top:-10px">The GeoSpatial Neighborhood Analysis Package</h2> 
 
@@ -224,6 +224,7 @@ classic clustering methods on the `Community`
 dc.cluster(method='kmeans', n_clusters=6, columns=['p_unemployment_rate', 'per_capita_income'] )
 dc.gdf[dc.gdf.year==2000].plot(column='kmeans')
 ```
+
 <p align="center">
 <img height=250 src="docs/figs/output_6_1.png"/>
 </p>
@@ -236,6 +237,7 @@ spatially-constrained clustering methods on the `Community`
 dc.cluster_spatial(method='spenc', n_clusters=6, columns=['p_unemployment_rate', 'per_capita_income'] )
 dc.gdf[dc.gdf.year==2000].plot('spenc')
 ```
+
 <p align="center">
 <img height=250 src="docs/figs/output_9_1.png"/>
 </p>

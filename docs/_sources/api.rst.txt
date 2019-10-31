@@ -10,17 +10,47 @@ API reference
 Data Module
 --------------
 
-geosnap provides contructors for several common datasets 
+Storing data
+'''''''''''''''
+
+geosnap's data module provides functions for collecting and storing a variety of datasets
+including U.S. Census data from 1990-2010, LEHD data from any vintage, and external longitudinal databases.
 
 .. currentmodule:: geosnap.data
 
 .. autosummary::
    :toctree: generated/
 
-    data.data_store
+    data.store_census
+    data.store_blocks_2000
+    data.store_blocks_2010
     data.store_ltdb
     data.store_ncdb
     data.get_lehd
+
+Accessing Stored Datasets
+'''''''''''''''''''''''''''''''
+
+It also provides a storage container (called a "data_store") that provides access to datasets that have been imported with the functions above
+
+.. currentmodule:: geosnap.data
+
+.. autosummary::
+   :toctree: generated/
+   
+    data.data_store
+    data_store.blocks_2000
+    data_store.blocks_2010
+    data_store.codebook
+    data_store.counties
+    data_store.ltdb
+    data_store.msa_definitions
+    data_store.msas
+    data_store.ncdb
+    data_store.states
+    data_store.tracts_1990
+    data_store.tracts_2000
+    data_store.tracts_2010
 
 
 The Community Class
@@ -127,6 +157,8 @@ Model neighborhood change using optimal-matching algorithms or spatial discrete 
    geosnap.analyze.sequence
    geosnap.analyze.transition
 
+.. _harmonize_api:
+
 Harmonize Module
 ----------------
 .. currentmodule:: geosnap.data.Community
@@ -135,6 +167,8 @@ Harmonize Module
    :toctree: generated/
 
    Community.harmonize
+
+.. _visualize_api:
 
 Visualize Module
 ----------------

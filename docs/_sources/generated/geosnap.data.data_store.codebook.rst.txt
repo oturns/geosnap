@@ -1,0 +1,6 @@
+geosnap.data.data\_store.codebook
+=================================
+
+.. currentmodule:: geosnap.data
+
+.. autoattribute:: data_store.codebook
