@@ -681,7 +681,7 @@ def store_ncdb(filepath):
 
     # Inflation logic for ncdb.
     inflate_cols = [
-        "MDVALHS", 
+        "MDVALHS",
         "MDGRENT",
         "MDHHY",
     ]
