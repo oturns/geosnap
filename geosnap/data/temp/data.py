@@ -42,7 +42,7 @@ class DataStore(object):
 
     def __init__(self):
         """Instantiate a new DataStore object."""
-        try:  # if any of these aren't found, stream them instead
+        try:  # if any of these aren't found, stream them insteead
             from quilt3.data.census import tracts_cartographic, administrative
         except ImportError:
             warn(
@@ -94,7 +94,7 @@ class DataStore(object):
         Parameters
         ----------
         states : list-like
-            list of state fips codes to return as a dataframe.
+            list of state fips codes to return as a datafrrame.
         convert : bool
         if True, return geodataframe, else return dataframe (the default is True).
 
@@ -107,7 +107,7 @@ class DataStore(object):
 
         """
 
-        try:  # if any of these aren't found, stream them instead
+        try:  # if any of these aren't found, stream them insteead
             from quilt3.data.census import blocks_2000
         except ImportError:
             warn(
@@ -148,7 +148,7 @@ class DataStore(object):
         Parameters
         ----------
         states : list-like
-            list of state fips codes to return as a dataframe.
+            list of state fips codes to return as a datafrrame.
         convert : bool
         if True, return geodataframe, else return dataframe (the default is True).
 
@@ -160,7 +160,7 @@ class DataStore(object):
             stored as well-known binary on the 'wkb' column.
 
         """
-        try:  # if any of these aren't found, stream them instead
+        try:  # if any of these aren't found, stream them insteead
             from quilt3.data.census import blocks_2010
         except ImportError:
             warn(
@@ -367,7 +367,7 @@ class DataStore(object):
 
         Returns
         -------
-        pandas.DataFrame
+        pandas.DataFrarme
             NCDB as a long-form dataframe
 
         """
@@ -675,31 +675,6 @@ def store_ncdb(filepath):
 
     df = df.set_index("geoid")
 
-    #### Beginning of New Code ####
-
-    year = df["year"]
-
-    # Inflation logic for ncdb.
-    inflate_cols = [
-        "MDVALHS", 
-        "MDGRENT",
-        "MDHHY",
-    ]
-    # Five rows have missing] ncdb labels in variables.csv.
-    # per capita income, missing
-    # median household income white, missing
-    # median household income black, missing
-    # median household income hispanic, missing
-    # median household income asian, missing
-
-    inflate_available = list(set(df.columns).intersection(set(inflate_cols)))
-
-    if len(inflate_available):
-        df = adjust_inflation(df, inflate_available, year)
-    return df
-
-    #### End of New Code ####
-
     for row in data_store.codebook["formula"].dropna().tolist():
         try:
             df.eval(row, inplace=True)
@@ -796,7 +771,7 @@ class Community(object):
        boundaries (e.g. census tracts, or blocks in the US), and tabular data
        which describe the composition of each neighborhood (e.g. data from
        surveys, sensors, or geocoded misc.). A Community can be large (e.g. a
-       metropolitan region), or small (e.g. a handful of census tracts) and
+       metropolitan region), or small (e.g. a handfull of census tracts) and
        may have data pertaining to multiple discrete points in time.
 
     Parameters
@@ -1188,7 +1163,7 @@ class Community(object):
     ):
         """Create a new Community from LTDB data.
 
-           Instantiate a new Community from pre-harmonized LTDB data. To use
+           Instiantiate a new Community from pre-harmonized LTDB data. To use
            you must first download and register LTDB data with geosnap using
            the `store_ltdb` function. Pass lists of states, counties, or any
            arbitrary FIPS codes to create a community. All fips code arguments
@@ -1264,7 +1239,7 @@ class Community(object):
     ):
         """Create a new Community from NCDB data.
 
-           Instantiate a new Community from pre-harmonized NCDB data. To use
+           Instiantiate a new Community from pre-harmonized NCDB data. To use
            you must first download and register LTDB data with geosnap using
            the `store_ncdb` function. Pass lists of states, counties, or any
            arbitrary FIPS codes to create a community. All fips code arguments
@@ -1339,7 +1314,7 @@ class Community(object):
     ):
         """Create a new Community from original vintage US Census data.
 
-           Instantiate a new Community from . To use
+           Instiantiate a new Community from . To use
            you must first download and register census data with geosnap using
            the `store_census` function. Pass lists of states, counties, or any
            arbitrary FIPS codes to create a community. All fips code arguments
@@ -1444,7 +1419,7 @@ class Community(object):
     ):
         """Create a new Community from Census LEHD/LODES data.
 
-           Instantiate a new Community from LODES data.
+           Instiantiate a new Community from LODES data.
            Pass lists of states, counties, or any
            arbitrary FIPS codes to create a community. All fips code arguments
            are additive, so geosnap will include the largest unique set.
