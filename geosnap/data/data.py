@@ -685,7 +685,7 @@ def store_ncdb(filepath):
         "MDGRENT",
         "MDHHY",
     ]
-    # Five rows have missing] ncdb labels in variables.csv.
+    # Five rows have missing ncdb labels in variables.csv.
     # per capita income, missing
     # median household income white, missing
     # median household income black, missing
