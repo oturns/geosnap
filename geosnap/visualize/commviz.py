@@ -2,6 +2,24 @@ from mapclassify import *
 
 
 def explore(data="census"):
+    """Launch an interactive visualization portal.
+    
+    This function launches an interactive dataset explorer based on plotly's `dash`
+    Currently it is still experimental, but it provides a set of interactive widgets
+    and maps that allow users to rapidly create  metropolitan-scale datasets and choropleth
+    webmaps using a variety of census data.
+
+    Parameters
+    ----------
+    data : str
+        Which dataset to explore. Options include "census, "ltdb", and "ncdb" (the default is "census").
+
+    Returns
+    -------
+    None
+        Launches a web-browser with the interactive visualization.
+
+    """
     mem = {}
     mem["last_metro"] = ""
     mem["last_comm"] = ""

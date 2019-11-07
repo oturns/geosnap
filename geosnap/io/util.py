@@ -1,9 +1,9 @@
 import pandas as pd
-import multiprocessing
 from shapely import wkb, wkt
-import geopandas as gpd
 from urllib.error import HTTPError
 import os
+
+from .._data import _convert_gdf as convert_gdf
 
 
 def _deserialize_wkb(str):
@@ -12,44 +12,6 @@ def _deserialize_wkb(str):
 
 def _deserialize_wkt(str):
     return wkt.loads(str)
-
-
-def convert_gdf(df):
-    """Convert DataFrame to GeoDataFrame.
-
-    DataFrame to GeoDataFrame by converting wkt/wkb geometry representation
-    back to Shapely object.
-
-    Parameters
-    ----------
-    df : pandas.DataFrame
-        dataframe with column named either "wkt" or "wkb" that stores
-        geometric information as well-known text or well-known binary,
-        (hex encoded) respectively.
-
-    Returns
-    -------
-    gpd.GeoDataFrame
-        geodataframe with converted `geometry` column.
-
-    """
-    df = df.copy()
-    df.reset_index(inplace=True, drop=True)
-
-    if "wkt" in df.columns.tolist():
-        with multiprocessing.Pool() as P:
-            df["geometry"] = P.map(_deserialize_wkt, df["wkt"])
-        df = df.drop(columns=["wkt"])
-
-    else:
-        with multiprocessing.Pool() as P:
-            df["geometry"] = P.map(_deserialize_wkb, df["wkb"])
-        df = df.drop(columns=["wkb"])
-
-    df = gpd.GeoDataFrame(df)
-    df.crs = {"init": "epsg:4326"}
-
-    return df
 
 
 def get_lehd(dataset="wac", state="dc", year=2015):
@@ -75,21 +37,19 @@ def get_lehd(dataset="wac", state="dc", year=2015):
 
     """
     lodes_vars = pd.read_csv(
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), "lodes.csv")
-    )
-    renamer = dict(zip(lodes_vars["variable"].tolist(), lodes_vars["name"].tolist()))
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "lodes.csv"))
+    renamer = dict(
+        zip(lodes_vars["variable"].tolist(), lodes_vars["name"].tolist()))
 
     state = state.lower()
     url = "https://lehd.ces.census.gov/data/lodes/LODES7/{state}/{dataset}/{state}_{dataset}_S000_JT00_{year}.csv.gz".format(
-        dataset=dataset, state=state, year=year
-    )
+        dataset=dataset, state=state, year=year)
     try:
         df = pd.read_csv(url, converters={"w_geocode": str, "h_geocode": str})
     except HTTPError:
         raise ValueError(
             "Unable to retrieve LEHD data. Check your internet connection "
-            "and that the state/year combination you specified is available"
-        )
+            "and that the state/year combination you specified is available")
     df = df.rename({"w_geocode": "geoid", "h_geocode": "geoid"}, axis=1)
     df.rename(renamer, axis="columns", inplace=True)
     df = df.set_index("geoid")
@@ -123,8 +83,7 @@ def adjust_inflation(df, columns, given_year, base_year=2015):
     """
     # get inflation adjustment table from BLS
     inflation = pd.read_excel(
-        "https://www.bls.gov/cpi/research-series/allitems.xlsx", skiprows=6
-    )
+        "https://www.bls.gov/cpi/research-series/allitems.xlsx", skiprows=6)
     inflation.columns = inflation.columns.str.lower()
     inflation.columns = inflation.columns.str.strip(".")
     inflation = inflation.dropna(subset=["year"])
@@ -132,9 +91,8 @@ def adjust_inflation(df, columns, given_year, base_year=2015):
     inflator[1970] = 63.9
 
     df = df.copy()
-    updated = df[columns].apply(
-        lambda x: x * (inflator[base_year] / inflator[given_year])
-    )
+    updated = df[columns].apply(lambda x: x *
+                                (inflator[base_year] / inflator[given_year]))
     df.update(updated)
 
     return df
