@@ -3,5 +3,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
+from geosnap import Community, datasets
 import analyze
-import data
+import io
+import harmonize

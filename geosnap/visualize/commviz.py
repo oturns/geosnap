@@ -3,7 +3,7 @@ from mapclassify import *
 
 def explore(data="census"):
     """Launch an interactive visualization portal.
-    
+
     This function launches an interactive dataset explorer based on plotly's `dash`
     Currently it is still experimental, but it provides a set of interactive widgets
     and maps that allow users to rapidly create  metropolitan-scale datasets and choropleth
@@ -31,7 +31,7 @@ def explore(data="census"):
     import webbrowser
     import palettable
     import json
-    from geosnap.data import Community, data_store as store
+    from geosnap.io import Community, data_store as store
 
     mem["data"] = data
 

@@ -2,14 +2,16 @@
 
 import multiprocessing
 import os
-import pandas as pd
-import geopandas as gpd
-import quilt3
 import pathlib
+from warnings import warn
+
+from appdirs import user_data_dir
+
+import geopandas as gpd
+import pandas as pd
+import quilt3
 from requests.exceptions import Timeout
 from shapely import wkb, wkt
-from warnings import warn
-from appdirs import user_data_dir
 
 appname = "geosnap"
 appauthor = "geosnap"
@@ -72,6 +74,7 @@ def _convert_gdf(df):
 
 class DataStore(object):
     """Storage for geosnap data. Currently supports US Census data."""
+
     def __init__(self):
         """Instantiate a new DataStore object."""
         try:  # if any of these aren't found, stream them insteead
@@ -80,12 +83,15 @@ class DataStore(object):
             warn(
                 "Unable to locate local census data. Streaming instead.\n"
                 "If you plan to use census data repeatedly you can store it locally "
-                "with the data.store_census function for better performance")
+                "with the data.store_census function for better performance"
+            )
             try:
                 tracts_cartographic = quilt3.Package.browse(
-                    "census/tracts_cartographic", "s3://quilt-cgs")
-                administrative = quilt3.Package.browse("census/administrative",
-                                                       "s3://quilt-cgs")
+                    "census/tracts_cartographic", "s3://quilt-cgs"
+                )
+                administrative = quilt3.Package.browse(
+                    "census/administrative", "s3://quilt-cgs"
+                )
 
             except Timeout:
                 warn(
@@ -93,7 +99,8 @@ class DataStore(object):
                     "You will be unable to use built-in data during this session. "
                     "If you need these data, please try downloading a local copy "
                     "with the data.store_census function, then restart your "
-                    "python kernel and try again.")
+                    "python kernel and try again."
+                )
         self.tracts_cartographic = tracts_cartographic
         self.administrative = administrative
 
@@ -134,7 +141,6 @@ class DataStore(object):
             stored as well-known binary on the 'wkb' column.
 
         """
-
         try:  # if any of these aren't found, stream them insteead
             from quilt3.data.census import blocks_2000
         except ImportError:
@@ -144,19 +150,21 @@ class DataStore(object):
                 "with the data.store_blocks_2000 function for better performance"
             )
             try:
-                blocks_2000 = quilt3.Package.browse("census/blocks_2000",
-                                                    "s3://quilt-cgs")
+                blocks_2000 = quilt3.Package.browse(
+                    "census/blocks_2000", "s3://quilt-cgs"
+                )
 
             except Timeout:
                 warn(
                     "Unable to locate local census data and unable to reach s3 bucket."
                     "You will be unable to use built-in data during this session. "
                     "Try downloading a local copy with the data.store_blocks_2000 function,"
-                    "then restart your python kernel and try again.")
+                    "then restart your python kernel and try again."
+                )
 
-        if isinstance(states, (str, )):
+        if isinstance(states, (str,)):
             states = [states]
-        if isinstance(states, (int, )):
+        if isinstance(states, (int,)):
             states = [states]
         blks = {}
         for state in states:
@@ -195,8 +203,9 @@ class DataStore(object):
                 "with the data.store_blocks_2010 function for better performance"
             )
             try:
-                blocks_2010 = quilt3.Package.browse("census/blocks_2010",
-                                                    "s3://quilt-cgs")
+                blocks_2010 = quilt3.Package.browse(
+                    "census/blocks_2010", "s3://quilt-cgs"
+                )
 
             except Timeout:
                 warn(
@@ -204,7 +213,8 @@ class DataStore(object):
                     "You will be unable to use built-in data during this session. "
                     "If you need these data, please try downloading a local copy "
                     "with the data.store_blocks_2010 function, then restart your "
-                    "python kernel and try again.")
+                    "python kernel and try again."
+                )
 
         if isinstance(states, (str, int)):
             states = [states]
@@ -313,9 +323,9 @@ class DataStore(object):
         """
         if convert:
             return _convert_gdf(
-                self.administrative["msas.parquet"]().sort_values(by="name"))
-        else:
-            return self.administrative["msas.parquet"]().sort_values(by="name")
+                self.administrative["msas.parquet"]().sort_values(by="name")
+            )
+        return self.administrative["msas.parquet"]().sort_values(by="name")
 
     def states(self, convert=True):
         """States.
@@ -334,10 +344,9 @@ class DataStore(object):
         """
         if convert:
             return _convert_gdf(self.administrative["states.parquet"]())
-        else:
-            return self.administrative["states.parquet"]()
+        return self.administrative["states.parquet"]()
 
-    def counties(self, convert=True):
+    def counties(self):
         """Nationwide counties as drawn in 2010.
 
         Parameters
@@ -379,8 +388,10 @@ class DataStore(object):
         try:
             return storage["ltdb"]()
         except KeyError:
-            print("Unable to locate LTDB data. Try saving the data again "
-                  "using the `store_ltdb` function")
+            print(
+                "Unable to locate LTDB data. Try saving the data again "
+                "using the `store_ltdb` function"
+            )
 
     @property
     def ncdb(self):
@@ -395,8 +406,10 @@ class DataStore(object):
         try:
             return storage["ncdb"]()
         except KeyError:
-            print("Unable to locate NCDB data. Try saving the data again "
-                  "using the `store_ncdb` function")
+            print(
+                "Unable to locate NCDB data. Try saving the data again "
+                "using the `store_ncdb` function"
+            )
 
     @property
     def codebook(self):
@@ -409,8 +422,8 @@ class DataStore(object):
 
         """
         return pd.read_csv(
-            os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                         "io/variables.csv"))
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), "io/variables.csv")
+        )
 
 
 datasets = DataStore()

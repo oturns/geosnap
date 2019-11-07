@@ -1,9 +1,11 @@
-import pandas as pd
+"""Use spatial interpolation to standardize neighborhood boundaries over time."""
+
 import geopandas as gpd
+import pandas as pd
 from tobler.area_weighted import (
+    area_interpolate,
     area_interpolate_binning,
     area_tables_raster,
-    area_interpolate,
 )
 from tobler.util.util import _check_presence_of_crs
 
@@ -21,12 +23,11 @@ def harmonize(
     index="geoid",
     time_col="year",
 ):
-    """
-    Harmonize Multiples GeoData Sources with different approaches
+    r"""
+    Use spatial interpolation to standardize neighborhood boundaries over time.
 
     Parameters
     ----------
-
     raw_community : list
         Multiple GeoDataFrames given by a list (see (1) in Notes).
 
@@ -78,7 +79,6 @@ def harmonize(
 
     Notes
     -----
-
     1) Each GeoDataFrame of raw_community is assumed to have a 'year' column
        Also, all GeoDataFrames must have the same Coordinate Reference System (CRS).
 

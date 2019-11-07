@@ -1,15 +1,21 @@
-import pandas as pd
+"""A Community is a thin wrapper around a long-form time-series geodataframe."""
+from warnings import warn
+
 import geopandas as gpd
 import numpy as np
-from .analyze import cluster as _cluster, cluster_spatial as _cluster_spatial, transition as _transition, sequence as _sequence
-from .harmonize import harmonize as _harmonize
-from warnings import warn
-from .io import _fips_filter, _from_db, _fipstable, get_lehd
+import pandas as pd
+
 from ._data import datasets
+from .analyze import cluster as _cluster
+from .analyze import cluster_spatial as _cluster_spatial
+from .analyze import sequence as _sequence
+from .analyze import transition as _transition
+from .harmonize import harmonize as _harmonize
+from .io import _fips_filter, _fipstable, _from_db, get_lehd
 
 
-class Community(object):
-    """Spatial and tabular data for a collection of "neighborhoods".
+class Community:
+    """Spatial and tabular data for a collection of "neighborhoods" over time.
 
        A community is a collection of "neighborhoods" represented by spatial
        boundaries (e.g. census tracts, or blocks in the US), and tabular data
@@ -38,6 +44,7 @@ class Community(object):
         consistent units over time
 
     """
+
     def __init__(self, gdf=None, harmonized=None, **kwargs):
         """Initialize a new Community.
 
@@ -57,17 +64,17 @@ class Community(object):
         self.harmonized = harmonized
 
     def harmonize(
-            self,
-            target_year=None,
-            weights_method="area",
-            extensive_variables=None,
-            intensive_variables=None,
-            allocate_total=True,
-            raster="nlcd_2011",
-            codes=[21, 22, 23, 24],
-            force_crs_match=True,
+        self,
+        target_year=None,
+        weights_method="area",
+        extensive_variables=None,
+        intensive_variables=None,
+        allocate_total=True,
+        raster="nlcd_2011",
+        codes=[21, 22, 23, 24],
+        force_crs_match=True,
     ):
-        """Short summary.
+        """Standardize inconsistent boundaries into time-static ones.
 
         Parameters
         ----------
@@ -125,15 +132,15 @@ class Community(object):
         return Community(gdf, harmonized=True)
 
     def cluster(
-            self,
-            n_clusters=6,
-            method=None,
-            best_model=False,
-            columns=None,
-            verbose=False,
-            return_model=False,
-            scaler=None,
-            **kwargs,
+        self,
+        n_clusters=6,
+        method=None,
+        best_model=False,
+        columns=None,
+        verbose=False,
+        return_model=False,
+        scaler=None,
+        **kwargs,
     ):
         """Create a geodemographic typology by running a cluster analysis on
         the study area's neighborhood attributes
@@ -164,6 +171,7 @@ class Community(object):
         -------
         pandas.DataFrame with a column of neighborhood cluster labels appended
         as a new column. Will overwrite columns of the same name.
+
         """
         harmonized = self.harmonized
         if return_model:
@@ -175,34 +183,34 @@ class Community(object):
                 columns=columns,
                 verbose=verbose,
                 return_model=return_model,
+                scaler=scaler,
                 **kwargs,
             )
             return Community(gdf, harmonized=harmonized), model
-        else:
-            gdf = _cluster(
-                gdf=self.gdf.copy(),
-                n_clusters=n_clusters,
-                method=method,
-                best_model=best_model,
-                columns=columns,
-                verbose=verbose,
-                return_model=return_model,
-                **kwargs,
-            )
-            return Community(gdf, harmonized=harmonized)
+        gdf = _cluster(
+            gdf=self.gdf.copy(),
+            n_clusters=n_clusters,
+            method=method,
+            best_model=best_model,
+            columns=columns,
+            verbose=verbose,
+            return_model=return_model,
+            **kwargs,
+        )
+        return Community(gdf, harmonized=harmonized)
 
     def cluster_spatial(
-            self,
-            n_clusters=6,
-            spatial_weights="rook",
-            method=None,
-            best_model=False,
-            columns=None,
-            threshold_variable="count",
-            threshold=10,
-            return_model=False,
-            scaler=None,
-            **kwargs,
+        self,
+        n_clusters=6,
+        spatial_weights="rook",
+        method=None,
+        best_model=False,
+        columns=None,
+        threshold_variable="count",
+        threshold=10,
+        return_model=False,
+        scaler=None,
+        **kwargs,
     ):
         """Create a *spatial* geodemographic typology by running a cluster
         analysis on the metro area's neighborhood attributes and including a
@@ -239,6 +247,7 @@ class Community(object):
         -------
         geopandas.GeoDataFrame with a column of neighborhood cluster labels
         appended as a new column. Will overwrite columns of the same name.
+
         """
         harmonized = self.harmonized
 
@@ -253,30 +262,28 @@ class Community(object):
                 threshold_variable=threshold_variable,
                 threshold=threshold,
                 return_model=return_model,
+                scaler=scaler,
                 **kwargs,
             )
             return Community(gdf, harmonized=True), model
-        else:
-            gdf = _cluster_spatial(
-                gdf=self.gdf.copy(),
-                n_clusters=n_clusters,
-                spatial_weights=spatial_weights,
-                method=method,
-                best_model=best_model,
-                columns=columns,
-                threshold_variable=threshold_variable,
-                threshold=threshold,
-                return_model=return_model,
-                **kwargs,
-            )
-            return Community(gdf, harmonized=harmonized)
+        gdf = _cluster_spatial(
+            gdf=self.gdf.copy(),
+            n_clusters=n_clusters,
+            spatial_weights=spatial_weights,
+            method=method,
+            best_model=best_model,
+            columns=columns,
+            threshold_variable=threshold_variable,
+            threshold=threshold,
+            return_model=return_model,
+            scaler=scaler,
+            **kwargs,
+        )
+        return Community(gdf, harmonized=harmonized)
 
-    def transition(self,
-                   cluster_col,
-                   time_var="year",
-                   id_var="geoid",
-                   w_type=None,
-                   permutations=0):
+    def transition(
+        self, cluster_col, time_var="year", id_var="geoid", w_type=None, permutations=0
+    ):
         """
         (Spatial) Markov approach to transitional dynamics of neighborhoods.
 
@@ -303,14 +310,15 @@ class Community(object):
                           number of permutations for use in randomization based
                           inference (the default is 0).
 
-        Return
-        ------
+
+        Returns
+        ---------
         mar             : object
                           if w_type=None, return a giddy.markov.Markov instance;
                           if w_type is given, return a
                           giddy.markov.Spatial_Markov instance.
-        """
 
+        """
         mar = _transition(
             self.gdf,
             cluster_col,
@@ -322,14 +330,14 @@ class Community(object):
         return mar
 
     def sequence(
-            self,
-            cluster_col,
-            seq_clusters=5,
-            subs_mat=None,
-            dist_type=None,
-            indel=None,
-            time_var="year",
-            id_var="geoid",
+        self,
+        cluster_col,
+        seq_clusters=5,
+        subs_mat=None,
+        dist_type=None,
+        indel=None,
+        time_var="year",
+        id_var="geoid",
     ):
         """
         Pairwise sequence analysis to evaluate the distance/dissimilarity
@@ -383,6 +391,7 @@ class Community(object):
         seq_dis_mat     : array
                           (n,n), distance/dissimilarity matrix for each pair of
                           sequences
+
         """
         gdf_temp, df_wide, seq_dis_mat = _sequence(
             self.gdf,
@@ -399,13 +408,13 @@ class Community(object):
 
     @classmethod
     def from_ltdb(
-            cls,
-            state_fips=None,
-            county_fips=None,
-            msa_fips=None,
-            fips=None,
-            boundary=None,
-            years=[1970, 1980, 1990, 2000, 2010],
+        cls,
+        state_fips=None,
+        county_fips=None,
+        msa_fips=None,
+        fips=None,
+        boundary=None,
+        years=[1970, 1980, 1990, 2000, 2010],
     ):
         """Create a new Community from LTDB data.
 
@@ -451,10 +460,13 @@ class Community(object):
             tracts = datasets.tracts_2010()[["geoid", "geometry"]]
             ltdb = datasets.ltdb.reset_index()
             if boundary.crs != tracts.crs:
-                warn("Unable to determine whether boundary CRS is WGS84 "
-                     "if this produces unexpected results, try reprojecting")
-            tracts = tracts[tracts.representative_point().intersects(
-                boundary.unary_union)]
+                warn(
+                    "Unable to determine whether boundary CRS is WGS84 "
+                    "if this produces unexpected results, try reprojecting"
+                )
+            tracts = tracts[
+                tracts.representative_point().intersects(boundary.unary_union)
+            ]
             gdf = ltdb[ltdb["geoid"].isin(tracts["geoid"])]
             gdf = gpd.GeoDataFrame(gdf.merge(tracts, on="geoid", how="left"))
 
@@ -472,13 +484,13 @@ class Community(object):
 
     @classmethod
     def from_ncdb(
-            cls,
-            state_fips=None,
-            county_fips=None,
-            msa_fips=None,
-            fips=None,
-            boundary=None,
-            years=[1970, 1980, 1990, 2000, 2010],
+        cls,
+        state_fips=None,
+        county_fips=None,
+        msa_fips=None,
+        fips=None,
+        boundary=None,
+        years=[1970, 1980, 1990, 2000, 2010],
     ):
         """Create a new Community from NCDB data.
 
@@ -523,10 +535,13 @@ class Community(object):
             tracts = datasets.tracts_2010()[["geoid", "geometry"]]
             ncdb = datasets.ncdb.reset_index()
             if boundary.crs != tracts.crs:
-                warn("Unable to determine whether boundary CRS is WGS84 "
-                     "if this produces unexpected results, try reprojecting")
-            tracts = tracts[tracts.representative_point().intersects(
-                boundary.unary_union)]
+                warn(
+                    "Unable to determine whether boundary CRS is WGS84 "
+                    "if this produces unexpected results, try reprojecting"
+                )
+            tracts = tracts[
+                tracts.representative_point().intersects(boundary.unary_union)
+            ]
             gdf = ncdb[ncdb["geoid"].isin(tracts["geoid"])]
             gdf = gpd.GeoDataFrame(gdf.merge(tracts, on="geoid", how="left"))
 
@@ -544,13 +559,13 @@ class Community(object):
 
     @classmethod
     def from_census(
-            cls,
-            state_fips=None,
-            county_fips=None,
-            msa_fips=None,
-            fips=None,
-            boundary=None,
-            years=[1990, 2000, 2010],
+        cls,
+        state_fips=None,
+        county_fips=None,
+        msa_fips=None,
+        fips=None,
+        boundary=None,
+        years=[1990, 2000, 2010],
     ):
         """Create a new Community from original vintage US Census data.
 
@@ -597,8 +612,8 @@ class Community(object):
         msa_states = []
         if msa_fips:
             msa_states += datasets.msa_definitions[
-                datasets.msa_definitions["CBSA Code"] ==
-                msa_fips]["stcofips"].tolist()
+                datasets.msa_definitions["CBSA Code"] == msa_fips
+            ]["stcofips"].tolist()
         msa_states = [i[:2] for i in msa_states]
 
         # build a list of states in the dataset
@@ -625,10 +640,13 @@ class Community(object):
 
         if isinstance(boundary, gpd.GeoDataFrame):
             if boundary.crs != tracts.crs:
-                warn("Unable to determine whether boundary CRS is WGS84 "
-                     "if this produces unexpected results, try reprojecting")
-            tracts = tracts[tracts.representative_point().intersects(
-                boundary.unary_union)]
+                warn(
+                    "Unable to determine whether boundary CRS is WGS84 "
+                    "if this produces unexpected results, try reprojecting"
+                )
+            tracts = tracts[
+                tracts.representative_point().intersects(boundary.unary_union)
+            ]
             gdf = tracts.copy()
 
         else:
@@ -645,14 +663,14 @@ class Community(object):
 
     @classmethod
     def from_lodes(
-            cls,
-            state_fips=None,
-            county_fips=None,
-            msa_fips=None,
-            fips=None,
-            boundary=None,
-            years=2015,
-            dataset="wac",
+        cls,
+        state_fips=None,
+        county_fips=None,
+        msa_fips=None,
+        fips=None,
+        boundary=None,
+        years=2015,
+        dataset="wac",
     ):
         """Create a new Community from Census LEHD/LODES data.
 
@@ -702,8 +720,8 @@ class Community(object):
         msa_states = []
         if msa_fips:
             msa_states += datasets.msa_definitions[
-                datasets.msa_definitions["CBSA Code"] ==
-                msa_fips]["stcofips"].tolist()
+                datasets.msa_definitions["CBSA Code"] == msa_fips
+            ]["stcofips"].tolist()
         msa_states = [i[:2] for i in msa_states]
 
         # build a list of states in the dataset
@@ -721,8 +739,11 @@ class Community(object):
         gdf = gdf.drop(columns=["year"])
 
         # grab state abbreviations
-        names = (_fipstable[_fipstable["FIPS Code"].isin(states)]
-                 ["State Abbreviation"].str.lower().tolist())
+        names = (
+            _fipstable[_fipstable["FIPS Code"].isin(states)]["State Abbreviation"]
+            .str.lower()
+            .tolist()
+        )
 
         dfs = []
         if isinstance(names, str):
@@ -740,10 +761,11 @@ class Community(object):
 
         if isinstance(boundary, gpd.GeoDataFrame):
             if boundary.crs != gdf.crs:
-                warn("Unable to determine whether boundary CRS is WGS84 "
-                     "if this produces unexpected results, try reprojecting")
-            gdf = gdf[gdf.representative_point().intersects(
-                boundary.unary_union)]
+                warn(
+                    "Unable to determine whether boundary CRS is WGS84 "
+                    "if this produces unexpected results, try reprojecting"
+                )
+            gdf = gdf[gdf.representative_point().intersects(boundary.unary_union)]
 
         else:
 
@@ -774,6 +796,5 @@ class Community(object):
             neighborhood units over time.
 
         """
-
         gdf = pd.concat(gdfs, sort=True)
         return cls(gdf=gdf)

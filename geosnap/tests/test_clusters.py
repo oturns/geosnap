@@ -1,14 +1,15 @@
-from context import data
+# from context import datasets, io, Community
+from geosnap import io, datasets, Community
 import os
 
 path = os.environ["DLPATH"]
 
 if not os.path.exists(
-    os.path.join(os.path.dirname(os.path.abspath(data.__file__)), "ltdb.parquet")
+    os.path.join(os.path.dirname(os.path.abspath(io.__file__)), "ltdb.parquet")
 ):
-    data.store_ltdb(sample=path + "/ltdb_sample.zip", fullcount=path + "/ltdb_full.zip")
+    io.store_ltdb(sample=path + "/ltdb_sample.zip", fullcount=path + "/ltdb_full.zip")
 
-reno = data.Community.from_ltdb(msa_fips="39900")
+reno = Community.from_ltdb(msa_fips="39900")
 columns = ["median_household_income", "p_poverty_rate", "p_unemployment_rate"]
 
 # Aspatial Clusters

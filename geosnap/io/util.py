@@ -1,7 +1,8 @@
+import os
+from urllib.error import HTTPError
+
 import pandas as pd
 from shapely import wkb, wkt
-from urllib.error import HTTPError
-import os
 
 from .._data import _convert_gdf as convert_gdf
 
@@ -37,19 +38,21 @@ def get_lehd(dataset="wac", state="dc", year=2015):
 
     """
     lodes_vars = pd.read_csv(
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), "lodes.csv"))
-    renamer = dict(
-        zip(lodes_vars["variable"].tolist(), lodes_vars["name"].tolist()))
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "lodes.csv")
+    )
+    renamer = dict(zip(lodes_vars["variable"].tolist(), lodes_vars["name"].tolist()))
 
     state = state.lower()
     url = "https://lehd.ces.census.gov/data/lodes/LODES7/{state}/{dataset}/{state}_{dataset}_S000_JT00_{year}.csv.gz".format(
-        dataset=dataset, state=state, year=year)
+        dataset=dataset, state=state, year=year
+    )
     try:
         df = pd.read_csv(url, converters={"w_geocode": str, "h_geocode": str})
     except HTTPError:
         raise ValueError(
             "Unable to retrieve LEHD data. Check your internet connection "
-            "and that the state/year combination you specified is available")
+            "and that the state/year combination you specified is available"
+        )
     df = df.rename({"w_geocode": "geoid", "h_geocode": "geoid"}, axis=1)
     df.rename(renamer, axis="columns", inplace=True)
     df = df.set_index("geoid")
@@ -83,7 +86,8 @@ def adjust_inflation(df, columns, given_year, base_year=2015):
     """
     # get inflation adjustment table from BLS
     inflation = pd.read_excel(
-        "https://www.bls.gov/cpi/research-series/allitems.xlsx", skiprows=6)
+        "https://www.bls.gov/cpi/research-series/allitems.xlsx", skiprows=6
+    )
     inflation.columns = inflation.columns.str.lower()
     inflation.columns = inflation.columns.str.strip(".")
     inflation = inflation.dropna(subset=["year"])
@@ -91,8 +95,9 @@ def adjust_inflation(df, columns, given_year, base_year=2015):
     inflator[1970] = 63.9
 
     df = df.copy()
-    updated = df[columns].apply(lambda x: x *
-                                (inflator[base_year] / inflator[given_year]))
+    updated = df[columns].apply(
+        lambda x: x * (inflator[base_year] / inflator[given_year])
+    )
     df.update(updated)
 
     return df

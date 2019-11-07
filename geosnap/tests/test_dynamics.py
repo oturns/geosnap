@@ -1,18 +1,18 @@
-# from context import analyze
-import numpy as np
-from context import data
 import os
+
+import numpy as np
+from geosnap import Community, io, datasets
 from geosnap.analyze import sequence, transition
 
 RTOL = 0.00001
 path = os.environ["DLPATH"]
 
 if not os.path.exists(
-    os.path.join(os.path.dirname(os.path.abspath(data.__file__)), "ltdb.parquet")
+    os.path.join(os.path.dirname(os.path.abspath(io.__file__)), "ltdb.parquet")
 ):
-    data.store_ltdb(sample=path + "/ltdb_sample.zip", fullcount=path + "/ltdb_full.zip")
+    io.store_ltdb(sample=path + "/ltdb_sample.zip", fullcount=path + "/ltdb_full.zip")
 
-columbus = data.Community.from_ltdb(msa_fips="18140")
+columbus = Community.from_ltdb(msa_fips="18140")
 columns = [
     "median_household_income",
     "p_poverty_rate",

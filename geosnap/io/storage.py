@@ -1,19 +1,21 @@
 """Tools for creating and manipulating neighborhood datasets."""
 
 import os
+import pathlib
 import zipfile
+from warnings import warn
+
+from appdirs import user_data_dir
+
+import geopandas as gpd
 import pandas as pd
 import quilt3
-import geopandas as gpd
-import pathlib
-from warnings import warn
-from appdirs import user_data_dir
+
 from .._data import datasets
-from .util import convert_gdf, adjust_inflation
+from .util import adjust_inflation, convert_gdf
 
 _fipstable = pd.read_csv(
-    os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                 "stfipstable.csv"),
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "stfipstable.csv"),
     converters={"FIPS Code": str},
 )
 
@@ -100,10 +102,7 @@ def store_ltdb(sample, fullcount):
         df = pd.read_csv(
             path.open(file),
             na_values=["", " ", 99999, -999],
-            converters={
-                0: str,
-                "placefp10": str
-            },
+            converters={0: str, "placefp10": str},
             low_memory=False,
             encoding="latin1",
         )
@@ -138,8 +137,7 @@ def store_ltdb(sample, fullcount):
             "hinca",
         ]
 
-        inflate_available = list(
-            set(df.columns).intersection(set(inflate_cols)))
+        inflate_available = list(set(df.columns).intersection(set(inflate_cols)))
 
         if len(inflate_available):
             df = adjust_inflation(df, inflate_available, year)
@@ -156,9 +154,7 @@ def store_ltdb(sample, fullcount):
         year=1970,
     )
 
-    fullcount70 = _ltdb_reader(fullcount_zip,
-                               "LTDB_Std_1970_fullcount.csv",
-                               year=1970)
+    fullcount70 = _ltdb_reader(fullcount_zip, "LTDB_Std_1970_fullcount.csv", year=1970)
 
     sample80 = _ltdb_reader(
         sample_zip,
@@ -167,9 +163,7 @@ def store_ltdb(sample, fullcount):
         year=1980,
     )
 
-    fullcount80 = _ltdb_reader(fullcount_zip,
-                               "LTDB_Std_1980_fullcount.csv",
-                               year=1980)
+    fullcount80 = _ltdb_reader(fullcount_zip, "LTDB_Std_1980_fullcount.csv", year=1980)
 
     sample90 = _ltdb_reader(
         sample_zip,
@@ -178,9 +172,7 @@ def store_ltdb(sample, fullcount):
         year=1990,
     )
 
-    fullcount90 = _ltdb_reader(fullcount_zip,
-                               "LTDB_Std_1990_fullcount.csv",
-                               year=1990)
+    fullcount90 = _ltdb_reader(fullcount_zip, "LTDB_Std_1990_fullcount.csv", year=1990)
 
     sample00 = _ltdb_reader(
         sample_zip,
@@ -189,32 +181,31 @@ def store_ltdb(sample, fullcount):
         year=2000,
     )
 
-    fullcount00 = _ltdb_reader(fullcount_zip,
-                               "LTDB_Std_2000_fullcount.csv",
-                               year=2000)
+    fullcount00 = _ltdb_reader(fullcount_zip, "LTDB_Std_2000_fullcount.csv", year=2000)
 
-    sample10 = _ltdb_reader(sample_zip,
-                            "ltdb_std_all_sample/ltdb_std_2010_sample.csv",
-                            year=2010)
+    sample10 = _ltdb_reader(
+        sample_zip, "ltdb_std_all_sample/ltdb_std_2010_sample.csv", year=2010
+    )
     # join the sample and fullcount variables into a single df for the year
-    ltdb_1970 = sample70.drop(columns=["year"]).join(fullcount70.iloc[:, 7:],
-                                                     how="left")
-    ltdb_1980 = sample80.drop(columns=["year"]).join(fullcount80.iloc[:, 7:],
-                                                     how="left")
-    ltdb_1990 = sample90.drop(columns=["year"]).join(fullcount90.iloc[:, 7:],
-                                                     how="left")
-    ltdb_2000 = sample00.drop(columns=["year"]).join(fullcount00.iloc[:, 7:],
-                                                     how="left")
+    ltdb_1970 = sample70.drop(columns=["year"]).join(
+        fullcount70.iloc[:, 7:], how="left"
+    )
+    ltdb_1980 = sample80.drop(columns=["year"]).join(
+        fullcount80.iloc[:, 7:], how="left"
+    )
+    ltdb_1990 = sample90.drop(columns=["year"]).join(
+        fullcount90.iloc[:, 7:], how="left"
+    )
+    ltdb_2000 = sample00.drop(columns=["year"]).join(
+        fullcount00.iloc[:, 7:], how="left"
+    )
     ltdb_2010 = sample10
 
-    df = pd.concat([ltdb_1970, ltdb_1980, ltdb_1990, ltdb_2000, ltdb_2010],
-                   sort=True)
+    df = pd.concat([ltdb_1970, ltdb_1980, ltdb_1990, ltdb_2000, ltdb_2010], sort=True)
 
     renamer = dict(
-        zip(
-            datasets.codebook["ltdb"].tolist(),
-            datasets.codebook["variable"].tolist(),
-        ))
+        zip(datasets.codebook["ltdb"].tolist(), datasets.codebook["variable"].tolist())
+    )
 
     df.rename(renamer, axis="columns", inplace=True)
 
@@ -222,8 +213,9 @@ def store_ltdb(sample, fullcount):
     for row in datasets.codebook["formula"].dropna().tolist():
         df.eval(row, inplace=True)
 
-    keeps = df.columns[df.columns.isin(datasets.codebook["variable"].tolist() +
-                                       ["year"])]
+    keeps = df.columns[
+        df.columns.isin(datasets.codebook["variable"].tolist() + ["year"])
+    ]
     df = df[keeps]
 
     df.to_parquet(os.path.join(data_dir, "ltdb.parquet"), compression="brotli")
@@ -253,7 +245,7 @@ def store_ncdb(filepath):
     c = pd.Series(c.values)
 
     keep = []
-    for i, col in c.items():
+    for _, col in c.items():
         for name in names:
             if col.startswith(name):
                 keep.append(col)
@@ -297,20 +289,13 @@ def store_ncdb(filepath):
 
     df = df[df.columns[df.columns.isin(names)]]
 
-    df = pd.wide_to_long(df,
-                         stubnames=ncdb_vars,
-                         i="GEO2010",
-                         j="year",
-                         suffix="(7|8|9|0|1|2)").reset_index()
+    df = pd.wide_to_long(
+        df, stubnames=ncdb_vars, i="GEO2010", j="year", suffix="(7|8|9|0|1|2)"
+    ).reset_index()
 
-    df["year"] = df["year"].replace({
-        7: 1970,
-        8: 1980,
-        9: 1990,
-        0: 2000,
-        1: 2010,
-        2: 2010
-    })
+    df["year"] = df["year"].replace(
+        {7: 1970, 8: 1980, 9: 1990, 0: 2000, 1: 2010, 2: 2010}
+    )
     df = df.groupby(["GEO2010", "year"]).first()
 
     mapper = dict(zip(datasets.codebook.ncdb, datasets.codebook.variable))
@@ -327,8 +312,9 @@ def store_ncdb(filepath):
         except:
             warn("Unable to compute " + str(row))
 
-    keeps = df.columns[df.columns.isin(datasets.codebook["variable"].tolist() +
-                                       ["year"])]
+    keeps = df.columns[
+        df.columns.isin(datasets.codebook["variable"].tolist() + ["year"])
+    ]
 
     df = df[keeps]
 
@@ -339,17 +325,15 @@ def store_ncdb(filepath):
     storage.build("geosnap_data/storage")
 
 
-def _fips_filter(state_fips=None,
-                 county_fips=None,
-                 msa_fips=None,
-                 fips=None,
-                 data=None):
+def _fips_filter(
+    state_fips=None, county_fips=None, msa_fips=None, fips=None, data=None
+):
 
-    if isinstance(state_fips, (str, )):
+    if isinstance(state_fips, (str,)):
         state_fips = [state_fips]
-    if isinstance(county_fips, (str, )):
+    if isinstance(county_fips, (str,)):
         county_fips = [county_fips]
-    if isinstance(fips, (str, )):
+    if isinstance(fips, (str,)):
         fips = [fips]
 
     # if counties already present in states, ignore them
@@ -375,8 +359,8 @@ def _fips_filter(state_fips=None,
 
     if msa_fips:
         fips_list += datasets.msa_definitions[
-            datasets.msa_definitions["CBSA Code"] ==
-            msa_fips]["stcofips"].tolist()
+            datasets.msa_definitions["CBSA Code"] == msa_fips
+        ]["stcofips"].tolist()
 
     dfs = []
     for index in fips_list:
@@ -385,12 +369,9 @@ def _fips_filter(state_fips=None,
     return pd.concat(dfs)
 
 
-def _from_db(data,
-             state_fips=None,
-             county_fips=None,
-             msa_fips=None,
-             fips=None,
-             years=None):
+def _from_db(
+    data, state_fips=None, county_fips=None, msa_fips=None, fips=None, years=None
+):
 
     data = data[data.year.isin(years)]
     data = data.reset_index()
