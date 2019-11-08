@@ -328,45 +328,23 @@ def store_ncdb(filepath):
 def _fips_filter(
     state_fips=None, county_fips=None, msa_fips=None, fips=None, data=None
 ):
-
-    if isinstance(state_fips, (str,)):
-        state_fips = [state_fips]
-    if isinstance(county_fips, (str,)):
-        county_fips = [county_fips]
-    if isinstance(fips, (str,)):
-        fips = [fips]
-
-    # if counties already present in states, ignore them
-    if county_fips:
-        for i in county_fips:
-            if state_fips and i[:2] in county_fips:
-                county_fips.remove(i)
-    # if any fips present in state or counties, ignore them too
-    if fips:
-        for i in fips:
-            if state_fips and i[:2] in state_fips:
-                fips.remove(i)
-            if county_fips and i[:5] in county_fips:
-                fips.remove(i)
+    data = data.copy()
 
     fips_list = []
-    if fips:
-        fips_list += fips
-    if county_fips:
-        fips_list += county_fips
-    if state_fips:
-        fips_list += state_fips
+    for each in [state_fips, county_fips, fips]:
+        if isinstance(each, (str,)):
+            each = [each]
+        if isinstance(each, (list,)):
+            fips_list += each
 
     if msa_fips:
         fips_list += datasets.msa_definitions[
             datasets.msa_definitions["CBSA Code"] == msa_fips
         ]["stcofips"].tolist()
 
-    dfs = []
-    for index in fips_list:
-        dfs.append(data[data.geoid.str.startswith(index)])
+    df = data[data.geoid.str.startswith(tuple(fips_list))]
 
-    return pd.concat(dfs)
+    return df
 
 
 def _from_db(

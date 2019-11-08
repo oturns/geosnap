@@ -1,15 +1,8 @@
-# from context import datasets, io, Community
-from geosnap import io, datasets, Community
 import os
 
-path = os.environ["DLPATH"]
+from geosnap import Community, datasets, io
 
-if not os.path.exists(
-    os.path.join(os.path.dirname(os.path.abspath(io.__file__)), "ltdb.parquet")
-):
-    io.store_ltdb(sample=path + "/ltdb_sample.zip", fullcount=path + "/ltdb_full.zip")
-
-reno = Community.from_ltdb(msa_fips="39900")
+reno = Community.from_census(msa_fips="39900")
 columns = ["median_household_income", "p_poverty_rate", "p_unemployment_rate"]
 
 # Aspatial Clusters
@@ -18,7 +11,7 @@ columns = ["median_household_income", "p_poverty_rate", "p_unemployment_rate"]
 def test_gm():
 
     r = reno.cluster(columns=columns, method="gaussian_mixture", best_model=True)
-    assert len(r.gdf.gaussian_mixture.unique()) >= 6
+    assert len(r.gdf.gaussian_mixture.unique()) >= 5
 
 
 def test_ward():
@@ -42,13 +35,13 @@ def test_kmeans():
 def test_aff_prop():
 
     r = reno.cluster(columns=columns, method="affinity_propagation", preference=-100)
-    assert len(r.gdf.affinity_propagation.unique()) == 4
+    assert len(r.gdf.affinity_propagation.unique()) == 3
 
 
 def test_hdbscan():
 
     r = reno.cluster(columns=columns, method="hdbscan")
-    assert len(r.gdf.hdbscan.unique()) > 27
+    assert len(r.gdf.hdbscan.unique()) >= 4
 
 
 # Spatial Clusters
@@ -63,7 +56,7 @@ def test_spenc():
 def test_maxp():
 
     r = reno.cluster_spatial(columns=columns, method="max_p", initial=10)
-    assert len(r.gdf.max_p.unique()) >= 10
+    assert len(r.gdf.max_p.unique()) >= 8
 
 
 def test_ward_spatial():

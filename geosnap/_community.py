@@ -617,8 +617,11 @@ class Community:
         allfips = []
         for i in [state_fips, county_fips, fips, msa_states]:
             if i:
-                allfips.append(i[:2])
-        states = np.unique(allfips)
+                if isinstance(i, (str,)):
+                    i = [i]
+                for each in i:
+                    allfips.append(each[:2])
+        states = list(set(allfips))
 
         # if using a boundary there will be no fips, so reset states to None
         if len(states) == 0:

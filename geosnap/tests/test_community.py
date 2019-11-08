@@ -2,24 +2,17 @@ import os
 
 from geosnap import Community, datasets, io
 
-path = os.environ["DLPATH"]
-
-try:
-    ltdb = datasets.ltdb
-except KeyError:
-    io.store_ltdb(sample=path + "/ltdb_sample.zip", fullcount=path + "/ltdb_full.zip")
-
 
 def test_Community_from_cbsa():
 
-    la = Community.from_ltdb(msa_fips="31080")
-    assert la.gdf.shape == (14617, 194)
+    la = Community.from_census(msa_fips="31080")
+    assert la.gdf.shape == (7683, 195)
 
 
 def test_Community_from_stcofips():
 
-    mn = Community.from_ltdb(state_fips="27", county_fips=["053", "055"])
-    assert mn.gdf.shape == (5719, 194)
+    mn = Community.from_census(state_fips="27", county_fips=["26001", "26002"])
+    assert mn.gdf.shape == (3881, 195)
 
 
 def test_Community_from_indices():
@@ -32,8 +25,8 @@ def test_Community_from_boundary():
     msas = datasets.msas()
 
     reno = msas[msas["geoid"] == "39900"]
-    rn = Community.from_ltdb(boundary=reno)
-    assert rn.gdf.shape == (555, 195)
+    rn = Community.from_census(boundary=reno)
+    assert rn.gdf.shape == (234, 195)
 
 
 def test_Community_from_census():
