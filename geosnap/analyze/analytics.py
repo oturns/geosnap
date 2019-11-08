@@ -198,17 +198,16 @@ def cluster_spatial(
 
     ws = {}
     clusters = []
-    dfs = []
+    gdf[method] = np.nan
     # loop over each time period, standardize the data and build a weights matrix
     for time in times:
         df = data.loc[time].dropna(how="any", subset=columns).reset_index()
         df[time_var] = time
         df[columns] = scaler.fit_transform(df[columns].values)
+
         w0 = W.from_dataframe(df)
         w1 = KNN.from_dataframe(df, k=1)
         ws = [w0, w1]
-        # the rescalar can create nans if a column has no variance, so fill with 0
-        df = df.fillna(0)
 
         if threshold_variable and threshold_variable != "count":
             data[threshold_variable] = gdf[threshold_variable]
@@ -235,9 +234,12 @@ def cluster_spatial(
         clusters = pd.DataFrame(
             {method: labels, time_var: df[time_var], id_var: df[id_var]}
         )
+        clusters = clusters.drop_duplicates(subset=[id_var])
         clusters.set_index([time_var, id_var], inplace=True)
-        dfs.append(gdf.loc[time].join(clusters, how="left"))
-    gdf = pd.concat(dfs).reset_index()
+        gdf.update(clusters)
+
+    gdf = gdf.reset_index()
+
     if return_model:
         return gdf, model
     return gdf
