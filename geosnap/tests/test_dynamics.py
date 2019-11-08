@@ -1,7 +1,8 @@
 import os
 
 import numpy as np
-from geosnap import Community, io, datasets
+
+from geosnap import Community, io
 from geosnap.analyze import sequence, transition
 
 RTOL = 0.00001

@@ -1,5 +1,6 @@
-from geosnap import Community, datasets
 from numpy.testing import assert_allclose
+
+from geosnap import Community
 
 
 def test_harmonize_area():
