@@ -9,3 +9,4 @@ pytest-mpl
 pytest-cov
 hdbscan
 twine
+jupyter
