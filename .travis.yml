@@ -41,7 +41,7 @@ script:
   - if [[ $TRAVIS_JOB_NAME == python-* ]]; then
       travis_wait 45 pytest --ignore=examples/ --ignore=geosnap/util/  --ignore=geosnap/visualize/ --cov geosnap ;
     fi
-
+  - jupyter nbconvert --to notebook --execute --inplace examples/*.ipynb
   - if [[ $TRAVIS_JOB_NAME == 'tarball' ]]; then
       pip wheel . -w dist --no-deps ;
       twine check dist/* ;
