@@ -37,7 +37,7 @@ install:
 
 script:
   - python -c "from tobler.data import store_rasters; store_rasters()"
-  - python -c "import os;from geosnap import io;path = os.environ["DLPATH"];io.store_ltdb(sample=path + "/ltdb_sample.zip", fullcount=path + "/ltdb_full.zip")"
+  - python -c "import os;from geosnap import io;path = os.environ['DLPATH'];io.store_ltdb(sample=path + '/ltdb_sample.zip', fullcount=path + '/ltdb_full.zip')"
   - if [[ $TRAVIS_JOB_NAME == python-* ]]; then
       travis_wait 45 pytest --ignore=examples/ --ignore=geosnap/util/  --ignore=geosnap/visualize/ --cov geosnap ;
     fi
