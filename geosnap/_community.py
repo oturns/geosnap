@@ -142,8 +142,7 @@ class Community:
         scaler=None,
         **kwargs,
     ):
-        """Create a geodemographic typology by running a cluster analysis on
-        the study area's neighborhood attributes
+        """Create a geodemographic typology by running a cluster analysis on the study area's neighborhood attributes.
 
         Parameters
         ----------
@@ -212,9 +211,7 @@ class Community:
         scaler=None,
         **kwargs,
     ):
-        """Create a *spatial* geodemographic typology by running a cluster
-        analysis on the metro area's neighborhood attributes and including a
-        contiguity constraint.
+        """Create a *spatial* geodemographic typology by running a cluster analysis on the metro area's neighborhood attributes and including a contiguity constraint.
 
         Parameters
         ----------
