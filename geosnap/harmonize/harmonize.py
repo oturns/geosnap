@@ -138,24 +138,31 @@ def harmonize(
             )
 
         elif weights_method == "land_type_area":
+            try:
 
-            area_tables_raster_fitted = area_tables_raster(
-                source_df,
-                target_df.copy(),
-                raster_path=raster,
-                codes=codes,
-                force_crs_match=force_crs_match,
-            )
+                area_tables_raster_fitted = area_tables_raster(
+                    source_df,
+                    target_df.copy(),
+                    raster_path=raster,
+                    codes=codes,
+                    force_crs_match=force_crs_match,
+                )
 
-            # In area_interpolate, the resulting variable has same lenght as target_df
-            interpolation = area_interpolate(
-                source_df,
-                target_df.copy(),
-                extensive_variables=extensive_variables,
-                intensive_variables=intensive_variables,
-                allocate_total=allocate_total,
-                tables=area_tables_raster_fitted,
-            )
+                # In area_interpolate, the resulting variable has same lenght as target_df
+                interpolation = area_interpolate(
+                    source_df,
+                    target_df.copy(),
+                    extensive_variables=extensive_variables,
+                    intensive_variables=intensive_variables,
+                    allocate_total=allocate_total,
+                    tables=area_tables_raster_fitted,
+                )
+            except IOError:
+                raise IOError(
+                    "You must have NLCD raster data installed locally to use the"
+                    "`land_type_area` method. You can install it using the"
+                    "`tobler.data.store_rasters()` function from the `tobler` package"
+                )
         else:
             raise ValueError('weights_method must of one of ["area", "land_type_area"]')
 
