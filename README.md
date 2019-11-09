@@ -250,11 +250,26 @@ consistent over time. For example
 ```
 will create a new `Community` with population in 1990 and 2000 modeled as 2010 tract boundaries (2010 will remain unchanged). Thanks to [`tobler`](http://github.com/pysal/tobler), geosnap provides several methods for harmonization, from simple areal interpolation to model-based approaches using auxiliary data. See the [example notebook](examples/03_harmonizing_community_boundaries.ipynb) for more examples
 
+You can explore datasets using a prototype interactive dashboard using
+
+```python
+from geosnap.vizualize import explore
+explore()
+```
+
+![](docs/figs/commviz.png)
+
+By default, the dashboard will launch with built-in census data, but if you've stored other databases, then you can exlore those as well. 
+
+Many more visualization features coming soon
+
 ## Architecture
 
-##### `geosnap` is comprised of five modules:
+Most interaction in geosnap happens with a `Community`, and almost all of geosnap's functionality is available as a method on a `Community` object. But when you need to use other fetures, like access data or launch an interactive visuzalization, you may need to access functions in one of geosnap's submodules.
 
-- **`datasets`**:   Access to built-in datasets, including 30 years of census data for the USA, and and databases stored with functions from the `io` module
+##### `geosnap` has five modules:
+
+- **`datasets`**:   Access built-in datasets, including 30 years of census data for the USA,  and databases stored with functions from the `io` module
 
 - **`io`**:  Ingest, create, and manipulate space-time datasets
 
