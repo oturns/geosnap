@@ -1,6 +1,4 @@
-import os
-
-from geosnap import Community, datasets, io
+from geosnap import Community
 
 reno = Community.from_census(msa_fips="39900")
 columns = ["median_household_income", "p_poverty_rate", "p_unemployment_rate"]

@@ -132,7 +132,9 @@ contiguity constraint.</p>
 </dd>
 <dt><strong>n_clusters</strong><span class="classifier">int</span></dt><dd><p>the number of clusters to model. The default is 6).</p>
 </dd>
-<dt><strong>weights_type</strong><span class="classifier">str ‘queen’ or ‘rook’</span></dt><dd><p>spatial weights matrix specification` (the default is “rook”).</p>
+<dt><strong>spatial_weights</strong><span class="classifier">str (‘queen’ or ‘rook’) or libpysal.weights object</span></dt><dd><p>spatial weights matrix specification`. By default, geosnap will calculate Rook
+weights, but you can also pass a <cite>libpysal.weights</cite> object for more control
+over the specification.</p>
 </dd>
 <dt><strong>method</strong><span class="classifier">str</span></dt><dd><p>the clustering algorithm used to identify neighborhood types</p>
 </dd>

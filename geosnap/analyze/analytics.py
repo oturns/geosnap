@@ -139,8 +139,10 @@ def cluster_spatial(
         long-form geodataframe holding neighborhood attribute and geometry data.
     n_clusters : int
         the number of clusters to model. The default is 6).
-    weights_type : str 'queen' or 'rook'
-        spatial weights matrix specification` (the default is "rook").
+    spatial_weights : str ('queen' or 'rook') or libpysal.weights object
+        spatial weights matrix specification`. By default, geosnap will calculate Rook
+        weights, but you can also pass a `libpysal.weights` object for more control
+        over the specification.
     method : str
         the clustering algorithm used to identify neighborhood types
     columns : list-like

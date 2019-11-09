@@ -2,7 +2,7 @@
 <p align="center">
 <img height=100  src="docs/figs/geosnap.svg" alt="geosnap"/>
 </p>
-<h2 align="center" style="margin-top:-10px">The GeoSpatial Neighborhood Analysis Package</h2> 
+<h2 align="center" style="margin-top:-10px">The <b>Geos</b>patial <b>N</b>eighborhood <b>A</b>nalysis <b>P</b>ackage</h2> 
 
 [![Build Status](https://travis-ci.com/spatialucr/geosnap.svg?branch=master)](https://travis-ci.com/spatialucr/geosnap)
 [![Coverage Status](https://coveralls.io/repos/github/spatialucr/geosnap/badge.svg?branch=master)](https://coveralls.io/github/spatialucr/geosnap?branch=master&service=github)

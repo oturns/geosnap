@@ -1,6 +1,4 @@
-import os
-
-from geosnap import Community, datasets, io
+from geosnap import Community, datasets
 
 
 def test_Community_from_cbsa():
