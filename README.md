@@ -2,7 +2,7 @@
 <p align="center">
 <img height=100  src="docs/figs/geosnap.svg" alt="geosnap"/>
 </p>
-<h2 align="center" style="margin-top:-10px">The <b>Geos</b>patial <b>N</b>eighborhood <b>A</b>nalysis <b>P</b>ackage</h2> 
+<h2 align="center" style="margin-top:-10px">The Geospatial Neighborhood Analysis Package</h2> 
 
 [![Build Status](https://travis-ci.com/spatialucr/geosnap.svg?branch=master)](https://travis-ci.com/spatialucr/geosnap)
 [![Coverage Status](https://coveralls.io/repos/github/spatialucr/geosnap/badge.svg?branch=master)](https://coveralls.io/github/spatialucr/geosnap?branch=master&service=github)
@@ -273,7 +273,7 @@ Most interaction in geosnap happens with a `Community`, and almost all of geosna
 
 - **`io`**:  Ingest, create, and manipulate space-time datasets
 
- - **`analyze`**:  Analyze and model neighborhood boundaries and spatio-temporal dynamics
+- **`analyze`**:  Analyze and model neighborhood boundaries and spatio-temporal dynamics
 
 - **`harmonize`**:  Harmonize neighborhood boundaries into consistent, stable units using spatial statistical
 methods
