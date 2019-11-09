@@ -46,7 +46,7 @@ works with any data you provide, any place in the world.
 **See the [example notebooks](https://github.com/spatialucr/geosnap/tree/master/examples) for a
 gentle introduction to `geosnap`'s major functionality**
 
-the `Community` class is geosnap’s central data construct that holds space-time neighborhood data.
+the `Community` class is geosnap’s central data construct that holds space-time neighborhood data.  
 You can create a `Community` from geosnap’s built-in data by passing a set of fips codes to a
 constructor method
 
@@ -221,7 +221,7 @@ you can create a [geodemographic typology](https://en.wikipedia.org/wiki/Geodemo
 classic clustering methods on the `Community`
 
 ```python
-dc.cluster(method='kmeans', n_clusters=6, columns=['p_unemployment_rate', 'per_capita_income'] )
+dc = dc.cluster(method='kmeans', n_clusters=6, columns=['p_unemployment_rate', 'per_capita_income'] )
 dc.gdf[dc.gdf.year==2000].plot(column='kmeans')
 ```
 
@@ -234,7 +234,7 @@ you can create a
 spatially-constrained clustering methods on the `Community`
 
 ```python
-dc.cluster_spatial(method='spenc', n_clusters=6, columns=['p_unemployment_rate', 'per_capita_income'] )
+dc = dc.cluster_spatial(method='spenc', n_clusters=6, columns=['p_unemployment_rate', 'per_capita_income'] )
 dc.gdf[dc.gdf.year==2000].plot('spenc')
 ```
 
@@ -243,30 +243,27 @@ dc.gdf[dc.gdf.year==2000].plot('spenc')
 </p>
 
 You can also [harmonize](https://github.com/spatialucr/tobler) `Community` boundaries so that they’re
-consistent over time
+consistent over time. For example 
 
- **coming soon!**
+```python
+ dc = dc.harmonize(2010, extensive_variables=["population"])
+```
+will create a new `Community` with population in 1990 and 2000 modeled as 2010 tract boundaries (2010 will remain unchanged). Thanks to [`tobler`](http://github.com/pysal/tobler), geosnap provides several methods for harmonization, from simple areal interpolation to model-based approaches using auxiliary data. See the [example notebook](examples/03_harmonizing_community_boundaries.ipynb) for more examples
 
 ## Architecture
 
-#### `geosnap` is comprised of four modules:
+##### `geosnap` is comprised of five modules:
 
-##### `data`
+- **`datasets`**:   Access to built-in datasets, including 30 years of census data for the USA, and and databases stored with functions from the `io` module
 
-Ingest, create, and manipulate space-time datasets
+- **`io`**:  Ingest, create, and manipulate space-time datasets
 
-##### `analyze`
+ - **`analyze`**:  Analyze and model neighborhood boundaries and spatio-temporal dynamics
 
-Analyze and model neighborhood dynamics
-
-##### `harmonize`
-
-Harmonize neighborhood boundaries into consistent, stable units using spatial statistical
+- **`harmonize`**:  Harmonize neighborhood boundaries into consistent, stable units using spatial statistical
 methods
 
-##### `visualize`
-
-Visualize neighborhood dynamics
+- **`visualize`**:  Visualize neighborhood dynamics
 
 *You can learn more about the functionality in each module by browsing the
 [example notebooks](https://github.com/spatialucr/geosnap/tree/master/examples)*
@@ -303,5 +300,5 @@ conditions for usage, and a DISCLAIMER OF ALL WARRANTIES.
 
 ## Funding
 
-<img src="docs/nsf_logo.jpg" width=100 /> This project is supported by NSF Award #1733705,
+<img src="docs/figs/nsf_logo.jpg" width=100 /> This project is supported by NSF Award #1733705,
 [Neighborhoods in Space-Time Contexts](https://www.nsf.gov/awardsearch/showAward?AWD_ID=1733705&HistoricalAwards=false)
