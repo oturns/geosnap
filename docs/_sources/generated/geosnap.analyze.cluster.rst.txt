@@ -1,7 +1,6 @@
-geosnap.analyze.cluster module
-==============================
+geosnap.analyze.cluster
+=======================
 
-.. automodule:: geosnap.analyze.cluster
-   :members:
-   :undoc-members:
-   :show-inheritance:
+.. currentmodule:: geosnap.analyze
+
+.. autofunction:: cluster

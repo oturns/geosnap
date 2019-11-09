@@ -1,6 +1,0 @@
-geosnap.analyze.cluster
-=====================
-
-.. currentmodule:: geosnap.analyze
-
-.. autofunction:: cluster

@@ -1,6 +1,0 @@
-geosnap.data.data.get\_lehd
-===========================
-
-.. currentmodule:: geosnap.data.data
-
-.. autofunction:: get_lehd

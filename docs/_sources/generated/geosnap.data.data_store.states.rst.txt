@@ -1,6 +1,0 @@
-geosnap.data.data\_store.states
-===============================
-
-.. currentmodule:: geosnap.data
-
-.. automethod:: data_store.states

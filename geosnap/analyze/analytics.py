@@ -2,14 +2,15 @@
 
 import numpy as np
 import pandas as pd
+from sklearn.preprocessing import StandardScaler
+
 from libpysal.weights import attach_islands
 from libpysal.weights.contiguity import Queen, Rook
 from libpysal.weights.distance import KNN
-from sklearn.preprocessing import StandardScaler
 
 from .cluster import (
-    azp,
     affinity_propagation,
+    azp,
     gaussian_mixture,
     hdbscan,
     kmeans,

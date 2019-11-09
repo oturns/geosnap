@@ -1,7 +1,0 @@
-geosnap.visualize.seq module
-============================
-
-.. automodule:: geosnap.visualize.seq
-   :members:
-   :undoc-members:
-   :show-inheritance:

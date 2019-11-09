@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>geosnap.analyze.Sequence &#8212; geosnap v0.0.2 Manual</title>
+    <title>geosnap.analyze.sequence &#8212; geosnap v0.0.2 Manual</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/pysal-styles.css" />
@@ -15,6 +15,8 @@
     <link rel="shortcut icon" href="../_static/pysal_favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="geosnap.analyze.transition" href="geosnap.analyze.transition.html" />
+    <link rel="prev" title="geosnap.analyze.linc" href="geosnap.analyze.linc.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -57,16 +59,16 @@
   <ul class="dropdown-menu globaltoc"
       role="menu"
       aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../installation.html#installing-released-version">Installing released version</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../installation.html#installing-development-version">Installing development version</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../api.html">API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../api.html#data-module">Data Module</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../api.html#io-module">IO Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#the-community-class">The Community Class</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api.html#analyze-module">Analyze Module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#analyze-module">Analyze Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#harmonize-module">Harmonize Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#visualize-module">Visualize Module</a></li>
 </ul>
@@ -85,7 +87,7 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">geosnap.analyze.Sequence</a></li>
+<li><a class="reference internal" href="#">geosnap.analyze.sequence</a></li>
 </ul>
 </ul>
 </li>
@@ -116,7 +118,68 @@
     <div class="body col-md-12 content" role="main">
       
   <div class="section" id="geosnap-analyze-sequence">
-<h1>geosnap.analyze.Sequence<a class="headerlink" href="#geosnap-analyze-sequence" title="Permalink to this headline">¶</a></h1>
+<h1>geosnap.analyze.sequence<a class="headerlink" href="#geosnap-analyze-sequence" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="geosnap.analyze.sequence">
+<code class="sig-prename descclassname">geosnap.analyze.</code><code class="sig-name descname">sequence</code><span class="sig-paren">(</span><em class="sig-param">gdf</em>, <em class="sig-param">cluster_col</em>, <em class="sig-param">seq_clusters=5</em>, <em class="sig-param">subs_mat=None</em>, <em class="sig-param">dist_type=None</em>, <em class="sig-param">indel=None</em>, <em class="sig-param">time_var='year'</em>, <em class="sig-param">id_var='geoid'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/analyze/dynamics.html#sequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.analyze.sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pairwise sequence analysis and sequence clustering.</p>
+<p>Dynamic programming if optimal matching.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>gdf</strong><span class="classifier">(geo)DataFrame</span></dt><dd><p>Long-form (geo)DataFrame containing neighborhood
+attributes with a column defining neighborhood clusters.</p>
+</dd>
+<dt><strong>cluster_col</strong><span class="classifier">string or int</span></dt><dd><p>Column name for the neighborhood segmentation, such as
+“ward”, “kmeans”, etc.</p>
+</dd>
+<dt><strong>seq_clusters</strong><span class="classifier">int, optional</span></dt><dd><p>Number of neighborhood sequence clusters. Agglomerative
+Clustering with Ward linkage is now used for clustering
+the sequences. Default is 5.</p>
+</dd>
+<dt><strong>dist_type</strong><span class="classifier">string</span></dt><dd><p>“hamming”: hamming distance (substitution only
+and its cost is constant 1) from sklearn.metrics;
+“markov”: utilize empirical transition
+probabilities to define substitution costs;
+“interval”: differences between states are used
+to define substitution costs, and indel=k-1;
+“arbitrary”: arbitrary distance if there is not a
+strong theory guidance: substitution=0.5, indel=1.
+“tran”: transition-oriented optimal matching. Sequence of
+transitions. Based on <a class="reference internal" href="../references.html#biemann-2011" id="id1">[Bie11]</a>.</p>
+</dd>
+<dt><strong>subs_mat</strong><span class="classifier">array</span></dt><dd><p>(k,k), substitution cost matrix. Should be hollow (
+0 cost between the same type), symmetric and non-negative.</p>
+</dd>
+<dt><strong>indel</strong><span class="classifier">float, optional</span></dt><dd><p>insertion/deletion cost.</p>
+</dd>
+<dt><strong>time_var</strong><span class="classifier">string, optional</span></dt><dd><p>Column defining time and or sequencing of the long-form data.
+Default is “year”.</p>
+</dd>
+<dt><strong>id_var</strong><span class="classifier">string, optional</span></dt><dd><p>Column identifying the unique id of spatial units.
+Default is “geoid”.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">geosnap.data</span> <span class="k">import</span> <span class="n">Community</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">columbus</span> <span class="o">=</span> <span class="n">Community</span><span class="o">.</span><span class="n">from_ltdb</span><span class="p">(</span><span class="n">msa_fips</span><span class="o">=</span><span class="n">columbusfips</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">columbus1</span> <span class="o">=</span> <span class="n">columbus</span><span class="o">.</span><span class="n">cluster</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;median_household_income&#39;</span><span class="p">,</span>
+<span class="gp">... </span><span class="s1">&#39;p_poverty_rate&#39;</span><span class="p">,</span> <span class="s1">&#39;p_edu_college_greater&#39;</span><span class="p">,</span> <span class="s1">&#39;p_unemployment_rate&#39;</span><span class="p">],</span>
+<span class="gp">... </span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;ward&#39;</span><span class="p">,</span> <span class="n">n_clusters</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gdf</span> <span class="o">=</span> <span class="n">columbus1</span><span class="o">.</span><span class="n">gdf</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gdf_new</span><span class="p">,</span> <span class="n">df_wide</span><span class="p">,</span> <span class="n">seq_hamming</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="n">dist_type</span><span class="o">=</span><span class="s2">&quot;hamming&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">seq_hamming</span><span class="o">.</span><span class="n">seq_dis_mat</span><span class="p">[:</span><span class="mi">5</span><span class="p">,</span> <span class="p">:</span><span class="mi">5</span><span class="p">]</span>
+<span class="go">array([[0., 3., 4., 5., 5.],</span>
+<span class="go">       [3., 0., 3., 3., 3.],</span>
+<span class="go">       [4., 3., 0., 2., 2.],</span>
+<span class="go">       [5., 3., 2., 0., 0.],</span>
+<span class="go">       [5., 3., 2., 0., 0.]])</span>
+</pre></div>
+</div>
+</dd></dl>
+
 </div>
 
 
@@ -132,7 +195,7 @@
         <br/>
         
 <div id="sourcelink">
-  <a href="../_sources/generated/geosnap.analyze.Sequence.rst.txt"
+  <a href="../_sources/generated/geosnap.analyze.sequence.rst.txt"
      rel="nofollow">Source</a>
 </div>
       

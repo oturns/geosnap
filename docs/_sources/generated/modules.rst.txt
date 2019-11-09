@@ -1,7 +1,0 @@
-geosnap
-=======
-
-.. toctree::
-   :maxdepth: 4
-
-   geosnap

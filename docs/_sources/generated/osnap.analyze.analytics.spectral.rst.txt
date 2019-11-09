@@ -1,6 +1,0 @@
-geosnap.analyze.analytics.spectral
-================================
-
-.. currentmodule:: geosnap.analyze.analytics
-
-.. autofunction:: spectral

@@ -1,0 +1,6 @@
+geosnap.io.store\_blocks\_2010
+==============================
+
+.. currentmodule:: geosnap.io
+
+.. autofunction:: store_blocks_2010

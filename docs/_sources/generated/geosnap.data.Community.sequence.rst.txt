@@ -1,6 +1,0 @@
-geosnap.data.Community.sequence
-===============================
-
-.. currentmodule:: geosnap.data
-
-.. automethod:: Community.sequence

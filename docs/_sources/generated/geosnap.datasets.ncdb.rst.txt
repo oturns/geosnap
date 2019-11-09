@@ -1,0 +1,6 @@
+geosnap.datasets.ncdb
+=====================
+
+.. currentmodule:: geosnap
+
+.. autoattribute:: datasets.ncdb

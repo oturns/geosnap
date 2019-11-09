@@ -1,0 +1,6 @@
+geosnap.datasets.counties
+=========================
+
+.. currentmodule:: geosnap
+
+.. automethod:: datasets.counties

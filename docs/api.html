@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="_static/pysal_favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="geosnap.data.data.store_census" href="generated/geosnap.data.data.store_census.html" />
+    <link rel="next" title="geosnap.io.store_census" href="generated/geosnap.io.store_census.html" />
     <link rel="prev" title="Installation" href="installation.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -66,7 +66,7 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#data-module">Data Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#io-module">IO Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#the-community-class">The Community Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#analyze-module">Analyze Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#harmonize-module">Harmonize Module</a></li>
@@ -88,7 +88,7 @@
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
 <li><a class="reference internal" href="#">API reference</a><ul>
-<li><a class="reference internal" href="#data-module">Data Module</a><ul>
+<li><a class="reference internal" href="#io-module">IO Module</a><ul>
 <li><a class="reference internal" href="#storing-data">Storing data</a></li>
 <li><a class="reference internal" href="#accessing-stored-datasets">Accessing Stored Datasets</a></li>
 </ul>
@@ -144,11 +144,11 @@
       
   <div class="section" id="api-reference">
 <span id="api-ref"></span><h1>API reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="data-module">
-<span id="data-api"></span><h2>Data Module<a class="headerlink" href="#data-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="io-module">
+<span id="data-api"></span><h2>IO Module<a class="headerlink" href="#io-module" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="storing-data">
 <h3>Storing data<a class="headerlink" href="#storing-data" title="Permalink to this headline">¶</a></h3>
-<p>geosnap’s data module provides functions for collecting and storing a variety of datasets
+<p>geosnap’s <cite>io</cite> module provides functions for collecting and storing a variety of datasets
 including U.S. Census data from 1990-2010, LEHD data from any vintage, and external longitudinal databases.</p>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -156,22 +156,22 @@ including U.S. Census data from 1990-2010, LEHD data from any vintage, and exter
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.data.data.store_census.html#geosnap.data.data.store_census" title="geosnap.data.data.store_census"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data.store_census</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.io.store_census.html#geosnap.io.store_census" title="geosnap.io.store_census"><code class="xref py py-obj docutils literal notranslate"><span class="pre">io.store_census</span></code></a>()</p></td>
 <td><p>Save census data to the local quilt package storage.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.data.data.store_blocks_2000.html#geosnap.data.data.store_blocks_2000" title="geosnap.data.data.store_blocks_2000"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data.store_blocks_2000</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.io.store_blocks_2000.html#geosnap.io.store_blocks_2000" title="geosnap.io.store_blocks_2000"><code class="xref py py-obj docutils literal notranslate"><span class="pre">io.store_blocks_2000</span></code></a>()</p></td>
 <td><p>Save census 2000 census block data to the local quilt package storage.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.data.data.store_blocks_2010.html#geosnap.data.data.store_blocks_2010" title="geosnap.data.data.store_blocks_2010"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data.store_blocks_2010</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.io.store_blocks_2010.html#geosnap.io.store_blocks_2010" title="geosnap.io.store_blocks_2010"><code class="xref py py-obj docutils literal notranslate"><span class="pre">io.store_blocks_2010</span></code></a>()</p></td>
 <td><p>Save census 2010 census block data to the local quilt package storage.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.data.data.store_ltdb.html#geosnap.data.data.store_ltdb" title="geosnap.data.data.store_ltdb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data.store_ltdb</span></code></a>(sample, fullcount)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.io.store_ltdb.html#geosnap.io.store_ltdb" title="geosnap.io.store_ltdb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">io.store_ltdb</span></code></a>(sample, fullcount)</p></td>
 <td><p>Read &amp; store data from Brown’s Longitudinal Tract Database (LTDB).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.data.data.store_ncdb.html#geosnap.data.data.store_ncdb" title="geosnap.data.data.store_ncdb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data.store_ncdb</span></code></a>(filepath)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.io.store_ncdb.html#geosnap.io.store_ncdb" title="geosnap.io.store_ncdb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">io.store_ncdb</span></code></a>(filepath)</p></td>
 <td><p>Read &amp; store data from Geolytics’s Neighborhood Change Database.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.data.data.get_lehd.html#geosnap.data.data.get_lehd" title="geosnap.data.data.get_lehd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data.get_lehd</span></code></a>([dataset, state, year])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.io.get_lehd.html#geosnap.io.get_lehd" title="geosnap.io.get_lehd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">io.get_lehd</span></code></a>([dataset, state, year])</p></td>
 <td><p>Grab data from the LODES FTP server as a pandas DataFrame.</p></td>
 </tr>
 </tbody>
@@ -179,50 +179,50 @@ including U.S. Census data from 1990-2010, LEHD data from any vintage, and exter
 </div>
 <div class="section" id="accessing-stored-datasets">
 <h3>Accessing Stored Datasets<a class="headerlink" href="#accessing-stored-datasets" title="Permalink to this headline">¶</a></h3>
-<p>It also provides a storage container (called a “data_store”) that provides access to datasets that have been imported with the functions above</p>
+<p>It also provides a storage container <cite>datasets</cite> that provides access to datasets that have been imported with the functions above</p>
 <table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.data.data.data_store.html#geosnap.data.data.data_store" title="geosnap.data.data.data_store"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data.data_store</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.datasets.html#geosnap.datasets" title="geosnap.datasets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets</span></code></a></p></td>
 <td><p>Storage for geosnap data.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.data.data_store.blocks_2000.html#geosnap.data.data_store.blocks_2000" title="geosnap.data.data_store.blocks_2000"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data_store.blocks_2000</span></code></a>([states, convert])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.datasets.blocks_2000.html#geosnap.datasets.blocks_2000" title="geosnap.datasets.blocks_2000"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets.blocks_2000</span></code></a>([states, convert])</p></td>
 <td><p>Census blocks for 2000.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.data.data_store.blocks_2010.html#geosnap.data.data_store.blocks_2010" title="geosnap.data.data_store.blocks_2010"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data_store.blocks_2010</span></code></a>([states, convert])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.datasets.blocks_2010.html#geosnap.datasets.blocks_2010" title="geosnap.datasets.blocks_2010"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets.blocks_2010</span></code></a>([states, convert])</p></td>
 <td><p>Census blocks for 2010.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.data.data_store.codebook.html#geosnap.data.data_store.codebook" title="geosnap.data.data_store.codebook"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data_store.codebook</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.datasets.codebook.html#geosnap.datasets.codebook" title="geosnap.datasets.codebook"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets.codebook</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.data.data_store.counties.html#geosnap.data.data_store.counties" title="geosnap.data.data_store.counties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data_store.counties</span></code></a>([convert])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.datasets.counties.html#geosnap.datasets.counties" title="geosnap.datasets.counties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets.counties</span></code></a>()</p></td>
 <td><p>Nationwide counties as drawn in 2010.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.data.data_store.ltdb.html#geosnap.data.data_store.ltdb" title="geosnap.data.data_store.ltdb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data_store.ltdb</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.datasets.ltdb.html#geosnap.datasets.ltdb" title="geosnap.datasets.ltdb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets.ltdb</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.data.data_store.msa_definitions.html#geosnap.data.data_store.msa_definitions" title="geosnap.data.data_store.msa_definitions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data_store.msa_definitions</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.datasets.msa_definitions.html#geosnap.datasets.msa_definitions" title="geosnap.datasets.msa_definitions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets.msa_definitions</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.data.data_store.msas.html#geosnap.data.data_store.msas" title="geosnap.data.data_store.msas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data_store.msas</span></code></a>([convert])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.datasets.msas.html#geosnap.datasets.msas" title="geosnap.datasets.msas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets.msas</span></code></a>([convert])</p></td>
 <td><p>Metropolitan Statistical Areas as drawn in 2010.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.data.data_store.ncdb.html#geosnap.data.data_store.ncdb" title="geosnap.data.data_store.ncdb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data_store.ncdb</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.datasets.ncdb.html#geosnap.datasets.ncdb" title="geosnap.datasets.ncdb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets.ncdb</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.data.data_store.states.html#geosnap.data.data_store.states" title="geosnap.data.data_store.states"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data_store.states</span></code></a>([convert])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.datasets.states.html#geosnap.datasets.states" title="geosnap.datasets.states"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets.states</span></code></a>([convert])</p></td>
 <td><p>States.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.data.data_store.tracts_1990.html#geosnap.data.data_store.tracts_1990" title="geosnap.data.data_store.tracts_1990"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data_store.tracts_1990</span></code></a>([states, convert])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.datasets.tracts_1990.html#geosnap.datasets.tracts_1990" title="geosnap.datasets.tracts_1990"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets.tracts_1990</span></code></a>([states, convert])</p></td>
 <td><p>Nationwide Census Tracts as drawn in 1990 (cartographic 500k).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.data.data_store.tracts_2000.html#geosnap.data.data_store.tracts_2000" title="geosnap.data.data_store.tracts_2000"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data_store.tracts_2000</span></code></a>([states, convert])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.datasets.tracts_2000.html#geosnap.datasets.tracts_2000" title="geosnap.datasets.tracts_2000"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets.tracts_2000</span></code></a>([states, convert])</p></td>
 <td><p>Nationwide Census Tracts as drawn in 2000 (cartographic 500k).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.data.data_store.tracts_2010.html#geosnap.data.data_store.tracts_2010" title="geosnap.data.data_store.tracts_2010"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data_store.tracts_2010</span></code></a>([states, convert])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.datasets.tracts_2010.html#geosnap.datasets.tracts_2010" title="geosnap.datasets.tracts_2010"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets.tracts_2010</span></code></a>([states, convert])</p></td>
 <td><p>Nationwide Census Tracts as drawn in 2010 (cartographic 500k).</p></td>
 </tr>
 </tbody>
@@ -240,8 +240,8 @@ then using analytical methods upon the community</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.data.Community.html#geosnap.data.Community" title="geosnap.data.Community"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geosnap.data.Community</span></code></a>([gdf, harmonized])</p></td>
-<td><p>Spatial and tabular data for a collection of “neighborhoods”.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.Community.html#geosnap.Community" title="geosnap.Community"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community</span></code></a>([gdf, harmonized])</p></td>
+<td><p>Spatial and tabular data for a collection of “neighborhoods” over time.</p></td>
 </tr>
 </tbody>
 </table>
@@ -253,19 +253,19 @@ then using analytical methods upon the community</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.data.Community.from_census.html#geosnap.data.Community.from_census" title="geosnap.data.Community.from_census"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.from_census</span></code></a>([state_fips, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.Community.from_census.html#geosnap.Community.from_census" title="geosnap.Community.from_census"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.from_census</span></code></a>([state_fips, …])</p></td>
 <td><p>Create a new Community from original vintage US Census data.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.data.Community.from_geodataframes.html#geosnap.data.Community.from_geodataframes" title="geosnap.data.Community.from_geodataframes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.from_geodataframes</span></code></a>([gdfs])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.Community.from_geodataframes.html#geosnap.Community.from_geodataframes" title="geosnap.Community.from_geodataframes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.from_geodataframes</span></code></a>([gdfs])</p></td>
 <td><p>Create a new Community from a list of geodataframes.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.data.Community.from_lodes.html#geosnap.data.Community.from_lodes" title="geosnap.data.Community.from_lodes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.from_lodes</span></code></a>([state_fips, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.Community.from_lodes.html#geosnap.Community.from_lodes" title="geosnap.Community.from_lodes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.from_lodes</span></code></a>([state_fips, …])</p></td>
 <td><p>Create a new Community from Census LEHD/LODES data.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.data.Community.from_ltdb.html#geosnap.data.Community.from_ltdb" title="geosnap.data.Community.from_ltdb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.from_ltdb</span></code></a>([state_fips, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.Community.from_ltdb.html#geosnap.Community.from_ltdb" title="geosnap.Community.from_ltdb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.from_ltdb</span></code></a>([state_fips, …])</p></td>
 <td><p>Create a new Community from LTDB data.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.data.Community.from_ncdb.html#geosnap.data.Community.from_ncdb" title="geosnap.data.Community.from_ncdb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.from_ncdb</span></code></a>([state_fips, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.Community.from_ncdb.html#geosnap.Community.from_ncdb" title="geosnap.Community.from_ncdb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.from_ncdb</span></code></a>([state_fips, …])</p></td>
 <td><p>Create a new Community from NCDB data.</p></td>
 </tr>
 </tbody>
@@ -279,19 +279,19 @@ then using analytical methods upon the community</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.data.Community.cluster.html#geosnap.data.Community.cluster" title="geosnap.data.Community.cluster"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.cluster</span></code></a>(self[, n_clusters, …])</p></td>
-<td><p>Create a geodemographic typology by running a cluster analysis on the study area’s neighborhood attributes</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.Community.cluster.html#geosnap.Community.cluster" title="geosnap.Community.cluster"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.cluster</span></code></a>(self[, n_clusters, …])</p></td>
+<td><p>Create a geodemographic typology by running a cluster analysis on the study area’s neighborhood attributes.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.data.Community.cluster_spatial.html#geosnap.data.Community.cluster_spatial" title="geosnap.data.Community.cluster_spatial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.cluster_spatial</span></code></a>(self[, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.Community.cluster_spatial.html#geosnap.Community.cluster_spatial" title="geosnap.Community.cluster_spatial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.cluster_spatial</span></code></a>(self[, …])</p></td>
 <td><p>Create a <em>spatial</em> geodemographic typology by running a cluster analysis on the metro area’s neighborhood attributes and including a contiguity constraint.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.data.Community.harmonize.html#geosnap.data.Community.harmonize" title="geosnap.data.Community.harmonize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.harmonize</span></code></a>(self[, target_year, …])</p></td>
-<td><p>Short summary.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.Community.harmonize.html#geosnap.Community.harmonize" title="geosnap.Community.harmonize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.harmonize</span></code></a>(self[, target_year, …])</p></td>
+<td><p>Standardize inconsistent boundaries into time-static ones.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.data.Community.sequence.html#geosnap.data.Community.sequence" title="geosnap.data.Community.sequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.sequence</span></code></a>(self, cluster_col[, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.Community.sequence.html#geosnap.Community.sequence" title="geosnap.Community.sequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.sequence</span></code></a>(self, cluster_col[, …])</p></td>
 <td><p>Pairwise sequence analysis to evaluate the distance/dissimilarity between every two neighborhood sequences.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.data.Community.transition.html#geosnap.data.Community.transition" title="geosnap.data.Community.transition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.transition</span></code></a>(self, cluster_col[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.Community.transition.html#geosnap.Community.transition" title="geosnap.Community.transition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.transition</span></code></a>(self, cluster_col[, …])</p></td>
 <td><p>(Spatial) Markov approach to transitional dynamics of neighborhoods.</p></td>
 </tr>
 </tbody>
@@ -307,10 +307,10 @@ then using analytical methods upon the community</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.analyze.cluster.html#module-geosnap.analyze.cluster" title="geosnap.analyze.cluster"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geosnap.analyze.cluster</span></code></a>(gdf[, n_clusters, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.analyze.cluster.html#geosnap.analyze.cluster" title="geosnap.analyze.cluster"><code class="xref py py-obj docutils literal notranslate"><span class="pre">analyze.cluster</span></code></a>(gdf[, n_clusters, method, …])</p></td>
 <td><p>Create a geodemographic typology by running a cluster analysis on the</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.analyze.cluster_spatial.html#geosnap.analyze.cluster_spatial" title="geosnap.analyze.cluster_spatial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geosnap.analyze.cluster_spatial</span></code></a>(gdf[, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.analyze.cluster_spatial.html#geosnap.analyze.cluster_spatial" title="geosnap.analyze.cluster_spatial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">analyze.cluster_spatial</span></code></a>(gdf[, n_clusters, …])</p></td>
 <td><p>Create a <em>spatial</em> geodemographic typology by running a cluster analysis on the metro area’s neighborhood attributes and including a contiguity constraint.</p></td>
 </tr>
 </tbody>
@@ -381,13 +381,13 @@ then using analytical methods upon the community</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.analyze.linc.html#geosnap.analyze.linc" title="geosnap.analyze.linc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geosnap.analyze.linc</span></code></a>(labels_sequence)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.analyze.linc.html#geosnap.analyze.linc" title="geosnap.analyze.linc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">analyze.linc</span></code></a>(labels_sequence)</p></td>
 <td><p>Local Indicator of Neighborhood Change</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.analyze.html#geosnap.analyze.sequence" title="geosnap.analyze.sequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geosnap.analyze.sequence</span></code></a>(gdf, cluster_col[, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.analyze.sequence.html#geosnap.analyze.sequence" title="geosnap.analyze.sequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">analyze.sequence</span></code></a>(gdf, cluster_col[, …])</p></td>
 <td><p>Pairwise sequence analysis and sequence clustering.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.analyze.html#geosnap.analyze.transition" title="geosnap.analyze.transition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geosnap.analyze.transition</span></code></a>(gdf, cluster_col)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.analyze.transition.html#geosnap.analyze.transition" title="geosnap.analyze.transition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">analyze.transition</span></code></a>(gdf, cluster_col[, …])</p></td>
 <td><p>(Spatial) Markov approach to transitional dynamics of neighborhoods.</p></td>
 </tr>
 </tbody>
@@ -404,8 +404,8 @@ then using analytical methods upon the community</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.harmonize</span></code></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.Community.harmonize.html#geosnap.Community.harmonize" title="geosnap.Community.harmonize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.harmonize</span></code></a>(self[, target_year, …])</p></td>
+<td><p>Standardize inconsistent boundaries into time-static ones.</p></td>
 </tr>
 </tbody>
 </table>
@@ -418,10 +418,10 @@ then using analytical methods upon the community</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualize.indexplot_seq</span></code>(df_traj, clustering)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.visualize.indexplot_seq.html#geosnap.visualize.indexplot_seq" title="geosnap.visualize.indexplot_seq"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualize.indexplot_seq</span></code></a>(df_traj, clustering)</p></td>
 <td><p>Function for index plot of neighborhood sequences within each cluster.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualize.explore</span></code>([data])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.visualize.explore.html#geosnap.visualize.explore" title="geosnap.visualize.explore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visualize.explore</span></code></a>([data])</p></td>
 <td><p>Launch an interactive visualization portal.</p></td>
 </tr>
 </tbody>

@@ -7,50 +7,50 @@ API reference
 
 .. _data_api:
 
-Data Module
+IO Module
 --------------
 
 Storing data
 '''''''''''''''
 
-geosnap's data module provides functions for collecting and storing a variety of datasets
+geosnap's `io` module provides functions for collecting and storing a variety of datasets
 including U.S. Census data from 1990-2010, LEHD data from any vintage, and external longitudinal databases.
 
-.. currentmodule:: geosnap.data
+.. currentmodule:: geosnap
 
 .. autosummary::
    :toctree: generated/
 
-    data.store_census
-    data.store_blocks_2000
-    data.store_blocks_2010
-    data.store_ltdb
-    data.store_ncdb
-    data.get_lehd
+    io.store_census
+    io.store_blocks_2000
+    io.store_blocks_2010
+    io.store_ltdb
+    io.store_ncdb
+    io.get_lehd
 
 Accessing Stored Datasets
 '''''''''''''''''''''''''''''''
 
-It also provides a storage container (called a "data_store") that provides access to datasets that have been imported with the functions above
+It also provides a storage container `datasets` that provides access to datasets that have been imported with the functions above
 
-.. currentmodule:: geosnap.data
+.. currentmodule:: geosnap
 
 .. autosummary::
    :toctree: generated/
    
-    data.data_store
-    data_store.blocks_2000
-    data_store.blocks_2010
-    data_store.codebook
-    data_store.counties
-    data_store.ltdb
-    data_store.msa_definitions
-    data_store.msas
-    data_store.ncdb
-    data_store.states
-    data_store.tracts_1990
-    data_store.tracts_2000
-    data_store.tracts_2010
+    datasets
+    datasets.blocks_2000
+    datasets.blocks_2010
+    datasets.codebook
+    datasets.counties
+    datasets.ltdb
+    datasets.msa_definitions
+    datasets.msas
+    datasets.ncdb
+    datasets.states
+    datasets.tracts_1990
+    datasets.tracts_2000
+    datasets.tracts_2010
 
 
 The Community Class
@@ -60,16 +60,16 @@ The `Community` is the central construct in geonap used to hold spatiotemporal n
 The most common way to interact with geosnap is by instantiating a Community using a constructor method,
 then using analytical methods upon the community
 
-.. currentmodule:: geosnap.data
+.. currentmodule:: geosnap
 
 .. autosummary::
    :toctree: generated/
    
-   geosnap.data.Community
+   Community
    
 Community Constructors
 ''''''''''''''''''''''''''''
-.. currentmodule:: geosnap.data
+.. currentmodule:: geosnap
 
 .. autosummary::
    :toctree: generated/
@@ -85,7 +85,7 @@ Community Constructors
 
 Community Analytics
 '''''''''''''''''''''''''
-.. currentmodule:: geosnap.data
+.. currentmodule:: geosnap
 
 .. autosummary::
    :toctree: generated/
@@ -104,11 +104,13 @@ Neighborhood Clustering Methods
 ``````````````````````````````````
 Model neighborhood differentiation using multivariate clustering algorithms
 
+.. currentmodule:: geosnap
+
 .. autosummary::
    :toctree: generated/
    
-    geosnap.analyze.cluster
-    geosnap.analyze.cluster_spatial
+    analyze.cluster
+    analyze.cluster_spatial
 
 Clustering algorithms
 '''''''''''''''''''''''
@@ -153,15 +155,15 @@ Model neighborhood change using optimal-matching algorithms or spatial discrete 
 .. autosummary::
    :toctree: generated/
    
-   geosnap.analyze.linc
-   geosnap.analyze.sequence
-   geosnap.analyze.transition
+   analyze.linc
+   analyze.sequence
+   analyze.transition
 
 .. _harmonize_api:
 
 Harmonize Module
 ----------------
-.. currentmodule:: geosnap.data.Community
+.. currentmodule:: geosnap
 
 .. autosummary::
    :toctree: generated/
@@ -173,7 +175,7 @@ Harmonize Module
 Visualize Module
 ----------------
 
-.. currentmodule:: geosnap.visualize
+.. currentmodule:: geosnap
 
 .. autosummary::
    :toctree: generated/
