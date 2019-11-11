@@ -2,8 +2,6 @@ from numpy.testing import assert_allclose
 
 from geosnap import Community
 
-store_rasters()
-
 
 def test_harmonize_area():
     la = Community.from_census(county_fips="06037")
