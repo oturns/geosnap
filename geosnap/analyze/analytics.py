@@ -272,7 +272,7 @@ def cluster_spatial(
         clusters.set_index([time_var, id_var], inplace=True)
         gdf.update(clusters)
         results = ModelResults(
-            X=data.values,
+            X=df[columns].values,
             columns=columns,
             labels=model.labels_,
             instance=model,
