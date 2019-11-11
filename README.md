@@ -6,6 +6,8 @@
 
 [![Build Status](https://travis-ci.com/spatialucr/geosnap.svg?branch=master)](https://travis-ci.com/spatialucr/geosnap)
 [![Coverage Status](https://coveralls.io/repos/github/spatialucr/geosnap/badge.svg?branch=master)](https://coveralls.io/github/spatialucr/geosnap?branch=master&service=github)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3526163.svg)](https://doi.org/10.5281/zenodo.3526163)
+
 
 `geosnap` makes it easier to explore, model, analyze, and visualize the social and spatial dynamics
 of neighborhoods.
@@ -318,6 +320,21 @@ To search for or report bugs, please see geosnap’s
 
 See the file “LICENSE.txt” for information on the history of this software, terms &
 conditions for usage, and a DISCLAIMER OF ALL WARRANTIES.
+
+## Citation
+
+For a generic citation of geosnap, we recommend the following: 
+
+```latex
+@misc{Knaap2019,
+author = {Knaap, Elijah and Kang, Wei and Rey, Sergio and Wolf, Levi John and Cortes, Renan Xavier and Han, Su},
+doi = {10.5281/ZENODO.3526163},
+title = {{geosnap: The Geospatial Neighborhood Analysis Package}},
+url = {https://zenodo.org/record/3526163},
+year = {2019}
+}
+```
+If you need to cite a specific release of the package, please find the appropriate version on [Zenodo](https://zenodo.org/record/3526163)
 
 ## Funding
 
