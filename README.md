@@ -41,10 +41,16 @@ works with any data you provide, any place in the world.
 <img width=75% src='docs/figs/Washington-Arlington-Alexandria_DC-VA-MD-WV.gif' alt='DC Transitions' style=' display: block; margin-left: auto; margin-right: auto;'/>
 </p>
 
+## User Guide 
+See the [User Guide](https://spatialucr.github.io/geosnap-guide/) for a
+gentle introduction to using `geosnap` for neighborhood research 
+## API Documentation
+
+See the [API docs](https://spatialucr.github.io/geosnap/api.html) for a thorough explanation of `geosnap`'s core functionality
+
+
 ## Quickstart
 
-**See the [example notebooks](https://github.com/spatialucr/geosnap/tree/master/examples) for a
-gentle introduction to `geosnap`'s major functionality**
 
 the `Community` class is geosnap’s central data construct that holds space-time neighborhood data.  
 You can create a `Community` from geosnap’s built-in data by passing a set of fips codes to a
@@ -248,7 +254,7 @@ consistent over time. For example
 ```python
  dc = dc.harmonize(2010, extensive_variables=["population"])
 ```
-will create a new `Community` with population in 1990 and 2000 modeled as 2010 tract boundaries (2010 will remain unchanged). Thanks to [`tobler`](http://github.com/pysal/tobler), geosnap provides several methods for harmonization, from simple areal interpolation to model-based approaches using auxiliary data. See the [example notebook](examples/03_harmonizing_community_boundaries.ipynb) for more examples
+will create a new `Community` with population in 1990 and 2000 modeled as 2010 tract boundaries (2010 will remain unchanged). Thanks to [`tobler`](http://github.com/pysal/tobler), geosnap provides several methods for harmonization, from simple areal interpolation to model-based approaches using auxiliary data. See the [harmonization example](https://spatialucr.github.io/geosnap-guide/notebooks/03_harmonizing_community_boundaries.html) for more code samples
 
 You can explore datasets using a prototype interactive dashboard using
 
@@ -281,7 +287,7 @@ methods
 - **`visualize`**:  Visualize neighborhood dynamics
 
 *You can learn more about the functionality in each module by browsing the
-[example notebooks](https://github.com/spatialucr/geosnap/tree/master/examples)*
+[User Guide](https://spatialucr.github.io/geosnap-guide/notebooks/03_harmonizing_community_boundaries.html)*
 
 ## Installation
 
