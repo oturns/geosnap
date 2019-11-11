@@ -1,6 +1,9 @@
 from numpy.testing import assert_allclose
 
 from geosnap import Community
+from tobler.data import store_rasters
+
+store_rasters()
 
 
 def test_harmonize_area():
