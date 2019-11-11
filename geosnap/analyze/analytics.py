@@ -69,6 +69,11 @@ def cluster(
     pandas.DataFrame with a column of neighborhood cluster labels appended
     as a new column. Will overwrite columns of the same name.
     """
+    # if we already have a column named after the clustering method, then increment it.
+    if method in gdf.columns.tolist():
+        model_name = method + str(len(gdf.columns[gdf.columns.str.startswith(method)]))
+    else:
+        model_name = method
     if not columns:
         raise ValueError("You must provide a subset of columns as input")
     if not method:
@@ -105,14 +110,12 @@ def cluster(
     labels = model.labels_.astype(str)
     data = data.reset_index()
     clusters = pd.DataFrame(
-        {method: labels, time_var: data[time_var], id_var: data[id_var]}
+        {model_name: labels, time_var: data[time_var], id_var: data[id_var]}
     )
     clusters.set_index([time_var, id_var], inplace=True)
     gdf = gdf.join(clusters, how="left")
     gdf = gdf.reset_index()
-    if return_model:
-        return gdf, model
-    return gdf
+    return gdf, model, model_name
 
 
 def cluster_spatial(
@@ -169,6 +172,10 @@ def cluster_spatial(
     appended as a new column. Will overwrite columns of the same name.
 
     """
+    if method in gdf.columns.tolist():
+        model_name = method + str(len(gdf.columns[gdf.columns.str.startswith(method)]))
+    else:
+        model_name = method
     if not columns:
         raise ValueError("You must provide a subset of columns as input")
     if not method:
@@ -201,7 +208,7 @@ def cluster_spatial(
 
     ws = {}
     clusters = []
-    gdf[method] = np.nan
+    gdf[model_name] = np.nan
     # loop over each time period, standardize the data and build a weights matrix
     for time in times:
         df = data.loc[time].dropna(how="any", subset=columns).reset_index()
@@ -235,7 +242,7 @@ def cluster_spatial(
 
         labels = model.labels_.astype(str)
         clusters = pd.DataFrame(
-            {method: labels, time_var: df[time_var], id_var: df[id_var]}
+            {model_name: labels, time_var: df[time_var], id_var: df[id_var]}
         )
         clusters = clusters.drop_duplicates(subset=[id_var])
         clusters.set_index([time_var, id_var], inplace=True)
@@ -243,6 +250,4 @@ def cluster_spatial(
 
     gdf = gdf.reset_index()
 
-    if return_model:
-        return gdf, model
-    return gdf
+    return gdf, model, model_name

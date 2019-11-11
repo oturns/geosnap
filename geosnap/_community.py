@@ -62,6 +62,7 @@ class Community:
         """
         self.gdf = gdf
         self.harmonized = harmonized
+        self.models = {}
 
     def harmonize(
         self,
@@ -173,20 +174,7 @@ class Community:
 
         """
         harmonized = self.harmonized
-        if return_model:
-            gdf, model = _cluster(
-                gdf=self.gdf.copy(),
-                n_clusters=n_clusters,
-                method=method,
-                best_model=best_model,
-                columns=columns,
-                verbose=verbose,
-                return_model=return_model,
-                scaler=scaler,
-                **kwargs,
-            )
-            return Community(gdf, harmonized=harmonized), model
-        gdf = _cluster(
+        gdf, model, model_name = _cluster(
             gdf=self.gdf.copy(),
             n_clusters=n_clusters,
             method=method,
@@ -194,9 +182,14 @@ class Community:
             columns=columns,
             verbose=verbose,
             return_model=return_model,
+            scaler=scaler,
             **kwargs,
         )
-        return Community(gdf, harmonized=harmonized)
+
+        comm = Community(gdf, harmonized=harmonized)
+        comm.models = self.models  # keep any existing models in the input Community
+        comm.models[model_name] = model
+        return comm
 
     def cluster_spatial(
         self,
@@ -248,22 +241,7 @@ class Community:
         """
         harmonized = self.harmonized
 
-        if return_model:
-            gdf, model = _cluster_spatial(
-                gdf=self.gdf.copy(),
-                n_clusters=n_clusters,
-                spatial_weights=spatial_weights,
-                method=method,
-                best_model=best_model,
-                columns=columns,
-                threshold_variable=threshold_variable,
-                threshold=threshold,
-                return_model=return_model,
-                scaler=scaler,
-                **kwargs,
-            )
-            return Community(gdf, harmonized=True), model
-        gdf = _cluster_spatial(
+        gdf, model, model_name = _cluster_spatial(
             gdf=self.gdf.copy(),
             n_clusters=n_clusters,
             spatial_weights=spatial_weights,
@@ -276,7 +254,11 @@ class Community:
             scaler=scaler,
             **kwargs,
         )
-        return Community(gdf, harmonized=harmonized)
+
+        comm = Community(gdf, harmonized=harmonized)
+        comm.models = self.models  # keep any existing models in the input Community
+        comm.models[model_name] = model
+        return comm
 
     def transition(
         self, cluster_col, time_var="year", id_var="geoid", w_type=None, permutations=0
