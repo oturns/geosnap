@@ -159,8 +159,9 @@
 <span class="sd">        consistent units over time</span>
 <span class="sd">    models : dict</span>
 <span class="sd">        Dictionary of model instances that have been fitted on the community.</span>
-<span class="sd">        The model name is the key and the model itself is the value. For cluster models,</span>
-<span class="sd">        the model name will match a column on the Community.gdf</span>
+<span class="sd">        The model name is the key and the value is a named tuple that stores the input matrix,</span>
+<span class="sd">        the columns used to fit the model, the cluster labels, and the spatial weights matrix</span>
+<span class="sd">        if necessary. For cluster models, the model name will match a column on the Community.gdf.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 

@@ -151,8 +151,9 @@ and geometries for one or more time periods</p>
 consistent units over time</p>
 </dd>
 <dt><strong>models</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of model instances that have been fitted on the community.
-The model name is the key and the model itself is the value. For cluster models,
-the model name will match a column on the Community.gdf</p>
+The model name is the key and the value is a named tuple that stores the input matrix,
+the columns used to fit the model, the cluster labels, and the spatial weights matrix
+if necessary. For cluster models, the model name will match a column on the Community.gdf.</p>
 </dd>
 </dl>
 </dd>

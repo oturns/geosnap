@@ -115,6 +115,8 @@
   <h1>Source code for geosnap.analyze.analytics</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Tools for the spatial analysis of neighborhood change.&quot;&quot;&quot;</span>
 
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">StandardScaler</span>
@@ -135,6 +137,10 @@
     <span class="n">spenc</span><span class="p">,</span>
     <span class="n">ward</span><span class="p">,</span>
     <span class="n">ward_spatial</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">ModelResults</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span>
+    <span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="s2">&quot;columns&quot;</span><span class="p">,</span> <span class="s2">&quot;labels&quot;</span><span class="p">,</span> <span class="s2">&quot;instance&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">],</span> <span class="n">rename</span><span class="o">=</span><span class="kc">False</span>
 <span class="p">)</span>
 
 
@@ -237,7 +243,10 @@
     <span class="n">clusters</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">time_var</span><span class="p">,</span> <span class="n">id_var</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
     <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">gdf</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">model_name</span></div>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">ModelResults</span><span class="p">(</span>
+        <span class="n">X</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">labels_</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">W</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">gdf</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">model_name</span></div>
 
 
 <div class="viewcode-block" id="cluster_spatial"><a class="viewcode-back" href="../../../generated/geosnap.analyze.cluster_spatial.html#geosnap.analyze.cluster_spatial">[docs]</a><span class="k">def</span> <span class="nf">cluster_spatial</span><span class="p">(</span>
@@ -377,7 +386,14 @@
         <span class="n">clusters</span> <span class="o">=</span> <span class="n">clusters</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="n">id_var</span><span class="p">])</span>
         <span class="n">clusters</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">time_var</span><span class="p">,</span> <span class="n">id_var</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">gdf</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
-        <span class="n">models</span><span class="p">[</span><span class="n">time</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">ModelResults</span><span class="p">(</span>
+            <span class="n">X</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+            <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
+            <span class="n">labels</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">labels_</span><span class="p">,</span>
+            <span class="n">instance</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">W</span><span class="o">=</span><span class="n">ws</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="n">models</span><span class="p">[</span><span class="n">time</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span>
 
     <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
 

@@ -1,5 +1,7 @@
 """Tools for the spatial analysis of neighborhood change."""
 
+from collections import namedtuple
+
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
@@ -20,6 +22,10 @@ from .cluster import (
     spenc,
     ward,
     ward_spatial,
+)
+
+ModelResults = namedtuple(
+    "model", ["X", "columns", "labels", "instance", "W"], rename=False
 )
 
 
@@ -122,7 +128,10 @@ def cluster(
     clusters.set_index([time_var, id_var], inplace=True)
     gdf = gdf.join(clusters, how="left")
     gdf = gdf.reset_index()
-    return gdf, model, model_name
+    results = ModelResults(
+        X=data.values, columns=columns, labels=model.labels_, instance=model, W=None
+    )
+    return gdf, results, model_name
 
 
 def cluster_spatial(
@@ -262,7 +271,14 @@ def cluster_spatial(
         clusters = clusters.drop_duplicates(subset=[id_var])
         clusters.set_index([time_var, id_var], inplace=True)
         gdf.update(clusters)
-        models[time] = model
+        results = ModelResults(
+            X=data.values,
+            columns=columns,
+            labels=model.labels_,
+            instance=model,
+            W=ws[0],
+        )
+        models[time] = results
 
     gdf = gdf.reset_index()
 
