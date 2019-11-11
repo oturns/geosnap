@@ -42,6 +42,10 @@ class Community:
     harmonized : bool
         Whether neighborhood boundaries have been harmonized into
         consistent units over time
+    models : dict
+        Dictionary of model instances that have been fitted on the community.
+        The model name is the key and the model itself is the value. For cluster models,
+        the model name will match a column on the Community.gdf
 
     """
 

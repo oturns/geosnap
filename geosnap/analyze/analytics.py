@@ -66,8 +66,16 @@ def cluster(
 
     Returns
     -------
-    pandas.DataFrame with a column of neighborhood cluster labels appended
-    as a new column. Will overwrite columns of the same name.
+    gdf : geopandas.GeoDataFrame
+        GeoDataFrame with a column of neighborhood cluster labels
+        appended as a new column. If cluster method exists as a column on the DataFrame
+        then the column will be incremented.
+
+    model : ModelInstance
+        fitted cluster model
+
+    model_name : str
+        name of model to be stored in a Community
     """
     # if we already have a column named after the clustering method, then increment it.
     if method in gdf.columns.tolist():
@@ -168,8 +176,16 @@ def cluster_spatial(
 
     Returns
     -------
-    geopandas.GeoDataFrame with a column of neighborhood cluster labels
-    appended as a new column. Will overwrite columns of the same name.
+    gdf : geopandas.GeoDataFrame
+        GeoDataFrame with a column of neighborhood cluster labels
+        appended as a new column. If cluster method exists as a column on the DataFrame
+        then the column will be incremented.
+
+    model : ModelInstance
+        fitted cluster model
+
+    model_name : str
+        name of model to be stored in a Community
 
     """
     if method in gdf.columns.tolist():

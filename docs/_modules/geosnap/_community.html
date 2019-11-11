@@ -157,6 +157,10 @@
 <span class="sd">    harmonized : bool</span>
 <span class="sd">        Whether neighborhood boundaries have been harmonized into</span>
 <span class="sd">        consistent units over time</span>
+<span class="sd">    models : dict</span>
+<span class="sd">        Dictionary of model instances that have been fitted on the community.</span>
+<span class="sd">        The model name is the key and the model itself is the value. For cluster models,</span>
+<span class="sd">        the model name will match a column on the Community.gdf</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -176,7 +180,8 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">harmonized</span> <span class="o">=</span> <span class="n">harmonized</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">harmonized</span> <span class="o">=</span> <span class="n">harmonized</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">models</span> <span class="o">=</span> <span class="p">{}</span></div>
 
 <div class="viewcode-block" id="Community.harmonize"><a class="viewcode-back" href="../../generated/geosnap.Community.harmonize.html#geosnap.Community.harmonize">[docs]</a>    <span class="k">def</span> <span class="nf">harmonize</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -288,20 +293,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">harmonized</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">harmonized</span>
-        <span class="k">if</span> <span class="n">return_model</span><span class="p">:</span>
-            <span class="n">gdf</span><span class="p">,</span> <span class="n">model</span> <span class="o">=</span> <span class="n">_cluster</span><span class="p">(</span>
-                <span class="n">gdf</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-                <span class="n">n_clusters</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">,</span>
-                <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
-                <span class="n">best_model</span><span class="o">=</span><span class="n">best_model</span><span class="p">,</span>
-                <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
-                <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-                <span class="n">return_model</span><span class="o">=</span><span class="n">return_model</span><span class="p">,</span>
-                <span class="n">scaler</span><span class="o">=</span><span class="n">scaler</span><span class="p">,</span>
-                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="k">return</span> <span class="n">Community</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="n">harmonized</span><span class="o">=</span><span class="n">harmonized</span><span class="p">),</span> <span class="n">model</span>
-        <span class="n">gdf</span> <span class="o">=</span> <span class="n">_cluster</span><span class="p">(</span>
+        <span class="n">gdf</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">model_name</span> <span class="o">=</span> <span class="n">_cluster</span><span class="p">(</span>
             <span class="n">gdf</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
             <span class="n">n_clusters</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">,</span>
             <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
@@ -309,9 +301,14 @@
             <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
             <span class="n">return_model</span><span class="o">=</span><span class="n">return_model</span><span class="p">,</span>
+            <span class="n">scaler</span><span class="o">=</span><span class="n">scaler</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">Community</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="n">harmonized</span><span class="o">=</span><span class="n">harmonized</span><span class="p">)</span></div>
+
+        <span class="n">comm</span> <span class="o">=</span> <span class="n">Community</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="n">harmonized</span><span class="o">=</span><span class="n">harmonized</span><span class="p">)</span>
+        <span class="n">comm</span><span class="o">.</span><span class="n">models</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span>  <span class="c1"># keep any existing models in the input Community</span>
+        <span class="n">comm</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="k">return</span> <span class="n">comm</span></div>
 
 <div class="viewcode-block" id="Community.cluster_spatial"><a class="viewcode-back" href="../../generated/geosnap.Community.cluster_spatial.html#geosnap.Community.cluster_spatial">[docs]</a>    <span class="k">def</span> <span class="nf">cluster_spatial</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -363,22 +360,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">harmonized</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">harmonized</span>
 
-        <span class="k">if</span> <span class="n">return_model</span><span class="p">:</span>
-            <span class="n">gdf</span><span class="p">,</span> <span class="n">model</span> <span class="o">=</span> <span class="n">_cluster_spatial</span><span class="p">(</span>
-                <span class="n">gdf</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-                <span class="n">n_clusters</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">,</span>
-                <span class="n">spatial_weights</span><span class="o">=</span><span class="n">spatial_weights</span><span class="p">,</span>
-                <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
-                <span class="n">best_model</span><span class="o">=</span><span class="n">best_model</span><span class="p">,</span>
-                <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
-                <span class="n">threshold_variable</span><span class="o">=</span><span class="n">threshold_variable</span><span class="p">,</span>
-                <span class="n">threshold</span><span class="o">=</span><span class="n">threshold</span><span class="p">,</span>
-                <span class="n">return_model</span><span class="o">=</span><span class="n">return_model</span><span class="p">,</span>
-                <span class="n">scaler</span><span class="o">=</span><span class="n">scaler</span><span class="p">,</span>
-                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="k">return</span> <span class="n">Community</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="n">harmonized</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">model</span>
-        <span class="n">gdf</span> <span class="o">=</span> <span class="n">_cluster_spatial</span><span class="p">(</span>
+        <span class="n">gdf</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">model_name</span> <span class="o">=</span> <span class="n">_cluster_spatial</span><span class="p">(</span>
             <span class="n">gdf</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
             <span class="n">n_clusters</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">,</span>
             <span class="n">spatial_weights</span><span class="o">=</span><span class="n">spatial_weights</span><span class="p">,</span>
@@ -391,7 +373,11 @@
             <span class="n">scaler</span><span class="o">=</span><span class="n">scaler</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">Community</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="n">harmonized</span><span class="o">=</span><span class="n">harmonized</span><span class="p">)</span></div>
+
+        <span class="n">comm</span> <span class="o">=</span> <span class="n">Community</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="n">harmonized</span><span class="o">=</span><span class="n">harmonized</span><span class="p">)</span>
+        <span class="n">comm</span><span class="o">.</span><span class="n">models</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span>  <span class="c1"># keep any existing models in the input Community</span>
+        <span class="n">comm</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="k">return</span> <span class="n">comm</span></div>
 
 <div class="viewcode-block" id="Community.transition"><a class="viewcode-back" href="../../generated/geosnap.Community.transition.html#geosnap.Community.transition">[docs]</a>    <span class="k">def</span> <span class="nf">transition</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">cluster_col</span><span class="p">,</span> <span class="n">time_var</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span> <span class="n">id_var</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span> <span class="n">w_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">permutations</span><span class="o">=</span><span class="mi">0</span>

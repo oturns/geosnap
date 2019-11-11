@@ -181,9 +181,22 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    pandas.DataFrame with a column of neighborhood cluster labels appended</span>
-<span class="sd">    as a new column. Will overwrite columns of the same name.</span>
+<span class="sd">    gdf : geopandas.GeoDataFrame</span>
+<span class="sd">        GeoDataFrame with a column of neighborhood cluster labels</span>
+<span class="sd">        appended as a new column. If cluster method exists as a column on the DataFrame</span>
+<span class="sd">        then the column will be incremented.</span>
+
+<span class="sd">    model : ModelInstance</span>
+<span class="sd">        fitted cluster model</span>
+
+<span class="sd">    model_name : str</span>
+<span class="sd">        name of model to be stored in a Community</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># if we already have a column named after the clustering method, then increment it.</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">gdf</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
+        <span class="n">model_name</span> <span class="o">=</span> <span class="n">method</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gdf</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">gdf</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">method</span><span class="p">)]))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">model_name</span> <span class="o">=</span> <span class="n">method</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">columns</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;You must provide a subset of columns as input&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">method</span><span class="p">:</span>
@@ -220,14 +233,12 @@
     <span class="n">labels</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">labels_</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
     <span class="n">clusters</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-        <span class="p">{</span><span class="n">method</span><span class="p">:</span> <span class="n">labels</span><span class="p">,</span> <span class="n">time_var</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="n">time_var</span><span class="p">],</span> <span class="n">id_var</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="n">id_var</span><span class="p">]}</span>
+        <span class="p">{</span><span class="n">model_name</span><span class="p">:</span> <span class="n">labels</span><span class="p">,</span> <span class="n">time_var</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="n">time_var</span><span class="p">],</span> <span class="n">id_var</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="n">id_var</span><span class="p">]}</span>
     <span class="p">)</span>
     <span class="n">clusters</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">time_var</span><span class="p">,</span> <span class="n">id_var</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
     <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">return_model</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">gdf</span><span class="p">,</span> <span class="n">model</span>
-    <span class="k">return</span> <span class="n">gdf</span></div>
+    <span class="k">return</span> <span class="n">gdf</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">model_name</span></div>
 
 
 <div class="viewcode-block" id="cluster_spatial"><a class="viewcode-back" href="../../../generated/geosnap.analyze.cluster_spatial.html#geosnap.analyze.cluster_spatial">[docs]</a><span class="k">def</span> <span class="nf">cluster_spatial</span><span class="p">(</span>
@@ -280,10 +291,22 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    geopandas.GeoDataFrame with a column of neighborhood cluster labels</span>
-<span class="sd">    appended as a new column. Will overwrite columns of the same name.</span>
+<span class="sd">    gdf : geopandas.GeoDataFrame</span>
+<span class="sd">        GeoDataFrame with a column of neighborhood cluster labels</span>
+<span class="sd">        appended as a new column. If cluster method exists as a column on the DataFrame</span>
+<span class="sd">        then the column will be incremented.</span>
+
+<span class="sd">    model : ModelInstance</span>
+<span class="sd">        fitted cluster model</span>
+
+<span class="sd">    model_name : str</span>
+<span class="sd">        name of model to be stored in a Community</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">gdf</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
+        <span class="n">model_name</span> <span class="o">=</span> <span class="n">method</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gdf</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">gdf</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">method</span><span class="p">)]))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">model_name</span> <span class="o">=</span> <span class="n">method</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">columns</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;You must provide a subset of columns as input&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">method</span><span class="p">:</span>
@@ -316,7 +339,7 @@
 
     <span class="n">ws</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">clusters</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">gdf</span><span class="p">[</span><span class="n">method</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="n">gdf</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
     <span class="c1"># loop over each time period, standardize the data and build a weights matrix</span>
     <span class="k">for</span> <span class="n">time</span> <span class="ow">in</span> <span class="n">times</span><span class="p">:</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">time</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s2">&quot;any&quot;</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
@@ -350,7 +373,7 @@
 
         <span class="n">labels</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">labels_</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
         <span class="n">clusters</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-            <span class="p">{</span><span class="n">method</span><span class="p">:</span> <span class="n">labels</span><span class="p">,</span> <span class="n">time_var</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="n">time_var</span><span class="p">],</span> <span class="n">id_var</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="n">id_var</span><span class="p">]}</span>
+            <span class="p">{</span><span class="n">model_name</span><span class="p">:</span> <span class="n">labels</span><span class="p">,</span> <span class="n">time_var</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="n">time_var</span><span class="p">],</span> <span class="n">id_var</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="n">id_var</span><span class="p">]}</span>
         <span class="p">)</span>
         <span class="n">clusters</span> <span class="o">=</span> <span class="n">clusters</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="n">id_var</span><span class="p">])</span>
         <span class="n">clusters</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">time_var</span><span class="p">,</span> <span class="n">id_var</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -358,9 +381,7 @@
 
     <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
 
-    <span class="k">if</span> <span class="n">return_model</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">gdf</span><span class="p">,</span> <span class="n">model</span>
-    <span class="k">return</span> <span class="n">gdf</span></div>
+    <span class="k">return</span> <span class="n">gdf</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">model_name</span></div>
 </pre></div>
 
     </div>

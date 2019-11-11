@@ -159,8 +159,14 @@ data. Defaults to StandardScaler</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>geopandas.GeoDataFrame with a column of neighborhood cluster labels</dt><dd></dd>
-<dt>appended as a new column. Will overwrite columns of the same name.</dt><dd></dd>
+<dt><strong>gdf</strong><span class="classifier">geopandas.GeoDataFrame</span></dt><dd><p>GeoDataFrame with a column of neighborhood cluster labels
+appended as a new column. If cluster method exists as a column on the DataFrame
+then the column will be incremented.</p>
+</dd>
+<dt><strong>model</strong><span class="classifier">ModelInstance</span></dt><dd><p>fitted cluster model</p>
+</dd>
+<dt><strong>model_name</strong><span class="classifier">str</span></dt><dd><p>name of model to be stored in a Community</p>
+</dd>
 </dl>
 </dd>
 </dl>
