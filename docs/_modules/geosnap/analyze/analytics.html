@@ -147,7 +147,6 @@
     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">time_var</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span>
     <span class="n">id_var</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span>
-    <span class="n">return_model</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">scaler</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
@@ -251,7 +250,6 @@
     <span class="n">threshold</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
     <span class="n">time_var</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span>
     <span class="n">id_var</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span>
-    <span class="n">return_model</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">scaler</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
@@ -296,8 +294,8 @@
 <span class="sd">        appended as a new column. If cluster method exists as a column on the DataFrame</span>
 <span class="sd">        then the column will be incremented.</span>
 
-<span class="sd">    model : ModelInstance</span>
-<span class="sd">        fitted cluster model</span>
+<span class="sd">    models : dict</span>
+<span class="sd">        dictionary of fitted cluster models keyed on the time variable</span>
 
 <span class="sd">    model_name : str</span>
 <span class="sd">        name of model to be stored in a Community</span>
@@ -337,6 +335,7 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">scaler</span><span class="p">:</span>
         <span class="n">scaler</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span>
 
+    <span class="n">models</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">ws</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">clusters</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">gdf</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
@@ -378,10 +377,11 @@
         <span class="n">clusters</span> <span class="o">=</span> <span class="n">clusters</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="n">id_var</span><span class="p">])</span>
         <span class="n">clusters</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">time_var</span><span class="p">,</span> <span class="n">id_var</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">gdf</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
+        <span class="n">models</span><span class="p">[</span><span class="n">time</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span>
 
     <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
 
-    <span class="k">return</span> <span class="n">gdf</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">model_name</span></div>
+    <span class="k">return</span> <span class="n">gdf</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">model_name</span></div>
 </pre></div>
 
     </div>

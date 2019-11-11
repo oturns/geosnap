@@ -32,7 +32,6 @@ def cluster(
     verbose=False,
     time_var="year",
     id_var="geoid",
-    return_model=False,
     scaler=None,
     **kwargs,
 ):
@@ -136,7 +135,6 @@ def cluster_spatial(
     threshold=10,
     time_var="year",
     id_var="geoid",
-    return_model=False,
     scaler=None,
     **kwargs,
 ):
@@ -181,8 +179,8 @@ def cluster_spatial(
         appended as a new column. If cluster method exists as a column on the DataFrame
         then the column will be incremented.
 
-    model : ModelInstance
-        fitted cluster model
+    models : dict
+        dictionary of fitted cluster models keyed on the time variable
 
     model_name : str
         name of model to be stored in a Community
@@ -222,6 +220,7 @@ def cluster_spatial(
     if not scaler:
         scaler = StandardScaler()
 
+    models = {}
     ws = {}
     clusters = []
     gdf[model_name] = np.nan
@@ -263,7 +262,8 @@ def cluster_spatial(
         clusters = clusters.drop_duplicates(subset=[id_var])
         clusters.set_index([time_var, id_var], inplace=True)
         gdf.update(clusters)
+        models[time] = model
 
     gdf = gdf.reset_index()
 
-    return gdf, model, model_name
+    return gdf, models, model_name
