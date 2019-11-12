@@ -59,7 +59,7 @@ You can create a `Community` from geosnap’s built-in data by passing a set of 
 constructor method
 
 ```python
-from geosnap.data import Community
+from geosnap import Community
 dc = Community.from_census(state_fips='11')
 ```
 
@@ -261,7 +261,7 @@ will create a new `Community` with population in 1990 and 2000 modeled as 2010 t
 You can explore datasets using a prototype interactive dashboard using
 
 ```python
-from geosnap.vizualize import explore
+from geosnap.visualize import explore
 explore()
 ```
 
