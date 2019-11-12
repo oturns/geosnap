@@ -192,7 +192,9 @@ class Community:
         )
 
         comm = Community(gdf, harmonized=harmonized)
-        comm.models = self.models  # keep any existing models in the input Community
+        comm.models.update(
+            self.models
+        )  # keep any existing models in the input Community
         comm.models[model_name] = model
         return comm
 
@@ -261,7 +263,9 @@ class Community:
         )
 
         comm = Community(gdf, harmonized=harmonized)
-        comm.models = self.models  # keep any existing models in the input Community
+        comm.models.update(
+            self.models
+        )  # keep any existing models in the input Community
         comm.models[model_name] = model
         return comm
 
