@@ -248,7 +248,10 @@ def cluster_spatial(
         df[time_var] = time
         df[columns] = scaler.fit_transform(df[columns].values)
 
-        w0 = W.from_dataframe(df, **weights_kwargs)
+        if weights_kwargs:
+            w0 = W.from_dataframe(df, **weights_kwargs)
+        else:
+            w0 = W.from_dataframe(df)
         w1 = KNN.from_dataframe(df, k=1)
         ws = [w0, w1]
 
