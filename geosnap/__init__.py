@@ -17,7 +17,7 @@ harmonize
     harmonize neighborhood boundaries into consistent demarcators
 visualize
     plot and animate neighborhoods and their change
-data
+io
     ingest, store, and manipulate spatiotemporal neighborhood data
 
 """
@@ -26,7 +26,9 @@ __version__ = "0.0.2"
 # __version__ has to be define in the first line
 
 from . import analyze
-from . import data
+from . import io
 from . import util
 from . import visualize
 from . import harmonize
+from ._data import datasets
+from ._community import Community

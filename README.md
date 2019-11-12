@@ -2,10 +2,12 @@
 <p align="center">
 <img height=100  src="docs/figs/geosnap.svg" alt="geosnap"/>
 </p>
-<h2 align="center" style="margin-top:-10px">The GeoSpatial Neighborhood Analysis Package</h2> 
+<h2 align="center" style="margin-top:-10px">The Geospatial Neighborhood Analysis Package</h2> 
 
 [![Build Status](https://travis-ci.com/spatialucr/geosnap.svg?branch=master)](https://travis-ci.com/spatialucr/geosnap)
 [![Coverage Status](https://coveralls.io/repos/github/spatialucr/geosnap/badge.svg?branch=master)](https://coveralls.io/github/spatialucr/geosnap?branch=master&service=github)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3526163.svg)](https://doi.org/10.5281/zenodo.3526163)
+
 
 `geosnap` makes it easier to explore, model, analyze, and visualize the social and spatial dynamics
 of neighborhoods.
@@ -41,12 +43,18 @@ works with any data you provide, any place in the world.
 <img width=75% src='docs/figs/Washington-Arlington-Alexandria_DC-VA-MD-WV.gif' alt='DC Transitions' style=' display: block; margin-left: auto; margin-right: auto;'/>
 </p>
 
+## User Guide 
+See the [User Guide](https://spatialucr.github.io/geosnap-guide/) for a
+gentle introduction to using `geosnap` for neighborhood research 
+## API Documentation
+
+See the [API docs](https://spatialucr.github.io/geosnap/api.html) for a thorough explanation of `geosnap`'s core functionality
+
+
 ## Quickstart
 
-**See the [example notebooks](https://github.com/spatialucr/geosnap/tree/master/examples) for a
-gentle introduction to `geosnap`'s major functionality**
 
-the `Community` class is geosnap’s central data construct that holds space-time neighborhood data.
+the `Community` class is geosnap’s central data construct that holds space-time neighborhood data.  
 You can create a `Community` from geosnap’s built-in data by passing a set of fips codes to a
 constructor method
 
@@ -221,7 +229,7 @@ you can create a [geodemographic typology](https://en.wikipedia.org/wiki/Geodemo
 classic clustering methods on the `Community`
 
 ```python
-dc.cluster(method='kmeans', n_clusters=6, columns=['p_unemployment_rate', 'per_capita_income'] )
+dc = dc.cluster(method='kmeans', n_clusters=6, columns=['p_unemployment_rate', 'per_capita_income'] )
 dc.gdf[dc.gdf.year==2000].plot(column='kmeans')
 ```
 
@@ -234,7 +242,7 @@ you can create a
 spatially-constrained clustering methods on the `Community`
 
 ```python
-dc.cluster_spatial(method='spenc', n_clusters=6, columns=['p_unemployment_rate', 'per_capita_income'] )
+dc = dc.cluster_spatial(method='spenc', n_clusters=6, columns=['p_unemployment_rate', 'per_capita_income'] )
 dc.gdf[dc.gdf.year==2000].plot('spenc')
 ```
 
@@ -243,33 +251,45 @@ dc.gdf[dc.gdf.year==2000].plot('spenc')
 </p>
 
 You can also [harmonize](https://github.com/spatialucr/tobler) `Community` boundaries so that they’re
-consistent over time
+consistent over time. For example 
 
- **coming soon!**
+```python
+ dc = dc.harmonize(2010, extensive_variables=["population"])
+```
+will create a new `Community` with population in 1990 and 2000 modeled as 2010 tract boundaries (2010 will remain unchanged). Thanks to [`tobler`](http://github.com/pysal/tobler), geosnap provides several methods for harmonization, from simple areal interpolation to model-based approaches using auxiliary data. See the [harmonization example](https://spatialucr.github.io/geosnap-guide/notebooks/03_harmonizing_community_boundaries.html) for more code samples
+
+You can explore datasets using a prototype interactive dashboard using
+
+```python
+from geosnap.vizualize import explore
+explore()
+```
+
+![](docs/figs/commviz.png)
+
+By default, the dashboard will launch with built-in census data, but if you've stored other databases, then you can exlore those as well. 
+
+Many more visualization features coming soon
 
 ## Architecture
 
-#### `geosnap` is comprised of four modules:
+Most interaction in geosnap happens with a `Community`, and almost all of geosnap's functionality is available as a method on a `Community` object. But when you need to use other fetures, like access data or launch an interactive visuzalization, you may need to access functions in one of geosnap's submodules.
 
-##### `data`
+##### `geosnap` has five modules:
 
-Ingest, create, and manipulate space-time datasets
+- **`datasets`**:   Access built-in datasets, including 30 years of census data for the USA,  and databases stored with functions from the `io` module
 
-##### `analyze`
+- **`io`**:  Ingest, create, and manipulate space-time datasets
 
-Analyze and model neighborhood dynamics
+- **`analyze`**:  Analyze and model neighborhood boundaries and spatio-temporal dynamics
 
-##### `harmonize`
-
-Harmonize neighborhood boundaries into consistent, stable units using spatial statistical
+- **`harmonize`**:  Harmonize neighborhood boundaries into consistent, stable units using spatial statistical
 methods
 
-##### `visualize`
-
-Visualize neighborhood dynamics
+- **`visualize`**:  Visualize neighborhood dynamics
 
 *You can learn more about the functionality in each module by browsing the
-[example notebooks](https://github.com/spatialucr/geosnap/tree/master/examples)*
+[User Guide](https://spatialucr.github.io/geosnap-guide/notebooks/03_harmonizing_community_boundaries.html)*
 
 ## Installation
 
@@ -301,7 +321,22 @@ To search for or report bugs, please see geosnap’s
 See the file “LICENSE.txt” for information on the history of this software, terms &
 conditions for usage, and a DISCLAIMER OF ALL WARRANTIES.
 
+## Citation
+
+For a generic citation of geosnap, we recommend the following: 
+
+```latex
+@misc{Knaap2019,
+author = {Knaap, Elijah and Kang, Wei and Rey, Sergio and Wolf, Levi John and Cortes, Renan Xavier and Han, Su},
+doi = {10.5281/ZENODO.3526163},
+title = {{geosnap: The Geospatial Neighborhood Analysis Package}},
+url = {https://zenodo.org/record/3526163},
+year = {2019}
+}
+```
+If you need to cite a specific release of the package, please find the appropriate version on [Zenodo](https://zenodo.org/record/3526163)
+
 ## Funding
 
-<img src="docs/nsf_logo.jpg" width=100 /> This project is supported by NSF Award #1733705,
+<img src="docs/figs/nsf_logo.jpg" width=100 /> This project is supported by NSF Award #1733705,
 [Neighborhoods in Space-Time Contexts](https://www.nsf.gov/awardsearch/showAward?AWD_ID=1733705&HistoricalAwards=false)

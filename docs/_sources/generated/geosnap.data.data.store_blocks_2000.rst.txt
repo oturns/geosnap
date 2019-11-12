@@ -1,6 +1,0 @@
-geosnap.data.data.store\_blocks\_2000
-=====================================
-
-.. currentmodule:: geosnap.data.data
-
-.. autofunction:: store_blocks_2000

@@ -1,0 +1,6 @@
+geosnap.datasets.tracts\_2000
+=============================
+
+.. currentmodule:: geosnap
+
+.. automethod:: datasets.tracts_2000

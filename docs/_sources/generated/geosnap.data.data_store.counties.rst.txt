@@ -1,6 +1,0 @@
-geosnap.data.data\_store.counties
-=================================
-
-.. currentmodule:: geosnap.data
-
-.. automethod:: data_store.counties

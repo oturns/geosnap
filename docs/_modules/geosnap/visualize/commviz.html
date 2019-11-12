@@ -64,7 +64,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../api.html#data-module">Data Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#io-module">IO Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api.html#the-community-class">The Community Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api.html#analyze-module">Analyze Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api.html#harmonize-module">Harmonize Module</a></li>
@@ -116,9 +116,9 @@
 <span></span><span class="kn">from</span> <span class="nn">mapclassify</span> <span class="k">import</span> <span class="o">*</span>
 
 
-<div class="viewcode-block" id="explore"><a class="viewcode-back" href="../../../generated/geosnap.visualize.explore.html#geosnap.visualize.commviz.explore">[docs]</a><span class="k">def</span> <span class="nf">explore</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="s2">&quot;census&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="explore"><a class="viewcode-back" href="../../../generated/geosnap.visualize.explore.html#geosnap.visualize.explore">[docs]</a><span class="k">def</span> <span class="nf">explore</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="s2">&quot;census&quot;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Launch an interactive visualization portal.</span>
-<span class="sd">    </span>
+
 <span class="sd">    This function launches an interactive dataset explorer based on plotly&#39;s `dash`</span>
 <span class="sd">    Currently it is still experimental, but it provides a set of interactive widgets</span>
 <span class="sd">    and maps that allow users to rapidly create  metropolitan-scale datasets and choropleth</span>
@@ -131,7 +131,7 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    none</span>
+<span class="sd">    None</span>
 <span class="sd">        Launches a web-browser with the interactive visualization.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -146,7 +146,7 @@
     <span class="kn">import</span> <span class="nn">webbrowser</span>
     <span class="kn">import</span> <span class="nn">palettable</span>
     <span class="kn">import</span> <span class="nn">json</span>
-    <span class="kn">from</span> <span class="nn">geosnap.data</span> <span class="k">import</span> <span class="n">Community</span><span class="p">,</span> <span class="n">data_store</span> <span class="k">as</span> <span class="n">store</span>
+    <span class="kn">from</span> <span class="nn">geosnap</span> <span class="k">import</span> <span class="n">Community</span><span class="p">,</span> <span class="n">datasets</span>
 
     <span class="n">mem</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
 
@@ -156,7 +156,7 @@
     <span class="n">external_stylesheets</span> <span class="o">=</span> <span class="p">[</span><span class="n">dbc</span><span class="o">.</span><span class="n">themes</span><span class="o">.</span><span class="n">JOURNAL</span><span class="p">]</span>
 
     <span class="n">opts</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">colname</span> <span class="ow">in</span> <span class="n">store</span><span class="o">.</span><span class="n">codebook</span><span class="o">.</span><span class="n">variable</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">colname</span> <span class="ow">in</span> <span class="n">datasets</span><span class="o">.</span><span class="n">codebook</span><span class="o">.</span><span class="n">variable</span><span class="p">:</span>
         <span class="n">val</span> <span class="o">=</span> <span class="n">colname</span>
         <span class="k">if</span> <span class="n">colname</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;n_&quot;</span><span class="p">):</span>
             <span class="n">colname</span> <span class="o">=</span> <span class="n">colname</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
@@ -235,7 +235,7 @@
 
     <span class="n">metro_opts</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">{</span><span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">metro</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]),</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">metro</span><span class="p">[</span><span class="s2">&quot;geoid&quot;</span><span class="p">]}</span>
-        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">metro</span> <span class="ow">in</span> <span class="n">store</span><span class="o">.</span><span class="n">msas</span><span class="p">()</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">metro</span> <span class="ow">in</span> <span class="n">datasets</span><span class="o">.</span><span class="n">msas</span><span class="p">()</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()</span>
     <span class="p">]</span>
 
     <span class="n">precomputed_color_ranges</span> <span class="o">=</span> <span class="n">palettable</span><span class="o">.</span><span class="n">colorbrewer</span><span class="o">.</span><span class="n">sequential</span><span class="o">.</span><span class="n">Blues_6</span><span class="o">.</span><span class="n">hex_colors</span>

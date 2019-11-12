@@ -1,15 +1,18 @@
 """Tools for the spatial analysis of neighborhood change."""
 
+from collections import namedtuple
+
 import numpy as np
 import pandas as pd
+from sklearn.preprocessing import StandardScaler
+
 from libpysal.weights import attach_islands
 from libpysal.weights.contiguity import Queen, Rook
 from libpysal.weights.distance import KNN
-from sklearn.preprocessing import StandardScaler
 
 from .cluster import (
-    azp,
     affinity_propagation,
+    azp,
     gaussian_mixture,
     hdbscan,
     kmeans,
@@ -19,6 +22,10 @@ from .cluster import (
     spenc,
     ward,
     ward_spatial,
+)
+
+ModelResults = namedtuple(
+    "model", ["X", "columns", "labels", "instance", "W"], rename=False
 )
 
 
@@ -31,7 +38,6 @@ def cluster(
     verbose=False,
     time_var="year",
     id_var="geoid",
-    return_model=False,
     scaler=None,
     **kwargs,
 ):
@@ -65,9 +71,22 @@ def cluster(
 
     Returns
     -------
-    pandas.DataFrame with a column of neighborhood cluster labels appended
-    as a new column. Will overwrite columns of the same name.
+    gdf : geopandas.GeoDataFrame
+        GeoDataFrame with a column of neighborhood cluster labels
+        appended as a new column. If cluster method exists as a column on the DataFrame
+        then the column will be incremented.
+
+    model : ModelInstance
+        fitted cluster model
+
+    model_name : str
+        name of model to be stored in a Community
     """
+    # if we already have a column named after the clustering method, then increment it.
+    if method in gdf.columns.tolist():
+        model_name = method + str(len(gdf.columns[gdf.columns.str.startswith(method)]))
+    else:
+        model_name = method
     if not columns:
         raise ValueError("You must provide a subset of columns as input")
     if not method:
@@ -104,14 +123,15 @@ def cluster(
     labels = model.labels_.astype(str)
     data = data.reset_index()
     clusters = pd.DataFrame(
-        {method: labels, time_var: data[time_var], id_var: data[id_var]}
+        {model_name: labels, time_var: data[time_var], id_var: data[id_var]}
     )
     clusters.set_index([time_var, id_var], inplace=True)
     gdf = gdf.join(clusters, how="left")
     gdf = gdf.reset_index()
-    if return_model:
-        return gdf, model
-    return gdf
+    results = ModelResults(
+        X=data.values, columns=columns, labels=model.labels_, instance=model, W=None
+    )
+    return gdf, results, model_name
 
 
 def cluster_spatial(
@@ -124,7 +144,6 @@ def cluster_spatial(
     threshold=10,
     time_var="year",
     id_var="geoid",
-    return_model=False,
     scaler=None,
     **kwargs,
 ):
@@ -138,8 +157,10 @@ def cluster_spatial(
         long-form geodataframe holding neighborhood attribute and geometry data.
     n_clusters : int
         the number of clusters to model. The default is 6).
-    weights_type : str 'queen' or 'rook'
-        spatial weights matrix specification` (the default is "rook").
+    spatial_weights : str ('queen' or 'rook') or libpysal.weights object
+        spatial weights matrix specification`. By default, geosnap will calculate Rook
+        weights, but you can also pass a `libpysal.weights` object for more control
+        over the specification.
     method : str
         the clustering algorithm used to identify neighborhood types
     columns : list-like
@@ -162,10 +183,22 @@ def cluster_spatial(
 
     Returns
     -------
-    geopandas.GeoDataFrame with a column of neighborhood cluster labels
-    appended as a new column. Will overwrite columns of the same name.
+    gdf : geopandas.GeoDataFrame
+        GeoDataFrame with a column of neighborhood cluster labels
+        appended as a new column. If cluster method exists as a column on the DataFrame
+        then the column will be incremented.
+
+    models : dict
+        dictionary of fitted cluster models keyed on the time variable
+
+    model_name : str
+        name of model to be stored in a Community
 
     """
+    if method in gdf.columns.tolist():
+        model_name = method + str(len(gdf.columns[gdf.columns.str.startswith(method)]))
+    else:
+        model_name = method
     if not columns:
         raise ValueError("You must provide a subset of columns as input")
     if not method:
@@ -196,19 +229,19 @@ def cluster_spatial(
     if not scaler:
         scaler = StandardScaler()
 
+    models = {}
     ws = {}
     clusters = []
-    dfs = []
+    gdf[model_name] = np.nan
     # loop over each time period, standardize the data and build a weights matrix
     for time in times:
         df = data.loc[time].dropna(how="any", subset=columns).reset_index()
         df[time_var] = time
         df[columns] = scaler.fit_transform(df[columns].values)
+
         w0 = W.from_dataframe(df)
         w1 = KNN.from_dataframe(df, k=1)
         ws = [w0, w1]
-        # the rescalar can create nans if a column has no variance, so fill with 0
-        df = df.fillna(0)
 
         if threshold_variable and threshold_variable != "count":
             data[threshold_variable] = gdf[threshold_variable]
@@ -233,11 +266,20 @@ def cluster_spatial(
 
         labels = model.labels_.astype(str)
         clusters = pd.DataFrame(
-            {method: labels, time_var: df[time_var], id_var: df[id_var]}
+            {model_name: labels, time_var: df[time_var], id_var: df[id_var]}
         )
+        clusters = clusters.drop_duplicates(subset=[id_var])
         clusters.set_index([time_var, id_var], inplace=True)
-        dfs.append(gdf.loc[time].join(clusters, how="left"))
-    gdf = pd.concat(dfs).reset_index()
-    if return_model:
-        return gdf, model
-    return gdf
+        gdf.update(clusters)
+        results = ModelResults(
+            X=df[columns].values,
+            columns=columns,
+            labels=model.labels_,
+            instance=model,
+            W=ws[0],
+        )
+        models[time] = results
+
+    gdf = gdf.reset_index()
+
+    return gdf, models, model_name

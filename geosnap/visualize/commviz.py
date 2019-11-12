@@ -2,6 +2,24 @@ from mapclassify import *
 
 
 def explore(data="census"):
+    """Launch an interactive visualization portal.
+
+    This function launches an interactive dataset explorer based on plotly's `dash`
+    Currently it is still experimental, but it provides a set of interactive widgets
+    and maps that allow users to rapidly create  metropolitan-scale datasets and choropleth
+    webmaps using a variety of census data.
+
+    Parameters
+    ----------
+    data : str
+        Which dataset to explore. Options include "census, "ltdb", and "ncdb" (the default is "census").
+
+    Returns
+    -------
+    None
+        Launches a web-browser with the interactive visualization.
+
+    """
     mem = {}
     mem["last_metro"] = ""
     mem["last_comm"] = ""
@@ -13,7 +31,7 @@ def explore(data="census"):
     import webbrowser
     import palettable
     import json
-    from geosnap.data import Community, data_store as store
+    from geosnap import Community, datasets
 
     mem["data"] = data
 
@@ -23,7 +41,7 @@ def explore(data="census"):
     external_stylesheets = [dbc.themes.JOURNAL]
 
     opts = []
-    for colname in store.codebook.variable:
+    for colname in datasets.codebook.variable:
         val = colname
         if colname.startswith("n_"):
             colname = colname[1:]
@@ -102,7 +120,7 @@ def explore(data="census"):
 
     metro_opts = [
         {"label": str(metro["name"]), "value": metro["geoid"]}
-        for _, metro in store.msas().iterrows()
+        for _, metro in datasets.msas().iterrows()
     ]
 
     precomputed_color_ranges = palettable.colorbrewer.sequential.Blues_6.hex_colors

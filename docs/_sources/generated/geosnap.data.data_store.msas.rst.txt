@@ -1,6 +1,0 @@
-geosnap.data.data\_store.msas
-=============================
-
-.. currentmodule:: geosnap.data
-
-.. automethod:: data_store.msas

@@ -1,6 +1,0 @@
-geosnap.data.Community.cluster\_spatial
-=======================================
-
-.. currentmodule:: geosnap.data
-
-.. automethod:: Community.cluster_spatial

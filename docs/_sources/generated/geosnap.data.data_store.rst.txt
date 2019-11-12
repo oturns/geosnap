@@ -1,6 +1,0 @@
-geosnap.data.data\_store
-========================
-
-.. currentmodule:: geosnap.data
-
-.. autodata:: data_store

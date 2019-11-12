@@ -1,7 +1,0 @@
-geosnap.analyze.analytics module
-================================
-
-.. automodule:: geosnap.analyze.analytics
-   :members:
-   :undoc-members:
-   :show-inheritance:

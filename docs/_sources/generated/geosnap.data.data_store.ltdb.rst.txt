@@ -1,6 +1,0 @@
-geosnap.data.data\_store.ltdb
-=============================
-
-.. currentmodule:: geosnap.data
-
-.. autoattribute:: data_store.ltdb

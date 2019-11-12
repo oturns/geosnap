@@ -1,6 +1,0 @@
-geosnap.data.Community.from\_geodataframes
-==========================================
-
-.. currentmodule:: geosnap.data
-
-.. automethod:: Community.from_geodataframes

@@ -1,6 +1,0 @@
-geosnap.data.Community.from\_census
-===================================
-
-.. currentmodule:: geosnap.data
-
-.. automethod:: Community.from_census

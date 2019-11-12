@@ -64,7 +64,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../api.html#data-module">Data Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#io-module">IO Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api.html#the-community-class">The Community Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api.html#analyze-module">Analyze Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api.html#harmonize-module">Harmonize Module</a></li>
@@ -132,7 +132,7 @@
 <span class="c1"># Sklearn a-spatial models</span>
 
 
-<div class="viewcode-block" id="ward"><a class="viewcode-back" href="../../../generated/geosnap.analyze.cluster.html#geosnap.analyze.analytics.ward">[docs]</a><span class="k">def</span> <span class="nf">ward</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="ward"><a class="viewcode-back" href="../../../generated/geosnap.analyze.analytics.ward.html#geosnap.analyze.analytics.ward">[docs]</a><span class="k">def</span> <span class="nf">ward</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Agglomerative clustering using Ward linkage.</span>
 
 <span class="sd">    Parameters</span>
@@ -154,7 +154,7 @@
     <span class="k">return</span> <span class="n">model</span></div>
 
 
-<div class="viewcode-block" id="kmeans"><a class="viewcode-back" href="../../../generated/geosnap.analyze.cluster.html#geosnap.analyze.analytics.kmeans">[docs]</a><span class="k">def</span> <span class="nf">kmeans</span><span class="p">(</span>
+<div class="viewcode-block" id="kmeans"><a class="viewcode-back" href="../../../generated/geosnap.analyze.analytics.kmeans.html#geosnap.analyze.analytics.kmeans">[docs]</a><span class="k">def</span> <span class="nf">kmeans</span><span class="p">(</span>
     <span class="n">X</span><span class="p">,</span>
     <span class="n">n_clusters</span><span class="p">,</span>
     <span class="n">init</span><span class="o">=</span><span class="s2">&quot;k-means++&quot;</span><span class="p">,</span>
@@ -214,7 +214,7 @@
     <span class="k">return</span> <span class="n">model</span></div>
 
 
-<div class="viewcode-block" id="affinity_propagation"><a class="viewcode-back" href="../../../generated/geosnap.analyze.cluster.html#geosnap.analyze.analytics.affinity_propagation">[docs]</a><span class="k">def</span> <span class="nf">affinity_propagation</span><span class="p">(</span>
+<div class="viewcode-block" id="affinity_propagation"><a class="viewcode-back" href="../../../generated/geosnap.analyze.analytics.affinity_propagation.html#geosnap.analyze.analytics.affinity_propagation">[docs]</a><span class="k">def</span> <span class="nf">affinity_propagation</span><span class="p">(</span>
     <span class="n">X</span><span class="p">,</span>
     <span class="n">damping</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
     <span class="n">preference</span><span class="o">=-</span><span class="mi">1000</span><span class="p">,</span>
@@ -263,7 +263,7 @@
     <span class="k">return</span> <span class="n">model</span></div>
 
 
-<div class="viewcode-block" id="spectral"><a class="viewcode-back" href="../../../generated/geosnap.analyze.cluster.html#geosnap.analyze.analytics.spectral">[docs]</a><span class="k">def</span> <span class="nf">spectral</span><span class="p">(</span>
+<div class="viewcode-block" id="spectral"><a class="viewcode-back" href="../../../generated/geosnap.analyze.analytics.spectral.html#geosnap.analyze.analytics.spectral">[docs]</a><span class="k">def</span> <span class="nf">spectral</span><span class="p">(</span>
     <span class="n">X</span><span class="p">,</span>
     <span class="n">n_clusters</span><span class="p">,</span>
     <span class="n">eigen_solver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -340,7 +340,7 @@
     <span class="k">return</span> <span class="n">model</span></div>
 
 
-<div class="viewcode-block" id="gaussian_mixture"><a class="viewcode-back" href="../../../generated/geosnap.analyze.cluster.html#geosnap.analyze.analytics.gaussian_mixture">[docs]</a><span class="k">def</span> <span class="nf">gaussian_mixture</span><span class="p">(</span>
+<div class="viewcode-block" id="gaussian_mixture"><a class="viewcode-back" href="../../../generated/geosnap.analyze.analytics.gaussian_mixture.html#geosnap.analyze.analytics.gaussian_mixture">[docs]</a><span class="k">def</span> <span class="nf">gaussian_mixture</span><span class="p">(</span>
     <span class="n">X</span><span class="p">,</span>
     <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
     <span class="n">covariance_type</span><span class="o">=</span><span class="s2">&quot;full&quot;</span><span class="p">,</span>
@@ -425,7 +425,7 @@
     <span class="k">return</span> <span class="n">model</span></div>
 
 
-<div class="viewcode-block" id="hdbscan"><a class="viewcode-back" href="../../../generated/geosnap.analyze.cluster.html#geosnap.analyze.analytics.hdbscan">[docs]</a><span class="k">def</span> <span class="nf">hdbscan</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">min_cluster_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">gen_min_span_tree</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="hdbscan"><a class="viewcode-back" href="../../../generated/geosnap.analyze.analytics.hdbscan.html#geosnap.analyze.analytics.hdbscan">[docs]</a><span class="k">def</span> <span class="nf">hdbscan</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">min_cluster_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">gen_min_span_tree</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Clustering with Hierarchical DBSCAN</span>
 
 <span class="sd">    Parameters</span>
@@ -459,7 +459,7 @@
 <span class="c1"># Spatially Explicit/Encouraged Methods</span>
 
 
-<div class="viewcode-block" id="ward_spatial"><a class="viewcode-back" href="../../../generated/geosnap.analyze.cluster.html#geosnap.analyze.analytics.ward_spatial">[docs]</a><span class="k">def</span> <span class="nf">ward_spatial</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="ward_spatial"><a class="viewcode-back" href="../../../generated/geosnap.analyze.analytics.ward_spatial.html#geosnap.analyze.analytics.ward_spatial">[docs]</a><span class="k">def</span> <span class="nf">ward_spatial</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Agglomerative clustering using Ward linkage with a spatial connectivity</span>
 <span class="sd">       constraint</span>
 
@@ -488,7 +488,7 @@
     <span class="k">return</span> <span class="n">model</span></div>
 
 
-<div class="viewcode-block" id="spenc"><a class="viewcode-back" href="../../../generated/geosnap.analyze.cluster.html#geosnap.analyze.analytics.spenc">[docs]</a><span class="k">def</span> <span class="nf">spenc</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="spenc"><a class="viewcode-back" href="../../../generated/geosnap.analyze.analytics.spenc.html#geosnap.analyze.analytics.spenc">[docs]</a><span class="k">def</span> <span class="nf">spenc</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Spatially encouraged spectral clustering</span>
 
 <span class="sd">    :cite:`wolf2018`</span>
@@ -519,7 +519,7 @@
     <span class="k">return</span> <span class="n">model</span></div>
 
 
-<div class="viewcode-block" id="skater"><a class="viewcode-back" href="../../../generated/geosnap.analyze.cluster.html#geosnap.analyze.analytics.skater">[docs]</a><span class="k">def</span> <span class="nf">skater</span><span class="p">(</span>
+<div class="viewcode-block" id="skater"><a class="viewcode-back" href="../../../generated/geosnap.analyze.analytics.skater.html#geosnap.analyze.analytics.skater">[docs]</a><span class="k">def</span> <span class="nf">skater</span><span class="p">(</span>
     <span class="n">X</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">floor</span><span class="o">=-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">trace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">islands</span><span class="o">=</span><span class="s2">&quot;increase&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;SKATER spatial clustering algorithm.</span>
@@ -558,7 +558,7 @@
     <span class="k">return</span> <span class="n">model</span></div>
 
 
-<div class="viewcode-block" id="azp"><a class="viewcode-back" href="../../../generated/geosnap.analyze.cluster.html#geosnap.analyze.analytics.azp">[docs]</a><span class="k">def</span> <span class="nf">azp</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="azp"><a class="viewcode-back" href="../../../generated/geosnap.analyze.analytics.azp.html#geosnap.analyze.analytics.azp">[docs]</a><span class="k">def</span> <span class="nf">azp</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;AZP clustering algorithm</span>
 
 <span class="sd">    Parameters</span>
@@ -584,7 +584,7 @@
     <span class="k">return</span> <span class="n">model</span></div>
 
 
-<div class="viewcode-block" id="max_p"><a class="viewcode-back" href="../../../generated/geosnap.analyze.cluster.html#geosnap.analyze.analytics.max_p">[docs]</a><span class="k">def</span> <span class="nf">max_p</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">threshold_variable</span><span class="o">=</span><span class="s2">&quot;count&quot;</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="max_p"><a class="viewcode-back" href="../../../generated/geosnap.analyze.analytics.max_p.html#geosnap.analyze.analytics.max_p">[docs]</a><span class="k">def</span> <span class="nf">max_p</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">threshold_variable</span><span class="o">=</span><span class="s2">&quot;count&quot;</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Max-p clustering algorithm</span>
 <span class="sd">    :cite:`Duque2012`</span>
 

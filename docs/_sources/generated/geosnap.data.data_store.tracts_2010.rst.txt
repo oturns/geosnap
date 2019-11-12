@@ -1,6 +1,0 @@
-geosnap.data.data\_store.tracts\_2010
-=====================================
-
-.. currentmodule:: geosnap.data
-
-.. automethod:: data_store.tracts_2010
