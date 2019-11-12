@@ -110,7 +110,7 @@ def harmonize(
 
     """
     if extensive_variables is None and intensive_variables is None:
-        raise (
+        raise ValueError(
             "You must pass a set of extensive and/or intensive variables to interpolate"
         )
 
