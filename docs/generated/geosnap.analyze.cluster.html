@@ -159,7 +159,8 @@ data. Defaults to StandardScaler</p>
 appended as a new column. If cluster method exists as a column on the DataFrame
 then the column will be incremented.</p>
 </dd>
-<dt><strong>model</strong><span class="classifier">ModelInstance</span></dt><dd><p>fitted cluster model</p>
+<dt><strong>model</strong><span class="classifier">named tuple</span></dt><dd><p>A tuple with attributes X, columns, labels, instance, W, which store the 
+input matrix, column labels, fitted model instance, and spatial weights matrix</p>
 </dd>
 <dt><strong>model_name</strong><span class="classifier">str</span></dt><dd><p>name of model to be stored in a Community</p>
 </dd>

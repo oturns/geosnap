@@ -121,16 +121,21 @@
 <h1>geosnap.Community.cluster_spatial<a class="headerlink" href="#geosnap-community-cluster-spatial" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
 <dt id="geosnap.Community.cluster_spatial">
-<code class="sig-prename descclassname">Community.</code><code class="sig-name descname">cluster_spatial</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">n_clusters=6</em>, <em class="sig-param">spatial_weights='rook'</em>, <em class="sig-param">method=None</em>, <em class="sig-param">best_model=False</em>, <em class="sig-param">columns=None</em>, <em class="sig-param">threshold_variable='count'</em>, <em class="sig-param">threshold=10</em>, <em class="sig-param">return_model=False</em>, <em class="sig-param">scaler=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/_community.html#Community.cluster_spatial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.Community.cluster_spatial" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">Community.</code><code class="sig-name descname">cluster_spatial</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">n_clusters=6</em>, <em class="sig-param">spatial_weights='rook'</em>, <em class="sig-param">method=None</em>, <em class="sig-param">best_model=False</em>, <em class="sig-param">columns=None</em>, <em class="sig-param">threshold_variable='count'</em>, <em class="sig-param">threshold=10</em>, <em class="sig-param">return_model=False</em>, <em class="sig-param">scaler=None</em>, <em class="sig-param">weights_kwargs=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/_community.html#Community.cluster_spatial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.Community.cluster_spatial" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a <em>spatial</em> geodemographic typology by running a cluster analysis on the metro area’s neighborhood attributes and including a contiguity constraint.</p>
-<dl class="field-list simple">
+<dl class="field-list">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
+<dd class="field-odd"><dl>
 <dt><strong>gdf</strong><span class="classifier">geopandas.GeoDataFrame</span></dt><dd><p>long-form geodataframe holding neighborhood attribute and geometry data.</p>
 </dd>
 <dt><strong>n_clusters</strong><span class="classifier">int</span></dt><dd><p>the number of clusters to model. The default is 6).</p>
 </dd>
-<dt><strong>weights_type</strong><span class="classifier">str ‘queen’ or ‘rook’</span></dt><dd><p>spatial weights matrix specification` (the default is “rook”).</p>
+<dt><strong>spatial_weights</strong><span class="classifier">str (‘queen’ or ‘rook’) or <cite>libpysal.weights</cite> instance</span></dt><dd><p>spatial weights matrix specification` (the default is “rook”). If ‘rook’ or ‘queen’
+then contiguity weights will be constructed internally, otherwise pass a
+<cite>libpysal.weights</cite> with additional arguments specified in weights_kwargs</p>
+</dd>
+<dt><strong>weights_kwargs: dict</strong></dt><dd><p>If passing a <cite>libpysal.weights</cite> instance to spatial_weights, these additional
+keyword arguments that will be passed to the weights constructor</p>
 </dd>
 <dt><strong>method</strong><span class="classifier">str</span></dt><dd><p>the clustering algorithm used to identify neighborhood types</p>
 </dd>

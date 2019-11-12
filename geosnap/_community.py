@@ -2,10 +2,9 @@
 from warnings import warn
 
 import geopandas as gpd
-import numpy as np
 import pandas as pd
 
-from ._data import datasets, _Map
+from ._data import _Map, datasets
 from .analyze import cluster as _cluster
 from .analyze import cluster_spatial as _cluster_spatial
 from .analyze import sequence as _sequence
@@ -220,8 +219,13 @@ class Community:
             long-form geodataframe holding neighborhood attribute and geometry data.
         n_clusters : int
             the number of clusters to model. The default is 6).
-        weights_type : str 'queen' or 'rook'
-            spatial weights matrix specification` (the default is "rook").
+        spatial_weights : str ('queen' or 'rook') or `libpysal.weights` instance
+            spatial weights matrix specification` (the default is "rook"). If 'rook' or 'queen'
+            then contiguity weights will be constructed internally, otherwise pass a
+            `libpysal.weights` with additional arguments specified in weights_kwargs
+        weights_kwargs: dict
+            If passing a `libpysal.weights` instance to spatial_weights, these additional
+            keyword arguments that will be passed to the weights constructor
         method : str
             the clustering algorithm used to identify neighborhood types
         best_model : type
