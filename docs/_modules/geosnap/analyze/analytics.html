@@ -363,7 +363,10 @@
         <span class="n">df</span><span class="p">[</span><span class="n">time_var</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span>
         <span class="n">df</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span> <span class="o">=</span> <span class="n">scaler</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
 
-        <span class="n">w0</span> <span class="o">=</span> <span class="n">W</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="o">**</span><span class="n">weights_kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">weights_kwargs</span><span class="p">:</span>
+            <span class="n">w0</span> <span class="o">=</span> <span class="n">W</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="o">**</span><span class="n">weights_kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">w0</span> <span class="o">=</span> <span class="n">W</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
         <span class="n">w1</span> <span class="o">=</span> <span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">ws</span> <span class="o">=</span> <span class="p">[</span><span class="n">w0</span><span class="p">,</span> <span class="n">w1</span><span class="p">]</span>
 
