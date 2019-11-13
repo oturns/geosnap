@@ -2,10 +2,9 @@
 from warnings import warn
 
 import geopandas as gpd
-import numpy as np
 import pandas as pd
 
-from ._data import datasets
+from ._data import _Map, datasets
 from .analyze import cluster as _cluster
 from .analyze import cluster_spatial as _cluster_spatial
 from .analyze import sequence as _sequence
@@ -67,7 +66,7 @@ class Community:
         """
         self.gdf = gdf
         self.harmonized = harmonized
-        self.models = {}
+        self.models = _Map()
 
     def harmonize(
         self,
@@ -209,6 +208,7 @@ class Community:
         threshold=10,
         return_model=False,
         scaler=None,
+        weights_kwargs=None,
         **kwargs,
     ):
         """Create a *spatial* geodemographic typology by running a cluster analysis on the metro area's neighborhood attributes and including a contiguity constraint.
@@ -219,8 +219,13 @@ class Community:
             long-form geodataframe holding neighborhood attribute and geometry data.
         n_clusters : int
             the number of clusters to model. The default is 6).
-        weights_type : str 'queen' or 'rook'
-            spatial weights matrix specification` (the default is "rook").
+        spatial_weights : str ('queen' or 'rook') or `libpysal.weights` instance
+            spatial weights matrix specification` (the default is "rook"). If 'rook' or 'queen'
+            then contiguity weights will be constructed internally, otherwise pass a
+            `libpysal.weights` with additional arguments specified in weights_kwargs
+        weights_kwargs: dict
+            If passing a `libpysal.weights` instance to spatial_weights, these additional
+            keyword arguments that will be passed to the weights constructor
         method : str
             the clustering algorithm used to identify neighborhood types
         best_model : type
@@ -259,6 +264,7 @@ class Community:
             threshold=threshold,
             return_model=return_model,
             scaler=scaler,
+            weights_kwargs=weights_kwargs,
             **kwargs,
         )
 
@@ -705,8 +711,11 @@ class Community:
             Community with LODES data
 
         """
-        if isinstance(years, (str, int)):
+        if isinstance(years, (str,)):
+            years = int(years)
+        if isinstance(years, (int,)):
             years = [years]
+        years = list(set(years))
 
         msa_states = []
         if msa_fips:
@@ -719,9 +728,11 @@ class Community:
         allfips = []
         for i in [state_fips, county_fips, fips, msa_states]:
             if i:
-                allfips.append(i[:2])
-        states = np.unique(allfips)
-        # states = np.unique([i[:2] for i in allfips])
+                if isinstance(i, (str,)):
+                    i = [i]
+                for each in i:
+                    allfips.append(each[:2])
+        states = list(set(allfips))
 
         if any(years) < 2010:
             gdf00 = datasets.blocks_2000(states=states)
@@ -736,6 +747,13 @@ class Community:
             .tolist()
         )
 
+        gdf = _fips_filter(
+            state_fips=state_fips,
+            county_fips=county_fips,
+            msa_fips=msa_fips,
+            fips=fips,
+            data=gdf,
+        )
         dfs = []
         if isinstance(names, str):
             names = [names]
@@ -757,16 +775,6 @@ class Community:
                     "if this produces unexpected results, try reprojecting"
                 )
             gdf = gdf[gdf.representative_point().intersects(boundary.unary_union)]
-
-        else:
-
-            gdf = _fips_filter(
-                state_fips=state_fips,
-                county_fips=county_fips,
-                msa_fips=msa_fips,
-                fips=fips,
-                data=gdf,
-            )
 
         return cls(gdf=gdf, harmonized=False)
 

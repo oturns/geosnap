@@ -121,7 +121,7 @@
 <h1>geosnap.analyze.cluster_spatial<a class="headerlink" href="#geosnap-analyze-cluster-spatial" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="geosnap.analyze.cluster_spatial">
-<code class="sig-prename descclassname">geosnap.analyze.</code><code class="sig-name descname">cluster_spatial</code><span class="sig-paren">(</span><em class="sig-param">gdf</em>, <em class="sig-param">n_clusters=6</em>, <em class="sig-param">spatial_weights='rook'</em>, <em class="sig-param">method=None</em>, <em class="sig-param">columns=None</em>, <em class="sig-param">threshold_variable='count'</em>, <em class="sig-param">threshold=10</em>, <em class="sig-param">time_var='year'</em>, <em class="sig-param">id_var='geoid'</em>, <em class="sig-param">scaler=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/analyze/analytics.html#cluster_spatial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.analyze.cluster_spatial" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">geosnap.analyze.</code><code class="sig-name descname">cluster_spatial</code><span class="sig-paren">(</span><em class="sig-param">gdf</em>, <em class="sig-param">n_clusters=6</em>, <em class="sig-param">spatial_weights='rook'</em>, <em class="sig-param">method=None</em>, <em class="sig-param">columns=None</em>, <em class="sig-param">threshold_variable='count'</em>, <em class="sig-param">threshold=10</em>, <em class="sig-param">time_var='year'</em>, <em class="sig-param">id_var='geoid'</em>, <em class="sig-param">scaler=None</em>, <em class="sig-param">weights_kwargs=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/analyze/analytics.html#cluster_spatial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.analyze.cluster_spatial" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a <em>spatial</em> geodemographic typology by running a cluster
 analysis on the metro area’s neighborhood attributes and including a
 contiguity constraint.</p>
@@ -152,6 +152,9 @@ long-form data. Default is “year”</p>
 <dt><strong>id_var: str</strong></dt><dd><p>which column on the long-form dataframe identifies the stable units
 over time. In a wide-form dataset, this would be the unique index</p>
 </dd>
+<dt><strong>weights_kwargs: dict</strong></dt><dd><p>If passing a <cite>libpysal.weights</cite> instance to spatial_weights, these additional
+keyword arguments that will be passed to the weights constructor</p>
+</dd>
 <dt><strong>scaler: str or sklearn.preprocessing.Scaler</strong></dt><dd><p>a scikit-learn preprocessing class that will be used to rescale the
 data. Defaults to StandardScaler</p>
 </dd>
@@ -163,7 +166,10 @@ data. Defaults to StandardScaler</p>
 appended as a new column. If cluster method exists as a column on the DataFrame
 then the column will be incremented.</p>
 </dd>
-<dt><strong>models</strong><span class="classifier">dict</span></dt><dd><p>dictionary of fitted cluster models keyed on the time variable</p>
+<dt><strong>models</strong><span class="classifier">dict of named tuples</span></dt><dd><p>tab-completable dictionary of named tuples keyed on the Community’s time variable
+(e.g. year). The tuples store model results and have attributes X, columns, labels,
+instance, W, which store the input matrix, column labels, fitted model instance,
+and spatial weights matrix</p>
 </dd>
 <dt><strong>model_name</strong><span class="classifier">str</span></dt><dd><p>name of model to be stored in a Community</p>
 </dd>

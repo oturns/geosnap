@@ -30,5 +30,5 @@ from . import io
 from . import util
 from . import visualize
 from . import harmonize
-from ._data import datasets
+from ._data import datasets, _Map
 from ._community import Community

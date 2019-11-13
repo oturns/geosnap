@@ -10,6 +10,7 @@ from libpysal.weights import attach_islands
 from libpysal.weights.contiguity import Queen, Rook
 from libpysal.weights.distance import KNN
 
+from .._data import _Map
 from .cluster import (
     affinity_propagation,
     azp,
@@ -76,8 +77,9 @@ def cluster(
         appended as a new column. If cluster method exists as a column on the DataFrame
         then the column will be incremented.
 
-    model : ModelInstance
-        fitted cluster model
+    model : named tuple
+        A tuple with attributes X, columns, labels, instance, W, which store the 
+        input matrix, column labels, fitted model instance, and spatial weights matrix
 
     model_name : str
         name of model to be stored in a Community
@@ -145,6 +147,7 @@ def cluster_spatial(
     time_var="year",
     id_var="geoid",
     scaler=None,
+    weights_kwargs=None,
     **kwargs,
 ):
     """Create a *spatial* geodemographic typology by running a cluster
@@ -177,6 +180,9 @@ def cluster_spatial(
     id_var: str
         which column on the long-form dataframe identifies the stable units
         over time. In a wide-form dataset, this would be the unique index
+    weights_kwargs: dict
+        If passing a `libpysal.weights` instance to spatial_weights, these additional
+        keyword arguments that will be passed to the weights constructor
     scaler: str or sklearn.preprocessing.Scaler
         a scikit-learn preprocessing class that will be used to rescale the
         data. Defaults to StandardScaler
@@ -188,8 +194,11 @@ def cluster_spatial(
         appended as a new column. If cluster method exists as a column on the DataFrame
         then the column will be incremented.
 
-    models : dict
-        dictionary of fitted cluster models keyed on the time variable
+    models : dict of named tuples
+        tab-completable dictionary of named tuples keyed on the Community's time variable
+        (e.g. year). The tuples store model results and have attributes X, columns, labels,
+        instance, W, which store the input matrix, column labels, fitted model instance,
+        and spatial weights matrix
 
     model_name : str
         name of model to be stored in a Community
@@ -229,7 +238,7 @@ def cluster_spatial(
     if not scaler:
         scaler = StandardScaler()
 
-    models = {}
+    models = _Map()
     ws = {}
     clusters = []
     gdf[model_name] = np.nan
@@ -239,7 +248,10 @@ def cluster_spatial(
         df[time_var] = time
         df[columns] = scaler.fit_transform(df[columns].values)
 
-        w0 = W.from_dataframe(df)
+        if weights_kwargs:
+            w0 = W.from_dataframe(df, **weights_kwargs)
+        else:
+            w0 = W.from_dataframe(df)
         w1 = KNN.from_dataframe(df, k=1)
         ws = [w0, w1]
 
