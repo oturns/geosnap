@@ -1,12 +1,12 @@
-<p align="center">
-<img height=200  src="docs/figs/geosnap_long.svg" alt="geosnap"/>
-</p>
-<h2 align="center" style="margin-top:-10px">The Geospatial Neighborhood Analysis Package</h2> 
-
 [![Build Status](https://travis-ci.com/spatialucr/geosnap.svg?branch=master)](https://travis-ci.com/spatialucr/geosnap)
 [![Coverage Status](https://coveralls.io/repos/github/spatialucr/geosnap/badge.svg?branch=master)](https://coveralls.io/github/spatialucr/geosnap?branch=master&service=github)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3526163.svg)](https://doi.org/10.5281/zenodo.3526163)
 
+
+<p align="center">
+<img height=200  src="docs/figs/geosnap_long.svg" alt="geosnap"/>
+</p>
+<h2 align="center" style="margin-top:-10px">The Geospatial Neighborhood Analysis Package</h2> 
 
 `geosnap` makes it easier to explore, model, analyze, and visualize the social and spatial dynamics
 of neighborhoods.
