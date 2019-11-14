@@ -1,12 +1,16 @@
-[![Build Status](https://travis-ci.com/spatialucr/geosnap.svg?branch=master)](https://travis-ci.com/spatialucr/geosnap)
-[![Coverage Status](https://coveralls.io/repos/github/spatialucr/geosnap/badge.svg?branch=master)](https://coveralls.io/github/spatialucr/geosnap?branch=master&service=github)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3526163.svg)](https://doi.org/10.5281/zenodo.3526163)
-
-
 <p align="center">
 <img height=200  src="docs/figs/geosnap_long.png" alt="geosnap"/>
 </p>
+
 <h2 align="center" style="margin-top:-10px">The Geospatial Neighborhood Analysis Package</h2> 
+
+[![Build Status](https://travis-ci.com/spatialucr/geosnap.svg?branch=master)](https://travis-ci.com/spatialucr/geosnap)
+[![Coverage Status](https://coveralls.io/repos/github/spatialucr/geosnap/badge.svg?branch=master)](https://coveralls.io/github/spatialucr/geosnap?branch=master&service=github)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/geosnap)
+![PyPI](https://img.shields.io/pypi/v/geosnap)
+![Conda (channel only)](https://img.shields.io/conda/vn/conda-forge/geosnap)
+![GitHub commits since latest release (branch)](https://img.shields.io/github/commits-since/spatialucr/geosnap/latest)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3526163.svg)](https://doi.org/10.5281/zenodo.3526163)
 
 `geosnap` makes it easier to explore, model, analyze, and visualize the social and spatial dynamics
 of neighborhoods.
