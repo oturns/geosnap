@@ -274,25 +274,6 @@ By default, the dashboard will launch with built-in census data, but if you've s
 
 Many more visualization features coming soon
 
-## Architecture
-
-Most interaction in geosnap happens with a `Community`, and almost all of geosnap's functionality is available as a method on a `Community` object. But when you need to use other fetures, like access data or launch an interactive visuzalization, you may need to access functions in one of geosnap's submodules.
-
-##### `geosnap` has five modules:
-
-- **`datasets`**:   Access built-in datasets, including 30 years of census data for the USA,  and databases stored with functions from the `io` module
-
-- **`io`**:  Ingest, create, and manipulate space-time datasets
-
-- **`analyze`**:  Analyze and model neighborhood boundaries and spatio-temporal dynamics
-
-- **`harmonize`**:  Harmonize neighborhood boundaries into consistent, stable units using spatial statistical
-methods
-
-- **`visualize`**:  Visualize neighborhood dynamics
-
-*You can learn more about the functionality in each module by browsing the
-[User Guide](https://spatialucr.github.io/geosnap-guide/notebooks/03_harmonizing_community_boundaries.html)*
 
 ## Installation
 
