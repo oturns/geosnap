@@ -144,7 +144,7 @@
 
 <span class="k">class</span> <span class="nc">_Map</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    tabbable dict</span>
+<span class="sd">    tabbable dict.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -273,7 +273,7 @@
 
         <span class="k">return</span> <span class="n">atts</span>
 
-    <span class="k">def</span> <span class="nf">blocks_2000</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">states</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">convert</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">blocks_2000</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">states</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">convert</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fips</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Census blocks for 2000.</span>
 
 <span class="sd">        Parameters</span>
@@ -318,7 +318,10 @@
             <span class="n">states</span> <span class="o">=</span> <span class="p">[</span><span class="n">states</span><span class="p">]</span>
         <span class="n">blks</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">states</span><span class="p">:</span>
-            <span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">=</span> <span class="n">blocks_2000</span><span class="p">[</span><span class="s2">&quot;</span><span class="si">{state}</span><span class="s2">.parquet&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">)]()</span>
+            <span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">=</span> <span class="n">blocks_2000</span><span class="p">[</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{state}</span><span class="s2">.parquet&quot;</span><span class="p">]()</span>
+            <span class="k">if</span> <span class="n">fips</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">fips</span><span class="p">)</span>
+                <span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">=</span> <span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">][</span><span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">][</span><span class="s2">&quot;geoid&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">fips</span><span class="p">)]</span>
             <span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">][</span><span class="s2">&quot;year&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2000</span>
         <span class="n">blocks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">blks</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
         <span class="n">blocks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">blocks</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -326,7 +329,7 @@
             <span class="k">return</span> <span class="n">_convert_gdf</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">blocks</span>
 
-    <span class="k">def</span> <span class="nf">blocks_2010</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">states</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">convert</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">blocks_2010</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">states</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">convert</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fips</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Census blocks for 2010.</span>
 
 <span class="sd">        Parameters</span>
@@ -370,7 +373,10 @@
             <span class="n">states</span> <span class="o">=</span> <span class="p">[</span><span class="n">states</span><span class="p">]</span>
         <span class="n">blks</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">states</span><span class="p">:</span>
-            <span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">=</span> <span class="n">blocks_2010</span><span class="p">[</span><span class="s2">&quot;</span><span class="si">{state}</span><span class="s2">.parquet&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">)]()</span>
+            <span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">=</span> <span class="n">blocks_2010</span><span class="p">[</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{state}</span><span class="s2">.parquet&quot;</span><span class="p">]()</span>
+            <span class="k">if</span> <span class="n">fips</span><span class="p">:</span>
+                <span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">=</span> <span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">][</span><span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">][</span><span class="s2">&quot;geoid&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">fips</span><span class="p">)]</span>
+
             <span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">][</span><span class="s2">&quot;year&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2010</span>
         <span class="n">blocks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">blks</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
         <span class="n">blocks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">blocks</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>

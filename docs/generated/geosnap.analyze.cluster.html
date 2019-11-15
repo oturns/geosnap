@@ -123,10 +123,7 @@
 <dl class="function">
 <dt id="geosnap.analyze.cluster">
 <code class="sig-prename descclassname">geosnap.analyze.</code><code class="sig-name descname">cluster</code><span class="sig-paren">(</span><em class="sig-param">gdf</em>, <em class="sig-param">n_clusters=6</em>, <em class="sig-param">method=None</em>, <em class="sig-param">best_model=False</em>, <em class="sig-param">columns=None</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">time_var='year'</em>, <em class="sig-param">id_var='geoid'</em>, <em class="sig-param">scaler=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/analyze/analytics.html#cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.analyze.cluster" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>Create a geodemographic typology by running a cluster analysis on the</dt><dd><p>study area’s neighborhood attributes</p>
-</dd>
-</dl>
+<dd><p>Create a geodemographic typology by running a cluster analysis on the study area’s neighborhood attributes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
@@ -160,7 +157,7 @@ data. Defaults to StandardScaler</p>
 appended as a new column. If cluster method exists as a column on the DataFrame
 then the column will be incremented.</p>
 </dd>
-<dt><strong>model</strong><span class="classifier">named tuple</span></dt><dd><p>A tuple with attributes X, columns, labels, instance, W, which store the 
+<dt><strong>model</strong><span class="classifier">named tuple</span></dt><dd><p>A tuple with attributes X, columns, labels, instance, W, which store the
 input matrix, column labels, fitted model instance, and spatial weights matrix</p>
 </dd>
 <dt><strong>model_name</strong><span class="classifier">str</span></dt><dd><p>name of model to be stored in a Community</p>

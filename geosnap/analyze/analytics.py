@@ -42,8 +42,7 @@ def cluster(
     scaler=None,
     **kwargs,
 ):
-    """Create a geodemographic typology by running a cluster analysis on the
-       study area's neighborhood attributes
+    """Create a geodemographic typology by running a cluster analysis on the study area's neighborhood attributes.
 
     Parameters
     ----------
@@ -78,11 +77,12 @@ def cluster(
         then the column will be incremented.
 
     model : named tuple
-        A tuple with attributes X, columns, labels, instance, W, which store the 
+        A tuple with attributes X, columns, labels, instance, W, which store the
         input matrix, column labels, fitted model instance, and spatial weights matrix
 
     model_name : str
         name of model to be stored in a Community
+
     """
     # if we already have a column named after the clustering method, then increment it.
     if method in gdf.columns.tolist():

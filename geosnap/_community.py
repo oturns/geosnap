@@ -76,7 +76,7 @@ class Community:
         intensive_variables=None,
         allocate_total=True,
         raster="nlcd_2011",
-        codes=[21, 22, 23, 24],
+        codes="developed",
         force_crs_match=True,
     ):
         """Standardize inconsistent boundaries into time-static ones.
@@ -109,8 +109,8 @@ class Community:
             path to the raster image that has the types of each pixel in the
             spatial context. Only taken into consideration for harmonization
             raster based.
-        codes : list
-            pixel values that should be included in the regression (the default is [21, 22, 23, 24]).
+        codes : list of ints
+            pixel values that should be included in the regression (the default "developed" includes [21, 22, 23, 24]).
         force_crs_match : bool
             whether source and target dataframes should be reprojected to match (the default is True).
 
@@ -122,7 +122,8 @@ class Community:
         """
         # convert the long-form into a list of dataframes
         # data = [x[1] for x in self.gdf.groupby("year")]
-
+        if codes == "developed":
+            codes = [21, 22, 23, 24]
         gdf = _harmonize(
             self.gdf,
             target_year=target_year,
@@ -408,7 +409,7 @@ class Community:
         msa_fips=None,
         fips=None,
         boundary=None,
-        years=[1970, 1980, 1990, 2000, 2010],
+        years="all",
     ):
         """Create a new Community from LTDB data.
 
@@ -439,9 +440,9 @@ class Community:
             This will be used to clip tracts lazily by selecting all
             `GeoDataFrame.representative_point()`s that intersect the
             boundary gdf
-        years : list
+        years : list of ints
             list of years (decades) to include in the study data
-            (the default is [1970, 1980, 1990, 2000, 2010]).
+            (the default "all" is [1970, 1980, 1990, 2000, 2010]).
 
         Returns
         -------
@@ -450,6 +451,8 @@ class Community:
 
 
         """
+        if years == "all":
+            years = [1970, 1980, 1990, 2000, 2010]
         if isinstance(boundary, gpd.GeoDataFrame):
             tracts = datasets.tracts_2010()[["geoid", "geometry"]]
             ltdb = datasets.ltdb.reset_index()
@@ -484,7 +487,7 @@ class Community:
         msa_fips=None,
         fips=None,
         boundary=None,
-        years=[1970, 1980, 1990, 2000, 2010],
+        years="all",
     ):
         """Create a new Community from NCDB data.
 
@@ -515,9 +518,9 @@ class Community:
             This will be used to clip tracts lazily by selecting all
             `GeoDataFrame.representative_point()`s that intersect the
             boundary gdf
-        years : list
+        years : list of ints
             list of years (decades) to include in the study data
-            (the default is [1970, 1980, 1990, 2000, 2010]).
+            (the default is all available [1970, 1980, 1990, 2000, 2010]).
 
         Returns
         -------
@@ -525,6 +528,8 @@ class Community:
             Community with NCDB data
 
         """
+        if years == "all":
+            years = [1970, 1980, 1990, 2000, 2010]
         if isinstance(boundary, gpd.GeoDataFrame):
             tracts = datasets.tracts_2010()[["geoid", "geometry"]]
             ncdb = datasets.ncdb.reset_index()
@@ -559,7 +564,7 @@ class Community:
         msa_fips=None,
         fips=None,
         boundary=None,
-        years=[1990, 2000, 2010],
+        years="all",
     ):
         """Create a new Community from original vintage US Census data.
 
@@ -590,7 +595,7 @@ class Community:
             This will be used to clip tracts lazily by selecting all
             `GeoDataFrame.representative_point()`s that intersect the
             boundary gdf
-        years : list
+        years : list of ints
             list of years to include in the study data
             (the default is [1990, 2000, 2010]).
 
@@ -600,6 +605,8 @@ class Community:
             Community with unharmonized census data
 
         """
+        if years == "all":
+            years = [1990, 2000, 2010]
         if isinstance(years, (str, int)):
             years = [years]
 
@@ -697,13 +704,13 @@ class Community:
             This will be used to clip tracts lazily by selecting all
             `GeoDataFrame.representative_point()`s that intersect the
             boundary gdf
-        years : list
+        years : list of ints
             list of years to include in the study data
-            (the default is [1990, 2000, 2010]).
+            (the default is 2015).
         dataset: str
             which LODES dataset should be used to create the Community.
             Options are 'wac' for workplace area characteristics or 'rac' for
-            residence area characteristics.
+            residence area characteristics. The default is workplace.
 
         Returns
         -------
@@ -717,27 +724,30 @@ class Community:
             years = [years]
         years = list(set(years))
 
-        msa_states = []
         if msa_fips:
-            msa_states += datasets.msa_definitions[
+            msa_counties = datasets.msa_definitions[
                 datasets.msa_definitions["CBSA Code"] == msa_fips
             ]["stcofips"].tolist()
-        msa_states = [i[:2] for i in msa_states]
+
+        else:
+            msa_counties = None
 
         # build a list of states in the dataset
         allfips = []
-        for i in [state_fips, county_fips, fips, msa_states]:
+        stateset = []
+        for i in [state_fips, county_fips, msa_counties, fips]:
             if i:
                 if isinstance(i, (str,)):
                     i = [i]
                 for each in i:
-                    allfips.append(each[:2])
-        states = list(set(allfips))
+                    allfips.append(each)
+                    stateset.append(each[:2])
+            states = list(set(stateset))
 
-        if any(years) < 2010:
-            gdf00 = datasets.blocks_2000(states=states)
+        if any(year < 2010 for year in years):
+            gdf00 = datasets.blocks_2000(states=states, fips=(tuple(allfips)))
             gdf00 = gdf00.drop(columns=["year"])
-        gdf = datasets.blocks_2010(states=states)
+        gdf = datasets.blocks_2010(states=states, fips=(tuple(allfips)))
         gdf = gdf.drop(columns=["year"])
 
         # grab state abbreviations
