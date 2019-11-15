@@ -28,7 +28,7 @@ except ImportError:
 
 class _Map(dict):
     """
-    tabbable dict
+    tabbable dict.
     """
 
     def __init__(self, *args, **kwargs):
