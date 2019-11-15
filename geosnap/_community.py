@@ -717,27 +717,27 @@ class Community:
             years = [years]
         years = list(set(years))
 
-        msa_states = []
         if msa_fips:
-            msa_states += datasets.msa_definitions[
+            msa_counties = datasets.msa_definitions[
                 datasets.msa_definitions["CBSA Code"] == msa_fips
             ]["stcofips"].tolist()
-        msa_states = [i[:2] for i in msa_states]
 
         # build a list of states in the dataset
         allfips = []
-        for i in [state_fips, county_fips, fips, msa_states]:
+        stateset = []
+        for i in [state_fips, county_fips, msa_counties, fips]:
             if i:
                 if isinstance(i, (str,)):
                     i = [i]
                 for each in i:
-                    allfips.append(each[:2])
-        states = list(set(allfips))
+                    allfips.append(each)
+                    stateset.append(each[:2])
+            states = list(set(stateset))
 
-        if any(years) < 2010:
-            gdf00 = datasets.blocks_2000(states=states)
+        if any(year < 2010 for year in years):
+            gdf00 = datasets.blocks_2000(states=states, fips=(tuple(allfips)))
             gdf00 = gdf00.drop(columns=["year"])
-        gdf = datasets.blocks_2010(states=states)
+        gdf = datasets.blocks_2010(states=states, fips=(tuple(allfips)))
         gdf = gdf.drop(columns=["year"])
 
         # grab state abbreviations

@@ -157,7 +157,7 @@ class DataStore(object):
 
         return atts
 
-    def blocks_2000(self, states=None, convert=True):
+    def blocks_2000(self, states=None, convert=True, fips=None):
         """Census blocks for 2000.
 
         Parameters
@@ -202,7 +202,10 @@ class DataStore(object):
             states = [states]
         blks = {}
         for state in states:
-            blks[state] = blocks_2000["{state}.parquet".format(state=state)]()
+            blks[state] = blocks_2000[f"{state}.parquet"]()
+            if fips:
+                print(fips)
+                blks[state] = blks[state][blks[state]["geoid"].str.startswith(fips)]
             blks[state]["year"] = 2000
         blocks = list(blks.values())
         blocks = pd.concat(blocks, sort=True)
@@ -210,7 +213,7 @@ class DataStore(object):
             return _convert_gdf(blocks)
         return blocks
 
-    def blocks_2010(self, states=None, convert=True):
+    def blocks_2010(self, states=None, convert=True, fips=None):
         """Census blocks for 2010.
 
         Parameters
@@ -254,7 +257,10 @@ class DataStore(object):
             states = [states]
         blks = {}
         for state in states:
-            blks[state] = blocks_2010["{state}.parquet".format(state=state)]()
+            blks[state] = blocks_2010[f"{state}.parquet"]()
+            if fips:
+                blks[state] = blks[state][blks[state]["geoid"].str.startswith(fips)]
+
             blks[state]["year"] = 2010
         blocks = list(blks.values())
         blocks = pd.concat(blocks, sort=True)
