@@ -722,6 +722,9 @@ class Community:
                 datasets.msa_definitions["CBSA Code"] == msa_fips
             ]["stcofips"].tolist()
 
+        else:
+            msa_counties = None
+
         # build a list of states in the dataset
         allfips = []
         stateset = []
