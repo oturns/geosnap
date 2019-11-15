@@ -122,7 +122,7 @@
 <h1>geosnap.Community.from_census<a class="headerlink" href="#geosnap-community-from-census" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
 <dt id="geosnap.Community.from_census">
-<em class="property">classmethod </em><code class="sig-prename descclassname">Community.</code><code class="sig-name descname">from_census</code><span class="sig-paren">(</span><em class="sig-param">state_fips=None, county_fips=None, msa_fips=None, fips=None, boundary=None, years=[1990, 2000, 2010]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/_community.html#Community.from_census"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.Community.from_census" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-prename descclassname">Community.</code><code class="sig-name descname">from_census</code><span class="sig-paren">(</span><em class="sig-param">state_fips=None</em>, <em class="sig-param">county_fips=None</em>, <em class="sig-param">msa_fips=None</em>, <em class="sig-param">fips=None</em>, <em class="sig-param">boundary=None</em>, <em class="sig-param">years='all'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/_community.html#Community.from_census"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.Community.from_census" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new Community from original vintage US Census data.</p>
 <blockquote>
 <div><p>Instiantiate a new Community from . To use
@@ -153,7 +153,7 @@ This will be used to clip tracts lazily by selecting all
 <a href="#id1"><span class="problematic" id="id2">`</span></a>GeoDataFrame.representative_point()`s that intersect the
 boundary gdf</p>
 </dd>
-<dt><strong>years</strong><span class="classifier">list</span></dt><dd><p>list of years to include in the study data
+<dt><strong>years</strong><span class="classifier">list of ints</span></dt><dd><p>list of years to include in the study data
 (the default is [1990, 2000, 2010]).</p>
 </dd>
 </dl>
