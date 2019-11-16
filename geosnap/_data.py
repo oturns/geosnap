@@ -5,11 +5,10 @@ import os
 import pathlib
 from warnings import warn
 
-from appdirs import user_data_dir
-
 import geopandas as gpd
 import pandas as pd
 import quilt3
+from appdirs import user_data_dir
 from requests.exceptions import Timeout
 from shapely import wkb, wkt
 
@@ -27,9 +26,7 @@ except ImportError:
 
 
 class _Map(dict):
-    """
-    tabbable dict.
-    """
+    """tabbable dict."""
 
     def __init__(self, *args, **kwargs):
         super(_Map, self).__init__(*args, **kwargs)
@@ -106,8 +103,14 @@ def _convert_gdf(df):
     return df
 
 
-class DataStore(object):
-    """Storage for geosnap data. Currently supports US Census data."""
+class DataStore:
+    """Storage for geosnap data. Currently supports US Census data.
+
+        Unless otherwise noted, data are collected from the U.S. Census Bureau's TIGER/LINE Files
+        https://www.census.gov/cgi-bin/geo/shapefiles/index.php?year=2018 and converted to
+        parquet files.
+
+    """
 
     def __init__(self):
         """Instantiate a new DataStore object."""
@@ -349,6 +352,9 @@ class DataStore(object):
     def msas(self, convert=True):
         """Metropolitan Statistical Areas as drawn in 2010.
 
+        Data come from the U.S. Census Bureau's most recent TIGER/LINE files
+        https://www.census.gov/cgi-bin/geo/shapefiles/index.php?year=2018&layergroup=Core+Based+Statistical+Areas
+
         Parameters
         ----------
         convert : bool
@@ -406,6 +412,9 @@ class DataStore(object):
     @property
     def msa_definitions(self):
         """2010 Metropolitan Statistical Area definitions.
+
+        Data come from the U.S. Census Bureau's most recent delineation files, available at
+        https://www.census.gov/geographies/reference-files/time-series/demo/metro-micro/delineation-files.html
 
         Returns
         -------
