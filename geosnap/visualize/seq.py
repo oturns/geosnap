@@ -21,6 +21,7 @@ def indexplot_seq(df_traj, clustering,
     """
     Function for index plot of neighborhood sequences within each cluster.
     Arguments
+
     ---------
     df_traj      : dataframe
                    dataframe of trajectories
@@ -43,6 +44,7 @@ def indexplot_seq(df_traj, clustering,
                    whether to save figure. Default is False.
     fig_suffix   : str, optional
                    suffix of the saved figure name. Default is "LA".
+
     Examples
     --------
     >>> import pandas as pd
@@ -125,3 +127,4 @@ def indexplot_seq(df_traj, clustering,
             mkdir(dirName)
         fig.savefig(dirName+"/%s_%s.png" % (clustering,fig_suffix),
                     dpi=500, bbox_inches='tight')
+        
