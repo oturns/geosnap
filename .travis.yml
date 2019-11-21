@@ -35,6 +35,7 @@ before_install:
 install:
   - pip install -e . --no-deps --force-reinstall
 
+
 script:
   - if [[ $TRAVIS_JOB_NAME == python-* ]]; then
       python -c "from tobler.data import store_rasters; store_rasters()"; 
