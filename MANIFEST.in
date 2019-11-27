@@ -1,3 +1,2 @@
-include geosnap/io/variables.csv geosnap/io/lodes.csv geosnap/io/stfipstable.csv
-
-
+include requirements*
+include io/*.csv
