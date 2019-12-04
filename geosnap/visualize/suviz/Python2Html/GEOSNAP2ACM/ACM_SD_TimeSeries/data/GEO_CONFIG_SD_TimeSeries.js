@@ -17,7 +17,7 @@ var Scatter_Plot = false;
 var Parallel_Coordinates_Plot = true;
 
 // The number of digit after the decial point.
-var Num_Of_Decimal_Places = 4;                             // default = 1 
+var Num_Of_Decimal_Places = 2;                             // default = 1 
 
 //Adjust the size of maps
 var Map_width  = "500px";                                  // min 350px
