@@ -50,9 +50,9 @@ def write_INDEX_html(param):
 	
 	#Replace variables based on the user's selection in each of four files below.
 	contents = contents.replace("Adaptive Choropleth Mapper", param['title'])
-	contents = contents.replace("GEO_CONFIG.js", "data/GEO_CONFIG_"+param['filename_suffix']+".js")
-	contents = contents.replace("GEO_JSON.js", "data/GEO_JSON_"+param['filename_suffix']+".js")
-	contents = contents.replace("GEO_VARIABLES.js", "data/GEO_VARIABLES_"+param['filename_suffix']+".js")
+	contents = contents.replace("data/GEO_CONFIG.js", "data/GEO_CONFIG_"+param['filename_suffix']+".js")
+	contents = contents.replace("data/GEO_JSON.js", "data/GEO_JSON_"+param['filename_suffix']+".js")
+	contents = contents.replace("data/GEO_VARIABLES.js", "data/GEO_VARIABLES_"+param['filename_suffix']+".js")
 	
 	#write new outfiles: GEO_CONFIG.js GEO_JSON.js VARIABLES.js
 	ofile = open(oDir+"/index.html", "w")

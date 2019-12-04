@@ -4,9 +4,9 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<title>Adaptive Choropleth Mapper</title>
 
-	<script src="GEO_CONFIG.js"></script>
-	<script src="GEO_JSON.js"></script>
-	<script src="GEO_VARIABLES.js"></script>
+	<script src="data/GEO_CONFIG.js"></script>
+	<script src="data/GEO_JSON.js"></script>
+	<script src="data/GEO_VARIABLES.js"></script>
 	
 	<script src="http://sarasen.asuscomm.com:8070/Adaptive_Choropleth_Mapper_v4/lib/plotly v1.48.3/plotly.min.js"></script>
 	<script src="http://sarasen.asuscomm.com:8070/Adaptive_Choropleth_Mapper_v4/lib/pyextjs-0.1.2/package/dist/ss.js"></script>
@@ -1263,9 +1263,11 @@ function ACSdata_render(mIDX) {
 			initializeLassoButtons(mIDX);
 			app[mIDX].lasso.remove();
 		}
-		app[mIDX].lasso = L.control.lasso({intersect: true,  position: 'topleft'}).addTo(map);
-		//app[mIDX].lasso = L.control.lasso({position: 'topleft'}).addTo(map);
-		$("#"+mIDX+" .leaflet-control-lasso").css('background-color', RGBwhite);
+		if (app.ScatterPlot == true || app.ParallelCoordinatesPlot == true) {
+			app[mIDX].lasso = L.control.lasso({intersect: true,  position: 'topleft'}).addTo(map);
+			//app[mIDX].lasso = L.control.lasso({position: 'topleft'}).addTo(map);
+			$("#"+mIDX+" .leaflet-control-lasso").css('background-color', RGBwhite);
+		}
 		// -- or --
 		//if (!$("#"+mIDX+" .leaflet-control-lasso").attr("title")) {				// if lasso button not existed
 		//	app[mIDX].lasso = L.control.lasso({intersect: true,  position: 'topleft'}).addTo(map);
@@ -1293,7 +1295,8 @@ function ACSdata_render(mIDX) {
 			if (GorL == "Local")  c = '<span> )</span>' + cm + '<span> &nbsp; (G: </span>' + cz + '<span> L: </span>';
 			this._div.innerHTML = '<h4></h4>' +  (props ?
 				'<b> ' + ((typeof v === 'number') ? v.toFixed(app.NumOfDecimalPlaces) : v) + '</b> &nbsp; ' + c + '<br/>'
-				+ ((app.geoname != "") ? app.geoname+' : '+props[app.geoname] : app.geokey+' : '+props[app.geokey])
+				+ ((app.geoname != "") ? app.geoname+' : '+props[app.geoname]+'<br/>' : '')
+				+ app.geokey+' : '+props[app.geokey]
 				: 'Hover over an area');
 		};
 		app[mIDX].info.addTo(map);
@@ -2135,6 +2138,7 @@ function fadeOutWindow(mIDX) {
 
 
 function mapOn_lasso_event_set() {
+	if (app.ScatterPlot == false && app.ParallelCoordinatesPlot == false) return;
 	j = null;
 	for (i=0; i<app.m; i++) {
 		var mIDX = "map" + i;

@@ -1,4 +1,4 @@
-2019-10-23 09:43:37
+2019-12-04 12:56:27
   {'Maps_of_neighborhood': True,
    'Parallel_Categories_Diagram_in_neighborhoods': True,
    'Sequence': {'dist_type': 'tran', 'seq_clusters': 5},
@@ -8,7 +8,8 @@
    'msa_fips': '41740',
    'nClusters': 8,
    'state_fips': None,
-   'title': 'Neighborhood Analysis: Kmeans, San Diego',
+   'title': 'Neighborhood Analysis: Kmeans with Parallel Categories Diagram, San '
+            'Diego',
    'variables': ['p_nonhisp_white_persons',
                  'p_nonhisp_black_persons',
                  'p_hispanic_persons',

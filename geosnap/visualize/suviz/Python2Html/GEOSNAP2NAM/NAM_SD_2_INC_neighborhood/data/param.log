@@ -1,4 +1,4 @@
-2019-10-23 09:39:39
+2019-12-04 12:55:27
   {'Distribution_INC1': True,
    'Distribution_INC2_different_cluster': True,
    'Distribution_INC2_different_period': True,
@@ -11,7 +11,8 @@
    'msa_fips': '41740',
    'nClusters': 8,
    'state_fips': None,
-   'title': 'Neighborhood Analysis: Kmeans, San Diego',
+   'title': 'Neighborhood Analysis: Kmeans with Index of Neighborhood Change, '
+            'San Diego',
    'variables': ['p_nonhisp_white_persons',
                  'p_nonhisp_black_persons',
                  'p_hispanic_persons',

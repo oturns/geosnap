@@ -7,6 +7,7 @@ var InitialLayers = ["INC", "1980", "1990", "2000", "2010"];
 //var Initial_map_zoom_level = 8;   
 
 
+var allMetros = false;                                      //choropleth map: Maps representing INC of all metros
 var Index_of_neighborhood_change = true;					//choropleth map: Maps representing index of neighborhood Change
 var Maps_of_neighborhood = true;							//choropleth map: Maps representing clustering result  
 var Distribution_INC1 = true;								//density chart: INC changes as the map extent changes 
