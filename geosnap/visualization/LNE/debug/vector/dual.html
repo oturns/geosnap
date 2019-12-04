@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Leaflet Sync Demo</title>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+
+    <style type="text/css">
+        html, body { width: 100%; height: 100%; margin: 0; }
+        #map1, #map2 { width: 49.5%; height: 100%; }
+        #map1 { float: left; }
+        #map2 { float: right; }
+		#input_area_left {
+			width: 50.5%;
+			height:100px;
+			background-color:blue;
+			float: left;
+		}
+		#input_area_right {
+			width: 49.5%;
+			height:100px;
+			background-color:green;
+			float: right; 
+		}
+		.info {
+			padding: 6px 8px;
+			font: 14px/16px Arial, Helvetica, sans-serif;
+			background: white;
+			background: rgba(255,255,255,0.8);
+			box-shadow: 0 0 15px rgba(0,0,0,0.2);
+			border-radius: 5px;
+		}
+		.info h4 {
+			margin: 0 0 5px;
+			color: #777;
+		}
+
+		.legend {
+			text-align: left;
+			line-height: 18px;
+			color: #555;
+		}
+		.legend i {
+			width: 18px;
+			height:15px;
+			float: left;
+			margin-right: 8px;
+			opacity: 0.7;
+		}		
+    </style>
+</head>
+
+<body>
+
+
+	<div id="input_area_left"></div>
+	<div id="input_area_right"></div>
+
+    <div id="map1"></div>
+		
+		
+    <div id="map2"></div>
+		
+
+	
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet-src.js"></script>
+    <script src="../L.Map.Sync.js"></script>
+
+    <script type="text/javascript">
+         var center = [33.0, -116.9]; //
+
+        var stamenOptions = {
+            attribution:
+                'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ' +
+                '<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; ' +
+                'Map data OpenStreetmap',
+            subdomains: 'abcd',
+            minZoom: 0,
+            maxZoom: 20
+        };		 
+		 
+        var layer1 = L.tileLayer('http://{s}.tile.stamen.com/toner-lite/{z}/{x}/{y}.png', stamenOptions);
+
+        var layer2 = L.tileLayer('http://{s}.tile.stamen.com/toner-lite/{z}/{x}/{y}.png', stamenOptions);
+
+        var map1 = L.map('map1', {
+            layers: [layer1],
+            center: center,
+            zoom: 9
+        });
+
+        map1.attributionControl.setPrefix('');
+
+        var map2 = L.map('map2', {
+            layers: [layer2],
+            center: center,
+            zoom: 9,
+            zoomControl: false
+        });
+
+        map1.sync(map2);
+        map2.sync(map1);
+
+    </script>
+</body>
+</html>

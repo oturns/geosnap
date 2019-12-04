@@ -1,0 +1,87 @@
+// Longitudinal Neighborhood Analysis Selected Variable List
+// Format
+//     column 1 : 1 if selected
+//     column 2 : groupid + '-' + sequential number
+//     column 3 : code
+//     column 4 : // comment
+// Group 1
+1	1-01 nhwhtXX        // % white, non-Hispanic
+0	1-02 nhblkXX        // % black, non-Hispanic
+0	1-03 hispXX         // % black, non-Hispanic
+0	1-04 ntvXX          // % Native American race
+0	1-05 asianXX        // % Asian and Pacific Islander race
+0	1-06 hawXX          // % Hawaiian race
+0	1-07 indiaXX        // % Indian birth/race
+0	1-08 chinaXX        // % Chinese birth/race
+0	1-09 filipXX        // % Filipino birth/race
+0	1-10 japanXX        // % Japanese birth/race
+0	1-11 koreaXX        // % Korean birth/race
+0	1-12 vietXX         // % Vietnamese race
+0	1-13 a15whtXX       // % 15 and under, non-Hispanic white
+0	1-14 a60whtXX       // % 60 and older, non-Hispanic white
+0	1-15 a15blkXX       // % 15 and under, non-Hispanic black
+1	1-16 a60blkXX       // % 60 and older, non-Hispanic black
+0	1-17 a15hspXX       // % 15 and under, Hispanic
+0	1-18 a60hspXX       // % 60 and older, Hispanic
+0	1-19 a15ntvXX       // % 15 and under, Native American
+0	1-20 a60ntvXX       // % 60 and older, Native American
+0	1-21 a15asnXX       // % 15 and under, Asian/  Pacific Islanders
+0	1-22 a60asnXX       // % 60 and older, Asian/  Pacific Islanders
+// Group 2
+0	2-01 mexXX          // % Mexican birth/ethnicity
+0	2-02 cubanXX        // % Cuban birth/ethnicity
+0	2-03 prXX           // % Puerto Rican birth/ethnicity
+0	2-04 ruancXX        // % Russian/USSR parentage/ancestry
+0	2-05 itancXX        // % Italian parentage/ancestry
+0	2-06 geancXX        // % German parentage/ancestry
+0	2-07 irancXX        // % Irish parentage/ancestry
+0	2-08 scancXX        // % Scandinavian parentage/ancestry
+0	2-09 fbXX           // % foreign born
+0	2-10 n10immXX       // % immigrated in past 10 years
+0	2-11 natXX          // % Naturalized
+0	2-12 olangXX        // % speaking other language at home, age 5+
+0	2-13 lepXX          // % speaking English not well, age 5+
+0	2-14 rufbXX         // % Russian/USSR birth
+0	2-15 itfbXX         // % Italian birth
+0	2-16 gefbXX         // % German birth
+0	2-17 irfbXX         // % Irish birth
+0	2-18 scfbXX         // % Scandinavian birth
+// Group 3
+0	3-01 hsXX           // % with high school degree or less
+0	3-02 colXX          // % with 4-year college degree or more
+0	3-03 unempXX        // % unemployed
+0	3-04 flabfXX        // % female labor force participation
+0	3-05 profXX         // % professional employees
+0	3-06 manufXX        // % manufacturing employees
+0	3-07 sempXX         // % self-employed
+0	3-08 vetXX          // % veteran
+0	3-09 disXX          // % with disability
+1	3-10 hincXX         // Median HH income, total
+0	3-11 hincwXX        // Median HH income, whites
+0	3-12 hincbXX        // Median HH income, blacks
+0	3-13 hinchXX        // Median HH income, Hispanics
+0	3-14 hincaXX        // Median HH income, Asian/ Pacific Islanders
+0	3-15 incpcXX        // Per capita income
+0	3-16 npovXX         // % in poverty, total
+0	3-17 n65povXX       // % in poverty, 65+
+0	3-18 nfmpovXX       // % in poverty, families with children
+0	3-19 nwpovXX        // % in poverty, whites
+0	3-20 nbpovXX        // % in poverty, African Americans
+0	3-21 nhpovXX        // % in poverty, Hispanics
+0	3-22 nnapovXX       // % in poverty, Native Americans
+0	3-23 napovXX        // % in poverty, Asian/ Pacific Islanders
+// Group 4
+0	4-01 vacXX          // % vacant units
+0	4-02 ownXX          // % owner-occupied units
+0	4-03 multiXX        // % multi-family units
+0	4-04 mhmvalXX       // Median home value
+0	4-05 mrentXX        // Median rent
+0	4-06 h30oldXX       // % structures more than 30 years old
+0	4-07 h10yrsXX       // % HH in neighborhood 10 years or less
+0	4-08 a18undXX       // % 17 and under, total
+0	4-09 a60upXX        // % 60 and older, total
+0	4-10 a75upXX        // % 75 and older, total
+0	4-11 marXX          // % currently married, not separated
+0	4-12 wdsXX          // % widowed, divorced and separated
+0	4-13 familyXX       // 
+0	4-14 fhhXX          // % female-headed families with children

@@ -1,0 +1,75 @@
+<!DOCTYPE html> 
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<title>Adaptive Choropleth Mapper</title>
+	
+	<script src="GEO_CONFIG.js"></script>
+	<script src="GEO_JSON.js"></script>
+	<script src="GEO_VARIABLES.js"></script>
+	
+	<script src="http://sarasen.asuscomm.com:8070/Adaptive_Choropleth_Mapper_v3/lib/jQuery/jquery-3.3.1.js"></script>
+	<script src="http://sarasen.asuscomm.com:8070/Adaptive_Choropleth_Mapper_v3/lib/d3/d3.min.js"></script>
+	<script src="http://sarasen.asuscomm.com:8070/Adaptive_Choropleth_Mapper_v3/lib/moment/moment.min.js"></script>
+	<script src="http://sarasen.asuscomm.com:8070/Adaptive_Choropleth_Mapper_v3/lib/geostats/geostats.min.js"></script>
+	<script src="http://sarasen.asuscomm.com:8070/Adaptive_Choropleth_Mapper_v3/lib/simple-statistics@6.0.0/simple-statistics.min.js"></script>
+	<link rel="stylesheet" href="http://sarasen.asuscomm.com:8070/Adaptive_Choropleth_Mapper_v3/lib/leaflet/leaflet.css" />
+	<script src="http://sarasen.asuscomm.com:8070/Adaptive_Choropleth_Mapper_v3/lib/leaflet/leaflet.js"></script>
+	<script src="http://sarasen.asuscomm.com:8070/Adaptive_Choropleth_Mapper_v3/lib/sweetalert/sweetalert.min.js"></script>
+
+	<link rel="stylesheet" href="http://sarasen.asuscomm.com:8070/Adaptive_Choropleth_Mapper_v3/css/Adaptive_Choropleth_Mapper.css" />
+	<script src="http://sarasen.asuscomm.com:8070/Adaptive_Choropleth_Mapper_v3/lib/Adaptive_Choropleth_Mapper.js"></script>
+</head>
+
+<body>
+	
+	<header>
+		<h1>Adaptive Choropleth Mapper</h1>	
+	</header>
+	
+	<br>
+	<section>
+	<div style="height:40px;background-color:transparent; width:1700px;">
+		<span>
+			<button type="submit" id="submitForm" style="margin:10px 10px 10px 0px; float:left">Submit form</button>
+		</span>
+		<button type="submit" id="initFiveMaps" style="margin:10px 10px 10px 0px; float:left" hidden>Initialize all maps</button>
+		<div id="global-selection" style="margin:1px 0px 1px 30px; float:left; height:55px; border: 1px solid #99CCFF; border-radius: 5px;" hidden>
+			<table>
+				<tr>
+					<td><div id="global_layer" style="margin:3px 0px 0px 15px;"></div><td>
+					<td><div id="global_class" style="margin:3px 0px 0px 15px;"></div><td>
+					<td><div id="global_count" style="margin:3px 0px 0px 0px;"></div><td>
+					<td>
+						<div id="global_img" style="margin:3px 0px 0px 15px;"></div>
+						<div id="global_color" style="margin:0px 0px 0px 15px;"></div>
+					<td>
+					<td>
+						<div id="local_img" style="margin:3px 0px 0px 10px;"></div>
+						<div id="local_color" style="margin:0px 0px 0px 10px;"></div>
+					<td>
+					<td><div id="global_join" style="margin:3px 10px 0px 15px;"></div><td>
+					<td><button id="global_submit" type="submit" style="margin:5px 20px 0px 10px;">Set Globally</button><td>
+				</tr>
+			</table>
+		</div>	
+	</div>
+	<div id="global-message" style="margin: 0px 160px; width:1100px; color:blue; font-size: smaller; clear:both;" hidden><i>The selections above are valid only after you click "Set Globally" button. To enable "Set Globally", make all maps have the same extents by clicking one of "Sync" buttons below.</div>
+	</section>
+	
+	<br><br>
+	<section>
+	</section>
+	<div class='backLayer' style=''></div>
+	<div id="mapContainer">
+		<div id="map0" class="mapArea"></div><div class="MapBetween"></div>
+		<div id="map1" class="mapArea"></div><div class="MapBetween"></div>
+		<div id="map2" class="mapArea"></div><div class="MapBetween"></div>
+		<div id="map3" class="mapArea"></div><div class="MapBetween"></div>
+		<div id="map4" class="mapArea"></div><div class="MapBetween"></div>
+		<div id="map5" class="mapArea"></div>
+    </div>
+	<br><br>
+
+</body>
+</html>

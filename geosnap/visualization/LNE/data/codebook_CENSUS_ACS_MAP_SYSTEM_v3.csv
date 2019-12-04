@@ -1,0 +1,123 @@
+serial,code,description,year1970,year1980,year1990,year2000,year2010,year2012,groupid,web_system,description_short_name,description_full_name,denominator70,denominator80,denominator90,denominator00,denominator10,denominator12
+1,popXX,total population,POP70,POP80,POP90,POP00,pop10,pop12_s,1,0,,,,,,,,
+2,whiteXX,persons of white race,WHITE70,,,,,,1,0,,percentage of persons of white race,pop70,,,,,
+3,nhwhtXX,"persons of black race, not Hispanic origin",WHITE70,NHWHT80,NHWHT90,NHWHT00,nhwht10,nhwht12_s,1,1,"% white, non-Hispanic","percentage of persons of white race, not Hispanic origin", pop70,pop80,pop90,pop00,pop10,pop12_s
+4,blackXX,persons of black race,BLACK70,,,,,,1,0,,percentage of persons of black race,pop70,,,,,
+5,nhblkXX,"persons of black race, not Hispanic origin",BLACK70,NHBLK80,NHBLK90,NHBLK00,nhblk10,nhblk12_s,1,1,"% black, non-Hispanic","percentage of persons of black race, not Hispanic origin", pop70,pop80,pop90,pop00,pop10,pop12_s
+6,hispXX,persons of Hispanic origin,,HISP80,HISP90,HISP00,hisp10,hisp12_s,1,1,"% black, non-Hispanic",percentage of persons of Hispanic origin,,pop80,pop90,pop00,pop10,pop12_s
+7,ntvXX,persons of Native American race,,NTV80,NTV90,NTV00,ntv10,ntv12_s,1,1,% Native American race,percentage of persons of Native American race,,pop80,pop90,pop00,pop10,pop12_s
+8,asianXX,persons of Asian race (and Pacific Islander),ASIAN70,ASIAN80,ASIAN90,ASIAN00,asian10,asian12_s,1,1,% Asian and Pacific Islander race,percentage of persons of Asian race (and Pacific Islander), pop70,pop80,pop90,pop00,pop10,pop12_s
+9,hawXX,persons of Hawaiian race,HAW70,HAW80,HAW90,HAW00,haw10,haw12_s,1,1,% Hawaiian race,percentage of persons of Hawaiian race, pop70,pop80,pop90,pop00,pop10,pop12_s
+10,indiaXX,persons of Asian Indian race,INDIA70,INDIA80,INDIA90,INDIA00,india10,india12_s,1,1,% Indian birth/race,percentage of persons of Asian Indian race, pop70,pop80,pop90,pop00,pop10,pop12_s
+11,chinaXX,persons of Chinese race,CHINA70,CHINA80,CHINA90,CHINA00,china10,china12_s,1,1,% Chinese birth/race,percentage of persons of Chinese race, pop70,pop80,pop90,pop00,pop10,pop12_s
+12,filipXX,persons of Filipino race,FILIP70,FILIP80,FILIP90,FILIP00,filip10,filip12_s,1,1,% Filipino birth/race,percentage of persons of Filipino race, pop70,pop80,pop90,pop00,pop10,pop12_s
+13,japanXX,persons of Japanese race,JAPAN70,JAPAN80,JAPAN90,JAPAN00,japan10,japan12_s,1,1,% Japanese birth/race,percentage of persons of Japanese race, pop70,pop80,pop90,pop00,pop10,pop12_s
+14,koreaXX,persons of Korean race,KOREA70,KOREA80,KOREA90,KOREA00,korea10,korea12_s,1,1,% Korean birth/race,percentage of persons of Korean race, pop70,pop80,pop90,pop00,pop10,pop12_s
+15,vietXX,persons of Vietnamese race,,VIET80,VIET90,VIET00,viet10,viet12_s,1,1,% Vietnamese race,percentage of persons of Vietnamese race,,pop80,pop90,pop00,pop10,pop12_s
+16,agewhtXX,white population with known age distribution,AGEWHT70,agewht80_s,AGEWHT90,AGEWHT00,agewht10,agewht12_s,1,0,,,,,,,,
+17,a15whtXX,0-15 years old of white race,A15WHT70,a15wht80_s,A15WHT90,A15WHT00,a15wht10,a15wht12_s,1,,"% 15 and under, non-Hispanic white","percentage of 0-15 years old of white race (in 1980, percentage of 0-14 years old of white race; in 2008-12 ACS, percentage of 0-14 years old of white race)",agewht70,agewht80_s,agewht90,agewht00,agewht10,agewht12_s
+18,a60whtXX,60 years and older of white race,A60WHT70,a60wht80_s,A60WHT90,A60WHT00,a60wht10,,1,,"% 60 and older, non-Hispanic white",percentage of 60 years and older of white race,agewht70,agewht80_s,agewht90,agewht00,agewht10,
+19,a65whtXX,65 years and older of non-Hispanic whites,,,,,a65wht12_s,a65wht12_s,1,0,,percentage of 65 years and older of non-Hispanic whites,,,,,agewht12_s,agewht12_s
+20,ageblkXX,black population with known age distribution,AGEBLK70,ageblk80_s,AGEBLK90,AGEBLK00,ageblk10,ageblk12_s,1,0,,,,,,,,
+21,a15blkXX,0-15 years old of black race,A15BLK70,a15blk80_s,A15BLK90,A15BLK00,a15blk10,a15blk12_s,1,1,"% 15 and under, non-Hispanic black","percentage of 0-15 years old of black race (in 1980, percentage of 0-14 years old of black race; in 2008-12 ACS, percentage of 0-14 years old of black race)",ageblk70,ageblk80_s,ageblk90,ageblk00,ageblk10,ageblk12_s
+22,a60blkXX,60 years and older of black race,A60BLK70,a60blk80_s,A60BLK90,A60BLK00,a60blk10,,1,1,"% 60 and older, non-Hispanic black",percentage of 60 years and older of black race,ageblk70,ageblk80_s,ageblk90,ageblk00,ageblk10,
+23,a65blkXX,65 years and older of black race,,,,,a65blk12_s,a65blk12_s,1,0,,percentage of 65 years and older of black race,,,,,ageblk12_s,ageblk12_s
+24,agehspXX,Hispanic population with known age distribution,,agehsp80_s,AGEHSP90,AGEHSP00,agehsp10,agehsp12_s,1,0,,,,,,,,
+25,a15hspXX,"0-15 years old, persons of Hispanic origins",,A15HSP80_s,A15HSP90,A15HSP00,a15hsp10,a15hsp12_s,1,1,"% 15 and under, Hispanic","percentage of 0-15 years old, persons of Hispanic origins (in 1980, percentage of 0-14 years old, persons of Hispanic origin; in 2008-12 ACS, percentage of 0-14 years old, persons of Hispanic origins)",,"agehsp80_s, ","agehsp90, ","agehsp00, ",agehsp10, gehsp12_s
+26,a60hspXX,"60 years and older, persons of Hispanic origins",,a60hsp80,A60HSP90,A60HSP00,a60hsp10,,1,1,"% 60 and older, Hispanic","percentage of 60 years and older, persons of Hispanic origins",,"agehsp80_s, ","agehsp90, ","agehsp00, ",agehsp10,
+27,a65hspXX,"65 years and older, persons of Hispanic origins",,,,,a65hsp12_s,a65hsp12_s,1,0,,"percentage of 65 years and older, persons of Hispanic origins",,,,,agehsp12_s,agehsp12_s
+28,agentvXX,Native American population with known age distribution,,AGENTV80_s,AGENTV90,AGENTV00,agentv10,agentv12_s,1,0,,,,,,,,
+29,a15ntvXX,0-15 years old of Native American race,,a15ntv80_s,A15NTV90,A15NTV00,a15ntv10,a15ntv12_s,1,1,"% 15 and under, Native American","percentage of 0-15 years old of Native American race (in 1980, percentage of 0-14 years old of Native American race; in 2008-12 ACS, percentage of 0-14 years old of Native American race)",,agentv80_s,agentv90,agentv00, agentv10,agentv12_s
+30,a60ntvXX,60 years and older of Native American race,,a60ntv80_s,A60NTV90,A60NTV00,a60ntv10,,1,1,"% 60 and older, Native American",percentage of 60 years and older of Native American race,,agentv80_s,agentv90,agentv00, agentv10,
+31,a65ntvXX,65 years and older of Native American race,,,,,a65ntv12_s,a65ntv12_s,1,0,,percentage of 65 years and older of Native American race,,,,,agentv12_s,agentv12_s
+32,ageasnXX,Asian and Pacific Islander population with known age distribution,,"ageasn80_s,",AGEASN90,AGEASN00,ageasn10,ageasn12_s,1,0,,,,,,,,
+33,a15asnXX,0-15 years old of Asians and Pacific Islanders,,a15asn80_s,A15ASN90,A15ASN00,a15asn10,a15asn12_s,1,1,"% 15 and under, Asian/  Pacific Islanders","percentage of 0-15 years old of Asians and Pacific Islanders (in 1980, percentage of 0-14 years old of Asians/Pacific Islanders; in 2008-12 ACS, percentage of 0-14 years old of Asian/Pacific Islander race)",,ageasn80_s,ageasn90,ageasn00,ageasn10,ageasn12_s
+34,a60asnXX,60 years and older of Asians and Pacific Islanders,,a60asn80_s,A60ASN90,A60ASN00,a60asn10,,1,1,"% 60 and older, Asian/  Pacific Islanders",percentage of 60 years and older of Asians and Pacific Islanders,,ageasn80_s,ageasn90,ageasn00,ageasn10,
+35,a65asnXX,65 years and older of Asians and Pacific Islanders,,,,,a65asn12_2,a65asn12_2,1,0,,percentage of 65 years and older of Asians and Pacific Islanders,,,,,ageasn12_s,ageasn12_s
+36,popXXsp1,total population from sample-based data,pop70sp1_s,,,,,,2,0,,,,,,,,
+37,popXXsp2,total population from sample-based data,pop70sp2_s,,,,,,2,0,,,,,,,,
+38,popXXsf3,total population from sample-based data,,pop80sp2_s,pop90sp2_s,pop00sp2_s,,,2,0,,,,,,,,
+39,popXXsf4,total population from sample-based data,,pop80sf4_s,pop90sf4_s,,,,2,0,,,,,,,,
+40,mexXX,Mexicans,MEX70_s,MEX80,MEX90,MEX00,mex10,mex12_s,2,1,% Mexican birth/ethnicity,percentage of Mexicans,pop70sp_s,pop80,pop90,pop00,pop10,pop12_s
+41,cubanXX,Cubans,cuban70_s,CUBAN80,CUBAN90,CUBAN00,cuban10,cuban12_s,2,1,% Cuban birth/ethnicity,percentage of Cubans,pop70sp_s,pop80,pop90,pop00,pop10,pop12_s
+42,prXX,Puerto Ricans,pr70_s,PR80,PR90,PR00,pr10,pr12_s,2,1,% Puerto Rican birth/ethnicity,percentage of Puerto Ricans,pop70sp_s,pop80,pop90,pop00,pop10,pop12_s
+43,ruancXX,persons of Russian/USSR parentage or ancestry,ruanc70_s,ruanc80_s,ruanc90_s,ruanc00_s,ruanc12_s,ruanc12_s,2,1,% Russian/USSR parentage/ancestry,percentage of persons of Russian/USSR parentage or ancestry,pop70sp2_s,pop80sf3_s,pop90sf3_s,pop00sf3_s,pop12_s,pop12_s
+44,itancXX,persons of Italian parentage or ancestry,itanc70_s,itanc80_s,itanc90_s,itanc00_s,itanc12_s,itanc12_s,2,1,% Italian parentage/ancestry,percentage of persons of Italian parentage or ancestry,pop70sp2_s,pop80sf3_s,pop90sf3_s,pop00sf3_s,pop12_s,pop12_s
+45,geancXX,persons of German parentage or ancestry,geanc70_s,geanc80_s,geanc90_s,geanc00_s,geanc12_s,geanc12_s,2,1,% German parentage/ancestry,percentage of persons of German parentage or ancestry,pop70sp2_s,pop80sf3_s,pop90sf3_s,pop00sf3_s,pop12_s,pop12_s
+46,irancXX,persons of Irish parentage or ancestry,iranc70_s,iranc80_s,iranc90_s,iranc00_s,iranc12_s,iranc12_s,2,1,% Irish parentage/ancestry,percentage of persons of Italian parentage or ancestry,pop70sp2_s,pop80sf3_s,pop90sf3_s,pop00sf3_s,pop12_s,pop12_s
+47,scancXX,"persons of Scandinavian parentage/ancestry (Finnish, Swedish, Danish, Norwegian)",scanc70_s,scanc80_s,scanc90_s,scanc00_s,scanc12_s,scanc12_s,2,1,% Scandinavian parentage/ancestry,"percentage of persons of Scandinavian parentage/ancestry (Finnish, Swedish, Danish, Norwegian)",pop70sp2_s,pop80sf3_s,pop90sf3_s,pop00sf3_s,pop12_s,pop12_s
+48,dfbXX,total population from sample-based data,,dfb80_s,,,,,2,0,,,,,,,,
+49,fbXX,foreign-born,fb70_s,fb80_s,fb90_s,fb00_s,fb12_s,fb12_s,2,1,% foreign born,percentage of foreign-born,pop70sp1_s   ,dfb80_s,pop90sf3_s,pop00sf3_s,pop12_s,pop12_s
+50,n10immXX,recent immigrants (within the past 10 years),n10imm70_s,n10imm80_s,n10imm90_s,n10imm00_s,n10imm12_s,n10imm12_s,2,1,% immigrated in past 10 years,"percentage of recent immigrants (within the past 10 years) (in 2008-12 ACS, the foreign-born who entered the U.S. 2000 or later)",pop70sp1_s ,pop80sf4_s,pop90sf3_s,pop00sf3_s ,pop12_s,pop12_s
+51,natXX,naturalized foreign-born,nat70_s,nat80_s,nat90_s,nat00_s,nat12_s,nat12_s,2,1,% Naturalized,percentage of naturalized foreign-born,pop70sp1_s ,pop80sf4_s,pop90sf3_s,pop00sf3_s ,pop12_s,pop12_s
+52,ag5upXX,persons 5 years and over,ag5up70_s,ag5up80_s,ag5up90_s,ag5up00_s,ag5up12_s,ag5up12_s,2,0,,,,,,,,
+53,olangXX,persons who speak language other than English at home,,olang80_s,olang90_s,olang00_s,olang12_s,olang12_s,2,1,"% speaking other language at home, age 5+",percentage of persons who speak language other than English at home,,ag5up80_s,ag5up90_s,ag5up00_s,ag5up12_s,ag5up12_s
+54,lepXX,persons who speak English not well,,lep80_s,lep90_s,lep00_s,lep12_s,lep12_s,2,1,"% speaking English not well, age 5+",percentage of persons who speak English not well,,ag5up80_s,ag5up90_s,ag5up00_s,ag5up12_s,ag5up12_s
+55,rufbXX,persons who were born in Russia/ USSR,rufb70_s,rufb80_s,rufb90_s,rufb00_s,rufb12_s,rufb12_s,2,1,% Russian/USSR birth,percentage of persons who were born in Russia/ USSR,pop70sp2_s,pop80sf4_s,pop90sf4_s,pop00sf3_s,pop12_s,pop12_s
+56,itfbXX,persons who were born in Italy,itfb70_s,itfb80_s,itfb90_s,itfb00_s,itfb12_s,itfb12_s,2,1,% Italian birth,percentage of persons who were born in Italy,pop70sp2_s,pop80sf4_s,pop90sf4_s,pop00sf3_s,pop12_s,pop12_s
+57,gefbXX,persons who were born in Germany,gefb70_s,gefb80_s,gefb90_s,gefb00_s,gefb12_s,gefb12_s,2,1,% German birth,percentage of persons who were born in Germany,pop70sp2_s,pop80sf4_s,pop90sf4_s,pop00sf3_s,pop12_s,pop12_s
+58,irfbXX,persons who were born in Ireland,irfb70_s,irfb80_s,irfb90_s,irfb00_s,irfb12_s,irfb12_s,2,1,% Irish birth,percentage of persons who were born in Ireland,pop70sp2_s,pop80sf4_s,pop90sf4_s,pop00sf3_s,pop12_s,pop12_s
+59,scfbXX,"persons who were born in Scandinavian Countries (Swedish, Norwegian, Finnish, Danish)",scfb70_s,scfb80_s,scfb90_s,scfb00_s,scfb12_s,scfb12_s,2,1,% Scandinavian birth,"percentage of persons who were born in Scandinavian Countries (Swedish, Norwegian, Finnish, Danish)",pop70sp2_s,pop80sf4_s,pop80sf4_s,pop00sf3_s,pop12_s,pop12_s
+60,ag25upXX,population 25 years and over,ag25up70_s,ag25up80_s,ag25up90_s,ag25up00_s,ag25up12_s,ag25up12_s,3,0,,,,,,,,
+61,hsXX,persons with high school degree or less,hs70_s,hs80_s,hs90_s,hs00_s,hs12_s,hs12_s,3,1,% with high school degree or less,percentage of persons with high school degree or less,ag25up70_s,ag25up80_s,ag25up90_s,ag25up00_s,ag25up12_s,ag25up12_s
+62,colXX,persons with at least a four-year college degree,col70_s,col80_s,col90_s,col00_s,col12_s,col12_s,3,1,% with 4-year college degree or more,percentage of persons with at least a four-year college degree,ag25up70_s,ag25up80_s,ag25up90_s,ag25up00_s,ag25up12_s,ag25up12_s
+63,clfXX,civilian labor force 16 years and over,clf70_s,clf80_s,clf90_s,clf00_s,clf12_s,clf12_s,3,0,% unemployed,,,,,,,
+64,unempXX,unemployed,unemp70_s,unemp80_s,unemp90_s,unemp00_s,unemp12_s,unemp12_s,3,1,% unemployed,percent unemployed,clf70_s,clf80_s,clf90_s,clf00_s,clf12_s,clf12_s
+65,dflabfXX,"females 16 years and over, except in armed forces",dflabf70_s,dflabf80_s,dflabf90_s,dflabf00_s,dflabf12_s,dflabf12_s,3,0,% female labor force participation,percentage of females in labor force,,,,,,
+66,flabfXX,females in labor force,flabf70_s,flabf80_s,flabf90_s,flabf00_s,flabf12_s,flabf12_s,3,1,% female labor force participation,percentage of females in labor force,dflab70_s,dflab80_s,dflab90_s,dflab00_s,dflab12_s,dflab12_s
+67,empclfXX,employed persons 16 years and over,empclf70_s,empclf80_s,empclf90_s,empclf00_s,empclf12_s,empclf12_s,3,0,,,,,,,,
+68,profXX,professional employees (by occupations),prof70_s,prof80_s,prof90_s,prof00_s,prof12_s,prof12_s,3,1,% professional employees,percentage of professional employees (by occupations),empclf70_s,empclf80_s,empclf90_s,empclf00_s,empclf12_s,empclf12_s
+69,manufXX,manufacturing employees (by industries),manuf70_s,manuf80_s,manuf90_s,manuf00_s,manuf12_s,manuf12_s,3,1,% manufacturing employees,percentage of manufacturing employees (by industries),empclf70_s,empclf80_s,empclf90_s,empclf00_s,empclf12_s,empclf12_s
+70,sempXX,self-employed,semp70_s,semp80_s,semp90_s,semp00_s,semp12_s,semp12_s,3,1,% self-employed,percentage of self-employed,empclf70_s,empclf80_s,empclf90_s,empclf00_s,empclf12_s,empclf12_s
+71,ag16cvXX,"civilian population 16 years and over (in 1970, civilian males 16 years and over)",ag16cv70_s,ag16cv80_s,ag16cv90_s,,,,3,0,,,,,,,,
+72,ag18cvXX,civilian population 18 years and over,,,,,ag18cv10_s,ag18cv12_s,3,0,,,,,,,,
+73,vetXX,veterans,vet70_s,vet80_s,vet90_s,vet00_s,vet12_s,vet12_s,3,1,% veteran,percentage of veterans,ag16cv70_s,ag16cv80_s,ag16cv90_s,Ag18cv00_s,Ag18cv10_s,Ag18cv12_s
+74,cni16uXX,civilian non-institutionalized persons 16-64 years old,cni16u70_s,cni16u80_s,cni16u90_s,cni16u00_s,,,3,0,,,,,,,,
+75,disXX,disabled,dis70_s,dis80_s,dis90_s,dis00_s,,,3,1,% with disability,percent with disability,cni16u70_s,cni16u80_s,cni16u90_s,cni16u00_s,,
+76,hincXX,Median household income,hinc70_s,hinc80_s,hinc90_s,hinc00_s,hinc12_s,hinc12_s,3,1,"Median HH income, total",Median household income,,,,,,
+77,hhXX,total households in sample-based data,hh70_s,hh80_s,hh90_s,hh00_s,hh12_s,hh12_s,3,0,,Median household income,,,,,,
+78,hincwXX,Median household income for whites,,hincw80_s,hincw90_s,hincw00_s,hincw12_s,hincw12_s,3,1,"Median HH income, whites",Median household income for whites,,,,,,
+79,hhwXX,total white households in sample-based data,,hhw80_s,hhw90_s,hhw00_s,hhw12_s,hhw12_s,3,0,,,,,,,,
+80,hincbXX,Median household income for blacks,,hincb80_s,hincb90_s,hincb00_s,hincb12_s,hincb12_s,3,1,"Median HH income, blacks",Median household income for blacks,,,,,,
+81,hhbXX,total black households in sample-based data,,hhb80_s,hhb90_s,hhb00_s,hhb12_s,hhb12_s,3,0,,,,,,,,
+82,hinchXX,Median household income for Hispanics,,hinc80_s,hinc90_s,hinc00_s,hinc12_s,hinc12_s,3,1,"Median HH income, Hispanics",Median household income for Hispanics,,,,,,
+83,hhhXX,total Hispanic households in sample-based data,,hhh80_s,hhh90_s,hhh00_s,hhh12_s,hhh12_s,3,0,,,,,,,,
+84,hincaXX,Median household income for Asians and Pacific Islanders,,hinca80_s,hinca90_s,hinca00_s,hinca12_s,hinca12_s,3,1,"Median HH income, Asian/ Pacific Islanders",Median household income for Asians and Pacific Islanders,,,,,,
+85,hhaXX,total Asian/Pacific Islander households in sample-based data,,hha80_s,hha90_s,hha00_s,hha12_s,hha12_s,3,0,,,,,,,,
+86,incpcXX,Per capita income,incpc70_s,incpc80_s,incpc90_s,incpc00_s,incpc12_s,incpc12_s,3,1,Per capita income,Per capita income,,,,,,
+87,dpovXX,persons for whom poverty status is determined,dpov70_s,dpov80_s,dpov90_s,dpov00_s,dpov12_s,dpov12_s,3,0,,,,,,,,
+88,npovXX,persons in poverty,npov70_s,npov80_s,npov90_s,npov00_s,npov12_s,npov12_s,3,1,"% in poverty, total",Percentage of people in poverty (total),dpov70_s,dpov80_s,dpov90_s,dpov00_s,dpov12_s,dpov12_s
+89,n65povXX,persons 65 years and older in poverty,n65pov70_s,n65pov80_s,n65pov90_s,n65pov00_s,n65pov12_s,n65pov12_s,3,1,"% in poverty, 65+",percentage of 65 years and older in poverty,dpov70_s,dpov80_s,dpov90_s,dpov00_s,dpov12_s,dpov12_s
+90,dfmpovXX,families for whom poverty status is determined,dfmpov70_s,dfmpov80_s,dfmpov90_s,dfmpov00_s,dfmpov12_s,dfmpov12_s,3,0,,,,,,,,
+91,nfmpovXX,families with children in poverty,nfmpov70_s,nfmpov80_s,nfmpov90_s,nfmpov00_s,nfmpov12_s,nfmpov12_s,3,1,"% in poverty, families with children",percentage of families with children in poverty,dfmpov70_s,dfmpov80_s,dfmpov90_s,dfmpov00_s,dfmpov12_s,dfmpov12_s
+92,dwpovXX,white persons for whom poverty status is determined,dwpov70_s,dwpov80_s,dwpov90_s,dwpov00_s,dwpov12_s,dwpov12_s,3,0,,,,,,,,
+93,nwpovXX,whites in poverty,nwpov70_s,nwpov80_s,nwpov90_s,nwpov00_s,nwpov12_s,nwpov12_s,3,1,"% in poverty, whites",percentage of whites in poverty,dwpov70_s,dwpov80_s,dwpov90_s,dwpov00_s,dwpov12_s,dwpov12_s
+94,dbpovXX,black persons for whom poverty status is determined,dbpov70_s,dbpov80_s,dbpov90_s,dbpov00_s,dbpov12_s,dbpov12_s,3,0,,,,,,,,
+95,nbpovXX,blacks in poverty,nbpov70_s,nbpov80_s,nbpov90_s,nbpov00_s,nbpov12_s,nbpov12_s,3,1,"% in poverty, African Americans",percentage of blacks in poverty,dbpov70_s,dbpov80_s,dbpov90_s,dbpov00_s,dbpov12_s,dbpov12_s
+96,dhpovXX,Hispanics for whom poverty status is determined,,dhpov80_s,dhpov90_s,dhpov00_s,dhpov12_s,dhpov12_s,3,0,,,,,,,,
+97,nhpovXX,Hispanics in poverty,,nhpov80_s,nhpov90_s,nhpov00_s,nhpov12_s,nhpov12_s,3,1,"% in poverty, Hispanics",percentage of Hispanics in poverty,,dhpov80_s,dhpov90_s,dhpov00_s,dhpov12_s,dhpov12_s
+98,dnapovXX,Native American for whom poverty status is determined,,dnapov80_s,dnapov90_s,dnapov00_s,dnapov12_s,dnapov12_s,3,0,,,,,,,,
+99,nnapovXX,Native Americans in poverty,,nnapov80_s,nnapov90_s,nnapov00_s,nnapov12_s,nnapov12_s,3,1,"% in poverty, Native Americans",percentage of Native Americans in poverty,,dnapov80_s,dnapov90_s,dnapov00_s,dnapov12_s,dnapov12_s
+100,dapovXX,Asians and Pacific Islanders for whom poverty status is determined,,dapov80_s,dapov90_s,dapov00_s,dapov12_s,dapov12_s,3,0,,,,,,,,
+101,napovXX,Asians and Pacific Islanders in poverty,,napov80_s,napov90_s,napov00_s,napov12_s,napov12_s,3,1,"% in poverty, Asian/ Pacific Islanders",percentage of Asian and Pacific Islanders in poverty,,dapov80_s,dapov90_s,dapov00_s,dapov12_s,dapov12_s
+102,huXX,housing units,HU70,HU80,HU90,HU00,hu10,hu12_s,4,0,,,,,,,,
+103,vacXX,vacant housing units,VAC70,VAC80,VAC90,VAC00,vac10,vac12_s,4,1,% vacant units,percentage of vacant housing units,HU70,HU80,HU90,HU00,hu10,hu12_s
+104,ohuXX,occupied housing units,OHU70,OHU80,OHU90,OHU00,ohu10,ohu_12_s,4,0,,,,,,,,
+105,ownXX,owner-occupied housing units,OWN70,OWN80,OWN90,OWN00,own10,own12_s,4,1,% owner-occupied units,percentage of owner-occupied housing units,OHU70,OHU80,OHU90,OHU00,ohu10,ohu_12_s
+106,rentXX,renter-occupied housing units,RENT70,RENT80,RENT90,RENT00,rent10,rent12_s,4,0,,,,,,,,
+107,dmultiXX,housing units,DMULTI70,dmulti80_s,dmulti90_s,dmulti00_s,dmulti12_s,dmulti12_s,4,0,,,,,,,,
+108,multiXX,housing units in multi-unit structures,MULTI70,multi80_s,multi90_s,multi00_s,multi12_s,multi12_s,4,1,% multi-family units,percentage of housing units in multi-unit structures,DMULTI70,dmulti80_s,dmulti90_s,dmulti00_s,dmulti12_s,dmulti12_s
+109,huXXsp,housing units in sample-based data,hu70sp_s,hu80sp_s,hu90sp_s,hu00sp_s,,,4,0,,,,,,,,
+110,mhmvalXX,Median home value,mhmval70_s,MHMVAL80,MHMVAL90,mhmval00_s,mhmval12_s,mhmval12_s,4,1,Median home value,Median home value,,,,,,
+111,mrentXX,Median monthly contract rent,mrent70_s,MRENT80,MRENT90,mrent00_s,mrent12_s,mrent12_s,4,1,Median rent,Median monthly contract rent,,,,,,
+112,h30oldXX,"structures built more than 30 years ago (in 2008-12 ACS, structures built 1979 or earlier)",h30old70_s,h30old80_s,h30old90_s,h30old00_s,h30old12_s,h30old12_s,4,1,% structures more than 30 years old,percentage of structures built more than 30 years ago,hu70sp_s,hu80sp_s,hu90sp_s,hu00sp_s,hu12sp_s,hu12sp_s
+113,ohuXXsp,occupied housing units in sample-based data,ohu70sp_s,ohu80sp_s,ohu90sp_s,ohu00sp_s,,,4,0,,,,,,,,
+114,h10yrsXX,"household heads moved into unit less than 10 years ago (in 2008-12 ACS, householders moved in 2000 or later)",h10yrs70_s,h10yrs80_s,h10yrs90_s,h10yrs00_s,h10yrs12_s,h10yrs12_s,4,1,% HH in neighborhood 10 years or less,percentage of household heads moved into unit less than 10 years ago,ohu70sp_s,ohu80sp_s,ohu90sp_s,ohu00sp_s,ohu12_s,ohu12_s
+115,a18undXX,persons age 17 years and under,A18UND70,A18UND80,A18UND90,A18UND00,a18und10,a18und12_s,4,1,"% 17 and under, total",percentage of persons age 17 years and under,pop70,pop80,pop90,pop00,pop10,pop12
+116,a60upXX,persons age 60 years and over,A60UP70,A60UP80,A60UP90,A60UP00,a60up10,a18und12_s,4,1,"% 60 and older, total",percentage of persons age 60 years and over,pop70,pop80,pop90,pop00,pop10,pop12
+117,a75upXX,persons age 75 years and over,A75UP70,A75UP80,A75UP90,A75UP00,a75up10,a75up12_s,4,1,"% 75 and older, total",percentage of persons age 75 years and over,pop70,pop80,pop90,pop00,pop10,pop12
+118,ag15upXX,population 15 years and over,AG15UP70,AG15UP80,AG15UP90,ag15up00_s,,ag15up12_s,4,0,,,,,,,,
+119,marXX,currently married,Mar70,Mar80,Mar90,Mar00_s,Mar12_s,Mar12_s,4,1,"% currently married, not separated",percent currently married (excluding separated),AG15UP70,AG15UP80,AG15UP90,ag15up00_s,ag15up12_s,ag15up12_s
+120,wdsXX,"widowed, divorced, and separated",WDS70,WDS80,WDS90,WDS00_s,WDS12_s,WDS12_s,4,1,"% widowed, divorced and separated","percent widowed, divorced, and separated",AG15UP70,AG15UP80,AG15UP90,ag15up00_s,ag15up12_s,ag15up12_s
+121,familyXX,total families,family70_s,family80_s,family90_s,FAMILY00,family10,family12_s,4,0,,,,,,,,
+122,fhhXX,female-headed families with children,fhh70_s,fhh80_s,fhh90_s,FHH00,fhh10,fhh12_s,4,1,% female-headed families with children,percentage of female-headed families with children,family70_s,family80_s,family90_s,FAMILY00,family10,family12_s
