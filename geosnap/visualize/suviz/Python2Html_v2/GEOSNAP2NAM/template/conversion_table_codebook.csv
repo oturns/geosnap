@@ -1,0 +1,75 @@
+seq,code,variable,short_name,full_name
+1-01,nhwhtXX,p_nonhisp_white_persons,"% white, non-Hispanic","percentage of persons of white race, not Hispanic origin"
+1-02,nhblkXX,p_nonhisp_black_persons,"% black, non-Hispanic","percentage of persons of black race, not Hispanic origin"
+1-03,hispXX,p_hispanic_persons,% Hispanic,percentage of persons of Hispanic origin
+1-04,ntvXX,p_native_persons,% Native American race,percentage of persons of Native American race
+1-05,asianXX,p_asian_persons,% Asian and Pacific Islander race,percentage of persons of Asian race (and Pacific Islander)
+1-06,hawXX,p_hawaiian_persons,% Hawaiian race,percentage of persons of Hawaiian race
+1-07,indiaXX,p_asian_indian_persons,% Indian birth/race,percentage of persons of Asian Indian race
+1-08,chinaXX,p_chinese_persons,% Chinese birth/race,percentage of persons of Chinese race
+1-09,filipXX,p_filipino_persons,% Filipino birth/race,percentage of persons of Filipino race
+1-10,japanXX,p_japanese_persons,% Japanese birth/race,percentage of persons of Japanese race
+1-11,koreaXX,p_korean_persons,% Korean birth/race,percentage of persons of Korean race
+1-12,vietXX,p_vietnamese_persons,% Vietnamese race,percentage of persons of Vietnamese race
+1-13,a15blkXX,p_black_under_15,"% 15 and under, non-Hispanic black",percentage of 0-15 years old of black race
+1-14,a60blkXX,p_black_over_60,"% 60 and older, non-Hispanic black",percentage of 60 years and older of black race
+1-15,a15hspXX,p_hispanic_under_15,"% 15 and under, Hispanic","percentage of 0-15 years old, persons of Hispanic origins"
+1-16,a60hspXX,p_hispanic_over_60,"% 60 and older, Hispanic","percentage of 60 years and older, persons of Hispanic origins"
+1-17,a15ntvXX,p_native_under_15,"% 15 and under, Native American",percentage of 0-15 years old of Native American race
+1-18,a60ntvXX,p_native_over_60,"% 60 and older, Native American",percentage of 60 years and older of Native American race
+1-19,a15asnXX,p_asian_under_15,"% 15 and under, Asian/  Pacific Islanders",percentage of 0-15 years old of Asians and Pacific Islanders
+1-20,a60asnXX,p_asian_over_60,"% 60 and older, Asian/  Pacific Islanders",percentage of 60 years and older of Asians and Pacific Islanders
+2-01,mexXX,p_mexican_pop,% Mexican birth/ethnicity,percentage of persons of Mexican parentage or ancestry
+2-02,cubanXX,p_cuban_pop,% Cuban birth/ethnicity,percentage of persons of Cuban parentage or ancestry
+2-03,prXX,p_puerto_rican_pop,% Puerto Rican birth/ethnicity,percentage of persons of Puerto Rican parentage or ancestry
+2-04,ruancXX,p_russian_pop,% Russian/USSR parentage/ancestry,percentage of persons of Russian/USSR parentage or ancestry
+2-05,itancXX,p_italian_pop,% Italian parentage/ancestry,percentage of persons of Italian parentage or ancestry
+2-06,geancXX,p_german_pop,% German parentage/ancestry,percentage of persons of German parentage or ancestry
+2-07,irancXX,p_irish_pop,% Irish parentage/ancestry,percentage of persons of Irish parentage or ancestry
+2-08,scancXX,p_scandanavian_pop,% Scandinavian parentage/ancestry,percentage of persons of Scandinavian parentage/ancestry
+2-09,fbXX,p_foreign_born_pop,% foreign born,percentage of foreign-born
+2-10,n10immXX,p_recent_immigrant_pop,% immigrated in past 10 years,percentage of recent immigrants (within the past 10 years)
+2-11,natXX,p_naturalized_pop,% Naturalized,percentage of naturalized foreign-born
+2-12,olangXX,p_other_language,"% speaking other language at home, age 5+",percentage of persons who speak language other than English at home
+2-13,lepXX,p_limited_english,"% speaking English not well, age 5+",percentage of persons who speak English not well
+2-14,rufbXX,p_russian_born_pop,% Russian/USSR birth,percentage of persons who were born in Russia/ USSR
+2-15,itfbXX,p_italian_born_pop,% Italian birth,percentage of persons who were born in Italy
+2-16,gefbXX,p_german_born_pop,% German birth,percentage of persons who were born in Germany
+2-17,irfbXX,p_irish_born_pop,% Irish birth,percentage of persons who were born in Ireland
+2-18,scfbXX,p_scandanavian_born_pop,% Scandinavian birth,percentage of persons who were born in Scandinavian Countries
+3-01,hsXX,p_edu_hs_less,% with high school degree or less,percentage of persons with high school degree or less
+3-02,colXX,p_edu_college_greater,% with 4-year college degree or more,percentage of persons with at least a four-year college degree
+3-03,unempXX,p_unemployment_rate,% unemployed,percent unemployed
+3-04,flabfXX,p_female_labor_force,% female labor force participation,percentage of females in labor force
+3-05,profXX,p_employed_professional,% professional employees,percentage of professional employees (by occupations)
+3-06,manufXX,p_employed_manufacturing,% manufacturing employees,percentage of manufacturing employees (by industries)
+3-07,sempXX,p_employed_self_employed,% self-employed,percentage of self-employed
+3-08,vetXX,p_veterans,% veteran,percentage of veterans
+3-09,disXX,p_disabled,% with disability,percent with disability
+3-10,hincXX,median_household_income,"Median HH income, total",Median household income
+3-11,hincwXX,median_income_whitehh,"Median HH income, whites",Median household income for whites
+3-12,hincbXX,median_income_blackhh,"Median HH income, blacks",Median household income for blacks
+3-13,hinchXX,median_income_hispanichh,"Median HH income, Hispanics",Median household income for Hispanics
+3-14,hincaXX,median_income_asianhh,"Median HH income, Asian/ Pacific Islanders",Median household income for Asians and Pacific Islanders
+3-15,incpcXX,per_capita_income,Per capita income,Per capita income
+3-16,npovXX,p_poverty_rate,"% in poverty, total",percent poor
+3-17,n65povXX,p_poverty_rate_over_65,"% in poverty, 65+",percentage of 65 years and older in poverty
+3-18,nfmpovXX,p_poverty_rate_children,"% in poverty, families with children",percentage of families with children in poverty
+3-19,nwpovXX,p_poverty_rate_white,"% in poverty, whites",percentage of whites in poverty
+3-20,nbpovXX,p_poverty_rate_white,"% in poverty, African Americans",percentage of whites in poverty
+3-21,nhpovXX,p_poverty_rate_hispanic,"% in poverty, Hispanics",percentage of Hispanics in poverty
+3-22,nnapovXX,p_poverty_rate_native,"% in poverty, Native Americans",percentage of Native Americans in poverty
+3-23,napovXX,p_poverty_rate_asian,"% in poverty, Asian/ Pacific Islanders",percentage of Asian and Pacific Islanders in poverty
+4-01,vacXX,p_vacant_housing_units,% vacant units,percentage of vacant housing units
+4-02,ownXX,p_owner_occupied_units,% owner-occupied units,percentage of owner-occupied housing units
+4-03,multiXX,p_housing_units_multiunit_structures,% multi-family units,percentage of housing units in multi-unit structures
+4-04,mhmvalXX,median_home_value,Median home value,Median home value
+4-05,mrentXX,median_contract_rent,Median rent,Median monthly contract rent
+4-06,h30oldXX,p_structures_30_old,% structures more than 30 years old,percentage of structures built more than 30 years ago
+4-07,h10yrsXX,p_household_recent_move,% HH in neighborhood 10 years or less,percentage of household heads moved into unit less than 10 years ago
+4-08,a18undXX,p_persons_under_18,"% 17 and under, total",percentage of persons age 17 years and under
+4-09,a60upXX,p_persons_over_60,"% 60 and older, total",percentage of persons age 60 years and over
+4-10,a75upXX,p_persons_over_75,"% 75 and older, total",percentage of persons age 75 years and over
+4-11,marXX,p_married,"% currently married, not separated",percent currently married (excluding separated)
+4-12,wdsXX,p_widowed_divorced,"% widowed, divorced and separated","percent widowed, divorced, and separated"
+4-13,fhhXX,p_female_headed_families,% female-headed families with children,percentage of female-headed families with children

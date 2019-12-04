@@ -1,0 +1,53 @@
+stateid,statename,stateabbr,subregion
+01,Alabama,AL,East South Central
+02,Alaska,AK,Pacific
+04,Arizona,AZ,Mountain
+05,Arkansas,AR,West South Central
+06,California,CA,Pacific
+08,Colorado,CO,Mountain
+09,Connecticut,CT,New England
+10,Delaware,DE,South Atlantic
+11,District of Columbia,DC,South Atlantic
+12,Florida,FL,South Atlantic
+13,Georgia,GA,South Atlantic
+15,Hawaii,HI,Pacific
+16,Idaho,ID,Mountain
+17,Illinois,IL,East North Central
+18,Indiana,IN,East North Central
+19,Iowa,IA,West North Central
+20,Kansas,KS,West North Central
+21,Kentucky,KY,East South Central
+22,Louisiana,LA,West South Central
+23,Maine,ME,New England
+24,Maryland,MD,South Atlantic
+25,Massachusetts,MA,New England
+26,Michigan,MI,East North Central
+27,Minnesota,MN,West North Central
+28,Mississippi,MS,East South Central
+29,Missouri,MO,West North Central
+30,Montana,MT,Mountain
+31,Nebraska,NE,West North Central
+32,Nevada,NV,Mountain
+33,New Hampshire,NH,New England
+34,New Jersey,NJ,Middle Atlantic
+35,New Mexico,NM,Mountain
+36,New York,NY,Middle Atlantic
+37,North Carolina,NC,South Atlantic
+38,North Dakota,ND,West North Central
+39,Ohio,OH,East North Central
+40,Oklahoma,OK,West South Central
+41,Oregon,OR,Pacific
+42,Pennsylvania,PA,Middle Atlantic
+72,Puerto Rico,PR,South Atlantic
+44,Rhode Island,RI,New England
+45,South Carolina,SC,South Atlantic
+46,South Dakota,SD,West North Central
+47,Tennessee,TN,East South Central
+48,Texas,TX,West South Central
+49,Utah,UT,Mountain
+50,Vermont,VT,New England
+51,Virginia,VA,South Atlantic
+53,Washington,WA,Pacific
+54,West Virginia,WV,South Atlantic
+55,Wisconsin,WI,East North Central
+56,Wyoming,WY,Mountain
