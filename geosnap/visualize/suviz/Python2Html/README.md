@@ -16,7 +16,7 @@
 
 ### Prerequisites
 
-GEOSNAP2ACM and GEOSNAP2NAM utilizes the GeoSpatial Neighborhood Analysis Package (GEOSNAP). This packages must be installed. The installation instruction is available at: https://github.com/spatialucr/geosnap 
+GEOSNAP2ACM and GEOSNAP2NAM utilize the GeoSpatial Neighborhood Analysis Package (GEOSNAP). This packages must be installed. The installation instruction is available at: https://github.com/spatialucr/geosnap 
 
 First-time users need to download LTDB data which are input for both GEOSNAP2ACM and GEONSNAP2NAM
 - Download LTDB data and create the folder, “downloads” in the GEOSNAP2ACM. https://s4.ad.brown.edu/projects/diversity/Researcher/LTDB.htm
@@ -26,7 +26,7 @@ First-time users need to download LTDB data which are input for both GEOSNAP2ACM
 ### Getting Started
 
 Run Jupyter notebook examples below to learn how to use GEOSNAP2ACM and GEOSNAP2NAN. Each folder has examples like below
-##### geosnap2ACM 
+#### geosnap2ACM 
 - ACM_SD_ACM_only : The output of ACM_only.ipynb. 
 It visualizes selected variables by using Adaptive Choropleth Mapper.
 Video demo: http://sarasen.asuscomm.com/ACM
@@ -48,30 +48,31 @@ Video demo:
 It visualizes the relationships among multiple variables.
 Video demo:
 
-##### geosnap2NAM
+#### geosnap2NAM
 - NAM_SD_eveything : The output of GEOSNAP2NAM.ipynb 
 This example visualizes all charts and maps including the result of sequence analysis (Just like an image above). Visualizing everything like this creates too many maps and charts. So it is hard to understand what is what. From this reason, charts and maps are divided into the four examples of output visualization below
+Video demo: http://osnap.cloud/~suhan/videos/NAM_SD_everything
 
 - NAM_US_0_INC: The output of GEOSNAP2NAM0_INC_whole.ipynb 
-This example computes INC value of all metro areas in the US and visualize the result using the Adaptive Choropleth Mapper (ACM)
-Video demo:
-Please note metro id is displayed on the top right corner of the map. The metro id can be used to create each of map visualization below from #3 to #6.
+This example computes INC value of all metro areas in the US and visualize the result using the Adaptive Choropleth Mapper (ACM). Please note metro id is displayed on the top right corner of the map. The metro id can be used to create each of map visualization below from #3 to #6.
 
 - NAM_SD_1_neighborhood : The output of  GEOSNAP2NAM1_neighborhood.ipynb 
 This example visualizes the spatiotemporal change of neighborhood (clustering result)
-Video demo:
+Video demo: http://osnap.cloud/~suhan/videos/NAM_SD_1_neighborhood
 
 - NAM_SD_2_INC_neighborhood : The output of GEOSNAP2NAM2_INC_neighborhood.ipynb  
 This example visualizes a map of the index of neighborhood change with maps showing the spatiotemporal change of neighborhood.
- Video demo:
+ Video demo: http://osnap.cloud/~suhan/videos/NAM_SD_2_INC_neighborhood
+
 
 - NAM_SD_3_sequence_neighborhood_categoriesDiagram : The output of  GEOSNAP2NAM3_sequence_neighborhood_categoriesDiagram.ipynb
-This example visualizes the parallel categorical diagram maps showing the spatiotemporal change of neighborhood.
-Video demo:
+This example visualizes the parallel categorical diagram with maps showing the spatiotemporal change of neighborhood.
+Video demo: http://osnap.cloud/~suhan/videos/NAM_SD_3_sequence_neighborhood_categoriesDiagram
 
 - NAM_SD_4_sequence_neighborhood_chordDiagram : The output of GEOSNAP2NAM4_sequence_neighborhood_chordDiagram.ipynb
 This example visualizes the chord diagram with maps showing the spatiotemporal change of neighborhood. 
- Video demo:
+ Video demo: http://osnap.cloud/~suhan/videos/NAM_SD_4_sequence_neighborhood_chordDiagram
+
  
 In the source code, the lines below should be executed only for the first run to write LTDB data downloaded in the previous step to your disk. In source code, the lines below are commented out. Remove # in each of the lines and comment out again after the first run. This process takes about 10 - 15 minutes. But you do not need to repeat it from the second run.
 ```

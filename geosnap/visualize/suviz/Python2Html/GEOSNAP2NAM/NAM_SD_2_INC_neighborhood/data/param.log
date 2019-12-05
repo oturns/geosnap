@@ -1,4 +1,4 @@
-2019-12-04 18:03:36
+2019-12-05 01:17:29
   {'Distribution_INC1': True,
    'Distribution_INC2_different_cluster': True,
    'Distribution_INC2_different_period': True,
@@ -7,11 +7,6 @@
    'Sequence': False,
    'county_fips': None,
    'filename_suffix': 'SD_2_INC_neighborhood',
-   'labels': ['% white, non-Hispanic',
-              '% black, non-Hispanic',
-              '% Hispanic',
-              '% Native American race',
-              '% Asian and Pacific Islander race'],
    'method': 'kmeans',
    'msa_fips': '41740',
    'nClusters': 8,

@@ -3925,7 +3925,7 @@ function drawChordDiagram(chordD, fYear, tYear, sDict, matrix) {
 // set highlight to style from chord diagram
 function setSytleHighlightfromChordDiagram(mapN, geokeys, color="#00ffff", weight=3, fillOpacity=0.9) {
 	//var mapN = "map" + i;
-	//if (!app[mapN].geojson) continue;
+	if (!app[mapN].geojson) return;
 	var selectedColor = color;
 	for (j=0; j<geokeys.length; j++) {
 		var geokey = geokeys[j];
@@ -3945,7 +3945,7 @@ function resetSytlefromChordDiagram(mapN, geokeys) {
 	console.log(mapN, geokeys)
 	return;
 	//var mapN = "map" + i;
-	//if (!app[mapN].geojson) continue;
+	if (!app[mapN].geojson) return;
 	for (j=0; j<geokeys.length; j++) {
 		var geokey = geokeys[j];
 		var layerN = app[mapN].geojson._layers[app[mapN].layers[geokey]];

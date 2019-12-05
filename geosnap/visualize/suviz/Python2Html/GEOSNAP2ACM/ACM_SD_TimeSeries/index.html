@@ -2934,13 +2934,16 @@ function paintParcoords({lassoData="", lassoedMap="", eventData="", globalJoin=n
 				//label: "[Map"+(i+1)+"] "+layers[i],
 				label: label,
 				values: array[i],
-				tickformat: ".f",
+				//tickformat: ".f",
+				tickformat: "."+app.NumOfDecimalPlaces+"f",
 			}
 		);
 	}
 	
-	var tickvals = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].slice(0, colorGradient.length);
-	var ticktext = tickvals.map(i => " Class "+(i+1));
+	//var tickvals = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].slice(0, colorGradient.length);
+	//var ticktext = tickvals.map(i => " Class "+(i+1));
+	var tickvals = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].slice(0, intervals.length);
+	var ticktext = intervals.map(i => i.toFixed(app.NumOfDecimalPlaces));
 	console.log(tickvals, ticktext)
 	
 	var data = [{
