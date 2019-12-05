@@ -1,0 +1,12 @@
+2019-12-05 01:21:43
+  {'allMetros': True,
+   'filename_suffix': 'US_0_INC',
+   'method': 'kmeans',
+   'nClusters': 8,
+   'title': 'Neighborhood Analysis: Kmeans, 1980~2010, 5 variables',
+   'variables': ['p_nonhisp_white_persons',
+                 'p_nonhisp_black_persons',
+                 'p_hispanic_persons',
+                 'p_native_persons',
+                 'p_asian_persons'],
+   'years': [1980, 1990, 2000, 2010]}

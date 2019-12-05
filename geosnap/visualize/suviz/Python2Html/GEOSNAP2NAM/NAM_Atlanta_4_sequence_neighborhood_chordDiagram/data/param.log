@@ -1,0 +1,17 @@
+2019-12-05 01:27:56
+  {'Chord_Diagram_in_neighborhoods': True,
+   'Maps_of_neighborhood': True,
+   'Sequence': {'dist_type': 'tran', 'seq_clusters': 5},
+   'county_fips': None,
+   'filename_suffix': 'Atlanta_4_sequence_neighborhood_chordDiagram',
+   'method': 'kmeans',
+   'msa_fips': '12060',
+   'nClusters': 8,
+   'state_fips': None,
+   'title': 'Neighborhood Analysis: Kmeans, Atlanta',
+   'variables': ['p_nonhisp_white_persons',
+                 'p_nonhisp_black_persons',
+                 'p_hispanic_persons',
+                 'p_native_persons',
+                 'p_asian_persons'],
+   'years': [1980, 1990, 2000, 2010]}
