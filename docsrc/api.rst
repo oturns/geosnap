@@ -147,7 +147,7 @@ Spatial Clustering
     ward_spatial    
 
     
-Neighborhod Dynamics Methods
+Neighborhood Dynamics Methods
 '''''''''''''''''''''''''''''''''''''''''''''
 
 Model neighborhood change using optimal-matching algorithms or spatial discrete markov chains

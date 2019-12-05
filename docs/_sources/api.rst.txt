@@ -101,7 +101,8 @@ Analyze Module
 ----------------
 
 Neighborhood Clustering Methods
-``````````````````````````````````
+'''''''''''''''''''''''''''''''''''''''''''''
+
 Model neighborhood differentiation using multivariate clustering algorithms
 
 .. currentmodule:: geosnap
@@ -113,7 +114,7 @@ Model neighborhood differentiation using multivariate clustering algorithms
     analyze.cluster_spatial
 
 Clustering algorithms
-'''''''''''''''''''''''
+``````````````````````````````````
 The following algorithms may be passed to `geosnap.analyze.cluster` or `geosnap.analyze.cluster_spatial` but they should not be called directly
 
 Classic (aspatial) Clustering
@@ -146,8 +147,9 @@ Spatial Clustering
     ward_spatial    
 
     
-Neighborhod Dynamics Methods
-````````````````````````````````
+Neighborhood Dynamics Methods
+'''''''''''''''''''''''''''''''''''''''''''''
+
 Model neighborhood change using optimal-matching algorithms or spatial discrete markov chains
 
 .. currentmodule:: geosnap

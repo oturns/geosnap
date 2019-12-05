@@ -253,7 +253,7 @@ texinfo_documents = [
 
 # Generate the API documentation when building
 autosummary_generate = True
-numpydoc_show_class_members = True
+numpydoc_show_class_members = False
 class_members_toctree = True
 numpydoc_show_inherited_class_members = True
 numpydoc_use_plots = True

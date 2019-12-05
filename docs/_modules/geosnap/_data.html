@@ -121,11 +121,10 @@
 <span class="kn">import</span> <span class="nn">pathlib</span>
 <span class="kn">from</span> <span class="nn">warnings</span> <span class="k">import</span> <span class="n">warn</span>
 
-<span class="kn">from</span> <span class="nn">appdirs</span> <span class="k">import</span> <span class="n">user_data_dir</span>
-
 <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">quilt3</span>
+<span class="kn">from</span> <span class="nn">appdirs</span> <span class="k">import</span> <span class="n">user_data_dir</span>
 <span class="kn">from</span> <span class="nn">requests.exceptions</span> <span class="k">import</span> <span class="n">Timeout</span>
 <span class="kn">from</span> <span class="nn">shapely</span> <span class="k">import</span> <span class="n">wkb</span><span class="p">,</span> <span class="n">wkt</span>
 
@@ -143,9 +142,7 @@
 
 
 <span class="k">class</span> <span class="nc">_Map</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    tabbable dict.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;tabbable dict.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">_Map</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -222,8 +219,14 @@
     <span class="k">return</span> <span class="n">df</span>
 
 
-<span class="k">class</span> <span class="nc">DataStore</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Storage for geosnap data. Currently supports US Census data.&quot;&quot;&quot;</span>
+<span class="k">class</span> <span class="nc">DataStore</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Storage for geosnap data. Currently supports US Census data.</span>
+
+<span class="sd">        Unless otherwise noted, data are collected from the U.S. Census Bureau&#39;s TIGER/LINE Files</span>
+<span class="sd">        https://www.census.gov/cgi-bin/geo/shapefiles/index.php?year=2018 and converted to</span>
+<span class="sd">        parquet files.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Instantiate a new DataStore object.&quot;&quot;&quot;</span>
@@ -465,6 +468,9 @@
     <span class="k">def</span> <span class="nf">msas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">convert</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Metropolitan Statistical Areas as drawn in 2010.</span>
 
+<span class="sd">        Data come from the U.S. Census Bureau&#39;s most recent TIGER/LINE files</span>
+<span class="sd">        https://www.census.gov/cgi-bin/geo/shapefiles/index.php?year=2018&amp;layergroup=Core+Based+Statistical+Areas</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        convert : bool</span>
@@ -522,6 +528,9 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">msa_definitions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;2010 Metropolitan Statistical Area definitions.</span>
+
+<span class="sd">        Data come from the U.S. Census Bureau&#39;s most recent delineation files, available at</span>
+<span class="sd">        https://www.census.gov/geographies/reference-files/time-series/demo/metro-micro/delineation-files.html</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
