@@ -1,12 +1,6 @@
-2019-12-03 18:19:42
-  {'Chord_Diagram_in_neighborhoods': True,
-   'Distribution_INC1': True,
-   'Distribution_INC2_different_cluster': True,
-   'Distribution_INC2_different_period': True,
-   'Index_of_neighborhood_change': True,
-   'Maps_of_neighborhood': True,
-   'Parallel_Categories_Diagram_in_neighborhoods': True,
-   'Sequence': {'dist_type': 'tran', 'seq_clusters': 5},
+2019-12-04 18:27:25
+  {'Maps_of_neighborhood': True,
+   'Sequence': False,
    'Temporal_change_in_neighborhoods': True,
    'county_fips': None,
    'filename_suffix': 'SD_1_neighborhood',
