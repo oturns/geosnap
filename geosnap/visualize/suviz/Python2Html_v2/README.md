@@ -2,7 +2,7 @@
 <img height=200 src="images/geosnap_viz.png" alt="geosnap"/>
 </p>
 
-<h2 align="center" style="margin-top:-10px">The Geospatial Neighborhood Analysis Package Visualizer</h2> 
+<h2 align="center" style="margin-top:-10px">The Geospatial Neighborhood Analysis Visualizer</h2> 
 
 `geosnap-viz` has a highly interactive and dynamic user-interface that makes it easier to explore, model, analyze, and visualize the social and spatial dynamics of neighborhoods.
 
