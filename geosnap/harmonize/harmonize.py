@@ -4,9 +4,9 @@ import geopandas as gpd
 import pandas as pd
 from tobler.area_weighted import (
     area_interpolate,
-    area_interpolate_binning,
     area_tables_raster,
 )
+from tobler.area_weighted import _slow_area_interpolate
 from tobler.util.util import _check_presence_of_crs
 
 
@@ -129,7 +129,7 @@ def harmonize(
         if weights_method == "area":
 
             # In area_interpolate, the resulting variable has same lenght as target_df
-            interpolation = area_interpolate_binning(
+            interpolation = area_interpolate(
                 source_df,
                 target_df.copy(),
                 extensive_variables=extensive_variables,
@@ -149,7 +149,7 @@ def harmonize(
                 )
 
                 # In area_interpolate, the resulting variable has same lenght as target_df
-                interpolation = area_interpolate(
+                interpolation = _slow_area_interpolate(
                     source_df,
                     target_df.copy(),
                     extensive_variables=extensive_variables,
