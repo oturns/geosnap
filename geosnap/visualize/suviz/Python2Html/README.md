@@ -26,7 +26,7 @@ First-time users need to download LTDB data which are input for both GEOSNAP2ACM
 ### Getting Started
 
 Run Jupyter notebook examples below to learn how to use GEOSNAP2ACM and GEOSNAP2NAN. Each folder has examples like below
-#### geosnap2ACM 
+#### GEOSNAP2ACM 
 - ACM_SD_ACM_only : The output of ACM_only.ipynb. 
 It visualizes selected variables by using Adaptive Choropleth Mapper.
 Video demo: http://sarasen.asuscomm.com/ACM
@@ -48,7 +48,7 @@ Video demo:
 It visualizes the relationships among multiple variables.
 Video demo:
 
-#### geosnap2NAM
+#### GEOSNAP2NAM
 - NAM_SD_eveything : The output of GEOSNAP2NAM.ipynb 
 This example visualizes all charts and maps including the result of sequence analysis (Just like an image above). Visualizing everything like this creates too many maps and charts. So it is hard to understand what is what. From this reason, charts and maps are divided into the four examples of output visualization below
 Video demo: http://osnap.cloud/~suhan/videos/NAM_SD_everything
