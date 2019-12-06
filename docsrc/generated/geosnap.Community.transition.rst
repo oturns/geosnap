@@ -1,6 +1,0 @@
-geosnap.Community.transition
-============================
-
-.. currentmodule:: geosnap
-
-.. automethod:: Community.transition

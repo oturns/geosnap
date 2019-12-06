@@ -1,6 +1,0 @@
-geosnap.Community.from\_ltdb
-============================
-
-.. currentmodule:: geosnap
-
-.. automethod:: Community.from_ltdb

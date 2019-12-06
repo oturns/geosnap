@@ -1,6 +1,0 @@
-geosnap.analyze.sequence
-========================
-
-.. currentmodule:: geosnap.analyze
-
-.. autofunction:: sequence

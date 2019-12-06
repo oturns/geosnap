@@ -1,6 +1,0 @@
-geosnap.datasets.codebook
-=========================
-
-.. currentmodule:: geosnap
-
-.. automethod:: datasets.codebook

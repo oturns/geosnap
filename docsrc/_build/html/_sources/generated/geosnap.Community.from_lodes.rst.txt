@@ -1,6 +1,0 @@
-geosnap.Community.from\_lodes
-=============================
-
-.. currentmodule:: geosnap
-
-.. automethod:: Community.from_lodes

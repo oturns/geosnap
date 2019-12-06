@@ -1,6 +1,0 @@
-geosnap.io.store\_census
-========================
-
-.. currentmodule:: geosnap.io
-
-.. autofunction:: store_census

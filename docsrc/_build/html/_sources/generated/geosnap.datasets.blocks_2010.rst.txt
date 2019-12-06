@@ -1,6 +1,0 @@
-geosnap.datasets.blocks\_2010
-=============================
-
-.. currentmodule:: geosnap
-
-.. automethod:: datasets.blocks_2010

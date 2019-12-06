@@ -1,6 +1,0 @@
-geosnap.datasets.states
-=======================
-
-.. currentmodule:: geosnap
-
-.. automethod:: datasets.states

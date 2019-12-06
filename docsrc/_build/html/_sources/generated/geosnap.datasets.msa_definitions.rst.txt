@@ -1,6 +1,0 @@
-geosnap.datasets.msa\_definitions
-=================================
-
-.. currentmodule:: geosnap
-
-.. automethod:: datasets.msa_definitions

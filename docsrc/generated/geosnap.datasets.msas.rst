@@ -1,6 +1,0 @@
-geosnap.datasets.msas
-=====================
-
-.. currentmodule:: geosnap
-
-.. automethod:: datasets.msas

@@ -1,6 +1,0 @@
-geosnap.io.store\_ncdb
-======================
-
-.. currentmodule:: geosnap.io
-
-.. autofunction:: store_ncdb

@@ -1,6 +1,0 @@
-geosnap.Community.cluster
-=========================
-
-.. currentmodule:: geosnap
-
-.. automethod:: Community.cluster

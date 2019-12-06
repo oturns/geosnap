@@ -1,6 +1,0 @@
-geosnap.Community.harmonize
-===========================
-
-.. currentmodule:: geosnap
-
-.. automethod:: Community.harmonize

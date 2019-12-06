@@ -1,6 +1,0 @@
-geosnap.datasets
-================
-
-.. currentmodule:: geosnap
-
-.. autodata:: datasets

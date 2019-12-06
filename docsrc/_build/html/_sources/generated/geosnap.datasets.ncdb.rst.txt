@@ -1,6 +1,0 @@
-geosnap.datasets.ncdb
-=====================
-
-.. currentmodule:: geosnap
-
-.. automethod:: datasets.ncdb

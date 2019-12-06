@@ -1,6 +1,0 @@
-geosnap.visualize.explore
-=========================
-
-.. currentmodule:: geosnap.visualize
-
-.. autofunction:: explore
