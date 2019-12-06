@@ -12,7 +12,7 @@
 - spectral clustering
 - Agglomerative clustering using Ward linkage.
 - AZP clustering algorithm
-- Max-p clustering algorithm [DAR12]
+- Max-p clustering algorithm 
 - SKATER spatial clustering algorithm.
 - Spatially encouraged spectral clustering
 - Agglomerative clustering using Ward linkage with a spatial connectivity
