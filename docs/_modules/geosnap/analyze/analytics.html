@@ -116,18 +116,18 @@
   <h1>Source code for geosnap.analyze.analytics</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Tools for the spatial analysis of neighborhood change.&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
 
-<span class="kn">from</span> <span class="nn">libpysal.weights</span> <span class="k">import</span> <span class="n">attach_islands</span>
-<span class="kn">from</span> <span class="nn">libpysal.weights.contiguity</span> <span class="k">import</span> <span class="n">Queen</span><span class="p">,</span> <span class="n">Rook</span>
-<span class="kn">from</span> <span class="nn">libpysal.weights.distance</span> <span class="k">import</span> <span class="n">KNN</span>
+<span class="kn">from</span> <span class="nn">libpysal.weights</span> <span class="kn">import</span> <span class="n">attach_islands</span>
+<span class="kn">from</span> <span class="nn">libpysal.weights.contiguity</span> <span class="kn">import</span> <span class="n">Queen</span><span class="p">,</span> <span class="n">Rook</span>
+<span class="kn">from</span> <span class="nn">libpysal.weights.distance</span> <span class="kn">import</span> <span class="n">KNN</span>
 
-<span class="kn">from</span> <span class="nn">.._data</span> <span class="k">import</span> <span class="n">_Map</span>
-<span class="kn">from</span> <span class="nn">.cluster</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">.._data</span> <span class="kn">import</span> <span class="n">_Map</span>
+<span class="kn">from</span> <span class="nn">.cluster</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">affinity_propagation</span><span class="p">,</span>
     <span class="n">azp</span><span class="p">,</span>
     <span class="n">gaussian_mixture</span><span class="p">,</span>
@@ -162,8 +162,8 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    gdf : pandas.DataFrame</span>
-<span class="sd">        long-form (geo)DataFrame containing neighborhood attributes</span>
+<span class="sd">    gdf : geopandas.GeoDataFrame</span>
+<span class="sd">        long-form GeoDataFrame containing neighborhood attributes</span>
 <span class="sd">    n_clusters : int</span>
 <span class="sd">        the number of clusters to model. The default is 6).</span>
 <span class="sd">    method : str</span>
@@ -428,7 +428,7 @@
     </p>
     <p>
         &copy; Copyright 2018, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.<br/>
     </p>
   </div>
 </footer>

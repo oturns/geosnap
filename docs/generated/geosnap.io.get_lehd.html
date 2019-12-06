@@ -124,23 +124,23 @@
 <dt id="geosnap.io.get_lehd">
 <code class="sig-prename descclassname">geosnap.io.</code><code class="sig-name descname">get_lehd</code><span class="sig-paren">(</span><em class="sig-param">dataset='wac'</em>, <em class="sig-param">state='dc'</em>, <em class="sig-param">year=2015</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/io/util.html#get_lehd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.io.get_lehd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Grab data from the LODES FTP server as a pandas DataFrame.</p>
-<dl class="field-list simple">
+<dl class="field-list">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>dataset</strong><span class="classifier">str</span></dt><dd><p>which LODES dataset to collect: “rac” or wac”, reffering to either
+<dd class="field-odd"><dl>
+<dt><strong>dataset</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>which LODES dataset to collect: “rac” or wac”, reffering to either
 residence area characteristics or workplace area characteristics
 the default is ‘wac’).</p>
 </dd>
-<dt><strong>state</strong><span class="classifier">str</span></dt><dd><p>two-digit state abbreviation for example “ca” or “OH”</p>
+<dt><strong>state</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>two-digit state abbreviation for example “ca” or “OH”</p>
 </dd>
-<dt><strong>year</strong><span class="classifier">str</span></dt><dd><p>which year to collect. First year avaialable for most states is 2002.
+<dt><strong>year</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>which year to collect. First year avaialable for most states is 2002.
 Consult the LODES documentation for more details. The default is 2015.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>pandas.DataFrame</dt><dd><p>a pandas DataFrame with columns representing census blocks, indexed on
+<dt><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.25.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></dt><dd><p>a pandas DataFrame with columns representing census blocks, indexed on
 the block FIPS code.</p>
 </dd>
 </dl>
@@ -170,7 +170,7 @@ the block FIPS code.</p>
     </p>
     <p>
         &copy; Copyright 2018, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.<br/>
     </p>
   </div>
 </footer>

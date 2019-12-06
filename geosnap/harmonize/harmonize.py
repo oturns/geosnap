@@ -28,7 +28,7 @@ def harmonize(
 
     Parameters
     ----------
-    raw_community : list
+    raw_community : list of geopandas.GeoDataFrames
         Multiple GeoDataFrames given by a list (see (1) in Notes).
 
     target_year : string

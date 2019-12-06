@@ -123,13 +123,13 @@
 <dl class="function">
 <dt id="geosnap.analyze.analytics.gaussian_mixture">
 <code class="sig-prename descclassname">geosnap.analyze.analytics.</code><code class="sig-name descname">gaussian_mixture</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">n_clusters=5</em>, <em class="sig-param">covariance_type='full'</em>, <em class="sig-param">best_model=False</em>, <em class="sig-param">max_clusters=10</em>, <em class="sig-param">random_state=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/analyze/cluster.html#gaussian_mixture"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.analyze.analytics.gaussian_mixture" title="Permalink to this definition">¶</a></dt>
-<dd><p>Clustering with Gaussian Mixture Model</p>
-<dl class="field-list simple">
+<dd><p>Clustering with Gaussian Mixture Model.</p>
+<dl class="field-list">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>X</strong><span class="classifier">array-like</span></dt><dd><p>n x k attribute data</p>
+<dd class="field-odd"><dl>
+<dt><strong>X</strong><span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/glossary.html#term-array-like" title="(in NumPy v1.17)"><span>array_like</span></a></span></dt><dd><p>n x k attribute data</p>
 </dd>
-<dt><strong>n_clusters</strong><span class="classifier">int, optional, default: 5</span></dt><dd><p>The number of clusters to form.</p>
+<dt><strong>n_clusters</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional, default: 5</span></dt><dd><p>The number of clusters to form.</p>
 </dd>
 <dt><strong>covariance_type: str, optional, default: “full””</strong></dt><dd><p>The covariance parameter passed to scikit-learn’s GaussianMixture
 algorithm</p>
@@ -141,11 +141,12 @@ Criterion</p>
 </dd>
 <dt><strong>random_state: int, optional, default: None</strong></dt><dd><p>The seed used to generate replicable results</p>
 </dd>
+<dt><strong>kwargs</strong></dt><dd></dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>model: sklearn GaussianMixture instance</dt><dd></dd>
+<dt>fitted cluster instance: <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.mixture.GaussianMixture.html#sklearn.mixture.GaussianMixture" title="(in scikit-learn v0.22)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.mixture.GaussianMixture</span></code></a></dt><dd></dd>
 </dl>
 </dd>
 </dl>
@@ -173,7 +174,7 @@ Criterion</p>
     </p>
     <p>
         &copy; Copyright 2018, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.<br/>
     </p>
   </div>
 </footer>

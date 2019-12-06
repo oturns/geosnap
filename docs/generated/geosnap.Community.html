@@ -132,26 +132,26 @@ surveys, sensors, or geocoded misc.). A Community can be large (e.g. a
 metropolitan region), or small (e.g. a handfull of census tracts) and
 may have data pertaining to multiple discrete points in time.</p>
 </div></blockquote>
-<dl class="field-list simple">
+<dl class="field-list">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>gdf</strong><span class="classifier">geopandas.GeoDataFrame</span></dt><dd><p>long-form geodataframe that holds spatial and tabular data.</p>
+<dd class="field-odd"><dl>
+<dt><strong>gdf</strong><span class="classifier"><a class="reference external" href="https://geopandas.readthedocs.io/en/latest/reference/geopandas.GeoDataFrame.html#geopandas.GeoDataFrame" title="(in GeoPandas v0.6.1+26.gca6e5e7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geopandas.GeoDataFrame</span></code></a></span></dt><dd><p>long-form geodataframe that holds spatial and tabular data.</p>
 </dd>
-<dt><strong>harmonized</strong><span class="classifier">bool</span></dt><dd><p>Whether neighborhood boundaries have been harmonized into a set of
+<dt><strong>harmonized</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bltin-boolean-values" title="(in Python v3.8)"><span class="xref std std-ref">bool</span></a></span></dt><dd><p>Whether neighborhood boundaries have been harmonized into a set of
 time-consistent units</p>
 </dd>
 <dt><strong>**kwargs</strong></dt><dd></dd>
 </dl>
 </dd>
 <dt class="field-even">Attributes</dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>gdf</strong><span class="classifier">geopandas.GeoDataFrame</span></dt><dd><p>long-form geodataframe that stores neighborhood-level attributes
+<dd class="field-even"><dl>
+<dt><strong>gdf</strong><span class="classifier"><a class="reference external" href="https://geopandas.readthedocs.io/en/latest/reference/geopandas.GeoDataFrame.html#geopandas.GeoDataFrame" title="(in GeoPandas v0.6.1+26.gca6e5e7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geopandas.GeoDataFrame</span></code></a></span></dt><dd><p>long-form geodataframe that stores neighborhood-level attributes
 and geometries for one or more time periods</p>
 </dd>
-<dt><strong>harmonized</strong><span class="classifier">bool</span></dt><dd><p>Whether neighborhood boundaries have been harmonized into
+<dt><strong>harmonized</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bltin-boolean-values" title="(in Python v3.8)"><span class="xref std std-ref">bool</span></a></span></dt><dd><p>Whether neighborhood boundaries have been harmonized into
 consistent units over time</p>
 </dd>
-<dt><strong>models</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of model instances that have been fitted on the community.
+<dt><strong>models</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">dict</span></code></a></span></dt><dd><p>Dictionary of model instances that have been fitted on the community.
 The model name is the key and the value is a named tuple that stores the input matrix,
 the columns used to fit the model, the cluster labels, and the spatial weights matrix
 if necessary. For cluster models, the model name will match a column on the Community.gdf.</p>
@@ -163,16 +163,16 @@ if necessary. For cluster models, the model name will match a column on the Comm
 <dt id="geosnap.Community.__init__">
 <code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">gdf=None</em>, <em class="sig-param">harmonized=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/_community.html#Community.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.Community.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize a new Community.</p>
-<dl class="field-list simple">
+<dl class="field-list">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>gdf</strong><span class="classifier">geopandas.GeoDataFrame</span></dt><dd><p>long-form geodataframe that stores neighborhood-level attributes
+<dd class="field-odd"><dl>
+<dt><strong>gdf</strong><span class="classifier"><a class="reference external" href="https://geopandas.readthedocs.io/en/latest/reference/geopandas.GeoDataFrame.html#geopandas.GeoDataFrame" title="(in GeoPandas v0.6.1+26.gca6e5e7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geopandas.GeoDataFrame</span></code></a></span></dt><dd><p>long-form geodataframe that stores neighborhood-level attributes
 and geometries for one or more time periods</p>
 </dd>
-<dt><strong>harmonized</strong><span class="classifier">bool</span></dt><dd><p>Whether neighborhood boundaries have been harmonized into
+<dt><strong>harmonized</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bltin-boolean-values" title="(in Python v3.8)"><span class="xref std std-ref">bool</span></a></span></dt><dd><p>Whether neighborhood boundaries have been harmonized into
 consistent units over time</p>
 </dd>
-<dt><strong>**kwargs</strong><span class="classifier">kwargs</span></dt><dd><p>extra keyword arguments <cite>**kwargs</cite>.</p>
+<dt><strong>**kwargs</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">kwargs</span></code></span></dt><dd><p>extra keyword arguments <cite>**kwargs</cite>.</p>
 </dd>
 </dl>
 </dd>
@@ -245,7 +245,7 @@ consistent units over time</p>
     </p>
     <p>
         &copy; Copyright 2018, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.<br/>
     </p>
   </div>
 </footer>

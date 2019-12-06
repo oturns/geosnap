@@ -125,32 +125,32 @@
 <span class="sd">labeling information</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">collections</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span><span class="p">,</span> <span class="n">abc</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span><span class="p">,</span> <span class="n">abc</span>
 <span class="kn">import</span> <span class="nn">functools</span>
-<span class="kn">from</span> <span class="nn">io</span> <span class="k">import</span> <span class="n">StringIO</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">StringIO</span>
 <span class="kn">import</span> <span class="nn">itertools</span>
 <span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">textwrap</span> <span class="k">import</span> <span class="n">dedent</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">FrozenSet</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">textwrap</span> <span class="kn">import</span> <span class="n">dedent</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">FrozenSet</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">numpy.ma</span> <span class="k">as</span> <span class="nn">ma</span>
 
-<span class="kn">from</span> <span class="nn">pandas._config</span> <span class="k">import</span> <span class="n">get_option</span>
+<span class="kn">from</span> <span class="nn">pandas._config</span> <span class="kn">import</span> <span class="n">get_option</span>
 
-<span class="kn">from</span> <span class="nn">pandas._libs</span> <span class="k">import</span> <span class="n">algos</span> <span class="k">as</span> <span class="n">libalgos</span><span class="p">,</span> <span class="n">lib</span>
-<span class="kn">from</span> <span class="nn">pandas.compat</span> <span class="k">import</span> <span class="n">PY36</span><span class="p">,</span> <span class="n">raise_with_traceback</span>
-<span class="kn">from</span> <span class="nn">pandas.compat.numpy</span> <span class="k">import</span> <span class="n">function</span> <span class="k">as</span> <span class="n">nv</span>
-<span class="kn">from</span> <span class="nn">pandas.util._decorators</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">pandas._libs</span> <span class="kn">import</span> <span class="n">algos</span> <span class="k">as</span> <span class="n">libalgos</span><span class="p">,</span> <span class="n">lib</span>
+<span class="kn">from</span> <span class="nn">pandas.compat</span> <span class="kn">import</span> <span class="n">PY36</span><span class="p">,</span> <span class="n">raise_with_traceback</span>
+<span class="kn">from</span> <span class="nn">pandas.compat.numpy</span> <span class="kn">import</span> <span class="n">function</span> <span class="k">as</span> <span class="n">nv</span>
+<span class="kn">from</span> <span class="nn">pandas.util._decorators</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Appender</span><span class="p">,</span>
     <span class="n">Substitution</span><span class="p">,</span>
     <span class="n">deprecate_kwarg</span><span class="p">,</span>
     <span class="n">rewrite_axis_style_signature</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">pandas.util._validators</span> <span class="k">import</span> <span class="n">validate_axis_style_args</span><span class="p">,</span> <span class="n">validate_bool_kwarg</span>
+<span class="kn">from</span> <span class="nn">pandas.util._validators</span> <span class="kn">import</span> <span class="n">validate_axis_style_args</span><span class="p">,</span> <span class="n">validate_bool_kwarg</span>
 
-<span class="kn">from</span> <span class="nn">pandas.core.dtypes.cast</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">pandas.core.dtypes.cast</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">cast_scalar_to_array</span><span class="p">,</span>
     <span class="n">coerce_to_dtypes</span><span class="p">,</span>
     <span class="n">find_common_type</span><span class="p">,</span>
@@ -163,7 +163,7 @@
     <span class="n">maybe_upcast</span><span class="p">,</span>
     <span class="n">maybe_upcast_putmask</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">pandas.core.dtypes.common</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">pandas.core.dtypes.common</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ensure_float64</span><span class="p">,</span>
     <span class="n">ensure_int64</span><span class="p">,</span>
     <span class="n">ensure_platform_int</span><span class="p">,</span>
@@ -188,36 +188,36 @@
     <span class="n">is_sequence</span><span class="p">,</span>
     <span class="n">needs_i8_conversion</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">pandas.core.dtypes.generic</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">pandas.core.dtypes.generic</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ABCDataFrame</span><span class="p">,</span>
     <span class="n">ABCIndexClass</span><span class="p">,</span>
     <span class="n">ABCMultiIndex</span><span class="p">,</span>
     <span class="n">ABCSeries</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">pandas.core.dtypes.missing</span> <span class="k">import</span> <span class="n">isna</span><span class="p">,</span> <span class="n">notna</span>
+<span class="kn">from</span> <span class="nn">pandas.core.dtypes.missing</span> <span class="kn">import</span> <span class="n">isna</span><span class="p">,</span> <span class="n">notna</span>
 
-<span class="kn">from</span> <span class="nn">pandas.core</span> <span class="k">import</span> <span class="n">algorithms</span><span class="p">,</span> <span class="n">common</span> <span class="k">as</span> <span class="n">com</span><span class="p">,</span> <span class="n">nanops</span><span class="p">,</span> <span class="n">ops</span>
-<span class="kn">from</span> <span class="nn">pandas.core.accessor</span> <span class="k">import</span> <span class="n">CachedAccessor</span>
-<span class="kn">from</span> <span class="nn">pandas.core.arrays</span> <span class="k">import</span> <span class="n">Categorical</span><span class="p">,</span> <span class="n">ExtensionArray</span>
-<span class="kn">from</span> <span class="nn">pandas.core.arrays.datetimelike</span> <span class="k">import</span> <span class="n">DatetimeLikeArrayMixin</span> <span class="k">as</span> <span class="n">DatetimeLikeArray</span>
-<span class="kn">from</span> <span class="nn">pandas.core.arrays.sparse</span> <span class="k">import</span> <span class="n">SparseFrameAccessor</span>
-<span class="kn">from</span> <span class="nn">pandas.core.generic</span> <span class="k">import</span> <span class="n">NDFrame</span><span class="p">,</span> <span class="n">_shared_docs</span>
-<span class="kn">from</span> <span class="nn">pandas.core.index</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">pandas.core</span> <span class="kn">import</span> <span class="n">algorithms</span><span class="p">,</span> <span class="n">common</span> <span class="k">as</span> <span class="n">com</span><span class="p">,</span> <span class="n">nanops</span><span class="p">,</span> <span class="n">ops</span>
+<span class="kn">from</span> <span class="nn">pandas.core.accessor</span> <span class="kn">import</span> <span class="n">CachedAccessor</span>
+<span class="kn">from</span> <span class="nn">pandas.core.arrays</span> <span class="kn">import</span> <span class="n">Categorical</span><span class="p">,</span> <span class="n">ExtensionArray</span>
+<span class="kn">from</span> <span class="nn">pandas.core.arrays.datetimelike</span> <span class="kn">import</span> <span class="n">DatetimeLikeArrayMixin</span> <span class="k">as</span> <span class="n">DatetimeLikeArray</span>
+<span class="kn">from</span> <span class="nn">pandas.core.arrays.sparse</span> <span class="kn">import</span> <span class="n">SparseFrameAccessor</span>
+<span class="kn">from</span> <span class="nn">pandas.core.generic</span> <span class="kn">import</span> <span class="n">NDFrame</span><span class="p">,</span> <span class="n">_shared_docs</span>
+<span class="kn">from</span> <span class="nn">pandas.core.index</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Index</span><span class="p">,</span>
     <span class="n">MultiIndex</span><span class="p">,</span>
     <span class="n">ensure_index</span><span class="p">,</span>
     <span class="n">ensure_index_from_sequences</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">pandas.core.indexes</span> <span class="k">import</span> <span class="n">base</span> <span class="k">as</span> <span class="n">ibase</span>
-<span class="kn">from</span> <span class="nn">pandas.core.indexes.datetimes</span> <span class="k">import</span> <span class="n">DatetimeIndex</span>
-<span class="kn">from</span> <span class="nn">pandas.core.indexes.period</span> <span class="k">import</span> <span class="n">PeriodIndex</span>
-<span class="kn">from</span> <span class="nn">pandas.core.indexing</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">pandas.core.indexes</span> <span class="kn">import</span> <span class="n">base</span> <span class="k">as</span> <span class="n">ibase</span>
+<span class="kn">from</span> <span class="nn">pandas.core.indexes.datetimes</span> <span class="kn">import</span> <span class="n">DatetimeIndex</span>
+<span class="kn">from</span> <span class="nn">pandas.core.indexes.period</span> <span class="kn">import</span> <span class="n">PeriodIndex</span>
+<span class="kn">from</span> <span class="nn">pandas.core.indexing</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">check_bool_indexer</span><span class="p">,</span>
     <span class="n">convert_to_index_sliceable</span><span class="p">,</span>
     <span class="n">maybe_droplevels</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">pandas.core.internals</span> <span class="k">import</span> <span class="n">BlockManager</span>
-<span class="kn">from</span> <span class="nn">pandas.core.internals.construction</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">pandas.core.internals</span> <span class="kn">import</span> <span class="n">BlockManager</span>
+<span class="kn">from</span> <span class="nn">pandas.core.internals.construction</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">arrays_to_mgr</span><span class="p">,</span>
     <span class="n">get_names_from_index</span><span class="p">,</span>
     <span class="n">init_dict</span><span class="p">,</span>
@@ -227,10 +227,10 @@
     <span class="n">sanitize_index</span><span class="p">,</span>
     <span class="n">to_arrays</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">pandas.core.series</span> <span class="k">import</span> <span class="n">Series</span>
+<span class="kn">from</span> <span class="nn">pandas.core.series</span> <span class="kn">import</span> <span class="n">Series</span>
 
-<span class="kn">from</span> <span class="nn">pandas.io.formats</span> <span class="k">import</span> <span class="n">console</span><span class="p">,</span> <span class="nb">format</span> <span class="k">as</span> <span class="n">fmt</span>
-<span class="kn">from</span> <span class="nn">pandas.io.formats.printing</span> <span class="k">import</span> <span class="n">pprint_thing</span>
+<span class="kn">from</span> <span class="nn">pandas.io.formats</span> <span class="kn">import</span> <span class="n">console</span><span class="p">,</span> <span class="nb">format</span> <span class="k">as</span> <span class="n">fmt</span>
+<span class="kn">from</span> <span class="nn">pandas.io.formats.printing</span> <span class="kn">import</span> <span class="n">pprint_thing</span>
 <span class="kn">import</span> <span class="nn">pandas.plotting</span>
 
 <span class="c1"># ---------------------------------------------------------------------</span>
@@ -509,7 +509,7 @@
     <span class="c1"># ----------------------------------------------------------------------</span>
     <span class="c1"># Constructors</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -744,7 +744,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_repr_fits_horizontal_</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_repr_fits_vertical_</span><span class="p">()</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a string representation for a particular DataFrame.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -887,7 +887,7 @@
 <span class="sd">        --------</span>
 <span class="sd">        io.formats.style.Styler</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">pandas.io.formats.style</span> <span class="k">import</span> <span class="n">Styler</span>
+        <span class="kn">from</span> <span class="nn">pandas.io.formats.style</span> <span class="kn">import</span> <span class="n">Styler</span>
 
         <span class="k">return</span> <span class="n">Styler</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
@@ -1085,7 +1085,7 @@
         <span class="c1"># fallback to regular tuples</span>
         <span class="k">return</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">arrays</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns length of info axis, but here we use the index.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1202,13 +1202,13 @@
         <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;unsupported type: </span><span class="si">{oth}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">oth</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)))</span>
 
-    <span class="k">def</span> <span class="nf">__matmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__matmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Matrix multiplication using binary `@` operator in Python&gt;=3.5.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__rmatmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__rmatmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Matrix multiplication using binary `@` operator in Python&gt;=3.5.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1601,7 +1601,7 @@
 <span class="sd">        pandas_gbq.to_gbq : This function in the pandas-gbq library.</span>
 <span class="sd">        read_gbq : Read a DataFrame from Google BigQuery.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">pandas.io</span> <span class="k">import</span> <span class="n">gbq</span>
+        <span class="kn">from</span> <span class="nn">pandas.io</span> <span class="kn">import</span> <span class="n">gbq</span>
 
         <span class="n">gbq</span><span class="o">.</span><span class="n">to_gbq</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
@@ -2099,7 +2099,7 @@
             <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="kn">from</span> <span class="nn">pandas.core.sparse.api</span> <span class="k">import</span> <span class="n">SparseDataFrame</span>
+        <span class="kn">from</span> <span class="nn">pandas.core.sparse.api</span> <span class="kn">import</span> <span class="n">SparseDataFrame</span>
 
         <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;SparseDataFrame&quot;</span><span class="p">)</span>
@@ -2213,9 +2213,9 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="s2">&quot;strl support is only available when using &quot;</span> <span class="s2">&quot;format 117&quot;</span>
                 <span class="p">)</span>
-            <span class="kn">from</span> <span class="nn">pandas.io.stata</span> <span class="k">import</span> <span class="n">StataWriter</span> <span class="k">as</span> <span class="n">statawriter</span>
+            <span class="kn">from</span> <span class="nn">pandas.io.stata</span> <span class="kn">import</span> <span class="n">StataWriter</span> <span class="k">as</span> <span class="n">statawriter</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">pandas.io.stata</span> <span class="k">import</span> <span class="n">StataWriter117</span> <span class="k">as</span> <span class="n">statawriter</span>
+            <span class="kn">from</span> <span class="nn">pandas.io.stata</span> <span class="kn">import</span> <span class="n">StataWriter117</span> <span class="k">as</span> <span class="n">statawriter</span>
 
             <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;convert_strl&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert_strl</span>
 
@@ -2243,7 +2243,7 @@
 <span class="sd">        fname : str</span>
 <span class="sd">            string file path</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">pandas.io.feather_format</span> <span class="k">import</span> <span class="n">to_feather</span>
+        <span class="kn">from</span> <span class="nn">pandas.io.feather_format</span> <span class="kn">import</span> <span class="n">to_feather</span>
 
         <span class="n">to_feather</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
 
@@ -2321,7 +2321,7 @@
 <span class="sd">        0     1     3</span>
 <span class="sd">        1     2     4</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">pandas.io.parquet</span> <span class="k">import</span> <span class="n">to_parquet</span>
+        <span class="kn">from</span> <span class="nn">pandas.io.parquet</span> <span class="kn">import</span> <span class="n">to_parquet</span>
 
         <span class="n">to_parquet</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
@@ -3057,7 +3057,7 @@
 
             <span class="k">return</span> <span class="n">result</span>
 
-    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="n">key</span> <span class="o">=</span> <span class="n">lib</span><span class="o">.</span><span class="n">item_from_zerodim</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
         <span class="n">key</span> <span class="o">=</span> <span class="n">com</span><span class="o">.</span><span class="n">apply_if_callable</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 
@@ -3396,7 +3396,7 @@
 <span class="sd">        3  4   4   8</span>
 <span class="sd">        4  5   2   7</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">pandas.core.computation.eval</span> <span class="k">import</span> <span class="nb">eval</span> <span class="k">as</span> <span class="n">_eval</span>
+        <span class="kn">from</span> <span class="nn">pandas.core.computation.eval</span> <span class="kn">import</span> <span class="nb">eval</span> <span class="k">as</span> <span class="n">_eval</span>
 
         <span class="n">inplace</span> <span class="o">=</span> <span class="n">validate_bool_kwarg</span><span class="p">(</span><span class="n">inplace</span><span class="p">,</span> <span class="s2">&quot;inplace&quot;</span><span class="p">)</span>
         <span class="n">resolvers</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;resolvers&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -3566,7 +3566,7 @@
         <span class="n">klass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constructor_sliced</span>
         <span class="k">return</span> <span class="n">klass</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">items</span><span class="p">,</span> <span class="n">fastpath</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="n">key</span> <span class="o">=</span> <span class="n">com</span><span class="o">.</span><span class="n">apply_if_callable</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 
         <span class="c1"># see if we can slice the rows</span>
@@ -5032,8 +5032,8 @@
 <span class="sd">        -------</span>
 <span class="sd">        Series</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">pandas.core.sorting</span> <span class="k">import</span> <span class="n">get_group_index</span>
-        <span class="kn">from</span> <span class="nn">pandas._libs.hashtable</span> <span class="k">import</span> <span class="n">duplicated_int64</span><span class="p">,</span> <span class="n">_SIZE_HINT_LIMIT</span>
+        <span class="kn">from</span> <span class="nn">pandas.core.sorting</span> <span class="kn">import</span> <span class="n">get_group_index</span>
+        <span class="kn">from</span> <span class="nn">pandas._libs.hashtable</span> <span class="kn">import</span> <span class="n">duplicated_int64</span><span class="p">,</span> <span class="n">_SIZE_HINT_LIMIT</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">Series</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
@@ -5092,13 +5092,13 @@
                 <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ascending</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">by</span><span class="p">))</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">by</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">pandas.core.sorting</span> <span class="k">import</span> <span class="n">lexsort_indexer</span>
+            <span class="kn">from</span> <span class="nn">pandas.core.sorting</span> <span class="kn">import</span> <span class="n">lexsort_indexer</span>
 
             <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_label_or_level_values</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">by</span><span class="p">]</span>
             <span class="n">indexer</span> <span class="o">=</span> <span class="n">lexsort_indexer</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">orders</span><span class="o">=</span><span class="n">ascending</span><span class="p">,</span> <span class="n">na_position</span><span class="o">=</span><span class="n">na_position</span><span class="p">)</span>
             <span class="n">indexer</span> <span class="o">=</span> <span class="n">ensure_platform_int</span><span class="p">(</span><span class="n">indexer</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">pandas.core.sorting</span> <span class="k">import</span> <span class="n">nargsort</span>
+            <span class="kn">from</span> <span class="nn">pandas.core.sorting</span> <span class="kn">import</span> <span class="n">nargsort</span>
 
             <span class="n">by</span> <span class="o">=</span> <span class="n">by</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_label_or_level_values</span><span class="p">(</span><span class="n">by</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
@@ -5162,7 +5162,7 @@
             <span class="p">)</span>
 
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">MultiIndex</span><span class="p">):</span>
-            <span class="kn">from</span> <span class="nn">pandas.core.sorting</span> <span class="k">import</span> <span class="n">lexsort_indexer</span>
+            <span class="kn">from</span> <span class="nn">pandas.core.sorting</span> <span class="kn">import</span> <span class="n">lexsort_indexer</span>
 
             <span class="n">indexer</span> <span class="o">=</span> <span class="n">lexsort_indexer</span><span class="p">(</span>
                 <span class="n">labels</span><span class="o">.</span><span class="n">_get_codes_for_sorting</span><span class="p">(),</span>
@@ -5170,7 +5170,7 @@
                 <span class="n">na_position</span><span class="o">=</span><span class="n">na_position</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">pandas.core.sorting</span> <span class="k">import</span> <span class="n">nargsort</span>
+            <span class="kn">from</span> <span class="nn">pandas.core.sorting</span> <span class="kn">import</span> <span class="n">nargsort</span>
 
             <span class="c1"># Check monotonic-ness before sort an index</span>
             <span class="c1"># GH11080</span>
@@ -6023,7 +6023,7 @@
     <span class="nd">@Substitution</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
     <span class="nd">@Appender</span><span class="p">(</span><span class="n">_shared_docs</span><span class="p">[</span><span class="s2">&quot;pivot&quot;</span><span class="p">])</span>
     <span class="k">def</span> <span class="nf">pivot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">pandas.core.reshape.pivot</span> <span class="k">import</span> <span class="n">pivot</span>
+        <span class="kn">from</span> <span class="nn">pandas.core.reshape.pivot</span> <span class="kn">import</span> <span class="n">pivot</span>
 
         <span class="k">return</span> <span class="n">pivot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">)</span>
 
@@ -6168,7 +6168,7 @@
         <span class="n">margins_name</span><span class="o">=</span><span class="s2">&quot;All&quot;</span><span class="p">,</span>
         <span class="n">observed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">pandas.core.reshape.pivot</span> <span class="k">import</span> <span class="n">pivot_table</span>
+        <span class="kn">from</span> <span class="nn">pandas.core.reshape.pivot</span> <span class="kn">import</span> <span class="n">pivot_table</span>
 
         <span class="k">return</span> <span class="n">pivot_table</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
@@ -6346,7 +6346,7 @@
 <span class="sd">        dog kg     NaN     2.0</span>
 <span class="sd">            m      3.0     NaN</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">pandas.core.reshape.reshape</span> <span class="k">import</span> <span class="n">stack</span><span class="p">,</span> <span class="n">stack_multiple</span>
+        <span class="kn">from</span> <span class="nn">pandas.core.reshape.reshape</span> <span class="kn">import</span> <span class="n">stack</span><span class="p">,</span> <span class="n">stack_multiple</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
             <span class="k">return</span> <span class="n">stack_multiple</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">dropna</span><span class="o">=</span><span class="n">dropna</span><span class="p">)</span>
@@ -6482,7 +6482,7 @@
 <span class="sd">             b  4.0</span>
 <span class="sd">        dtype: float64</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">pandas.core.reshape.reshape</span> <span class="k">import</span> <span class="n">unstack</span>
+        <span class="kn">from</span> <span class="nn">pandas.core.reshape.reshape</span> <span class="kn">import</span> <span class="n">unstack</span>
 
         <span class="k">return</span> <span class="n">unstack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">)</span>
 
@@ -6598,7 +6598,7 @@
         <span class="n">value_name</span><span class="o">=</span><span class="s2">&quot;value&quot;</span><span class="p">,</span>
         <span class="n">col_level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">pandas.core.reshape.melt</span> <span class="k">import</span> <span class="n">melt</span>
+        <span class="kn">from</span> <span class="nn">pandas.core.reshape.melt</span> <span class="kn">import</span> <span class="n">melt</span>
 
         <span class="k">return</span> <span class="n">melt</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
@@ -7006,7 +7006,7 @@
 <span class="sd">        1  1  2</span>
 <span class="sd">        2  1  2</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">pandas.core.apply</span> <span class="k">import</span> <span class="n">frame_apply</span>
+        <span class="kn">from</span> <span class="nn">pandas.core.apply</span> <span class="kn">import</span> <span class="n">frame_apply</span>
 
         <span class="n">op</span> <span class="o">=</span> <span class="n">frame_apply</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
@@ -7219,7 +7219,7 @@
             <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_indexer</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
                 <span class="n">other</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
 
-        <span class="kn">from</span> <span class="nn">pandas.core.reshape.concat</span> <span class="k">import</span> <span class="n">concat</span>
+        <span class="kn">from</span> <span class="nn">pandas.core.reshape.concat</span> <span class="kn">import</span> <span class="n">concat</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
             <span class="n">to_concat</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">+</span> <span class="n">other</span>
@@ -7358,8 +7358,8 @@
     <span class="k">def</span> <span class="nf">_join_compat</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="n">lsuffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">rsuffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">pandas.core.reshape.merge</span> <span class="k">import</span> <span class="n">merge</span>
-        <span class="kn">from</span> <span class="nn">pandas.core.reshape.concat</span> <span class="k">import</span> <span class="n">concat</span>
+        <span class="kn">from</span> <span class="nn">pandas.core.reshape.merge</span> <span class="kn">import</span> <span class="n">merge</span>
+        <span class="kn">from</span> <span class="nn">pandas.core.reshape.concat</span> <span class="kn">import</span> <span class="n">concat</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Series</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -7421,7 +7421,7 @@
         <span class="n">indicator</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">validate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">pandas.core.reshape.merge</span> <span class="k">import</span> <span class="n">merge</span>
+        <span class="kn">from</span> <span class="nn">pandas.core.reshape.merge</span> <span class="kn">import</span> <span class="n">merge</span>
 
         <span class="k">return</span> <span class="n">merge</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
@@ -7516,7 +7516,7 @@
 <span class="sd">        2   0.7   0.0</span>
 <span class="sd">        3   0.2   0.0</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">pandas.core.reshape.concat</span> <span class="k">import</span> <span class="n">concat</span>
+        <span class="kn">from</span> <span class="nn">pandas.core.reshape.concat</span> <span class="kn">import</span> <span class="n">concat</span>
 
         <span class="k">def</span> <span class="nf">_dict_round</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">decimals</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">vals</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -8032,7 +8032,7 @@
                         <span class="c1"># numeric_only and yet we have tried a</span>
                         <span class="c1"># column-by-column reduction, where we have mixed type.</span>
                         <span class="c1"># So let&#39;s just do what we can</span>
-                        <span class="kn">from</span> <span class="nn">pandas.core.apply</span> <span class="k">import</span> <span class="n">frame_apply</span>
+                        <span class="kn">from</span> <span class="nn">pandas.core.apply</span> <span class="kn">import</span> <span class="n">frame_apply</span>
 
                         <span class="n">opa</span> <span class="o">=</span> <span class="n">frame_apply</span><span class="p">(</span>
                             <span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="s2">&quot;expand&quot;</span><span class="p">,</span> <span class="n">ignore_failures</span><span class="o">=</span><span class="kc">True</span>
@@ -8526,7 +8526,7 @@
 <span class="sd">        dog        False      False</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="kn">from</span> <span class="nn">pandas.core.reshape.concat</span> <span class="k">import</span> <span class="n">concat</span>
+            <span class="kn">from</span> <span class="nn">pandas.core.reshape.concat</span> <span class="kn">import</span> <span class="n">concat</span>
 
             <span class="n">values</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">concat</span><span class="p">(</span>
@@ -8613,7 +8613,7 @@
     </p>
     <p>
         &copy; Copyright 2018, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.<br/>
     </p>
   </div>
 </footer>

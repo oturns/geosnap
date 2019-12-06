@@ -46,8 +46,8 @@ def cluster(
 
     Parameters
     ----------
-    gdf : pandas.DataFrame
-        long-form (geo)DataFrame containing neighborhood attributes
+    gdf : geopandas.GeoDataFrame
+        long-form GeoDataFrame containing neighborhood attributes
     n_clusters : int
         the number of clusters to model. The default is 6).
     method : str

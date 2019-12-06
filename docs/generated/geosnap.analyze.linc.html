@@ -125,9 +125,18 @@
 <code class="sig-prename descclassname">geosnap.analyze.</code><code class="sig-name descname">linc</code><span class="sig-paren">(</span><em class="sig-param">labels_sequence</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/analyze/incs.html#linc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.analyze.linc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Local Indicator of Neighborhood Change</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt>lincs: array</dt><dd><p>local indicator of neighborhood change over all periods</p>
+<dt><strong>labels_sequence: sequence of neighborhood labels (n,t)</strong></dt><dd><p>n areas in t periods
+first element is a list of neighborhood labels per area in
+period 0, second element is a list of neighborhood labels
+per area in period 1, and so on for all T periods.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>lincs: <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></dt><dd><p>local indicator of neighborhood change over all periods</p>
 </dd>
 </dl>
 </dd>
@@ -193,7 +202,7 @@ for each unit</p>
     </p>
     <p>
         &copy; Copyright 2018, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.<br/>
     </p>
   </div>
 </footer>

@@ -257,7 +257,7 @@ numpydoc_show_class_members = False
 class_members_toctree = True
 numpydoc_show_inherited_class_members = True
 numpydoc_use_plots = True
-
+numpydoc_xref_param_type=True
 # display the source code for Plot directive
 plot_include_source = True
 
@@ -267,4 +267,18 @@ def setup(app):
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {"https://docs.python.org/3.6/": None}
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3/', None),
+    'numpy': ('https://docs.scipy.org/doc/numpy', None),
+    'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
+    'geopandas': ('https://geopandas.readthedocs.io/en/latest/', None),
+    'sklearn': ('https://scikit-learn.org/stable/', None),
+    'giddy': ('https://giddy.readthedocs.io/en/latest/', None),
+    'libpysal': ('https://pysal.org/libpysal/', None),
+    'esda': ('https://esda.readthedocs.io/en/latest/', None),
+    'region': ('https://region.readthedocs.io/en/latest/', None),
+    'hdbscan': ('https://hdbscan.readthedocs.io/en/latest/', None)
+
+}
+
+numpydoc_xref_ignore = {'type', 'optional', 'default', 'shape', 'fitted', 'instance', 'cluster'}

@@ -125,20 +125,20 @@
 <code class="sig-prename descclassname">geosnap.analyze.</code><code class="sig-name descname">sequence</code><span class="sig-paren">(</span><em class="sig-param">gdf</em>, <em class="sig-param">cluster_col</em>, <em class="sig-param">seq_clusters=5</em>, <em class="sig-param">subs_mat=None</em>, <em class="sig-param">dist_type=None</em>, <em class="sig-param">indel=None</em>, <em class="sig-param">time_var='year'</em>, <em class="sig-param">id_var='geoid'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/analyze/dynamics.html#sequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.analyze.sequence" title="Permalink to this definition">¶</a></dt>
 <dd><p>Pairwise sequence analysis and sequence clustering.</p>
 <p>Dynamic programming if optimal matching.</p>
-<dl class="field-list simple">
+<dl class="field-list">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>gdf</strong><span class="classifier">(geo)DataFrame</span></dt><dd><p>Long-form (geo)DataFrame containing neighborhood
+<dd class="field-odd"><dl>
+<dt><strong>gdf</strong><span class="classifier"><a class="reference external" href="https://geopandas.readthedocs.io/en/latest/reference/geopandas.GeoDataFrame.html#geopandas.GeoDataFrame" title="(in GeoPandas v0.6.1+26.gca6e5e7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geopandas.GeoDataFrame</span></code></a> or <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.25.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></span></dt><dd><p>Long-form geopandas.GeoDataFrame or pandas.DataFrame containing neighborhood
 attributes with a column defining neighborhood clusters.</p>
 </dd>
-<dt><strong>cluster_col</strong><span class="classifier">string or int</span></dt><dd><p>Column name for the neighborhood segmentation, such as
+<dt><strong>cluster_col</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>Column name for the neighborhood segmentation, such as
 “ward”, “kmeans”, etc.</p>
 </dd>
-<dt><strong>seq_clusters</strong><span class="classifier">int, optional</span></dt><dd><p>Number of neighborhood sequence clusters. Agglomerative
+<dt><strong>seq_clusters</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>Number of neighborhood sequence clusters. Agglomerative
 Clustering with Ward linkage is now used for clustering
 the sequences. Default is 5.</p>
 </dd>
-<dt><strong>dist_type</strong><span class="classifier">string</span></dt><dd><p>“hamming”: hamming distance (substitution only
+<dt><strong>dist_type</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>“hamming”: hamming distance (substitution only
 and its cost is constant 1) from sklearn.metrics;
 “markov”: utilize empirical transition
 probabilities to define substitution costs;
@@ -149,22 +149,34 @@ strong theory guidance: substitution=0.5, indel=1.
 “tran”: transition-oriented optimal matching. Sequence of
 transitions. Based on <a class="reference internal" href="../references.html#biemann-2011" id="id1">[Bie11]</a>.</p>
 </dd>
-<dt><strong>subs_mat</strong><span class="classifier">array</span></dt><dd><p>(k,k), substitution cost matrix. Should be hollow (
+<dt><strong>subs_mat</strong><span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>(k,k), substitution cost matrix. Should be hollow (
 0 cost between the same type), symmetric and non-negative.</p>
 </dd>
-<dt><strong>indel</strong><span class="classifier">float, optional</span></dt><dd><p>insertion/deletion cost.</p>
+<dt><strong>indel</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, optional</span></dt><dd><p>insertion/deletion cost.</p>
 </dd>
-<dt><strong>time_var</strong><span class="classifier">string, optional</span></dt><dd><p>Column defining time and or sequencing of the long-form data.
+<dt><strong>time_var</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>Column defining time and or sequencing of the long-form data.
 Default is “year”.</p>
 </dd>
-<dt><strong>id_var</strong><span class="classifier">string, optional</span></dt><dd><p>Column identifying the unique id of spatial units.
+<dt><strong>id_var</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>Column identifying the unique id of spatial units.
 Default is “geoid”.</p>
+</dd>
+<dt><strong>Returns</strong></dt><dd></dd>
+<dt><strong>——</strong></dt><dd></dd>
+<dt><strong>gdf_temp</strong><span class="classifier"><a class="reference external" href="https://geopandas.readthedocs.io/en/latest/reference/geopandas.GeoDataFrame.html#geopandas.GeoDataFrame" title="(in GeoPandas v0.6.1+26.gca6e5e7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geopandas.GeoDataFrame</span></code></a> or <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.25.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></span></dt><dd><p>geopandas.GeoDataFrame or pandas.DataFrame with a new column for sequence
+labels.</p>
+</dd>
+<dt><strong>df_wide</strong><span class="classifier"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.25.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></span></dt><dd><p>Wide-form DataFrame with k (k is the number of periods)
+columns of neighborhood types and 1 column of sequence
+labels.</p>
+</dd>
+<dt><strong>seq_dis_mat</strong><span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>(n,n), distance/dissimilarity matrix for each pair of
+sequences</p>
 </dd>
 </dl>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">geosnap.data</span> <span class="k">import</span> <span class="n">Community</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">geosnap.data</span> <span class="kn">import</span> <span class="n">Community</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">columbus</span> <span class="o">=</span> <span class="n">Community</span><span class="o">.</span><span class="n">from_ltdb</span><span class="p">(</span><span class="n">msa_fips</span><span class="o">=</span><span class="n">columbusfips</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">columbus1</span> <span class="o">=</span> <span class="n">columbus</span><span class="o">.</span><span class="n">cluster</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;median_household_income&#39;</span><span class="p">,</span>
 <span class="gp">... </span><span class="s1">&#39;p_poverty_rate&#39;</span><span class="p">,</span> <span class="s1">&#39;p_edu_college_greater&#39;</span><span class="p">,</span> <span class="s1">&#39;p_unemployment_rate&#39;</span><span class="p">],</span>
@@ -203,7 +215,7 @@ Default is “geoid”.</p>
     </p>
     <p>
         &copy; Copyright 2018, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.<br/>
     </p>
   </div>
 </footer>

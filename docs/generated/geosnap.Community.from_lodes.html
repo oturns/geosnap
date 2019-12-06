@@ -132,13 +132,13 @@ are additive, so geosnap will include the largest unique set.
 Alternatively, you may provide a boundary to use as a clipping
 feature.</p>
 </div></blockquote>
-<dl class="field-list simple">
+<dl class="field-list">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>state_fips</strong><span class="classifier">list or str</span></dt><dd><p>string or list of strings of two-digit fips codes defining states
+<dd class="field-odd"><dl>
+<dt><strong>state_fips</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>string or list of strings of two-digit fips codes defining states
 to include in the study area.</p>
 </dd>
-<dt><strong>county_fips</strong><span class="classifier">list or str</span></dt><dd><p>string or list of strings of five-digit fips codes defining
+<dt><strong>county_fips</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>string or list of strings of five-digit fips codes defining
 counties to include in the study area.</p>
 </dd>
 <dt><strong>msa_fips</strong><span class="classifier">type</span></dt><dd><p>string or list of strings of fips codes defining
@@ -152,7 +152,7 @@ This will be used to clip tracts lazily by selecting all
 <a href="#id1"><span class="problematic" id="id2">`</span></a>GeoDataFrame.representative_point()`s that intersect the
 boundary gdf</p>
 </dd>
-<dt><strong>years</strong><span class="classifier">list of ints</span></dt><dd><p>list of years to include in the study data
+<dt><strong>years</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> <code class="xref py py-obj docutils literal notranslate"><span class="pre">of</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">ints</span></code></span></dt><dd><p>list of years to include in the study data
 (the default is 2015).</p>
 </dd>
 <dt><strong>dataset: str</strong></dt><dd><p>which LODES dataset should be used to create the Community.
@@ -163,7 +163,7 @@ residence area characteristics. The default is workplace.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>Community</dt><dd><p>Community with LODES data</p>
+<dt><a class="reference internal" href="geosnap.Community.html#geosnap.Community" title="geosnap.Community"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community</span></code></a></dt><dd><p>Community with LODES data</p>
 </dd>
 </dl>
 </dd>
@@ -192,7 +192,7 @@ residence area characteristics. The default is workplace.</p>
     </p>
     <p>
         &copy; Copyright 2018, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.<br/>
     </p>
   </div>
 </footer>

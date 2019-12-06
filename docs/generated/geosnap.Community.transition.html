@@ -127,30 +127,30 @@
 <p>The transitional dynamics approach should be adopted after
 neighborhood segmentation since the column name of neighborhood
 labels is a required input.</p>
-<dl class="field-list simple">
+<dl class="field-list">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>cluster_col</strong><span class="classifier">string or int</span></dt><dd><p>Column name for the neighborhood segmentation, such as
+<dd class="field-odd"><dl>
+<dt><strong>cluster_col</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>Column name for the neighborhood segmentation, such as
 “ward”, “kmeans”, etc.</p>
 </dd>
-<dt><strong>time_var</strong><span class="classifier">string, optional</span></dt><dd><p>Column defining time and or sequencing of the long-form data.
+<dt><strong>time_var</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>Column defining time and or sequencing of the long-form data.
 Default is “year”.</p>
 </dd>
-<dt><strong>id_var</strong><span class="classifier">string, optional</span></dt><dd><p>Column identifying the unique id of spatial units.
+<dt><strong>id_var</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>Column identifying the unique id of spatial units.
 Default is “geoid”.</p>
 </dd>
-<dt><strong>w_type</strong><span class="classifier">string, optional</span></dt><dd><p>Type of spatial weights type (“rook”, “queen”, “knn” or
+<dt><strong>w_type</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>Type of spatial weights type (“rook”, “queen”, “knn” or
 “kernel”) to be used for spatial structure. Default is
 None, if non-spatial Markov transition rates are desired.</p>
 </dd>
-<dt><strong>permutations</strong><span class="classifier">int, optional</span></dt><dd><p>number of permutations for use in randomization based
+<dt><strong>permutations</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>number of permutations for use in randomization based
 inference (the default is 0).</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>mar</strong><span class="classifier">object</span></dt><dd><p>if w_type=None, return a giddy.markov.Markov instance;
+<dd class="field-even"><dl>
+<dt><strong>mar</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">object</span></code></a></span></dt><dd><p>if w_type=None, return a giddy.markov.Markov instance;
 if w_type is given, return a
 giddy.markov.Spatial_Markov instance.</p>
 </dd>
@@ -181,7 +181,7 @@ giddy.markov.Spatial_Markov instance.</p>
     </p>
     <p>
         &copy; Copyright 2018, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.<br/>
     </p>
   </div>
 </footer>

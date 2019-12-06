@@ -152,8 +152,8 @@ class Community:
 
         Parameters
         ----------
-        gdf : pandas.DataFrame
-            long-form (geo)DataFrame containing neighborhood attributes
+        gdf : geopandas.GeoDataFrame
+            long-form geodataframe containing neighborhood attributes
         n_clusters : int
             the number of clusters to model. The default is 6).
         method : str
@@ -174,8 +174,9 @@ class Community:
 
         Returns
         -------
-        pandas.DataFrame with a column of neighborhood cluster labels appended
-        as a new column. Will overwrite columns of the same name.
+        geosnap.Community
+            a copy of input Community with neighborhood cluster labels appended
+            as a new column. If the cluster is already present, the name will be incremented
 
         """
         harmonized = self.harmonized
@@ -220,12 +221,12 @@ class Community:
             long-form geodataframe holding neighborhood attribute and geometry data.
         n_clusters : int
             the number of clusters to model. The default is 6).
-        spatial_weights : str ('queen' or 'rook') or `libpysal.weights` instance
+        spatial_weights : str ('queen' or 'rook') or libpysal.weights.W instance
             spatial weights matrix specification` (the default is "rook"). If 'rook' or 'queen'
             then contiguity weights will be constructed internally, otherwise pass a
-            `libpysal.weights` with additional arguments specified in weights_kwargs
+            libpysal.weights.W with additional arguments specified in weights_kwargs
         weights_kwargs: dict
-            If passing a `libpysal.weights` instance to spatial_weights, these additional
+            If passing a libpysal.weights.W instance to spatial_weights, these additional
             keyword arguments that will be passed to the weights constructor
         method : str
             the clustering algorithm used to identify neighborhood types
@@ -233,7 +234,7 @@ class Community:
             Description of parameter `best_model` (the default is False).
         columns : list-like
             subset of columns on which to apply the clustering
-        threshold_variable : str
+        threshold_variable : str, required if using max-p, optional otherwise
             for max-p, which variable should define `p`. The default is "count",
             which will grow regions until the threshold number of polygons have
             been aggregated
@@ -248,8 +249,10 @@ class Community:
 
         Returns
         -------
-        geopandas.GeoDataFrame with a column of neighborhood cluster labels
-        appended as a new column. Will overwrite columns of the same name.
+        geosnap.Community
+            a copy of input Community with neighborhood cluster labels appended
+            as a new column. If the cluster is already present, the name will be incremented
+
 
         """
         harmonized = self.harmonized
@@ -374,7 +377,7 @@ class Community:
                           Column identifying the unique id of spatial units.
                           Default is "geoid".
 
-        Return
+        Returns
         ------
         gdf_new         : Community instance
                           New Community instance with attribute "gdf" having
@@ -794,7 +797,7 @@ class Community:
 
         Parameters
         ----------
-        gdfs : list-like
+        gdfs : list-like of geopandas.GeoDataFrames
             list of geodataframes that hold attribute and geometry data for
             a study area. Each geodataframe must have neighborhood
             attribute data, geometry data, and a time column that defines

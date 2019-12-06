@@ -128,20 +128,20 @@ between every two neighborhood sequences.</p>
 <p>The sequence approach should be adopted after
 neighborhood segmentation since the column name of neighborhood
 labels is a required input.</p>
-<dl class="field-list simple">
+<dl class="field-list">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>cluster_col</strong><span class="classifier">string or int</span></dt><dd><p>Column name for the neighborhood segmentation, such as
+<dd class="field-odd"><dl>
+<dt><strong>cluster_col</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>Column name for the neighborhood segmentation, such as
 “ward”, “kmeans”, etc.</p>
 </dd>
-<dt><strong>seq_clusters</strong><span class="classifier">int, optional</span></dt><dd><p>Number of neighborhood sequence clusters. Agglomerative
+<dt><strong>seq_clusters</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>Number of neighborhood sequence clusters. Agglomerative
 Clustering with Ward linkage is now used for clustering
 the sequences. Default is 5.</p>
 </dd>
-<dt><strong>subs_mat</strong><span class="classifier">array</span></dt><dd><p>(k,k), substitution cost matrix. Should be hollow (
+<dt><strong>subs_mat</strong><span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>(k,k), substitution cost matrix. Should be hollow (
 0 cost between the same type), symmetric and non-negative.</p>
 </dd>
-<dt><strong>dist_type</strong><span class="classifier">string</span></dt><dd><p>“hamming”: hamming distance (substitution only
+<dt><strong>dist_type</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>“hamming”: hamming distance (substitution only
 and its cost is constant 1) from sklearn.metrics;
 “markov”: utilize empirical transition
 probabilities to define substitution costs;
@@ -152,13 +152,25 @@ strong theory guidance: substitution=0.5, indel=1.
 “tran”: transition-oriented optimal matching. Sequence of
 transitions. Based on <a class="reference internal" href="../references.html#biemann-2011" id="id1">[Bie11]</a>.</p>
 </dd>
-<dt><strong>indel</strong><span class="classifier">float, optional</span></dt><dd><p>insertion/deletion cost.</p>
+<dt><strong>indel</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, optional</span></dt><dd><p>insertion/deletion cost.</p>
 </dd>
-<dt><strong>time_var</strong><span class="classifier">string, optional</span></dt><dd><p>Column defining time and or sequencing of the long-form data.
+<dt><strong>time_var</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>Column defining time and or sequencing of the long-form data.
 Default is “year”.</p>
 </dd>
-<dt><strong>id_var</strong><span class="classifier">string, optional</span></dt><dd><p>Column identifying the unique id of spatial units.
+<dt><strong>id_var</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>Column identifying the unique id of spatial units.
 Default is “geoid”.</p>
+</dd>
+<dt><strong>Returns</strong></dt><dd></dd>
+<dt><strong>——</strong></dt><dd></dd>
+<dt><strong>gdf_new</strong><span class="classifier"><a class="reference internal" href="geosnap.Community.html#geosnap.Community" title="geosnap.Community"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community</span></code></a> instance</span></dt><dd><p>New Community instance with attribute “gdf” having
+a new column for sequence labels.</p>
+</dd>
+<dt><strong>df_wide</strong><span class="classifier"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.25.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></span></dt><dd><p>Wide-form DataFrame with k (k is the number of periods)
+columns of neighborhood types and 1 column of sequence
+labels.</p>
+</dd>
+<dt><strong>seq_dis_mat</strong><span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>(n,n), distance/dissimilarity matrix for each pair of
+sequences</p>
 </dd>
 </dl>
 </dd>
@@ -187,7 +199,7 @@ Default is “geoid”.</p>
     </p>
     <p>
         &copy; Copyright 2018, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.<br/>
     </p>
   </div>
 </footer>

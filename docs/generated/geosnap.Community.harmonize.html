@@ -130,7 +130,7 @@
 <dt><strong>target_year: int</strong></dt><dd><p>Polygons from this year will become the target boundaries for
 spatial interpolation.</p>
 </dd>
-<dt><strong>weights_method</strong><span class="classifier">string</span></dt><dd><p>The method that the harmonization will be conducted. This can be
+<dt><strong>weights_method</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>The method that the harmonization will be conducted. This can be
 set to:</p>
 <blockquote>
 <div><dl class="simple">
@@ -144,28 +144,28 @@ set to:</p>
 “land_type_Gaussian_regression” : NOT YET INTRODUCED.</p>
 </div></blockquote>
 </dd>
-<dt><strong>extensive_variables</strong><span class="classifier">list</span></dt><dd><p>extensive variables to be used in interpolation.</p>
+<dt><strong>extensive_variables</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a></span></dt><dd><p>extensive variables to be used in interpolation.</p>
 </dd>
 <dt><strong>intensive_variables</strong><span class="classifier">type</span></dt><dd><p>intensive variables to be used in interpolation.</p>
 </dd>
-<dt><strong>allocate_total</strong><span class="classifier">boolean</span></dt><dd><p>True if total value of source area should be allocated.
+<dt><strong>allocate_total</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bltin-boolean-values" title="(in Python v3.8)"><span class="xref std std-ref">bool</span></a></span></dt><dd><p>True if total value of source area should be allocated.
 False if denominator is area of i. Note that the two cases
 would be identical when the area of the source polygon is
 exhausted by intersections. See (3) in Notes for more details</p>
 </dd>
-<dt><strong>raster_path</strong><span class="classifier">str</span></dt><dd><p>path to the raster image that has the types of each pixel in the
+<dt><strong>raster_path</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>path to the raster image that has the types of each pixel in the
 spatial context. Only taken into consideration for harmonization
 raster based.</p>
 </dd>
-<dt><strong>codes</strong><span class="classifier">list of ints</span></dt><dd><p>pixel values that should be included in the regression (the default “developed” includes [21, 22, 23, 24]).</p>
+<dt><strong>codes</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> <code class="xref py py-obj docutils literal notranslate"><span class="pre">of</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">ints</span></code></span></dt><dd><p>pixel values that should be included in the regression (the default “developed” includes [21, 22, 23, 24]).</p>
 </dd>
-<dt><strong>force_crs_match</strong><span class="classifier">bool</span></dt><dd><p>whether source and target dataframes should be reprojected to match (the default is True).</p>
+<dt><strong>force_crs_match</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bltin-boolean-values" title="(in Python v3.8)"><span class="xref std std-ref">bool</span></a></span></dt><dd><p>whether source and target dataframes should be reprojected to match (the default is True).</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>None</dt><dd><p>New data are added to the input Community</p>
+<dt><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a></dt><dd><p>New data are added to the input Community</p>
 </dd>
 </dl>
 </dd>
@@ -194,7 +194,7 @@ raster based.</p>
     </p>
     <p>
         &copy; Copyright 2018, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.<br/>
     </p>
   </div>
 </footer>

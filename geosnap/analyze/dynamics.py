@@ -15,8 +15,8 @@ def transition(
 
     Parameters
     ----------
-    gdf             : (geo)DataFrame
-                      Long-form (geo)DataFrame containing neighborhood
+    gdf             : geopandas.GeoDataFrame or pandas.DataFrame
+                      Long-form geopandas.GeoDataFrame or pandas.DataFrame containing neighborhood
                       attributes with a column defining neighborhood clusters.
     cluster_col     : string or int
                       Column name for the neighborhood segmentation, such as
@@ -35,7 +35,7 @@ def transition(
                       number of permutations for use in randomization based
                       inference (the default is 0).
 
-    Return
+    Returns
     ------
     mar             : object
                       if w_type=None, return a giddy.markov.Markov instance;
@@ -118,8 +118,8 @@ def sequence(
 
     Parameters
     ----------
-    gdf             : (geo)DataFrame
-                      Long-form (geo)DataFrame containing neighborhood
+    gdf             : geopandas.GeoDataFrame or pandas.DataFrame
+                      Long-form geopandas.GeoDataFrame or pandas.DataFrame containing neighborhood
                       attributes with a column defining neighborhood clusters.
     cluster_col     : string or int
                       Column name for the neighborhood segmentation, such as
@@ -151,10 +151,10 @@ def sequence(
                       Column identifying the unique id of spatial units.
                       Default is "geoid".
 
-    Return
+    Returns
     ------
-    gdf_temp        : (geo)DataFrame
-                      (geo)DataFrame with a new column for sequence
+    gdf_temp        : geopandas.GeoDataFrame or pandas.DataFrame
+                      geopandas.GeoDataFrame or pandas.DataFrame with a new column for sequence
                       labels.
     df_wide         : pandas.DataFrame
                       Wide-form DataFrame with k (k is the number of periods)

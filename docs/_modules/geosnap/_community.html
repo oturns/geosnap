@@ -115,18 +115,18 @@
       
   <h1>Source code for geosnap._community</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;A Community is a thin wrapper around a long-form time-series geodataframe.&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">warnings</span> <span class="k">import</span> <span class="n">warn</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
 
 <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
-<span class="kn">from</span> <span class="nn">._data</span> <span class="k">import</span> <span class="n">_Map</span><span class="p">,</span> <span class="n">datasets</span>
-<span class="kn">from</span> <span class="nn">.analyze</span> <span class="k">import</span> <span class="n">cluster</span> <span class="k">as</span> <span class="n">_cluster</span>
-<span class="kn">from</span> <span class="nn">.analyze</span> <span class="k">import</span> <span class="n">cluster_spatial</span> <span class="k">as</span> <span class="n">_cluster_spatial</span>
-<span class="kn">from</span> <span class="nn">.analyze</span> <span class="k">import</span> <span class="n">sequence</span> <span class="k">as</span> <span class="n">_sequence</span>
-<span class="kn">from</span> <span class="nn">.analyze</span> <span class="k">import</span> <span class="n">transition</span> <span class="k">as</span> <span class="n">_transition</span>
-<span class="kn">from</span> <span class="nn">.harmonize</span> <span class="k">import</span> <span class="n">harmonize</span> <span class="k">as</span> <span class="n">_harmonize</span>
-<span class="kn">from</span> <span class="nn">.io</span> <span class="k">import</span> <span class="n">_fips_filter</span><span class="p">,</span> <span class="n">_fipstable</span><span class="p">,</span> <span class="n">_from_db</span><span class="p">,</span> <span class="n">get_lehd</span>
+<span class="kn">from</span> <span class="nn">._data</span> <span class="kn">import</span> <span class="n">_Map</span><span class="p">,</span> <span class="n">datasets</span>
+<span class="kn">from</span> <span class="nn">.analyze</span> <span class="kn">import</span> <span class="n">cluster</span> <span class="k">as</span> <span class="n">_cluster</span>
+<span class="kn">from</span> <span class="nn">.analyze</span> <span class="kn">import</span> <span class="n">cluster_spatial</span> <span class="k">as</span> <span class="n">_cluster_spatial</span>
+<span class="kn">from</span> <span class="nn">.analyze</span> <span class="kn">import</span> <span class="n">sequence</span> <span class="k">as</span> <span class="n">_sequence</span>
+<span class="kn">from</span> <span class="nn">.analyze</span> <span class="kn">import</span> <span class="n">transition</span> <span class="k">as</span> <span class="n">_transition</span>
+<span class="kn">from</span> <span class="nn">.harmonize</span> <span class="kn">import</span> <span class="n">harmonize</span> <span class="k">as</span> <span class="n">_harmonize</span>
+<span class="kn">from</span> <span class="nn">.io</span> <span class="kn">import</span> <span class="n">_fips_filter</span><span class="p">,</span> <span class="n">_fipstable</span><span class="p">,</span> <span class="n">_from_db</span><span class="p">,</span> <span class="n">get_lehd</span>
 
 
 <div class="viewcode-block" id="Community"><a class="viewcode-back" href="../../generated/geosnap.Community.html#geosnap.Community">[docs]</a><span class="k">class</span> <span class="nc">Community</span><span class="p">:</span>
@@ -165,7 +165,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Community.__init__"><a class="viewcode-back" href="../../generated/geosnap.Community.html#geosnap.Community.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gdf</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">harmonized</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Community.__init__"><a class="viewcode-back" href="../../generated/geosnap.Community.html#geosnap.Community.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gdf</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">harmonized</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialize a new Community.</span>
 
 <span class="sd">        Parameters</span>
@@ -268,8 +268,8 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        gdf : pandas.DataFrame</span>
-<span class="sd">            long-form (geo)DataFrame containing neighborhood attributes</span>
+<span class="sd">        gdf : geopandas.GeoDataFrame</span>
+<span class="sd">            long-form geodataframe containing neighborhood attributes</span>
 <span class="sd">        n_clusters : int</span>
 <span class="sd">            the number of clusters to model. The default is 6).</span>
 <span class="sd">        method : str</span>
@@ -290,8 +290,9 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        pandas.DataFrame with a column of neighborhood cluster labels appended</span>
-<span class="sd">        as a new column. Will overwrite columns of the same name.</span>
+<span class="sd">        geosnap.Community</span>
+<span class="sd">            a copy of input Community with neighborhood cluster labels appended</span>
+<span class="sd">            as a new column. If the cluster is already present, the name will be incremented</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">harmonized</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">harmonized</span>
@@ -336,12 +337,12 @@
 <span class="sd">            long-form geodataframe holding neighborhood attribute and geometry data.</span>
 <span class="sd">        n_clusters : int</span>
 <span class="sd">            the number of clusters to model. The default is 6).</span>
-<span class="sd">        spatial_weights : str (&#39;queen&#39; or &#39;rook&#39;) or `libpysal.weights` instance</span>
+<span class="sd">        spatial_weights : str (&#39;queen&#39; or &#39;rook&#39;) or libpysal.weights.W instance</span>
 <span class="sd">            spatial weights matrix specification` (the default is &quot;rook&quot;). If &#39;rook&#39; or &#39;queen&#39;</span>
 <span class="sd">            then contiguity weights will be constructed internally, otherwise pass a</span>
-<span class="sd">            `libpysal.weights` with additional arguments specified in weights_kwargs</span>
+<span class="sd">            libpysal.weights.W with additional arguments specified in weights_kwargs</span>
 <span class="sd">        weights_kwargs: dict</span>
-<span class="sd">            If passing a `libpysal.weights` instance to spatial_weights, these additional</span>
+<span class="sd">            If passing a libpysal.weights.W instance to spatial_weights, these additional</span>
 <span class="sd">            keyword arguments that will be passed to the weights constructor</span>
 <span class="sd">        method : str</span>
 <span class="sd">            the clustering algorithm used to identify neighborhood types</span>
@@ -349,7 +350,7 @@
 <span class="sd">            Description of parameter `best_model` (the default is False).</span>
 <span class="sd">        columns : list-like</span>
 <span class="sd">            subset of columns on which to apply the clustering</span>
-<span class="sd">        threshold_variable : str</span>
+<span class="sd">        threshold_variable : str, required if using max-p, optional otherwise</span>
 <span class="sd">            for max-p, which variable should define `p`. The default is &quot;count&quot;,</span>
 <span class="sd">            which will grow regions until the threshold number of polygons have</span>
 <span class="sd">            been aggregated</span>
@@ -364,8 +365,10 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        geopandas.GeoDataFrame with a column of neighborhood cluster labels</span>
-<span class="sd">        appended as a new column. Will overwrite columns of the same name.</span>
+<span class="sd">        geosnap.Community</span>
+<span class="sd">            a copy of input Community with neighborhood cluster labels appended</span>
+<span class="sd">            as a new column. If the cluster is already present, the name will be incremented</span>
+
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">harmonized</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">harmonized</span>
@@ -490,7 +493,7 @@
 <span class="sd">                          Column identifying the unique id of spatial units.</span>
 <span class="sd">                          Default is &quot;geoid&quot;.</span>
 
-<span class="sd">        Return</span>
+<span class="sd">        Returns</span>
 <span class="sd">        ------</span>
 <span class="sd">        gdf_new         : Community instance</span>
 <span class="sd">                          New Community instance with attribute &quot;gdf&quot; having</span>
@@ -910,7 +913,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        gdfs : list-like</span>
+<span class="sd">        gdfs : list-like of geopandas.GeoDataFrames</span>
 <span class="sd">            list of geodataframes that hold attribute and geometry data for</span>
 <span class="sd">            a study area. Each geodataframe must have neighborhood</span>
 <span class="sd">            attribute data, geometry data, and a time column that defines</span>
@@ -940,7 +943,7 @@
     </p>
     <p>
         &copy; Copyright 2018, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.<br/>
     </p>
   </div>
 </footer>

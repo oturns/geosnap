@@ -124,21 +124,21 @@
 <dt id="geosnap.analyze.cluster">
 <code class="sig-prename descclassname">geosnap.analyze.</code><code class="sig-name descname">cluster</code><span class="sig-paren">(</span><em class="sig-param">gdf</em>, <em class="sig-param">n_clusters=6</em>, <em class="sig-param">method=None</em>, <em class="sig-param">best_model=False</em>, <em class="sig-param">columns=None</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">time_var='year'</em>, <em class="sig-param">id_var='geoid'</em>, <em class="sig-param">scaler=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/analyze/analytics.html#cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.analyze.cluster" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a geodemographic typology by running a cluster analysis on the study area’s neighborhood attributes.</p>
-<dl class="field-list simple">
+<dl class="field-list">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>gdf</strong><span class="classifier">pandas.DataFrame</span></dt><dd><p>long-form (geo)DataFrame containing neighborhood attributes</p>
+<dd class="field-odd"><dl>
+<dt><strong>gdf</strong><span class="classifier"><a class="reference external" href="https://geopandas.readthedocs.io/en/latest/reference/geopandas.GeoDataFrame.html#geopandas.GeoDataFrame" title="(in GeoPandas v0.6.1+26.gca6e5e7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geopandas.GeoDataFrame</span></code></a></span></dt><dd><p>long-form GeoDataFrame containing neighborhood attributes</p>
 </dd>
-<dt><strong>n_clusters</strong><span class="classifier">int</span></dt><dd><p>the number of clusters to model. The default is 6).</p>
+<dt><strong>n_clusters</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>the number of clusters to model. The default is 6).</p>
 </dd>
-<dt><strong>method</strong><span class="classifier">str</span></dt><dd><p>the clustering algorithm used to identify neighborhood types</p>
+<dt><strong>method</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>the clustering algorithm used to identify neighborhood types</p>
 </dd>
-<dt><strong>best_model</strong><span class="classifier">bool</span></dt><dd><p>if using a gaussian mixture model, use BIC to choose the best
+<dt><strong>best_model</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bltin-boolean-values" title="(in Python v3.8)"><span class="xref std std-ref">bool</span></a></span></dt><dd><p>if using a gaussian mixture model, use BIC to choose the best
 n_clusters. (the default is False).</p>
 </dd>
 <dt><strong>columns</strong><span class="classifier">list-like</span></dt><dd><p>subset of columns on which to apply the clustering</p>
 </dd>
-<dt><strong>verbose</strong><span class="classifier">bool</span></dt><dd><p>whether to print warning messages (the default is False).</p>
+<dt><strong>verbose</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bltin-boolean-values" title="(in Python v3.8)"><span class="xref std std-ref">bool</span></a></span></dt><dd><p>whether to print warning messages (the default is False).</p>
 </dd>
 <dt><strong>time_var: str</strong></dt><dd><p>which column on the dataframe defines time and or sequencing of the
 long-form data. Default is “year”</p>
@@ -152,15 +152,15 @@ data. Defaults to StandardScaler</p>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>gdf</strong><span class="classifier">geopandas.GeoDataFrame</span></dt><dd><p>GeoDataFrame with a column of neighborhood cluster labels
+<dd class="field-even"><dl>
+<dt><strong>gdf</strong><span class="classifier"><a class="reference external" href="https://geopandas.readthedocs.io/en/latest/reference/geopandas.GeoDataFrame.html#geopandas.GeoDataFrame" title="(in GeoPandas v0.6.1+26.gca6e5e7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geopandas.GeoDataFrame</span></code></a></span></dt><dd><p>GeoDataFrame with a column of neighborhood cluster labels
 appended as a new column. If cluster method exists as a column on the DataFrame
 then the column will be incremented.</p>
 </dd>
-<dt><strong>model</strong><span class="classifier">named tuple</span></dt><dd><p>A tuple with attributes X, columns, labels, instance, W, which store the
+<dt><strong>model</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">named</span></code> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">tuple</span></code></a></span></dt><dd><p>A tuple with attributes X, columns, labels, instance, W, which store the
 input matrix, column labels, fitted model instance, and spatial weights matrix</p>
 </dd>
-<dt><strong>model_name</strong><span class="classifier">str</span></dt><dd><p>name of model to be stored in a Community</p>
+<dt><strong>model_name</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>name of model to be stored in a Community</p>
 </dd>
 </dl>
 </dd>
@@ -189,7 +189,7 @@ input matrix, column labels, fitted model instance, and spatial weights matrix</
     </p>
     <p>
         &copy; Copyright 2018, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.<br/>
     </p>
   </div>
 </footer>
