@@ -4,7 +4,7 @@
 
 <h2 align="center" style="margin-top:-10px">The Geospatial Neighborhood Analysis Visualizer</h2> 
 
-`geosnap-viz` has a highly interactive and dynamic user-interface that makes it easier to explore, model, analyze, and visualize the social and spatial dynamics of neighborhoods. geosnap-viz visualizes data from census and American communisty survey (ACS) visualizes results of several spatial statistcs that help to study spatiotemporal neighborhood changes. Here is the list of a sptial and sptial statistics analysis geosnap-viz provides:
+`GEOSNAP-VIZ` has a highly interactive and dynamic user-interface that makes it easier to explore, model, analyze, and visualize the social and spatial dynamics of neighborhoods. GEOSNAP-VIZ visualizes data from census and American communisty survey (ACS) visualizes results of several spatial statistcs that help to study spatiotemporal neighborhood changes. Here is the list of a sptial and sptial statistics analysis geosnap-viz provides:
 - Clustering with Affinity Propagation
 - Clustering with Gaussian Mixture Model
 - Clustering with Hierarchical DBSCAN
@@ -18,9 +18,9 @@
 - Agglomerative clustering using Ward linkage with a spatial connectivity
 - Index of Neighborhood Change 
 
-`geosnap-viz` utilizes data and analysis layers provided by  [“The Geospatial Neighborhood Analysis Packages”](https://github.com/spatialucr/geosnap) (written in python), and combines them with a visualization layer written in Javascript, Html and CSS. The visualization layer is made of open-source JavaScript libraries such as Leaflet, Plotly, and D3.
+`GEOSNAP-VIZ` utilizes data and analysis layers provided by  [“The Geospatial Neighborhood Analysis Packages”](https://github.com/spatialucr/geosnap) (written in python), and combines them with a visualization layer written in Javascript, Html and CSS. The visualization layer is made of open-source JavaScript libraries such as Leaflet, Plotly, and D3.
 
-`geosnap-viz` consists of GEOSNAP2ACM (Adaptive Choropleth Mapper) and GOESNA2NAM (Neighborhood Analysis Mapper). GEOSNAP2ACM and GEOSNAP2NAM are open source GIS software packages that support (1) querying Race/Ethnicity, Socioeconomic and Demographic variables, (2) data exploration, (3) neighborhood delineation and analysis, and (4) user-interactive and dynamic visualization. Python3 (comes with Anaconda3) and Jupyter Notebook are required to run them. For visualization, Firefox  or Google Chrome work best. It has not been tested in Internet Explorer (IE).
+`GEOSNAP-VIZ` consists of GEOSNAP2ACM (Adaptive Choropleth Mapper) and GOESNA2NAM (Neighborhood Analysis Mapper). GEOSNAP2ACM and GEOSNAP2NAM are open source GIS software packages that support (1) querying Race/Ethnicity, Socioeconomic and Demographic variables, (2) data exploration, (3) neighborhood delineation and analysis, and (4) user-interactive and dynamic visualization. Python3 (comes with Anaconda3) and Jupyter Notebook are required to run them. For visualization, Firefox  or Google Chrome work best. It has not been tested in Internet Explorer (IE).
 
 - GEOSNAP2ACM is one of the modules in GEOSNAP and includes data and visualization layers of GEOSNAP. GEOSNAP2ACM contains modules for Step1: Data Exploration – (1) Adaptive Choropleth Mapper (ACM), (2) ACM with Correlogram, (3) ACM with Scatter plot, (4) ACM with Time Series, and (5) ACM with PCP.
 
