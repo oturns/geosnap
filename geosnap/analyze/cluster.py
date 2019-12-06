@@ -1,3 +1,5 @@
+"""Wrappers for multivariate clustering algorithms."""
+
 from warnings import warn
 
 import numpy as np
@@ -24,14 +26,13 @@ def ward(X, n_clusters=5, **kwargs):
     ----------
     X  : array-like
         n x k attribute data
-
     n_clusters : int, optional, default: 8
         The number of clusters to form.
 
 
     Returns
     -------
-    model: sklearn AgglomerativeClustering instance
+    fitted model : sklearn.cluster.AgglomerativeClustering instance
 
     """
     model = AgglomerativeClustering(n_clusters=n_clusters, linkage="ward")
@@ -60,14 +61,13 @@ def kmeans(
     ----------
     X  : array-like
          n x k attribute data
-
     n_clusters : int, optional, default: 8
         The number of clusters to form as well as the number of centroids to
         generate.
 
     Returns
     -------
-    model: sklearn KMeans instance
+    fitted model : sklearn.cluster.KMeans instance
 
     """
     if X.shape[0] > 12000:
@@ -116,23 +116,18 @@ def affinity_propagation(
     ----------
     X  : array-like
          n x k attribute data
-
-    preference :  array-like, shape (n_samples,) or float, optional,
-                  default: None
+    preference :  array-like, shape (n_samples,) or float, optional, default: None
         The preference parameter passed to scikit-learn's affinity propagation
         algorithm
-
-    damping: float, optional, default: 0.8
+    damping : float, optional, default: 0.8
         The damping parameter passed to scikit-learn's affinity propagation
         algorithm
-
     max_iter : int, optional, default: 1000
         Maximum number of iterations
 
-
     Returns
     -------
-    model: sklearn AffinityPropagation instance
+    fitted cluster instance : sklearn.cluster.AffinityPropagation
 
     """
     model = AffinityPropagation(
@@ -165,45 +160,50 @@ def spectral(
     n_jobs=-1,
     **kwargs
 ):
-    """Short summary.
+    """Spectral Clustering.
 
     Parameters
     ----------
-    X : arral-like
+    X : array-like
         n x k attribute data
-    n_clusters : type
+    n_clusters : int
         The number of clusters to form as well as the number of centroids to
         generate.
-    eigen_solver : type
-        Description of parameter `eigen_solver` (the default is None).
-    random_state : type
-        Description of parameter `random_state` (the default is None).
-    n_init : type
-        Description of parameter `n_init` (the default is 10).
-    gamma : type
-        Description of parameter `gamma` (the default is 1.0).
-    affinity : type
-        Description of parameter `affinity` (the default is 'rbf').
-    n_neighbors : type
-        Description of parameter `n_neighbors` (the default is 10).
-    eigen_tol : type
-        Description of parameter `eigen_tol` (the default is 0.0).
-    assign_labels : type
-        Description of parameter `assign_labels` (the default is 'kmeans').
-    degree : type
-        Description of parameter `degree` (the default is 3).
-    coef0 : type
-        Description of parameter `coef0` (the default is 1).
-    kernel_params : type
-        Description of parameter `kernel_params` (the default is None).
-    n_jobs : type
-        Description of parameter `n_jobs` (the default is -1).
-    **kwargs : type
-        Description of parameter `**kwargs`.
+    eigen_solver : {None, ‘arpack’, ‘lobpcg’, or ‘amg’}
+        The eigenvalue decomposition strategy to use. AMG requires pyamg to be installed. It can be
+        faster on very large, sparse problems, but may also lead to instabilities.
+    n_components : integer, optional, default=n_clusters
+        Number of eigen vectors to use for the spectral embedding
+    random_state : int, RandomState instance or None (default)
+        A pseudo random number generator used for the initialization of the lobpcg eigen vectors
+        decomposition when eigen_solver='amg' and by the K-Means initialization. Use an int to make
+        the randomness deterministic. See Glossary.
+    n_init : int, optional, default: 10
+        Number of time the k-means algorithm will be run with different centroid seeds. The final
+        results will be the best output of n_init consecutive runs in terms of inertia.
+    gamma : float, default=1.0
+        Kernel coefficient for rbf, poly, sigmoid, laplacian and chi2 kernels. Ignored for
+        affinity='nearest_neighbors'.
+    affinity : string or callable, default ‘rbf’
+        How to construct the affinity matrix.
+    n_neighbors : integer
+        Number of neighbors to use when constructing the affinity matrix using the nearest neighbors
+        method. Ignored for affinity='rbf'.
+    eigen_tol : float, optional, default: 0.0
+        Stopping criterion for eigendecomposition of the Laplacian matrix when eigen_solver='arpack'.
+    degree : float, default=3
+        Degree of the polynomial kernel. Ignored by other kernels.
+    coef0 : float, default=1
+        Zero coefficient for polynomial and sigmoid kernels. Ignored by other kernels.
+    n_jobs : int or None, optional (default=None)
+        The number of parallel jobs to run. None means 1 unless in a joblib.parallel_backend context.
+        -1 means using all processors. See Glossary for more details.
+    **kwargs : dict
+        additional wkargs.
 
     Returns
     -------
-    model: sklearn SpectralClustering instance
+    fitted cluster instance : sklearn.cluster.SpectralClustering
 
     """
     model = SpectralClustering(
@@ -234,43 +234,36 @@ def gaussian_mixture(
     random_state=None,
     **kwargs
 ):
-    """Clustering with Gaussian Mixture Model
-
+    """Clustering with Gaussian Mixture Model.
 
     Parameters
     ----------
-
     X  : array-like
         n x k attribute data
-
     n_clusters : int, optional, default: 5
         The number of clusters to form.
-
     covariance_type: str, optional, default: "full""
         The covariance parameter passed to scikit-learn's GaussianMixture
         algorithm
-
     best_model: bool, optional, default: False
         Option for finding endogenous K according to Bayesian Information
         Criterion
-
     max_clusters: int, optional, default:10
         The max number of clusters to test if using `best_model` option
-
     random_state: int, optional, default: None
         The seed used to generate replicable results
+    kwargs
 
     Returns
     -------
-
-    model: sklearn GaussianMixture instance
+    fitted cluster instance: sklearn.mixture.GaussianMixture
 
     """
     if random_state is None:
         warn(
             "Note: Gaussian Mixture Clustering is probabilistic--\
-cluster labels may be different for different runs. If you need consistency,\
-you should set the `random_state` parameter"
+             cluster labels may be different for different runs. If you need consistency,\
+             you should set the `random_state` parameter"
         )
 
     if best_model is True:
@@ -311,22 +304,21 @@ you should set the `random_state` parameter"
 
 
 def hdbscan(X, min_cluster_size=5, gen_min_span_tree=True, **kwargs):
-    """Clustering with Hierarchical DBSCAN
+    """Clustering with Hierarchical DBSCAN.
 
     Parameters
     ----------
     X : array-like
          n x k attribute data
-
     min_cluster_size : int, default: 5
         the minimum number of points necessary to generate a cluster
-
     gen_min_span_tree : bool
         Description of parameter `gen_min_span_tree` (the default is True).
+    kwargs
 
     Returns
     -------
-    model: hdbscan HDBSCAN instance
+    fitted cluster instance: hdbscan.hdbscan.HDBSCAN
 
     """
     try:
@@ -345,27 +337,22 @@ def hdbscan(X, min_cluster_size=5, gen_min_span_tree=True, **kwargs):
 
 
 def ward_spatial(X, w, n_clusters=5, **kwargs):
-    """Agglomerative clustering using Ward linkage with a spatial connectivity
-       constraint
+    """Agglomerative clustering using Ward linkage with a spatial connectivity constraint.
 
     Parameters
     ----------
     X : array-like
          n x k attribute data
-
-    w : PySAL W instance
+    w : libpywal.weights.W instance
         spatial weights matrix
-
     n_clusters : int, optional, default: 5
         The number of clusters to form.
 
-
     Returns
     -------
-    model: sklearn AgglomerativeClustering instance
+    fitted cluster instance: sklearn.cluster.AgglomerativeClustering
 
     """
-
     model = AgglomerativeClustering(
         n_clusters=n_clusters, connectivity=w.sparse, linkage="ward"
     )
@@ -374,7 +361,7 @@ def ward_spatial(X, w, n_clusters=5, **kwargs):
 
 
 def spenc(X, w, n_clusters=5, gamma=1, **kwargs):
-    """Spatially encouraged spectral clustering
+    """Spatially encouraged spectral clustering.
 
     :cite:`wolf2018`
 
@@ -382,20 +369,16 @@ def spenc(X, w, n_clusters=5, gamma=1, **kwargs):
     ----------
     X : array-like
          n x k attribute data
-
-    w : PySAL W instance
+    w : libpysal.weights.W instance
         spatial weights matrix
-
     n_clusters : int, optional, default: 5
         The number of clusters to form.
-
     gamma : int, default:1
         TODO.
 
-
     Returns
     -------
-    model: spenc SPENC instance
+    fitted cluster instance: spenc.SPENC
 
     """
     model = SPENC(n_clusters=n_clusters, gamma=gamma)
@@ -413,30 +396,22 @@ def skater(
     ----------
     X : array-like
          n x k attribute data
-
-    w : PySAL W instance
+    w : libpysal.weights.W instance
         spatial weights matrix
-
     n_clusters : int, optional, default: 5
         The number of clusters to form.
-
     floor : type
         TODO.
-
     trace : type
         TODO.
-
     islands : type
         TODO.
 
-
     Returns
     -------
-
-    model: skater SKATER instance
+    fitted cluster instance: region.skater.skater.Spanning_Forest
 
     """
-
     model = Spanning_Forest()
     model.fit(n_clusters, w, data=X.values, quorum=floor, trace=trace)
     model.labels_ = model.current_labels_
@@ -444,54 +419,45 @@ def skater(
 
 
 def azp(X, w, n_clusters=5, **kwargs):
-    """AZP clustering algorithm
+    """AZP clustering algorithm.
 
     Parameters
     ----------
     X : array-like
          n x k attribute data
-
-    w : PySAL W instance
+    w : libpysal.weights.W instance
         spatial weights matrix
-
     n_clusters : int, optional, default: 5
         The number of clusters to form.
 
-
     Returns
     -------
-    model: region AZP instance
+    fitted cluster instance: region.p_regions.azp.AZP
 
     """
-
     model = AZP()
     model.fit_from_w(attr=X.values, w=w, n_regions=n_clusters)
     return model
 
 
 def max_p(X, w, threshold_variable="count", threshold=10, **kwargs):
-    """Max-p clustering algorithm
-    :cite:`Duque2012`
+    """Max-p clustering algorithm :cite:`Duque2012`.
 
     Parameters
     ----------
     X : array-like
          n x k attribute data
-
-    w : PySAL W instance
+    w : libpysal.weights.W instance
         spatial weights matrix
-
     threshold_variable : str, default:"count"
         attribute variable to use as floor when calculate
-
     threshold : int, default:10
         integer that defines the upper limit of a variable that can be grouped
         into a single region
 
-
     Returns
     -------
-    model: region MaxPRegionsHeu instance
+    fitted cluster instance: region.p_regions.heuristics.MaxPRegionsHeu
 
     """
     model = MaxPRegionsHeu()

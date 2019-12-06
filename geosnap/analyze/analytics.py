@@ -46,28 +46,28 @@ def cluster(
 
     Parameters
     ----------
-    gdf : pandas.DataFrame
-        long-form (geo)DataFrame containing neighborhood attributes
-    n_clusters : int
+    gdf : geopandas.GeoDataFrame, required
+        long-form GeoDataFrame containing neighborhood attributes
+    n_clusters : int, required
         the number of clusters to model. The default is 6).
-    method : str
+    method : str in ['kmeans', 'ward', 'affinity_propagation', 'spectral','gaussian_mixture', 'hdbscan'], required
         the clustering algorithm used to identify neighborhood types
-    best_model : bool
+    best_model : bool, optional
         if using a gaussian mixture model, use BIC to choose the best
         n_clusters. (the default is False).
-    columns : list-like
+    columns : list-like, required
         subset of columns on which to apply the clustering
-    verbose : bool
+    verbose : bool, optional
         whether to print warning messages (the default is False).
-    time_var: str
+    time_var : str, optional
         which column on the dataframe defines time and or sequencing of the
         long-form data. Default is "year"
-    id_var: str
+    id_var : str, optional
         which column on the long-form dataframe identifies the stable units
         over time. In a wide-form dataset, this would be the unique index
-    scaler: str or sklearn.preprocessing.Scaler
+    scaler : None or scaler from sklearn.preprocessing, optional
         a scikit-learn preprocessing class that will be used to rescale the
-        data. Defaults to StandardScaler
+        data. Defaults to sklearn.preprocessing.StandardScaler
 
     Returns
     -------
@@ -164,7 +164,7 @@ def cluster_spatial(
         spatial weights matrix specification`. By default, geosnap will calculate Rook
         weights, but you can also pass a `libpysal.weights` object for more control
         over the specification.
-    method : str
+    method : str in ['ward_spatial', 'spenc', 'skater', 'azp', 'max_p']
         the clustering algorithm used to identify neighborhood types
     columns : list-like
         subset of columns on which to apply the clustering
@@ -174,18 +174,18 @@ def cluster_spatial(
         been aggregated
     threshold : numeric
         threshold to use for max-p clustering (the default is 10).
-    time_var: str
+    time_var : str
         which column on the dataframe defines time and or sequencing of the
         long-form data. Default is "year"
-    id_var: str
+    id_var : str
         which column on the long-form dataframe identifies the stable units
         over time. In a wide-form dataset, this would be the unique index
-    weights_kwargs: dict
+    weights_kwargs : dict
         If passing a `libpysal.weights` instance to spatial_weights, these additional
         keyword arguments that will be passed to the weights constructor
-    scaler: str or sklearn.preprocessing.Scaler
+    scaler : None or scaler class from sklearn.preprocessing
         a scikit-learn preprocessing class that will be used to rescale the
-        data. Defaults to StandardScaler
+        data. Defaults to sklearn.preprocessing.StandardScaler
 
     Returns
     -------

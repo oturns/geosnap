@@ -124,34 +124,30 @@
 <dt id="geosnap.Community.cluster">
 <code class="sig-prename descclassname">Community.</code><code class="sig-name descname">cluster</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">n_clusters=6</em>, <em class="sig-param">method=None</em>, <em class="sig-param">best_model=False</em>, <em class="sig-param">columns=None</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">return_model=False</em>, <em class="sig-param">scaler=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/_community.html#Community.cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.Community.cluster" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a geodemographic typology by running a cluster analysis on the study area’s neighborhood attributes.</p>
-<dl class="field-list simple">
+<dl class="field-list">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>gdf</strong><span class="classifier">pandas.DataFrame</span></dt><dd><p>long-form (geo)DataFrame containing neighborhood attributes</p>
+<dd class="field-odd"><dl>
+<dt><strong>n_clusters</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, required</span></dt><dd><p>the number of clusters to model. The default is 6).</p>
 </dd>
-<dt><strong>n_clusters</strong><span class="classifier">int</span></dt><dd><p>the number of clusters to model. The default is 6).</p>
+<dt><strong>method</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a> <code class="xref py py-obj docutils literal notranslate"><span class="pre">in</span></code> [‘kmeans’, ‘ward’, ‘affinity_propagation’, ‘spectral’, ‘gaussian_mixture’, ‘hdbscan’], required</span></dt><dd><p>the clustering algorithm used to identify neighborhood types</p>
 </dd>
-<dt><strong>method</strong><span class="classifier">str</span></dt><dd><p>the clustering algorithm used to identify neighborhood types</p>
-</dd>
-<dt><strong>best_model</strong><span class="classifier">bool</span></dt><dd><p>if using a gaussian mixture model, use BIC to choose the best
+<dt><strong>best_model</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bltin-boolean-values" title="(in Python v3.8)"><span class="xref std std-ref">bool</span></a>, optional</span></dt><dd><p>if using a gaussian mixture model, use BIC to choose the best
 n_clusters. (the default is False).</p>
 </dd>
-<dt><strong>columns</strong><span class="classifier">list-like</span></dt><dd><p>subset of columns on which to apply the clustering</p>
+<dt><strong>columns</strong><span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/glossary.html#term-array-like" title="(in NumPy v1.17)"><span>array_like</span></a>, required</span></dt><dd><p>subset of columns on which to apply the clustering</p>
 </dd>
-<dt><strong>verbose</strong><span class="classifier">bool</span></dt><dd><p>whether to print warning messages (the default is False).</p>
+<dt><strong>verbose</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bltin-boolean-values" title="(in Python v3.8)"><span class="xref std std-ref">bool</span></a>, optional</span></dt><dd><p>whether to print warning messages (the default is False).</p>
 </dd>
-<dt><strong>return_model</strong><span class="classifier">bool</span></dt><dd><p>whether to return the underlying cluster model instance for further
-analysis</p>
-</dd>
-<dt><strong>scaler: str or sklearn.preprocessing.Scaler</strong></dt><dd><p>a scikit-learn preprocessing class that will be used to rescale the
-data. Defaults to StandardScaler</p>
+<dt><strong>scaler</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">scaler</span></code> from <a class="reference external" href="https://scikit-learn.org/stable/modules/classes.html#module-sklearn.preprocessing" title="(in scikit-learn v0.22)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.preprocessing</span></code></a>, optional</span></dt><dd><p>a scikit-learn preprocessing class that will be used to rescale the
+data. Defaults to sklearn.preprocessing.StandardScaler</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>pandas.DataFrame with a column of neighborhood cluster labels appended</dt><dd></dd>
-<dt>as a new column. Will overwrite columns of the same name.</dt><dd></dd>
+<dt><a class="reference internal" href="geosnap.Community.html#geosnap.Community" title="geosnap.Community"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geosnap.Community</span></code></a></dt><dd><p>a copy of input Community with neighborhood cluster labels appended
+as a new column. If the cluster is already present, the name will be incremented</p>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -179,7 +175,7 @@ data. Defaults to StandardScaler</p>
     </p>
     <p>
         &copy; Copyright 2018, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.<br/>
     </p>
   </div>
 </footer>

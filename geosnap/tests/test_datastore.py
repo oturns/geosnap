@@ -30,18 +30,18 @@ def test_msas():
 
 
 def test_msa_defs():
-    df = datasets.msa_definitions
+    df = datasets.msa_definitions()
     assert df.shape == (1915, 13)
 
 
 def test_codebook():
-    df = datasets.codebook
+    df = datasets.codebook()
     assert df.shape == (194, 12)
 
 
 def test_ltdb():
-    assert datasets.ltdb.shape == (330388, 192)
+    assert datasets.ltdb().shape == (330388, 192)
 
 
 def test_ncdb():
-    assert datasets.ncdb.shape == (328633, 77)
+    assert datasets.ncdb().shape == (328633, 77)

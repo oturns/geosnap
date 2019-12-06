@@ -1,7 +1,7 @@
 .. image:: figs/geosnap_long.png
     :align: center
     :height: 200px
-    :width: 800px
+    :width: 500px
     :alt: geosnap
 
 

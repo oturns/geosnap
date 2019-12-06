@@ -116,18 +116,18 @@
   <h1>Source code for geosnap.analyze.analytics</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Tools for the spatial analysis of neighborhood change.&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
 
-<span class="kn">from</span> <span class="nn">libpysal.weights</span> <span class="k">import</span> <span class="n">attach_islands</span>
-<span class="kn">from</span> <span class="nn">libpysal.weights.contiguity</span> <span class="k">import</span> <span class="n">Queen</span><span class="p">,</span> <span class="n">Rook</span>
-<span class="kn">from</span> <span class="nn">libpysal.weights.distance</span> <span class="k">import</span> <span class="n">KNN</span>
+<span class="kn">from</span> <span class="nn">libpysal.weights</span> <span class="kn">import</span> <span class="n">attach_islands</span>
+<span class="kn">from</span> <span class="nn">libpysal.weights.contiguity</span> <span class="kn">import</span> <span class="n">Queen</span><span class="p">,</span> <span class="n">Rook</span>
+<span class="kn">from</span> <span class="nn">libpysal.weights.distance</span> <span class="kn">import</span> <span class="n">KNN</span>
 
-<span class="kn">from</span> <span class="nn">.._data</span> <span class="k">import</span> <span class="n">_Map</span>
-<span class="kn">from</span> <span class="nn">.cluster</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">.._data</span> <span class="kn">import</span> <span class="n">_Map</span>
+<span class="kn">from</span> <span class="nn">.cluster</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">affinity_propagation</span><span class="p">,</span>
     <span class="n">azp</span><span class="p">,</span>
     <span class="n">gaussian_mixture</span><span class="p">,</span>
@@ -162,28 +162,28 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    gdf : pandas.DataFrame</span>
-<span class="sd">        long-form (geo)DataFrame containing neighborhood attributes</span>
-<span class="sd">    n_clusters : int</span>
+<span class="sd">    gdf : geopandas.GeoDataFrame, required</span>
+<span class="sd">        long-form GeoDataFrame containing neighborhood attributes</span>
+<span class="sd">    n_clusters : int, required</span>
 <span class="sd">        the number of clusters to model. The default is 6).</span>
-<span class="sd">    method : str</span>
+<span class="sd">    method : str in [&#39;kmeans&#39;, &#39;ward&#39;, &#39;affinity_propagation&#39;, &#39;spectral&#39;,&#39;gaussian_mixture&#39;, &#39;hdbscan&#39;], required</span>
 <span class="sd">        the clustering algorithm used to identify neighborhood types</span>
-<span class="sd">    best_model : bool</span>
+<span class="sd">    best_model : bool, optional</span>
 <span class="sd">        if using a gaussian mixture model, use BIC to choose the best</span>
 <span class="sd">        n_clusters. (the default is False).</span>
-<span class="sd">    columns : list-like</span>
+<span class="sd">    columns : list-like, required</span>
 <span class="sd">        subset of columns on which to apply the clustering</span>
-<span class="sd">    verbose : bool</span>
+<span class="sd">    verbose : bool, optional</span>
 <span class="sd">        whether to print warning messages (the default is False).</span>
-<span class="sd">    time_var: str</span>
+<span class="sd">    time_var : str, optional</span>
 <span class="sd">        which column on the dataframe defines time and or sequencing of the</span>
 <span class="sd">        long-form data. Default is &quot;year&quot;</span>
-<span class="sd">    id_var: str</span>
+<span class="sd">    id_var : str, optional</span>
 <span class="sd">        which column on the long-form dataframe identifies the stable units</span>
 <span class="sd">        over time. In a wide-form dataset, this would be the unique index</span>
-<span class="sd">    scaler: str or sklearn.preprocessing.Scaler</span>
+<span class="sd">    scaler : None or scaler from sklearn.preprocessing, optional</span>
 <span class="sd">        a scikit-learn preprocessing class that will be used to rescale the</span>
-<span class="sd">        data. Defaults to StandardScaler</span>
+<span class="sd">        data. Defaults to sklearn.preprocessing.StandardScaler</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -280,7 +280,7 @@
 <span class="sd">        spatial weights matrix specification`. By default, geosnap will calculate Rook</span>
 <span class="sd">        weights, but you can also pass a `libpysal.weights` object for more control</span>
 <span class="sd">        over the specification.</span>
-<span class="sd">    method : str</span>
+<span class="sd">    method : str in [&#39;ward_spatial&#39;, &#39;spenc&#39;, &#39;skater&#39;, &#39;azp&#39;, &#39;max_p&#39;]</span>
 <span class="sd">        the clustering algorithm used to identify neighborhood types</span>
 <span class="sd">    columns : list-like</span>
 <span class="sd">        subset of columns on which to apply the clustering</span>
@@ -290,18 +290,18 @@
 <span class="sd">        been aggregated</span>
 <span class="sd">    threshold : numeric</span>
 <span class="sd">        threshold to use for max-p clustering (the default is 10).</span>
-<span class="sd">    time_var: str</span>
+<span class="sd">    time_var : str</span>
 <span class="sd">        which column on the dataframe defines time and or sequencing of the</span>
 <span class="sd">        long-form data. Default is &quot;year&quot;</span>
-<span class="sd">    id_var: str</span>
+<span class="sd">    id_var : str</span>
 <span class="sd">        which column on the long-form dataframe identifies the stable units</span>
 <span class="sd">        over time. In a wide-form dataset, this would be the unique index</span>
-<span class="sd">    weights_kwargs: dict</span>
+<span class="sd">    weights_kwargs : dict</span>
 <span class="sd">        If passing a `libpysal.weights` instance to spatial_weights, these additional</span>
 <span class="sd">        keyword arguments that will be passed to the weights constructor</span>
-<span class="sd">    scaler: str or sklearn.preprocessing.Scaler</span>
+<span class="sd">    scaler : None or scaler class from sklearn.preprocessing</span>
 <span class="sd">        a scikit-learn preprocessing class that will be used to rescale the</span>
-<span class="sd">        data. Defaults to StandardScaler</span>
+<span class="sd">        data. Defaults to sklearn.preprocessing.StandardScaler</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -428,7 +428,7 @@
     </p>
     <p>
         &copy; Copyright 2018, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.<br/>
     </p>
   </div>
 </footer>

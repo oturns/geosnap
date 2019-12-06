@@ -204,17 +204,17 @@ def store_ltdb(sample, fullcount):
     df = pd.concat([ltdb_1970, ltdb_1980, ltdb_1990, ltdb_2000, ltdb_2010], sort=True)
 
     renamer = dict(
-        zip(datasets.codebook["ltdb"].tolist(), datasets.codebook["variable"].tolist())
+        zip(datasets.codebook()["ltdb"].tolist(), datasets.codebook()["variable"].tolist())
     )
 
     df.rename(renamer, axis="columns", inplace=True)
 
     # compute additional variables from lookup table
-    for row in datasets.codebook["formula"].dropna().tolist():
+    for row in datasets.codebook()["formula"].dropna().tolist():
         df.eval(row, inplace=True)
 
     keeps = df.columns[
-        df.columns.isin(datasets.codebook["variable"].tolist() + ["year"])
+        df.columns.isin(datasets.codebook()["variable"].tolist() + ["year"])
     ]
     df = df[keeps]
 
@@ -233,7 +233,7 @@ def store_ncdb(filepath):
         location of the input CSV file extracted from your Geolytics DVD
 
     """
-    ncdb_vars = datasets.codebook["ncdb"].dropna()[1:].values
+    ncdb_vars = datasets.codebook()["ncdb"].dropna()[1:].values
 
     names = []
     for name in ncdb_vars:
@@ -298,7 +298,7 @@ def store_ncdb(filepath):
     )
     df = df.groupby(["GEO2010", "year"]).first()
 
-    mapper = dict(zip(datasets.codebook.ncdb, datasets.codebook.variable))
+    mapper = dict(zip(datasets.codebook().ncdb, datasets.codebook().variable))
 
     df.reset_index(inplace=True)
 
@@ -306,14 +306,14 @@ def store_ncdb(filepath):
 
     df = df.set_index("geoid")
 
-    for row in datasets.codebook["formula"].dropna().tolist():
+    for row in datasets.codebook()["formula"].dropna().tolist():
         try:
             df.eval(row, inplace=True)
         except:
             warn("Unable to compute " + str(row))
 
     keeps = df.columns[
-        df.columns.isin(datasets.codebook["variable"].tolist() + ["year"])
+        df.columns.isin(datasets.codebook()["variable"].tolist() + ["year"])
     ]
 
     df = df[keeps]
@@ -338,8 +338,8 @@ def _fips_filter(
             fips_list += each
 
     if msa_fips:
-        fips_list += datasets.msa_definitions[
-            datasets.msa_definitions["CBSA Code"] == msa_fips
+        fips_list += datasets.msa_definitions()[
+            datasets.msa_definitions()["CBSA Code"] == msa_fips
         ]["stcofips"].tolist()
 
     df = data[data.geoid.str.startswith(tuple(fips_list))]

@@ -80,7 +80,7 @@ def _convert_gdf(df):
 
     Returns
     -------
-    gpd.GeoDataFrame
+    geopandas.GeoDataFrame
         geodataframe with converted `geometry` column.
 
     """
@@ -173,7 +173,7 @@ class DataStore:
         Returns
         -------
         type
-        pandas.DataFrame or geopandas.GeoDataFrame.
+        pandas.DataFrame or geopandas.GeoDataFrame
             2000 blocks as a geodataframe or as a dataframe with geometry
             stored as well-known binary on the 'wkb' column.
 
@@ -229,7 +229,7 @@ class DataStore:
         Returns
         -------
         type
-        pandas.DataFrame or geopandas.GeoDataFrame.
+        pandas.DataFrame or geopandas.GeoDataFrame
             2010 blocks as a geodataframe or as a dataframe with geometry
             stored as well-known binary on the 'wkb' column.
 
@@ -283,7 +283,7 @@ class DataStore:
 
         Returns
         -------
-        pandas.DataFrame or geopandas.GeoDataFrame.
+        pandas.DataFrame or geopandas.GeoDataFrame
             1990 tracts as a geodataframe or as a dataframe with geometry
             stored as well-known binary on the 'wkb' column.
 
@@ -309,7 +309,7 @@ class DataStore:
 
         Returns
         -------
-        pandas.DataFrame.
+        pandas.DataFrame or geopandas.GeoDataFrame
             2000 tracts as a geodataframe or as a dataframe with geometry
             stored as well-known binary on the 'wkb' column.
 
@@ -335,7 +335,7 @@ class DataStore:
 
         Returns
         -------
-        pandas.DataFrame.
+        pandas.DataFrame or geopandas.GeoDataFrame
             2010 tracts as a geodataframe or as a dataframe with geometry
             stored as well-known binary on the 'wkb' column.
 
@@ -362,7 +362,7 @@ class DataStore:
 
         Returns
         -------
-        geopandas.GeoDataFrame.
+        pandas.DataFrame or geopandas.GeoDataFrame
             2010 MSAs as a geodataframe or as a dataframe with geometry
             stored as well-known binary on the 'wkb' column.
 
@@ -383,7 +383,7 @@ class DataStore:
 
         Returns
         -------
-        geopandas.GeoDataFrame.
+        pandas.DataFrame or geopandas.GeoDataFrame
             US States as a geodataframe or as a dataframe with geometry
             stored as well-known binary on the 'wkb' column.
 
@@ -402,14 +402,13 @@ class DataStore:
 
         Returns
         -------
-        geopandas.GeoDataFrame.
+        geopandas.GeoDataFrame
             2010 counties as a geodataframe or as a dataframe with geometry
             stored as well-known binary on the 'wkb' column.
 
         """
         return _convert_gdf(self.administrative["counties.parquet"]())
 
-    @property
     def msa_definitions(self):
         """2010 Metropolitan Statistical Area definitions.
 
@@ -424,7 +423,6 @@ class DataStore:
         """
         return self.administrative["msa_definitions.parquet"]()
 
-    @property
     def ltdb(self):
         """Longitudinal Tract Database (LTDB).
 
@@ -442,7 +440,6 @@ class DataStore:
                 "using the `store_ltdb` function"
             )
 
-    @property
     def ncdb(self):
         """Geolytics Neighborhood Change Database (NCDB).
 
@@ -460,13 +457,12 @@ class DataStore:
                 "using the `store_ncdb` function"
             )
 
-    @property
     def codebook(self):
         """Codebook.
 
         Returns
         -------
-        pandas.DataFrame.
+        pandas.DataFrame
             codebook that stores variable names, definitions, and formulas.
 
         """

@@ -170,7 +170,7 @@ Harmonize Module
 .. autosummary::
    :toctree: generated/
 
-   Community.harmonize
+   harmonize.harmonize
 
 .. _visualize_api:
 

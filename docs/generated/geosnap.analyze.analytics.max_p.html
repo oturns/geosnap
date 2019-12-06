@@ -123,25 +123,24 @@
 <dl class="function">
 <dt id="geosnap.analyze.analytics.max_p">
 <code class="sig-prename descclassname">geosnap.analyze.analytics.</code><code class="sig-name descname">max_p</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">w</em>, <em class="sig-param">threshold_variable='count'</em>, <em class="sig-param">threshold=10</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/analyze/cluster.html#max_p"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.analyze.analytics.max_p" title="Permalink to this definition">¶</a></dt>
-<dd><p>Max-p clustering algorithm
-<a class="reference internal" href="../references.html#duque2012" id="id1">[DAR12]</a></p>
-<dl class="field-list simple">
+<dd><p>Max-p clustering algorithm <a class="reference internal" href="../references.html#duque2012" id="id1">[DAR12]</a>.</p>
+<dl class="field-list">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>X</strong><span class="classifier">array-like</span></dt><dd><p>n x k attribute data</p>
+<dd class="field-odd"><dl>
+<dt><strong>X</strong><span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/glossary.html#term-array-like" title="(in NumPy v1.17)"><span>array_like</span></a></span></dt><dd><p>n x k attribute data</p>
 </dd>
-<dt><strong>w</strong><span class="classifier">PySAL W instance</span></dt><dd><p>spatial weights matrix</p>
+<dt><strong>w</strong><span class="classifier"><a class="reference external" href="https://pysal.org/libpysal/generated/libpysal.weights.W.html#libpysal.weights.W" title="(in libpysal v4.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">libpysal.weights.W</span></code></a> instance</span></dt><dd><p>spatial weights matrix</p>
 </dd>
-<dt><strong>threshold_variable</strong><span class="classifier">str, default:”count”</span></dt><dd><p>attribute variable to use as floor when calculate</p>
+<dt><strong>threshold_variable</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, default:”count”</span></dt><dd><p>attribute variable to use as floor when calculate</p>
 </dd>
-<dt><strong>threshold</strong><span class="classifier">int, default:10</span></dt><dd><p>integer that defines the upper limit of a variable that can be grouped
+<dt><strong>threshold</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, default:10</span></dt><dd><p>integer that defines the upper limit of a variable that can be grouped
 into a single region</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>model: region MaxPRegionsHeu instance</dt><dd></dd>
+<dt>fitted cluster instance: <code class="xref py py-obj docutils literal notranslate"><span class="pre">region.p_regions.heuristics.MaxPRegionsHeu</span></code></dt><dd></dd>
 </dl>
 </dd>
 </dl>
@@ -169,7 +168,7 @@ into a single region</p>
     </p>
     <p>
         &copy; Copyright 2018, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.<br/>
     </p>
   </div>
 </footer>
