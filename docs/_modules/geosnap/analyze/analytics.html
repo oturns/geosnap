@@ -162,26 +162,26 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    gdf : geopandas.GeoDataFrame</span>
+<span class="sd">    gdf : geopandas.GeoDataFrame, required</span>
 <span class="sd">        long-form GeoDataFrame containing neighborhood attributes</span>
-<span class="sd">    n_clusters : int</span>
+<span class="sd">    n_clusters : int, required</span>
 <span class="sd">        the number of clusters to model. The default is 6).</span>
 <span class="sd">    method : str</span>
 <span class="sd">        the clustering algorithm used to identify neighborhood types</span>
-<span class="sd">    best_model : bool</span>
+<span class="sd">    best_model : bool, optional</span>
 <span class="sd">        if using a gaussian mixture model, use BIC to choose the best</span>
 <span class="sd">        n_clusters. (the default is False).</span>
-<span class="sd">    columns : list-like</span>
+<span class="sd">    columns : list-like, required</span>
 <span class="sd">        subset of columns on which to apply the clustering</span>
-<span class="sd">    verbose : bool</span>
+<span class="sd">    verbose : bool, optional</span>
 <span class="sd">        whether to print warning messages (the default is False).</span>
-<span class="sd">    time_var: str</span>
+<span class="sd">    time_var : str, optional</span>
 <span class="sd">        which column on the dataframe defines time and or sequencing of the</span>
 <span class="sd">        long-form data. Default is &quot;year&quot;</span>
-<span class="sd">    id_var: str</span>
+<span class="sd">    id_var : str, optional</span>
 <span class="sd">        which column on the long-form dataframe identifies the stable units</span>
 <span class="sd">        over time. In a wide-form dataset, this would be the unique index</span>
-<span class="sd">    scaler: None or scaler from sklearn.preprocessing</span>
+<span class="sd">    scaler : None or scaler from sklearn.preprocessing, optional</span>
 <span class="sd">        a scikit-learn preprocessing class that will be used to rescale the</span>
 <span class="sd">        data. Defaults to sklearn.preprocessing.StandardScaler</span>
 
@@ -290,16 +290,16 @@
 <span class="sd">        been aggregated</span>
 <span class="sd">    threshold : numeric</span>
 <span class="sd">        threshold to use for max-p clustering (the default is 10).</span>
-<span class="sd">    time_var: str</span>
+<span class="sd">    time_var : str</span>
 <span class="sd">        which column on the dataframe defines time and or sequencing of the</span>
 <span class="sd">        long-form data. Default is &quot;year&quot;</span>
-<span class="sd">    id_var: str</span>
+<span class="sd">    id_var : str</span>
 <span class="sd">        which column on the long-form dataframe identifies the stable units</span>
 <span class="sd">        over time. In a wide-form dataset, this would be the unique index</span>
-<span class="sd">    weights_kwargs: dict</span>
+<span class="sd">    weights_kwargs : dict</span>
 <span class="sd">        If passing a `libpysal.weights` instance to spatial_weights, these additional</span>
 <span class="sd">        keyword arguments that will be passed to the weights constructor</span>
-<span class="sd">    scaler: None or scaler class from sklearn.preprocessing</span>
+<span class="sd">    scaler : None or scaler class from sklearn.preprocessing</span>
 <span class="sd">        a scikit-learn preprocessing class that will be used to rescale the</span>
 <span class="sd">        data. Defaults to sklearn.preprocessing.StandardScaler</span>
 

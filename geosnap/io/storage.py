@@ -298,7 +298,7 @@ def store_ncdb(filepath):
     )
     df = df.groupby(["GEO2010", "year"]).first()
 
-    mapper = dict(zip(datasets.codebook().ncdb(), datasets.codebook().variable))
+    mapper = dict(zip(datasets.codebook().ncdb, datasets.codebook().variable))
 
     df.reset_index(inplace=True)
 

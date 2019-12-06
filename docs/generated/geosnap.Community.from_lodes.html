@@ -147,7 +147,7 @@ MSAs to include in the study area.</p>
 <dt><strong>fips</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>string or list of strings of five-digit fips codes defining
 counties to include in the study area.</p>
 </dd>
-<dt><strong>boundary: geopandas.GeoDataFrame, optional</strong></dt><dd><p>geodataframe that defines the total extent of the study area.
+<dt><strong>boundary</strong><span class="classifier"><a class="reference external" href="https://geopandas.readthedocs.io/en/latest/reference/geopandas.GeoDataFrame.html#geopandas.GeoDataFrame" title="(in GeoPandas v0.6.1+26.gca6e5e7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geopandas.GeoDataFrame</span></code></a>, optional</span></dt><dd><p>geodataframe that defines the total extent of the study area.
 This will be used to clip tracts lazily by selecting all
 <a href="#id1"><span class="problematic" id="id2">`</span></a>GeoDataFrame.representative_point()`s that intersect the
 boundary gdf</p>
@@ -155,9 +155,9 @@ boundary gdf</p>
 <dt><strong>years</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">ints</span></code>, required</span></dt><dd><p>list of years to include in the study data
 (the default is 2015).</p>
 </dd>
-<dt><strong>dataset: str, required</strong></dt><dd><p>which LODES dataset should be used to create the Community.
+<dt><strong>dataset</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, required</span></dt><dd><p>which LODES dataset should be used to create the Community.
 Options are ‘wac’ for workplace area characteristics or ‘rac’ for
-residence area characteristics. The default is workplace.</p>
+residence area characteristics. The default is “wac” for workplace.</p>
 </dd>
 </dl>
 </dd>

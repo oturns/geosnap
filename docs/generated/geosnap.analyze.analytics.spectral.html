@@ -132,33 +132,33 @@
 <dt><strong>n_clusters</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>The number of clusters to form as well as the number of centroids to
 generate.</p>
 </dd>
-<dt><strong>eigen_solver: {None, ‘arpack’, ‘lobpcg’, or ‘amg’}</strong></dt><dd><p>The eigenvalue decomposition strategy to use. AMG requires pyamg to be installed. It can be
+<dt><strong>eigen_solver</strong><span class="classifier">{<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a>, ‘arpack’, ‘lobpcg’, or ‘amg’}</span></dt><dd><p>The eigenvalue decomposition strategy to use. AMG requires pyamg to be installed. It can be
 faster on very large, sparse problems, but may also lead to instabilities.</p>
 </dd>
-<dt><strong>n_components: integer, optional, default=n_clusters</strong></dt><dd><p>Number of eigen vectors to use for the spectral embedding</p>
+<dt><strong>n_components</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">integer</span></code>, optional, default=n_clusters</span></dt><dd><p>Number of eigen vectors to use for the spectral embedding</p>
 </dd>
-<dt><strong>random_state: int, RandomState instance or None (default)</strong></dt><dd><p>A pseudo random number generator used for the initialization of the lobpcg eigen vectors
+<dt><strong>random_state</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">RandomState</span></code> instance or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a> (default)</span></dt><dd><p>A pseudo random number generator used for the initialization of the lobpcg eigen vectors
 decomposition when eigen_solver=’amg’ and by the K-Means initialization. Use an int to make
 the randomness deterministic. See Glossary.</p>
 </dd>
-<dt><strong>n_init: int, optional, default: 10</strong></dt><dd><p>Number of time the k-means algorithm will be run with different centroid seeds. The final
+<dt><strong>n_init</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional, default: 10</span></dt><dd><p>Number of time the k-means algorithm will be run with different centroid seeds. The final
 results will be the best output of n_init consecutive runs in terms of inertia.</p>
 </dd>
-<dt><strong>gamma: float, default=1.0</strong></dt><dd><p>Kernel coefficient for rbf, poly, sigmoid, laplacian and chi2 kernels. Ignored for
+<dt><strong>gamma</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, default=1.0</span></dt><dd><p>Kernel coefficient for rbf, poly, sigmoid, laplacian and chi2 kernels. Ignored for
 affinity=’nearest_neighbors’.</p>
 </dd>
-<dt><strong>affinity: string or callable, default ‘rbf’</strong></dt><dd><p>How to construct the affinity matrix.</p>
+<dt><strong>affinity</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#callable" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">callable()</span></code></a>, default ‘rbf’</span></dt><dd><p>How to construct the affinity matrix.</p>
 </dd>
-<dt><strong>n_neighbors: integer</strong></dt><dd><p>Number of neighbors to use when constructing the affinity matrix using the nearest neighbors
+<dt><strong>n_neighbors</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">integer</span></code></span></dt><dd><p>Number of neighbors to use when constructing the affinity matrix using the nearest neighbors
 method. Ignored for affinity=’rbf’.</p>
 </dd>
-<dt><strong>eigen_tol: float, optional, default: 0.0</strong></dt><dd><p>Stopping criterion for eigendecomposition of the Laplacian matrix when eigen_solver=’arpack’.</p>
+<dt><strong>eigen_tol</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, optional, default: 0.0</span></dt><dd><p>Stopping criterion for eigendecomposition of the Laplacian matrix when eigen_solver=’arpack’.</p>
 </dd>
-<dt><strong>degree: float, default=3</strong></dt><dd><p>Degree of the polynomial kernel. Ignored by other kernels.</p>
+<dt><strong>degree</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, default=3</span></dt><dd><p>Degree of the polynomial kernel. Ignored by other kernels.</p>
 </dd>
-<dt><strong>coef0: float, default=1</strong></dt><dd><p>Zero coefficient for polynomial and sigmoid kernels. Ignored by other kernels.</p>
+<dt><strong>coef0</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, default=1</span></dt><dd><p>Zero coefficient for polynomial and sigmoid kernels. Ignored by other kernels.</p>
 </dd>
-<dt><strong>n_jobs: int or None, optional (default=None)</strong></dt><dd><p>The number of parallel jobs to run. None means 1 unless in a joblib.parallel_backend context.
+<dt><strong>n_jobs</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a>, optional (default=None)</span></dt><dd><p>The number of parallel jobs to run. None means 1 unless in a joblib.parallel_backend context.
 -1 means using all processors. See Glossary for more details.</p>
 </dd>
 <dt><strong>**kwargs</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">dict</span></code></a></span></dt><dd><p>additional wkargs.</p>
@@ -166,8 +166,8 @@ method. Ignored for affinity=’rbf’.</p>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt>fitted cluster instance: <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.cluster.SpectralClustering.html#sklearn.cluster.SpectralClustering" title="(in scikit-learn v0.22)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.cluster.SpectralClustering</span></code></a></dt><dd></dd>
+<dd class="field-even"><dl>
+<dt><strong>fitted cluster instance</strong><span class="classifier"><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.cluster.SpectralClustering.html#sklearn.cluster.SpectralClustering" title="(in scikit-learn v0.22)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.cluster.SpectralClustering</span></code></a></span></dt><dd></dd>
 </dl>
 </dd>
 </dl>

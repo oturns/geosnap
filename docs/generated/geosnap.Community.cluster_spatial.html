@@ -135,12 +135,10 @@
 then contiguity weights will be constructed internally, otherwise pass a
 libpysal.weights.W with additional arguments specified in weights_kwargs</p>
 </dd>
-<dt><strong>weights_kwargs: dict</strong></dt><dd><p>If passing a libpysal.weights.W instance to spatial_weights, these additional
+<dt><strong>weights_kwargs</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">dict</span></code></a></span></dt><dd><p>If passing a libpysal.weights.W instance to spatial_weights, these additional
 keyword arguments that will be passed to the weights constructor</p>
 </dd>
 <dt><strong>method</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>the clustering algorithm used to identify neighborhood types</p>
-</dd>
-<dt><strong>best_model</strong><span class="classifier">type</span></dt><dd><p>Description of parameter <cite>best_model</cite> (the default is False).</p>
 </dd>
 <dt><strong>columns</strong><span class="classifier">list-like</span></dt><dd><p>subset of columns on which to apply the clustering</p>
 </dd>
@@ -150,10 +148,7 @@ been aggregated</p>
 </dd>
 <dt><strong>threshold</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numeric</span></code></span></dt><dd><p>threshold to use for max-p clustering (the default is 10).</p>
 </dd>
-<dt><strong>return_model</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bltin-boolean-values" title="(in Python v3.8)"><span class="xref std std-ref">bool</span></a></span></dt><dd><p>whether to return the underlying cluster model instance for further
-analysis</p>
-</dd>
-<dt><strong>scaler: None or scaler from sklearn.preprocessing</strong></dt><dd><p>a scikit-learn preprocessing class that will be used to rescale the
+<dt><strong>scaler</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">scaler</span></code> from <a class="reference external" href="https://scikit-learn.org/stable/modules/classes.html#module-sklearn.preprocessing" title="(in scikit-learn v0.22)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.preprocessing</span></code></a></span></dt><dd><p>a scikit-learn preprocessing class that will be used to rescale the
 data. Defaults to sklearn.preprocessing.StandardScaler</p>
 </dd>
 </dl>

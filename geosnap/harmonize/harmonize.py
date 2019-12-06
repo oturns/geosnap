@@ -37,10 +37,10 @@ def harmonize(
 
     weights_method : string
         The method that the harmonization will be conducted. This can be set to:
-            "area"                          : harmonization according to area weights.
-            "land_type_area"                : harmonization according to the Land Types considered 'populated' areas.
-            "land_type_Poisson_regression"  : NOT YET INTRODUCED.
-            "land_type_Gaussian_regression" : NOT YET INTRODUCED.
+            * "area"                          : harmonization according to area weights.
+            * "land_type_area"                : harmonization according to the Land Types considered 'populated' areas.
+            * "land_type_Poisson_regression"  : NOT YET INTRODUCED.
+            * "land_type_Gaussian_regression" : NOT YET INTRODUCED.
 
     extensive_variables : list
         The names of variables in each dataset of raw_community that contains

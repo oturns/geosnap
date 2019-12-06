@@ -32,7 +32,7 @@ def ward(X, n_clusters=5, **kwargs):
 
     Returns
     -------
-    fitted model: sklearn.cluster.AgglomerativeClustering instance
+    fitted model : sklearn.cluster.AgglomerativeClustering instance
 
     """
     model = AgglomerativeClustering(n_clusters=n_clusters, linkage="ward")
@@ -67,7 +67,7 @@ def kmeans(
 
     Returns
     -------
-    fitted model: sklearn.cluster.KMeans instance
+    fitted model : sklearn.cluster.KMeans instance
 
     """
     if X.shape[0] > 12000:
@@ -119,7 +119,7 @@ def affinity_propagation(
     preference :  array-like, shape (n_samples,) or float, optional, default: None
         The preference parameter passed to scikit-learn's affinity propagation
         algorithm
-    damping: float, optional, default: 0.8
+    damping : float, optional, default: 0.8
         The damping parameter passed to scikit-learn's affinity propagation
         algorithm
     max_iter : int, optional, default: 1000
@@ -127,7 +127,7 @@ def affinity_propagation(
 
     Returns
     -------
-    fitted cluster instance: sklearn.cluster.AffinityPropagation
+    fitted cluster instance : sklearn.cluster.AffinityPropagation
 
     """
     model = AffinityPropagation(
@@ -169,33 +169,33 @@ def spectral(
     n_clusters : int
         The number of clusters to form as well as the number of centroids to
         generate.
-    eigen_solver: {None, ‘arpack’, ‘lobpcg’, or ‘amg’}
+    eigen_solver : {None, ‘arpack’, ‘lobpcg’, or ‘amg’}
         The eigenvalue decomposition strategy to use. AMG requires pyamg to be installed. It can be
         faster on very large, sparse problems, but may also lead to instabilities.
-    n_components: integer, optional, default=n_clusters
+    n_components : integer, optional, default=n_clusters
         Number of eigen vectors to use for the spectral embedding
-    random_state: int, RandomState instance or None (default)
+    random_state : int, RandomState instance or None (default)
         A pseudo random number generator used for the initialization of the lobpcg eigen vectors
         decomposition when eigen_solver='amg' and by the K-Means initialization. Use an int to make
         the randomness deterministic. See Glossary.
-    n_init: int, optional, default: 10
+    n_init : int, optional, default: 10
         Number of time the k-means algorithm will be run with different centroid seeds. The final
         results will be the best output of n_init consecutive runs in terms of inertia.
-    gamma: float, default=1.0
+    gamma : float, default=1.0
         Kernel coefficient for rbf, poly, sigmoid, laplacian and chi2 kernels. Ignored for
         affinity='nearest_neighbors'.
-    affinity: string or callable, default ‘rbf’
+    affinity : string or callable, default ‘rbf’
         How to construct the affinity matrix.
-    n_neighbors: integer
+    n_neighbors : integer
         Number of neighbors to use when constructing the affinity matrix using the nearest neighbors
         method. Ignored for affinity='rbf'.
-    eigen_tol: float, optional, default: 0.0
+    eigen_tol : float, optional, default: 0.0
         Stopping criterion for eigendecomposition of the Laplacian matrix when eigen_solver='arpack'.
-    degree: float, default=3
+    degree : float, default=3
         Degree of the polynomial kernel. Ignored by other kernels.
-    coef0: float, default=1
+    coef0 : float, default=1
         Zero coefficient for polynomial and sigmoid kernels. Ignored by other kernels.
-    n_jobs: int or None, optional (default=None)
+    n_jobs : int or None, optional (default=None)
         The number of parallel jobs to run. None means 1 unless in a joblib.parallel_backend context.
         -1 means using all processors. See Glossary for more details.
     **kwargs : dict
@@ -203,7 +203,7 @@ def spectral(
 
     Returns
     -------
-    fitted cluster instance: sklearn.cluster.SpectralClustering
+    fitted cluster instance : sklearn.cluster.SpectralClustering
 
     """
     model = SpectralClustering(

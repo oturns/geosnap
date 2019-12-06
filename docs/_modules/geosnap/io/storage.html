@@ -320,17 +320,17 @@
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">ltdb_1970</span><span class="p">,</span> <span class="n">ltdb_1980</span><span class="p">,</span> <span class="n">ltdb_1990</span><span class="p">,</span> <span class="n">ltdb_2000</span><span class="p">,</span> <span class="n">ltdb_2010</span><span class="p">],</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="n">renamer</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-        <span class="nb">zip</span><span class="p">(</span><span class="n">datasets</span><span class="o">.</span><span class="n">codebook</span><span class="p">[</span><span class="s2">&quot;ltdb&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">datasets</span><span class="o">.</span><span class="n">codebook</span><span class="p">[</span><span class="s2">&quot;variable&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+        <span class="nb">zip</span><span class="p">(</span><span class="n">datasets</span><span class="o">.</span><span class="n">codebook</span><span class="p">()[</span><span class="s2">&quot;ltdb&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">datasets</span><span class="o">.</span><span class="n">codebook</span><span class="p">()[</span><span class="s2">&quot;variable&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
     <span class="p">)</span>
 
     <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">renamer</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;columns&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="c1"># compute additional variables from lookup table</span>
-    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">datasets</span><span class="o">.</span><span class="n">codebook</span><span class="p">[</span><span class="s2">&quot;formula&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">datasets</span><span class="o">.</span><span class="n">codebook</span><span class="p">()[</span><span class="s2">&quot;formula&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
         <span class="n">df</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="n">keeps</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">datasets</span><span class="o">.</span><span class="n">codebook</span><span class="p">[</span><span class="s2">&quot;variable&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">])</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">datasets</span><span class="o">.</span><span class="n">codebook</span><span class="p">()[</span><span class="s2">&quot;variable&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">])</span>
     <span class="p">]</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">keeps</span><span class="p">]</span>
 
@@ -349,7 +349,7 @@
 <span class="sd">        location of the input CSV file extracted from your Geolytics DVD</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">ncdb_vars</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">codebook</span><span class="p">[</span><span class="s2">&quot;ncdb&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">ncdb_vars</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">codebook</span><span class="p">()[</span><span class="s2">&quot;ncdb&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">values</span>
 
     <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">ncdb_vars</span><span class="p">:</span>
@@ -414,7 +414,7 @@
     <span class="p">)</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s2">&quot;GEO2010&quot;</span><span class="p">,</span> <span class="s2">&quot;year&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
 
-    <span class="n">mapper</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">datasets</span><span class="o">.</span><span class="n">codebook</span><span class="o">.</span><span class="n">ncdb</span><span class="p">,</span> <span class="n">datasets</span><span class="o">.</span><span class="n">codebook</span><span class="o">.</span><span class="n">variable</span><span class="p">))</span>
+    <span class="n">mapper</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">datasets</span><span class="o">.</span><span class="n">codebook</span><span class="p">()</span><span class="o">.</span><span class="n">ncdb</span><span class="p">,</span> <span class="n">datasets</span><span class="o">.</span><span class="n">codebook</span><span class="p">()</span><span class="o">.</span><span class="n">variable</span><span class="p">))</span>
 
     <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -422,14 +422,14 @@
 
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;geoid&quot;</span><span class="p">)</span>
 
-    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">datasets</span><span class="o">.</span><span class="n">codebook</span><span class="p">[</span><span class="s2">&quot;formula&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">datasets</span><span class="o">.</span><span class="n">codebook</span><span class="p">()[</span><span class="s2">&quot;formula&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">df</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Unable to compute &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
 
     <span class="n">keeps</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">datasets</span><span class="o">.</span><span class="n">codebook</span><span class="p">[</span><span class="s2">&quot;variable&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">])</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">datasets</span><span class="o">.</span><span class="n">codebook</span><span class="p">()[</span><span class="s2">&quot;variable&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">])</span>
     <span class="p">]</span>
 
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">keeps</span><span class="p">]</span>
@@ -454,8 +454,8 @@
             <span class="n">fips_list</span> <span class="o">+=</span> <span class="n">each</span>
 
     <span class="k">if</span> <span class="n">msa_fips</span><span class="p">:</span>
-        <span class="n">fips_list</span> <span class="o">+=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">msa_definitions</span><span class="p">[</span>
-            <span class="n">datasets</span><span class="o">.</span><span class="n">msa_definitions</span><span class="p">[</span><span class="s2">&quot;CBSA Code&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">msa_fips</span>
+        <span class="n">fips_list</span> <span class="o">+=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">msa_definitions</span><span class="p">()[</span>
+            <span class="n">datasets</span><span class="o">.</span><span class="n">msa_definitions</span><span class="p">()[</span><span class="s2">&quot;CBSA Code&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">msa_fips</span>
         <span class="p">][</span><span class="s2">&quot;stcofips&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 
     <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">geoid</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">fips_list</span><span class="p">))]</span>

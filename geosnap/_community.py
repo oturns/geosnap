@@ -89,13 +89,10 @@ class Community:
         weights_method : string
             The method that the harmonization will be conducted. This can be
             set to:
-                "area"                          : harmonization according to
-                                                  area weights.
-                "land_type_area"                : harmonization according to
-                                                  the Land Types considered
-                                                  'populated' areas.
-                "land_type_Poisson_regression"  : NOT YET INTRODUCED.
-                "land_type_Gaussian_regression" : NOT YET INTRODUCED.
+                * "area"                          : harmonization according to area weights.
+                * "land_type_area"                : harmonization according to the Land Types considered 'populated' areas.
+                * "land_type_Poisson_regression"  : NOT YET INTRODUCED.
+                * "land_type_Gaussian_regression" : NOT YET INTRODUCED.
         extensive_variables : list
             extensive variables to be used in interpolation.
         intensive_variables : type
@@ -165,10 +162,7 @@ class Community:
             subset of columns on which to apply the clustering
         verbose : bool
             whether to print warning messages (the default is False).
-        return_model : bool
-            whether to return the underlying cluster model instance for further
-            analysis
-        scaler: None or scaler from sklearn.preprocessing
+        scaler : None or scaler from sklearn.preprocessing
             a scikit-learn preprocessing class that will be used to rescale the
             data. Defaults to sklearn.preprocessing.StandardScaler
 
@@ -225,13 +219,11 @@ class Community:
             spatial weights matrix specification` (the default is "rook"). If 'rook' or 'queen'
             then contiguity weights will be constructed internally, otherwise pass a
             libpysal.weights.W with additional arguments specified in weights_kwargs
-        weights_kwargs: dict
+        weights_kwargs : dict
             If passing a libpysal.weights.W instance to spatial_weights, these additional
             keyword arguments that will be passed to the weights constructor
         method : str
             the clustering algorithm used to identify neighborhood types
-        best_model : type
-            Description of parameter `best_model` (the default is False).
         columns : list-like
             subset of columns on which to apply the clustering
         threshold_variable : str, required if using max-p, optional otherwise
@@ -240,10 +232,7 @@ class Community:
             been aggregated
         threshold : numeric
             threshold to use for max-p clustering (the default is 10).
-        return_model : bool
-            whether to return the underlying cluster model instance for further
-            analysis
-        scaler: None or scaler from sklearn.preprocessing
+        scaler : None or scaler from sklearn.preprocessing
             a scikit-learn preprocessing class that will be used to rescale the
             data. Defaults to sklearn.preprocessing.StandardScaler
 
@@ -311,10 +300,9 @@ class Community:
 
         Returns
         ---------
-        mar             : object
-                          if w_type=None, return a giddy.markov.Markov instance;
-                          if w_type is given, return a
-                          giddy.markov.Spatial_Markov instance.
+        mar             : giddy.markov.Markov or giddy.markov.Spatial_Markov
+                          if w_type=None, return a classic Markov instance;
+                          if w_type is given, return a Spatial_Markov instance
 
         """
         mar = _transition(
@@ -432,13 +420,13 @@ class Community:
         county_fips : list or str
             string or list of strings of five-digit fips codes defining
             counties to include in the study area.
-        msa_fips : type
+        msa_fips : list or str
             string or list of strings of fips codes defining
             MSAs to include in the study area.
-        fips : type
+        fips : list or str
             string or list of strings of five-digit fips codes defining
             counties to include in the study area.
-        boundary: geopandas.GeoDataFrame
+        boundary : geopandas.GeoDataFrame
             geodataframe that defines the total extent of the study area.
             This will be used to clip tracts lazily by selecting all
             `GeoDataFrame.representative_point()`s that intersect the
@@ -510,13 +498,13 @@ class Community:
         county_fips : list or str
             string or list of strings of five-digit fips codes defining
             counties to include in the study area.
-        msa_fips : type
+        msa_fips : list or str
             string or list of strings of fips codes defining
             MSAs to include in the study area.
-        fips : type
+        fips : list or str
             string or list of strings of five-digit fips codes defining
             counties to include in the study area.
-        boundary: geopandas.GeoDataFrame
+        boundary : geopandas.GeoDataFrame
             geodataframe that defines the total extent of the study area.
             This will be used to clip tracts lazily by selecting all
             `GeoDataFrame.representative_point()`s that intersect the
@@ -593,7 +581,7 @@ class Community:
         fips : list or str, optional
             string or list of strings of five-digit fips codes defining
             counties to include in the study area.
-        boundary: geopandas.GeoDataFrame, optional
+        boundary : geopandas.GeoDataFrame, optional
             geodataframe that defines the total extent of the study area.
             This will be used to clip tracts lazily by selecting all
             `GeoDataFrame.representative_point()`s that intersect the
@@ -702,7 +690,7 @@ class Community:
         fips : list or str, optional
             string or list of strings of five-digit fips codes defining
             counties to include in the study area.
-        boundary: geopandas.GeoDataFrame, optional
+        boundary : geopandas.GeoDataFrame, optional
             geodataframe that defines the total extent of the study area.
             This will be used to clip tracts lazily by selecting all
             `GeoDataFrame.representative_point()`s that intersect the
@@ -710,10 +698,10 @@ class Community:
         years : list of ints, required
             list of years to include in the study data
             (the default is 2015).
-        dataset: str, required
+        dataset : str, required
             which LODES dataset should be used to create the Community.
             Options are 'wac' for workplace area characteristics or 'rac' for
-            residence area characteristics. The default is workplace.
+            residence area characteristics. The default is "wac" for workplace.
 
         Returns
         -------

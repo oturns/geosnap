@@ -70,7 +70,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../api.html#io-module">IO Module</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../api.html#the-community-class">The Community Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#analyze-module">Analyze Module</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../api.html#harmonize-module">Harmonize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#harmonize-module">Harmonize Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#visualize-module">Visualize Module</a></li>
 </ul>
 </li>
@@ -133,15 +133,12 @@ spatial interpolation.</p>
 <dt><strong>weights_method</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>The method that the harmonization will be conducted. This can be
 set to:</p>
 <blockquote>
-<div><dl class="simple">
-<dt>“area”<span class="classifier">harmonization according to</span></dt><dd><p>area weights.</p>
-</dd>
-<dt>“land_type_area”<span class="classifier">harmonization according to</span></dt><dd><p>the Land Types considered
-‘populated’ areas.</p>
-</dd>
-</dl>
-<p>“land_type_Poisson_regression”  : NOT YET INTRODUCED.
-“land_type_Gaussian_regression” : NOT YET INTRODUCED.</p>
+<div><ul class="simple">
+<li><p>“area”                          : harmonization according to area weights.</p></li>
+<li><p>“land_type_area”                : harmonization according to the Land Types considered ‘populated’ areas.</p></li>
+<li><p>“land_type_Poisson_regression”  : NOT YET INTRODUCED.</p></li>
+<li><p>“land_type_Gaussian_regression” : NOT YET INTRODUCED.</p></li>
+</ul>
 </div></blockquote>
 </dd>
 <dt><strong>extensive_variables</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a></span></dt><dd><p>extensive variables to be used in interpolation.</p>

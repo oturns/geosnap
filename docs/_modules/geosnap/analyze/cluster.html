@@ -148,7 +148,7 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    fitted model: sklearn.cluster.AgglomerativeClustering instance</span>
+<span class="sd">    fitted model : sklearn.cluster.AgglomerativeClustering instance</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">AgglomerativeClustering</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">,</span> <span class="n">linkage</span><span class="o">=</span><span class="s2">&quot;ward&quot;</span><span class="p">)</span>
@@ -183,7 +183,7 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    fitted model: sklearn.cluster.KMeans instance</span>
+<span class="sd">    fitted model : sklearn.cluster.KMeans instance</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">12000</span><span class="p">:</span>
@@ -235,7 +235,7 @@
 <span class="sd">    preference :  array-like, shape (n_samples,) or float, optional, default: None</span>
 <span class="sd">        The preference parameter passed to scikit-learn&#39;s affinity propagation</span>
 <span class="sd">        algorithm</span>
-<span class="sd">    damping: float, optional, default: 0.8</span>
+<span class="sd">    damping : float, optional, default: 0.8</span>
 <span class="sd">        The damping parameter passed to scikit-learn&#39;s affinity propagation</span>
 <span class="sd">        algorithm</span>
 <span class="sd">    max_iter : int, optional, default: 1000</span>
@@ -243,7 +243,7 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    fitted cluster instance: sklearn.cluster.AffinityPropagation</span>
+<span class="sd">    fitted cluster instance : sklearn.cluster.AffinityPropagation</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">AffinityPropagation</span><span class="p">(</span>
@@ -285,33 +285,33 @@
 <span class="sd">    n_clusters : int</span>
 <span class="sd">        The number of clusters to form as well as the number of centroids to</span>
 <span class="sd">        generate.</span>
-<span class="sd">    eigen_solver: {None, ‘arpack’, ‘lobpcg’, or ‘amg’}</span>
+<span class="sd">    eigen_solver : {None, ‘arpack’, ‘lobpcg’, or ‘amg’}</span>
 <span class="sd">        The eigenvalue decomposition strategy to use. AMG requires pyamg to be installed. It can be</span>
 <span class="sd">        faster on very large, sparse problems, but may also lead to instabilities.</span>
-<span class="sd">    n_components: integer, optional, default=n_clusters</span>
+<span class="sd">    n_components : integer, optional, default=n_clusters</span>
 <span class="sd">        Number of eigen vectors to use for the spectral embedding</span>
-<span class="sd">    random_state: int, RandomState instance or None (default)</span>
+<span class="sd">    random_state : int, RandomState instance or None (default)</span>
 <span class="sd">        A pseudo random number generator used for the initialization of the lobpcg eigen vectors</span>
 <span class="sd">        decomposition when eigen_solver=&#39;amg&#39; and by the K-Means initialization. Use an int to make</span>
 <span class="sd">        the randomness deterministic. See Glossary.</span>
-<span class="sd">    n_init: int, optional, default: 10</span>
+<span class="sd">    n_init : int, optional, default: 10</span>
 <span class="sd">        Number of time the k-means algorithm will be run with different centroid seeds. The final</span>
 <span class="sd">        results will be the best output of n_init consecutive runs in terms of inertia.</span>
-<span class="sd">    gamma: float, default=1.0</span>
+<span class="sd">    gamma : float, default=1.0</span>
 <span class="sd">        Kernel coefficient for rbf, poly, sigmoid, laplacian and chi2 kernels. Ignored for</span>
 <span class="sd">        affinity=&#39;nearest_neighbors&#39;.</span>
-<span class="sd">    affinity: string or callable, default ‘rbf’</span>
+<span class="sd">    affinity : string or callable, default ‘rbf’</span>
 <span class="sd">        How to construct the affinity matrix.</span>
-<span class="sd">    n_neighbors: integer</span>
+<span class="sd">    n_neighbors : integer</span>
 <span class="sd">        Number of neighbors to use when constructing the affinity matrix using the nearest neighbors</span>
 <span class="sd">        method. Ignored for affinity=&#39;rbf&#39;.</span>
-<span class="sd">    eigen_tol: float, optional, default: 0.0</span>
+<span class="sd">    eigen_tol : float, optional, default: 0.0</span>
 <span class="sd">        Stopping criterion for eigendecomposition of the Laplacian matrix when eigen_solver=&#39;arpack&#39;.</span>
-<span class="sd">    degree: float, default=3</span>
+<span class="sd">    degree : float, default=3</span>
 <span class="sd">        Degree of the polynomial kernel. Ignored by other kernels.</span>
-<span class="sd">    coef0: float, default=1</span>
+<span class="sd">    coef0 : float, default=1</span>
 <span class="sd">        Zero coefficient for polynomial and sigmoid kernels. Ignored by other kernels.</span>
-<span class="sd">    n_jobs: int or None, optional (default=None)</span>
+<span class="sd">    n_jobs : int or None, optional (default=None)</span>
 <span class="sd">        The number of parallel jobs to run. None means 1 unless in a joblib.parallel_backend context.</span>
 <span class="sd">        -1 means using all processors. See Glossary for more details.</span>
 <span class="sd">    **kwargs : dict</span>
@@ -319,7 +319,7 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    fitted cluster instance: sklearn.cluster.SpectralClustering</span>
+<span class="sd">    fitted cluster instance : sklearn.cluster.SpectralClustering</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">SpectralClustering</span><span class="p">(</span>
