@@ -36,15 +36,14 @@ def transition(
                       inference (the default is 0).
 
     Returns
-    ------
-    mar             : object
-                      if w_type=None, return a giddy.markov.Markov instance;
-                      if w_type is given, return a
-                      giddy.markov.Spatial_Markov instance.
+    --------
+    mar             : giddy.markov.Markov instance or giddy.markov.Spatial_Markov
+                      if w_type=None, a classic Markov instance is returned. 
+                      if w_type is given, a Spatial_Markov instance is returned.
 
     Examples
     --------
-    >>> from geosnap.data import Community
+    >>> from geosnap import Community
     >>> columbus = Community.from_ltdb(msa_fips=columbusfips)
     >>> columbus1 = columbus.cluster(columns=['median_household_income',
     ... 'p_poverty_rate', 'p_edu_college_greater', 'p_unemployment_rate'],
@@ -152,7 +151,7 @@ def sequence(
                       Default is "geoid".
 
     Returns
-    ------
+    --------
     gdf_temp        : geopandas.GeoDataFrame or pandas.DataFrame
                       geopandas.GeoDataFrame or pandas.DataFrame with a new column for sequence
                       labels.

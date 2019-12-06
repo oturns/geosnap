@@ -281,4 +281,4 @@ intersphinx_mapping = {
 
 }
 
-numpydoc_xref_ignore = {'type', 'optional', 'default', 'shape', 'fitted', 'instance', 'cluster'}
+numpydoc_xref_ignore = {'type', 'optional', 'default', 'shape', 'fitted', 'instance', 'cluster', 'of', 'or', 'if', 'using', 'otherwise', 'required'}

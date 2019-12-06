@@ -1,0 +1,6 @@
+geosnap.io.get\_lehd
+====================
+
+.. currentmodule:: geosnap.io
+
+.. autofunction:: get_lehd

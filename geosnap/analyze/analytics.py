@@ -65,9 +65,9 @@ def cluster(
     id_var: str
         which column on the long-form dataframe identifies the stable units
         over time. In a wide-form dataset, this would be the unique index
-    scaler: str or sklearn.preprocessing.Scaler
+    scaler: None or scaler from sklearn.preprocessing
         a scikit-learn preprocessing class that will be used to rescale the
-        data. Defaults to StandardScaler
+        data. Defaults to sklearn.preprocessing.StandardScaler
 
     Returns
     -------
@@ -183,9 +183,9 @@ def cluster_spatial(
     weights_kwargs: dict
         If passing a `libpysal.weights` instance to spatial_weights, these additional
         keyword arguments that will be passed to the weights constructor
-    scaler: str or sklearn.preprocessing.Scaler
+    scaler: None or scaler class from sklearn.preprocessing
         a scikit-learn preprocessing class that will be used to rescale the
-        data. Defaults to StandardScaler
+        data. Defaults to sklearn.preprocessing.StandardScaler
 
     Returns
     -------

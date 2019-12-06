@@ -1,0 +1,6 @@
+geosnap.datasets.tracts\_2010
+=============================
+
+.. currentmodule:: geosnap
+
+.. automethod:: datasets.tracts_2010

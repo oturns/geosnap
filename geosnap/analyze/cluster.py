@@ -318,7 +318,7 @@ def hdbscan(X, min_cluster_size=5, gen_min_span_tree=True, **kwargs):
 
     Returns
     -------
-    fitted cluster instance: hdbscan.HDBSCAN
+    fitted cluster instance: hdbscan.hdbscan.HDBSCAN
 
     """
     try:

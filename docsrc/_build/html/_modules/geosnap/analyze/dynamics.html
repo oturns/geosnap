@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>geosnap.analyze.dynamics &#8212; geosnap v0.0.2 Manual</title>
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pysal-styles.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../../../_static/geosnap.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/geosnap.svg"></span>
+          geosnap</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.2</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../installation.html">Installation</a></li>
+                <li><a href="../../../api.html">API</a></li>
+                <li><a href="https://spatialucr.github.io/geosnap-guide/">User Guide</a></li>
+                <li><a href="../../../references.html">References</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#installing-released-version">Installing released version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#installing-development-version">Installing development version</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#io-module">IO Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#the-community-class">The Community Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#analyze-module">Analyze Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#harmonize-module">Harmonize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#visualize-module">Visualize Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for geosnap.analyze.dynamics</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Transition and sequence analysis of neighborhood change.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">giddy.markov</span> <span class="kn">import</span> <span class="n">Markov</span><span class="p">,</span> <span class="n">Spatial_Markov</span>
+<span class="kn">from</span> <span class="nn">giddy.sequence</span> <span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">from</span> <span class="nn">libpysal.weights.contiguity</span> <span class="kn">import</span> <span class="n">Queen</span><span class="p">,</span> <span class="n">Rook</span>
+<span class="kn">from</span> <span class="nn">libpysal.weights.distance</span> <span class="kn">import</span> <span class="n">KNN</span><span class="p">,</span> <span class="n">Kernel</span>
+<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">AgglomerativeClustering</span>
+
+
+<div class="viewcode-block" id="transition"><a class="viewcode-back" href="../../../generated/geosnap.analyze.transition.html#geosnap.analyze.transition">[docs]</a><span class="k">def</span> <span class="nf">transition</span><span class="p">(</span>
+    <span class="n">gdf</span><span class="p">,</span> <span class="n">cluster_col</span><span class="p">,</span> <span class="n">time_var</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span> <span class="n">id_var</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span> <span class="n">w_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">permutations</span><span class="o">=</span><span class="mi">0</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    (Spatial) Markov approach to transitional dynamics of neighborhoods.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    gdf             : geopandas.GeoDataFrame or pandas.DataFrame</span>
+<span class="sd">                      Long-form geopandas.GeoDataFrame or pandas.DataFrame containing neighborhood</span>
+<span class="sd">                      attributes with a column defining neighborhood clusters.</span>
+<span class="sd">    cluster_col     : string or int</span>
+<span class="sd">                      Column name for the neighborhood segmentation, such as</span>
+<span class="sd">                      &quot;ward&quot;, &quot;kmeans&quot;, etc.</span>
+<span class="sd">    time_var        : string, optional</span>
+<span class="sd">                      Column defining time and or sequencing of the long-form data.</span>
+<span class="sd">                      Default is &quot;year&quot;.</span>
+<span class="sd">    id_var          : string, optional</span>
+<span class="sd">                      Column identifying the unique id of spatial units.</span>
+<span class="sd">                      Default is &quot;geoid&quot;.</span>
+<span class="sd">    w_type          : string, optional</span>
+<span class="sd">                      Type of spatial weights type (&quot;rook&quot;, &quot;queen&quot;, &quot;knn&quot; or</span>
+<span class="sd">                      &quot;kernel&quot;) to be used for spatial structure. Default is</span>
+<span class="sd">                      None, if non-spatial Markov transition rates are desired.</span>
+<span class="sd">    permutations    : int, optional</span>
+<span class="sd">                      number of permutations for use in randomization based</span>
+<span class="sd">                      inference (the default is 0).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    --------</span>
+<span class="sd">    mar             : giddy.markov.Markov instance or giddy.markov.Spatial_Markov</span>
+<span class="sd">                      if w_type=None, a classic Markov instance is returned. </span>
+<span class="sd">                      if w_type is given, a Spatial_Markov instance is returned.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from geosnap import Community</span>
+<span class="sd">    &gt;&gt;&gt; columbus = Community.from_ltdb(msa_fips=columbusfips)</span>
+<span class="sd">    &gt;&gt;&gt; columbus1 = columbus.cluster(columns=[&#39;median_household_income&#39;,</span>
+<span class="sd">    ... &#39;p_poverty_rate&#39;, &#39;p_edu_college_greater&#39;, &#39;p_unemployment_rate&#39;],</span>
+<span class="sd">    ... method=&#39;ward&#39;, n_clusters=6)</span>
+<span class="sd">    &gt;&gt;&gt; gdf = columbus1.gdf</span>
+<span class="sd">    &gt;&gt;&gt; a = transition(gdf, &quot;ward&quot;, w_type=&quot;rook&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; a.p</span>
+<span class="sd">    array([[0.79189189, 0.00540541, 0.0027027 , 0.13243243, 0.06216216,</span>
+<span class="sd">        0.00540541],</span>
+<span class="sd">       [0.0203252 , 0.75609756, 0.10569106, 0.11382114, 0.        ,</span>
+<span class="sd">        0.00406504],</span>
+<span class="sd">       [0.00917431, 0.20183486, 0.75229358, 0.01834862, 0.        ,</span>
+<span class="sd">        0.01834862],</span>
+<span class="sd">       [0.1959799 , 0.18341709, 0.00251256, 0.61809045, 0.        ,</span>
+<span class="sd">        0.        ],</span>
+<span class="sd">       [0.32307692, 0.        , 0.        , 0.        , 0.66153846,</span>
+<span class="sd">        0.01538462],</span>
+<span class="sd">       [0.09375   , 0.0625    , 0.        , 0.        , 0.        ,</span>
+<span class="sd">        0.84375   ]])</span>
+<span class="sd">    &gt;&gt;&gt; a.P[0]</span>
+<span class="sd">    array([[0.82119205, 0.        , 0.        , 0.10927152, 0.06622517,</span>
+<span class="sd">        0.00331126],</span>
+<span class="sd">       [0.14285714, 0.57142857, 0.14285714, 0.14285714, 0.        ,</span>
+<span class="sd">        0.        ],</span>
+<span class="sd">       [0.5       , 0.        , 0.5       , 0.        , 0.        ,</span>
+<span class="sd">        0.        ],</span>
+<span class="sd">       [0.21428571, 0.14285714, 0.        , 0.64285714, 0.        ,</span>
+<span class="sd">        0.        ],</span>
+<span class="sd">       [0.18918919, 0.        , 0.        , 0.        , 0.78378378,</span>
+<span class="sd">        0.02702703],</span>
+<span class="sd">       [0.28571429, 0.        , 0.        , 0.        , 0.        ,</span>
+<span class="sd">        0.71428571]])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">gdf_temp</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">gdf_temp</span><span class="p">[[</span><span class="n">id_var</span><span class="p">,</span> <span class="n">time_var</span><span class="p">,</span> <span class="n">cluster_col</span><span class="p">]]</span>
+    <span class="n">df_wide</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">id_var</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">time_var</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">cluster_col</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;int&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">df_wide</span><span class="o">.</span><span class="n">values</span>
+    <span class="k">if</span> <span class="n">w_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">mar</span> <span class="o">=</span> <span class="n">Markov</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>  <span class="c1"># class markov modeling</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">gdf_one</span> <span class="o">=</span> <span class="n">gdf_temp</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">([</span><span class="n">id_var</span><span class="p">])</span>
+        <span class="n">gdf_wide</span> <span class="o">=</span> <span class="n">df_wide</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">gdf_one</span><span class="p">,</span> <span class="n">left_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">right_on</span><span class="o">=</span><span class="n">id_var</span><span class="p">)</span>
+        <span class="n">w_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;rook&quot;</span><span class="p">:</span> <span class="n">Rook</span><span class="p">,</span> <span class="s2">&quot;queen&quot;</span><span class="p">:</span> <span class="n">Queen</span><span class="p">,</span> <span class="s2">&quot;knn&quot;</span><span class="p">:</span> <span class="n">KNN</span><span class="p">,</span> <span class="s2">&quot;kernel&quot;</span><span class="p">:</span> <span class="n">Kernel</span><span class="p">}</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">w_dict</span><span class="p">[</span><span class="n">w_type</span><span class="p">]</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">gdf_wide</span><span class="p">)</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s2">&quot;r&quot;</span>
+        <span class="n">mar</span> <span class="o">=</span> <span class="n">Spatial_Markov</span><span class="p">(</span>
+            <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">permutations</span><span class="o">=</span><span class="n">permutations</span><span class="p">,</span> <span class="n">discrete</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">variable_name</span><span class="o">=</span><span class="n">cluster_col</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">mar</span></div>
+
+
+<div class="viewcode-block" id="sequence"><a class="viewcode-back" href="../../../generated/geosnap.analyze.sequence.html#geosnap.analyze.sequence">[docs]</a><span class="k">def</span> <span class="nf">sequence</span><span class="p">(</span>
+    <span class="n">gdf</span><span class="p">,</span>
+    <span class="n">cluster_col</span><span class="p">,</span>
+    <span class="n">seq_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">subs_mat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">dist_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">indel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">time_var</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span>
+    <span class="n">id_var</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Pairwise sequence analysis and sequence clustering.</span>
+
+<span class="sd">    Dynamic programming if optimal matching.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    gdf             : geopandas.GeoDataFrame or pandas.DataFrame</span>
+<span class="sd">                      Long-form geopandas.GeoDataFrame or pandas.DataFrame containing neighborhood</span>
+<span class="sd">                      attributes with a column defining neighborhood clusters.</span>
+<span class="sd">    cluster_col     : string or int</span>
+<span class="sd">                      Column name for the neighborhood segmentation, such as</span>
+<span class="sd">                      &quot;ward&quot;, &quot;kmeans&quot;, etc.</span>
+<span class="sd">    seq_clusters    : int, optional</span>
+<span class="sd">                      Number of neighborhood sequence clusters. Agglomerative</span>
+<span class="sd">                      Clustering with Ward linkage is now used for clustering</span>
+<span class="sd">                      the sequences. Default is 5.</span>
+<span class="sd">    dist_type       : string</span>
+<span class="sd">                      &quot;hamming&quot;: hamming distance (substitution only</span>
+<span class="sd">                      and its cost is constant 1) from sklearn.metrics;</span>
+<span class="sd">                      &quot;markov&quot;: utilize empirical transition</span>
+<span class="sd">                      probabilities to define substitution costs;</span>
+<span class="sd">                      &quot;interval&quot;: differences between states are used</span>
+<span class="sd">                      to define substitution costs, and indel=k-1;</span>
+<span class="sd">                      &quot;arbitrary&quot;: arbitrary distance if there is not a</span>
+<span class="sd">                      strong theory guidance: substitution=0.5, indel=1.</span>
+<span class="sd">                      &quot;tran&quot;: transition-oriented optimal matching. Sequence of</span>
+<span class="sd">                      transitions. Based on :cite:`Biemann:2011`.</span>
+<span class="sd">    subs_mat        : array</span>
+<span class="sd">                      (k,k), substitution cost matrix. Should be hollow (</span>
+<span class="sd">                      0 cost between the same type), symmetric and non-negative.</span>
+<span class="sd">    indel           : float, optional</span>
+<span class="sd">                      insertion/deletion cost.</span>
+<span class="sd">    time_var        : string, optional</span>
+<span class="sd">                      Column defining time and or sequencing of the long-form data.</span>
+<span class="sd">                      Default is &quot;year&quot;.</span>
+<span class="sd">    id_var          : string, optional</span>
+<span class="sd">                      Column identifying the unique id of spatial units.</span>
+<span class="sd">                      Default is &quot;geoid&quot;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    --------</span>
+<span class="sd">    gdf_temp        : geopandas.GeoDataFrame or pandas.DataFrame</span>
+<span class="sd">                      geopandas.GeoDataFrame or pandas.DataFrame with a new column for sequence</span>
+<span class="sd">                      labels.</span>
+<span class="sd">    df_wide         : pandas.DataFrame</span>
+<span class="sd">                      Wide-form DataFrame with k (k is the number of periods)</span>
+<span class="sd">                      columns of neighborhood types and 1 column of sequence</span>
+<span class="sd">                      labels.</span>
+<span class="sd">    seq_dis_mat     : array</span>
+<span class="sd">                      (n,n), distance/dissimilarity matrix for each pair of</span>
+<span class="sd">                      sequences</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from geosnap.data import Community</span>
+<span class="sd">    &gt;&gt;&gt; columbus = Community.from_ltdb(msa_fips=columbusfips)</span>
+<span class="sd">    &gt;&gt;&gt; columbus1 = columbus.cluster(columns=[&#39;median_household_income&#39;,</span>
+<span class="sd">    ... &#39;p_poverty_rate&#39;, &#39;p_edu_college_greater&#39;, &#39;p_unemployment_rate&#39;],</span>
+<span class="sd">    ... method=&#39;ward&#39;, n_clusters=6)</span>
+<span class="sd">    &gt;&gt;&gt; gdf = columbus1.gdf</span>
+<span class="sd">    &gt;&gt;&gt; gdf_new, df_wide, seq_hamming = Sequence(gdf, dist_type=&quot;hamming&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; seq_hamming.seq_dis_mat[:5, :5]</span>
+<span class="sd">    array([[0., 3., 4., 5., 5.],</span>
+<span class="sd">           [3., 0., 3., 3., 3.],</span>
+<span class="sd">           [4., 3., 0., 2., 2.],</span>
+<span class="sd">           [5., 3., 2., 0., 0.],</span>
+<span class="sd">           [5., 3., 2., 0., 0.]])</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">gdf_temp</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">gdf_temp</span><span class="p">[[</span><span class="n">id_var</span><span class="p">,</span> <span class="n">time_var</span><span class="p">,</span> <span class="n">cluster_col</span><span class="p">]]</span>
+    <span class="n">df_wide</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">id_var</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">time_var</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">cluster_col</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;int&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">df_wide</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">seq_dis_mat</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">(</span>
+        <span class="n">y</span><span class="p">,</span> <span class="n">subs_mat</span><span class="o">=</span><span class="n">subs_mat</span><span class="p">,</span> <span class="n">dist_type</span><span class="o">=</span><span class="n">dist_type</span><span class="p">,</span> <span class="n">indel</span><span class="o">=</span><span class="n">indel</span><span class="p">,</span> <span class="n">cluster_type</span><span class="o">=</span><span class="n">cluster_col</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">seq_dis_mat</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">AgglomerativeClustering</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="n">seq_clusters</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">seq_dis_mat</span><span class="p">)</span>
+    <span class="n">name_seq</span> <span class="o">=</span> <span class="n">dist_type</span> <span class="o">+</span> <span class="s2">&quot;_</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">seq_clusters</span><span class="p">)</span>
+    <span class="n">df_wide</span><span class="p">[</span><span class="n">name_seq</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">labels_</span>
+    <span class="n">gdf_temp</span> <span class="o">=</span> <span class="n">gdf_temp</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df_wide</span><span class="p">[[</span><span class="n">name_seq</span><span class="p">]],</span> <span class="n">left_on</span><span class="o">=</span><span class="n">id_var</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">gdf_temp</span> <span class="o">=</span> <span class="n">gdf_temp</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">gdf_temp</span><span class="p">,</span> <span class="n">df_wide</span><span class="p">,</span> <span class="n">seq_dis_mat</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2018, geosnap developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

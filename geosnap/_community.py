@@ -168,9 +168,9 @@ class Community:
         return_model : bool
             whether to return the underlying cluster model instance for further
             analysis
-        scaler: str or sklearn.preprocessing.Scaler
+        scaler: None or scaler from sklearn.preprocessing
             a scikit-learn preprocessing class that will be used to rescale the
-            data. Defaults to StandardScaler
+            data. Defaults to sklearn.preprocessing.StandardScaler
 
         Returns
         -------
@@ -243,9 +243,9 @@ class Community:
         return_model : bool
             whether to return the underlying cluster model instance for further
             analysis
-        scaler: str or sklearn.preprocessing.Scaler
+        scaler: None or scaler from sklearn.preprocessing
             a scikit-learn preprocessing class that will be used to rescale the
-            data. Defaults to StandardScaler
+            data. Defaults to sklearn.preprocessing.StandardScaler
 
         Returns
         -------
@@ -378,7 +378,7 @@ class Community:
                           Default is "geoid".
 
         Returns
-        ------
+        -------
         gdf_new         : Community instance
                           New Community instance with attribute "gdf" having
                           a new column for sequence labels.
@@ -581,24 +581,24 @@ class Community:
 
         Parameters
         ----------
-        state_fips : list or str
+        state_fips : list or str, optional
             string or list of strings of two-digit fips codes defining states
             to include in the study area.
-        county_fips : list or str
+        county_fips : list or str, optional
             string or list of strings of five-digit fips codes defining
             counties to include in the study area.
-        msa_fips : type
+        msa_fips : list or str, optional
             string or list of strings of fips codes defining
             MSAs to include in the study area.
-        fips : type
+        fips : list or str, optional
             string or list of strings of five-digit fips codes defining
             counties to include in the study area.
-        boundary: geopandas.GeoDataFrame
+        boundary: geopandas.GeoDataFrame, optional
             geodataframe that defines the total extent of the study area.
             This will be used to clip tracts lazily by selecting all
             `GeoDataFrame.representative_point()`s that intersect the
             boundary gdf
-        years : list of ints
+        years : list of ints, required
             list of years to include in the study data
             (the default is [1990, 2000, 2010]).
 
@@ -690,27 +690,27 @@ class Community:
 
         Parameters
         ----------
-        state_fips : list or str
+        state_fips : list or str, optional
             string or list of strings of two-digit fips codes defining states
             to include in the study area.
-        county_fips : list or str
+        county_fips : list or str, optional
             string or list of strings of five-digit fips codes defining
             counties to include in the study area.
-        msa_fips : type
+        msa_fips : list or str, optional
             string or list of strings of fips codes defining
             MSAs to include in the study area.
-        fips : type
+        fips : list or str, optional
             string or list of strings of five-digit fips codes defining
             counties to include in the study area.
-        boundary: geopandas.GeoDataFrame
+        boundary: geopandas.GeoDataFrame, optional
             geodataframe that defines the total extent of the study area.
             This will be used to clip tracts lazily by selecting all
             `GeoDataFrame.representative_point()`s that intersect the
             boundary gdf
-        years : list of ints
+        years : list of ints, required
             list of years to include in the study data
             (the default is 2015).
-        dataset: str
+        dataset: str, required
             which LODES dataset should be used to create the Community.
             Options are 'wac' for workplace area characteristics or 'rac' for
             residence area characteristics. The default is workplace.

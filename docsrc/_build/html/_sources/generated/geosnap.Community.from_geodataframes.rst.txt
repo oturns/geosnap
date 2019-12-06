@@ -1,0 +1,6 @@
+geosnap.Community.from\_geodataframes
+=====================================
+
+.. currentmodule:: geosnap
+
+.. automethod:: Community.from_geodataframes

@@ -1,0 +1,6 @@
+geosnap.datasets.blocks\_2000
+=============================
+
+.. currentmodule:: geosnap
+
+.. automethod:: datasets.blocks_2000
