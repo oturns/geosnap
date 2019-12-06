@@ -265,20 +265,18 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        gdf : geopandas.GeoDataFrame</span>
-<span class="sd">            long-form geodataframe containing neighborhood attributes</span>
-<span class="sd">        n_clusters : int</span>
+<span class="sd">        n_clusters : int, required</span>
 <span class="sd">            the number of clusters to model. The default is 6).</span>
-<span class="sd">        method : str</span>
+<span class="sd">        method : str in [&#39;kmeans&#39;, &#39;ward&#39;, &#39;affinity_propagation&#39;, &#39;spectral&#39;, &#39;gaussian_mixture&#39;, &#39;hdbscan&#39;], required</span>
 <span class="sd">            the clustering algorithm used to identify neighborhood types</span>
-<span class="sd">        best_model : bool</span>
+<span class="sd">        best_model : bool, optional</span>
 <span class="sd">            if using a gaussian mixture model, use BIC to choose the best</span>
 <span class="sd">            n_clusters. (the default is False).</span>
-<span class="sd">        columns : list-like</span>
+<span class="sd">        columns : array-like, required</span>
 <span class="sd">            subset of columns on which to apply the clustering</span>
-<span class="sd">        verbose : bool</span>
+<span class="sd">        verbose : bool, optional</span>
 <span class="sd">            whether to print warning messages (the default is False).</span>
-<span class="sd">        scaler : None or scaler from sklearn.preprocessing</span>
+<span class="sd">        scaler : None or scaler from sklearn.preprocessing, optional</span>
 <span class="sd">            a scikit-learn preprocessing class that will be used to rescale the</span>
 <span class="sd">            data. Defaults to sklearn.preprocessing.StandardScaler</span>
 
@@ -327,28 +325,26 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        gdf : geopandas.GeoDataFrame</span>
-<span class="sd">            long-form geodataframe holding neighborhood attribute and geometry data.</span>
-<span class="sd">        n_clusters : int</span>
+<span class="sd">        n_clusters : int, required</span>
 <span class="sd">            the number of clusters to model. The default is 6).</span>
-<span class="sd">        spatial_weights : str (&#39;queen&#39; or &#39;rook&#39;) or libpysal.weights.W instance</span>
+<span class="sd">        spatial_weights : str (&#39;queen&#39; or &#39;rook&#39;) or libpysal.weights.W instance, optional</span>
 <span class="sd">            spatial weights matrix specification` (the default is &quot;rook&quot;). If &#39;rook&#39; or &#39;queen&#39;</span>
 <span class="sd">            then contiguity weights will be constructed internally, otherwise pass a</span>
 <span class="sd">            libpysal.weights.W with additional arguments specified in weights_kwargs</span>
-<span class="sd">        weights_kwargs : dict</span>
+<span class="sd">        weights_kwargs : dict, optional</span>
 <span class="sd">            If passing a libpysal.weights.W instance to spatial_weights, these additional</span>
 <span class="sd">            keyword arguments that will be passed to the weights constructor</span>
-<span class="sd">        method : str</span>
+<span class="sd">        method : str in [&#39;ward_spatial&#39;, &#39;spenc&#39;, &#39;skater&#39;, &#39;azp&#39;, &#39;max_p&#39;], required</span>
 <span class="sd">            the clustering algorithm used to identify neighborhood types</span>
-<span class="sd">        columns : list-like</span>
+<span class="sd">        columns : array-like, required</span>
 <span class="sd">            subset of columns on which to apply the clustering</span>
 <span class="sd">        threshold_variable : str, required if using max-p, optional otherwise</span>
 <span class="sd">            for max-p, which variable should define `p`. The default is &quot;count&quot;,</span>
 <span class="sd">            which will grow regions until the threshold number of polygons have</span>
 <span class="sd">            been aggregated</span>
-<span class="sd">        threshold : numeric</span>
+<span class="sd">        threshold : numeric, optional</span>
 <span class="sd">            threshold to use for max-p clustering (the default is 10).</span>
-<span class="sd">        scaler : None or scaler from sklearn.preprocessing</span>
+<span class="sd">        scaler : None or scaler from sklearn.preprocessing, optional</span>
 <span class="sd">            a scikit-learn preprocessing class that will be used to rescale the</span>
 <span class="sd">            data. Defaults to sklearn.preprocessing.StandardScaler</span>
 

@@ -50,7 +50,7 @@ def cluster(
         long-form GeoDataFrame containing neighborhood attributes
     n_clusters : int, required
         the number of clusters to model. The default is 6).
-    method : str
+    method : str in ['kmeans', 'ward', 'affinity_propagation', 'spectral','gaussian_mixture', 'hdbscan'], required
         the clustering algorithm used to identify neighborhood types
     best_model : bool, optional
         if using a gaussian mixture model, use BIC to choose the best
@@ -164,7 +164,7 @@ def cluster_spatial(
         spatial weights matrix specification`. By default, geosnap will calculate Rook
         weights, but you can also pass a `libpysal.weights` object for more control
         over the specification.
-    method : str
+    method : str in ['ward_spatial', 'spenc', 'skater', 'azp', 'max_p']
         the clustering algorithm used to identify neighborhood types
     columns : list-like
         subset of columns on which to apply the clustering

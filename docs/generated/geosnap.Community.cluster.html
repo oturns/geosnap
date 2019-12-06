@@ -127,20 +127,18 @@
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>gdf</strong><span class="classifier"><a class="reference external" href="https://geopandas.readthedocs.io/en/latest/reference/geopandas.GeoDataFrame.html#geopandas.GeoDataFrame" title="(in GeoPandas v0.6.1+26.gca6e5e7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geopandas.GeoDataFrame</span></code></a></span></dt><dd><p>long-form geodataframe containing neighborhood attributes</p>
+<dt><strong>n_clusters</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, required</span></dt><dd><p>the number of clusters to model. The default is 6).</p>
 </dd>
-<dt><strong>n_clusters</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>the number of clusters to model. The default is 6).</p>
+<dt><strong>method</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a> <code class="xref py py-obj docutils literal notranslate"><span class="pre">in</span></code> [‘kmeans’, ‘ward’, ‘affinity_propagation’, ‘spectral’, ‘gaussian_mixture’, ‘hdbscan’], required</span></dt><dd><p>the clustering algorithm used to identify neighborhood types</p>
 </dd>
-<dt><strong>method</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>the clustering algorithm used to identify neighborhood types</p>
-</dd>
-<dt><strong>best_model</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bltin-boolean-values" title="(in Python v3.8)"><span class="xref std std-ref">bool</span></a></span></dt><dd><p>if using a gaussian mixture model, use BIC to choose the best
+<dt><strong>best_model</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bltin-boolean-values" title="(in Python v3.8)"><span class="xref std std-ref">bool</span></a>, optional</span></dt><dd><p>if using a gaussian mixture model, use BIC to choose the best
 n_clusters. (the default is False).</p>
 </dd>
-<dt><strong>columns</strong><span class="classifier">list-like</span></dt><dd><p>subset of columns on which to apply the clustering</p>
+<dt><strong>columns</strong><span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/glossary.html#term-array-like" title="(in NumPy v1.17)"><span>array_like</span></a>, required</span></dt><dd><p>subset of columns on which to apply the clustering</p>
 </dd>
-<dt><strong>verbose</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bltin-boolean-values" title="(in Python v3.8)"><span class="xref std std-ref">bool</span></a></span></dt><dd><p>whether to print warning messages (the default is False).</p>
+<dt><strong>verbose</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bltin-boolean-values" title="(in Python v3.8)"><span class="xref std std-ref">bool</span></a>, optional</span></dt><dd><p>whether to print warning messages (the default is False).</p>
 </dd>
-<dt><strong>scaler</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">scaler</span></code> from <a class="reference external" href="https://scikit-learn.org/stable/modules/classes.html#module-sklearn.preprocessing" title="(in scikit-learn v0.22)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.preprocessing</span></code></a></span></dt><dd><p>a scikit-learn preprocessing class that will be used to rescale the
+<dt><strong>scaler</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">scaler</span></code> from <a class="reference external" href="https://scikit-learn.org/stable/modules/classes.html#module-sklearn.preprocessing" title="(in scikit-learn v0.22)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.preprocessing</span></code></a>, optional</span></dt><dd><p>a scikit-learn preprocessing class that will be used to rescale the
 data. Defaults to sklearn.preprocessing.StandardScaler</p>
 </dd>
 </dl>

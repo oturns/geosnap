@@ -149,20 +149,18 @@ class Community:
 
         Parameters
         ----------
-        gdf : geopandas.GeoDataFrame
-            long-form geodataframe containing neighborhood attributes
-        n_clusters : int
+        n_clusters : int, required
             the number of clusters to model. The default is 6).
-        method : str
+        method : str in ['kmeans', 'ward', 'affinity_propagation', 'spectral', 'gaussian_mixture', 'hdbscan'], required
             the clustering algorithm used to identify neighborhood types
-        best_model : bool
+        best_model : bool, optional
             if using a gaussian mixture model, use BIC to choose the best
             n_clusters. (the default is False).
-        columns : list-like
+        columns : array-like, required
             subset of columns on which to apply the clustering
-        verbose : bool
+        verbose : bool, optional
             whether to print warning messages (the default is False).
-        scaler : None or scaler from sklearn.preprocessing
+        scaler : None or scaler from sklearn.preprocessing, optional
             a scikit-learn preprocessing class that will be used to rescale the
             data. Defaults to sklearn.preprocessing.StandardScaler
 
@@ -211,28 +209,26 @@ class Community:
 
         Parameters
         ----------
-        gdf : geopandas.GeoDataFrame
-            long-form geodataframe holding neighborhood attribute and geometry data.
-        n_clusters : int
+        n_clusters : int, required
             the number of clusters to model. The default is 6).
-        spatial_weights : str ('queen' or 'rook') or libpysal.weights.W instance
+        spatial_weights : str ('queen' or 'rook') or libpysal.weights.W instance, optional
             spatial weights matrix specification` (the default is "rook"). If 'rook' or 'queen'
             then contiguity weights will be constructed internally, otherwise pass a
             libpysal.weights.W with additional arguments specified in weights_kwargs
-        weights_kwargs : dict
+        weights_kwargs : dict, optional
             If passing a libpysal.weights.W instance to spatial_weights, these additional
             keyword arguments that will be passed to the weights constructor
-        method : str
+        method : str in ['ward_spatial', 'spenc', 'skater', 'azp', 'max_p'], required
             the clustering algorithm used to identify neighborhood types
-        columns : list-like
+        columns : array-like, required
             subset of columns on which to apply the clustering
         threshold_variable : str, required if using max-p, optional otherwise
             for max-p, which variable should define `p`. The default is "count",
             which will grow regions until the threshold number of polygons have
             been aggregated
-        threshold : numeric
+        threshold : numeric, optional
             threshold to use for max-p clustering (the default is 10).
-        scaler : None or scaler from sklearn.preprocessing
+        scaler : None or scaler from sklearn.preprocessing, optional
             a scikit-learn preprocessing class that will be used to rescale the
             data. Defaults to sklearn.preprocessing.StandardScaler
 
