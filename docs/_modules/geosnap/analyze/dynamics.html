@@ -152,15 +152,14 @@
 <span class="sd">                      inference (the default is 0).</span>
 
 <span class="sd">    Returns</span>
-<span class="sd">    ------</span>
-<span class="sd">    mar             : object</span>
-<span class="sd">                      if w_type=None, return a giddy.markov.Markov instance;</span>
-<span class="sd">                      if w_type is given, return a</span>
-<span class="sd">                      giddy.markov.Spatial_Markov instance.</span>
+<span class="sd">    --------</span>
+<span class="sd">    mar             : giddy.markov.Markov instance or giddy.markov.Spatial_Markov</span>
+<span class="sd">                      if w_type=None, a classic Markov instance is returned. </span>
+<span class="sd">                      if w_type is given, a Spatial_Markov instance is returned.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; from geosnap.data import Community</span>
+<span class="sd">    &gt;&gt;&gt; from geosnap import Community</span>
 <span class="sd">    &gt;&gt;&gt; columbus = Community.from_ltdb(msa_fips=columbusfips)</span>
 <span class="sd">    &gt;&gt;&gt; columbus1 = columbus.cluster(columns=[&#39;median_household_income&#39;,</span>
 <span class="sd">    ... &#39;p_poverty_rate&#39;, &#39;p_edu_college_greater&#39;, &#39;p_unemployment_rate&#39;],</span>
@@ -268,7 +267,7 @@
 <span class="sd">                      Default is &quot;geoid&quot;.</span>
 
 <span class="sd">    Returns</span>
-<span class="sd">    ------</span>
+<span class="sd">    --------</span>
 <span class="sd">    gdf_temp        : geopandas.GeoDataFrame or pandas.DataFrame</span>
 <span class="sd">                      geopandas.GeoDataFrame or pandas.DataFrame with a new column for sequence</span>
 <span class="sd">                      labels.</span>

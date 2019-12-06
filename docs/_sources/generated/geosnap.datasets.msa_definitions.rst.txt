@@ -3,4 +3,4 @@ geosnap.datasets.msa\_definitions
 
 .. currentmodule:: geosnap
 
-.. autoattribute:: datasets.msa_definitions
+.. automethod:: datasets.msa_definitions

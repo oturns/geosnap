@@ -131,7 +131,7 @@
 </dd>
 <dt><strong>n_clusters</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>the number of clusters to model. The default is 6).</p>
 </dd>
-<dt><strong>spatial_weights</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a> (‘queen’ or ‘rook’) <code class="xref py py-obj docutils literal notranslate"><span class="pre">or</span></code> <a class="reference external" href="https://pysal.org/libpysal/generated/libpysal.weights.W.html#libpysal.weights.W" title="(in libpysal v4.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">libpysal.weights.W</span></code></a> instance</span></dt><dd><p>spatial weights matrix specification` (the default is “rook”). If ‘rook’ or ‘queen’
+<dt><strong>spatial_weights</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a> (‘queen’ or ‘rook’) or <a class="reference external" href="https://pysal.org/libpysal/generated/libpysal.weights.W.html#libpysal.weights.W" title="(in libpysal v4.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">libpysal.weights.W</span></code></a> instance</span></dt><dd><p>spatial weights matrix specification` (the default is “rook”). If ‘rook’ or ‘queen’
 then contiguity weights will be constructed internally, otherwise pass a
 libpysal.weights.W with additional arguments specified in weights_kwargs</p>
 </dd>
@@ -144,7 +144,7 @@ keyword arguments that will be passed to the weights constructor</p>
 </dd>
 <dt><strong>columns</strong><span class="classifier">list-like</span></dt><dd><p>subset of columns on which to apply the clustering</p>
 </dd>
-<dt><strong>threshold_variable</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">required</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">if</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">using</span></code> max-p, optional <code class="xref py py-obj docutils literal notranslate"><span class="pre">otherwise</span></code></span></dt><dd><p>for max-p, which variable should define <cite>p</cite>. The default is “count”,
+<dt><strong>threshold_variable</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, required if using max-p, optional otherwise</span></dt><dd><p>for max-p, which variable should define <cite>p</cite>. The default is “count”,
 which will grow regions until the threshold number of polygons have
 been aggregated</p>
 </dd>
@@ -153,8 +153,8 @@ been aggregated</p>
 <dt><strong>return_model</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bltin-boolean-values" title="(in Python v3.8)"><span class="xref std std-ref">bool</span></a></span></dt><dd><p>whether to return the underlying cluster model instance for further
 analysis</p>
 </dd>
-<dt><strong>scaler: str or sklearn.preprocessing.Scaler</strong></dt><dd><p>a scikit-learn preprocessing class that will be used to rescale the
-data. Defaults to StandardScaler</p>
+<dt><strong>scaler: None or scaler from sklearn.preprocessing</strong></dt><dd><p>a scikit-learn preprocessing class that will be used to rescale the
+data. Defaults to sklearn.preprocessing.StandardScaler</p>
 </dd>
 </dl>
 </dd>

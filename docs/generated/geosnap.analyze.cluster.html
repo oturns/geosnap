@@ -146,8 +146,8 @@ long-form data. Default is “year”</p>
 <dt><strong>id_var: str</strong></dt><dd><p>which column on the long-form dataframe identifies the stable units
 over time. In a wide-form dataset, this would be the unique index</p>
 </dd>
-<dt><strong>scaler: str or sklearn.preprocessing.Scaler</strong></dt><dd><p>a scikit-learn preprocessing class that will be used to rescale the
-data. Defaults to StandardScaler</p>
+<dt><strong>scaler: None or scaler from sklearn.preprocessing</strong></dt><dd><p>a scikit-learn preprocessing class that will be used to rescale the
+data. Defaults to sklearn.preprocessing.StandardScaler</p>
 </dd>
 </dl>
 </dd>

@@ -458,7 +458,7 @@ class Community:
             years = [1970, 1980, 1990, 2000, 2010]
         if isinstance(boundary, gpd.GeoDataFrame):
             tracts = datasets.tracts_2010()[["geoid", "geometry"]]
-            ltdb = datasets.ltdb.reset_index()
+            ltdb = datasets.ltdb().reset_index()
             if boundary.crs != tracts.crs:
                 warn(
                     "Unable to determine whether boundary CRS is WGS84 "
@@ -472,7 +472,7 @@ class Community:
 
         else:
             gdf = _from_db(
-                data=datasets.ltdb,
+                data=datasets.ltdb(),
                 state_fips=state_fips,
                 county_fips=county_fips,
                 msa_fips=msa_fips,
@@ -535,7 +535,7 @@ class Community:
             years = [1970, 1980, 1990, 2000, 2010]
         if isinstance(boundary, gpd.GeoDataFrame):
             tracts = datasets.tracts_2010()[["geoid", "geometry"]]
-            ncdb = datasets.ncdb.reset_index()
+            ncdb = datasets.ncdb().reset_index()
             if boundary.crs != tracts.crs:
                 warn(
                     "Unable to determine whether boundary CRS is WGS84 "
@@ -549,7 +549,7 @@ class Community:
 
         else:
             gdf = _from_db(
-                data=datasets.ncdb,
+                data=datasets.ncdb(),
                 state_fips=state_fips,
                 county_fips=county_fips,
                 msa_fips=msa_fips,
@@ -615,8 +615,8 @@ class Community:
 
         msa_states = []
         if msa_fips:
-            msa_states += datasets.msa_definitions[
-                datasets.msa_definitions["CBSA Code"] == msa_fips
+            msa_states += datasets.msa_definitions()[
+                datasets.msa_definitions()["CBSA Code"] == msa_fips
             ]["stcofips"].tolist()
         msa_states = [i[:2] for i in msa_states]
 
@@ -729,7 +729,7 @@ class Community:
 
         if msa_fips:
             msa_counties = datasets.msa_definitions[
-                datasets.msa_definitions["CBSA Code"] == msa_fips
+                datasets.msa_definitions()["CBSA Code"] == msa_fips
             ]["stcofips"].tolist()
 
         else:

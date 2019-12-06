@@ -146,17 +146,18 @@ None, if non-spatial Markov transition rates are desired.</p>
 <dt><strong>permutations</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>number of permutations for use in randomization based
 inference (the default is 0).</p>
 </dd>
-<dt><strong>Returns</strong></dt><dd></dd>
-<dt><strong>——</strong></dt><dd></dd>
-<dt><strong>mar</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">object</span></code></a></span></dt><dd><p>if w_type=None, return a giddy.markov.Markov instance;
-if w_type is given, return a
-giddy.markov.Spatial_Markov instance.</p>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>mar</strong><span class="classifier"><a class="reference external" href="https://giddy.readthedocs.io/en/latest/generated/giddy.markov.Markov.html#giddy.markov.Markov" title="(in giddy v2.2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">giddy.markov.Markov</span></code></a> instance or <a class="reference external" href="https://giddy.readthedocs.io/en/latest/generated/giddy.markov.Spatial_Markov.html#giddy.markov.Spatial_Markov" title="(in giddy v2.2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">giddy.markov.Spatial_Markov</span></code></a></span></dt><dd><p>if w_type=None, a classic Markov instance is returned. 
+if w_type is given, a Spatial_Markov instance is returned.</p>
 </dd>
 </dl>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">geosnap.data</span> <span class="kn">import</span> <span class="n">Community</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">geosnap</span> <span class="kn">import</span> <span class="n">Community</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">columbus</span> <span class="o">=</span> <span class="n">Community</span><span class="o">.</span><span class="n">from_ltdb</span><span class="p">(</span><span class="n">msa_fips</span><span class="o">=</span><span class="n">columbusfips</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">columbus1</span> <span class="o">=</span> <span class="n">columbus</span><span class="o">.</span><span class="n">cluster</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;median_household_income&#39;</span><span class="p">,</span>
 <span class="gp">... </span><span class="s1">&#39;p_poverty_rate&#39;</span><span class="p">,</span> <span class="s1">&#39;p_edu_college_greater&#39;</span><span class="p">,</span> <span class="s1">&#39;p_unemployment_rate&#39;</span><span class="p">],</span>

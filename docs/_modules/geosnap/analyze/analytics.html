@@ -181,9 +181,9 @@
 <span class="sd">    id_var: str</span>
 <span class="sd">        which column on the long-form dataframe identifies the stable units</span>
 <span class="sd">        over time. In a wide-form dataset, this would be the unique index</span>
-<span class="sd">    scaler: str or sklearn.preprocessing.Scaler</span>
+<span class="sd">    scaler: None or scaler from sklearn.preprocessing</span>
 <span class="sd">        a scikit-learn preprocessing class that will be used to rescale the</span>
-<span class="sd">        data. Defaults to StandardScaler</span>
+<span class="sd">        data. Defaults to sklearn.preprocessing.StandardScaler</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -299,9 +299,9 @@
 <span class="sd">    weights_kwargs: dict</span>
 <span class="sd">        If passing a `libpysal.weights` instance to spatial_weights, these additional</span>
 <span class="sd">        keyword arguments that will be passed to the weights constructor</span>
-<span class="sd">    scaler: str or sklearn.preprocessing.Scaler</span>
+<span class="sd">    scaler: None or scaler class from sklearn.preprocessing</span>
 <span class="sd">        a scikit-learn preprocessing class that will be used to rescale the</span>
-<span class="sd">        data. Defaults to StandardScaler</span>
+<span class="sd">        data. Defaults to sklearn.preprocessing.StandardScaler</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>

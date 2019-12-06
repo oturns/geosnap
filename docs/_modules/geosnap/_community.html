@@ -284,9 +284,9 @@
 <span class="sd">        return_model : bool</span>
 <span class="sd">            whether to return the underlying cluster model instance for further</span>
 <span class="sd">            analysis</span>
-<span class="sd">        scaler: str or sklearn.preprocessing.Scaler</span>
+<span class="sd">        scaler: None or scaler from sklearn.preprocessing</span>
 <span class="sd">            a scikit-learn preprocessing class that will be used to rescale the</span>
-<span class="sd">            data. Defaults to StandardScaler</span>
+<span class="sd">            data. Defaults to sklearn.preprocessing.StandardScaler</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -359,9 +359,9 @@
 <span class="sd">        return_model : bool</span>
 <span class="sd">            whether to return the underlying cluster model instance for further</span>
 <span class="sd">            analysis</span>
-<span class="sd">        scaler: str or sklearn.preprocessing.Scaler</span>
+<span class="sd">        scaler: None or scaler from sklearn.preprocessing</span>
 <span class="sd">            a scikit-learn preprocessing class that will be used to rescale the</span>
-<span class="sd">            data. Defaults to StandardScaler</span>
+<span class="sd">            data. Defaults to sklearn.preprocessing.StandardScaler</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -494,7 +494,7 @@
 <span class="sd">                          Default is &quot;geoid&quot;.</span>
 
 <span class="sd">        Returns</span>
-<span class="sd">        ------</span>
+<span class="sd">        -------</span>
 <span class="sd">        gdf_new         : Community instance</span>
 <span class="sd">                          New Community instance with attribute &quot;gdf&quot; having</span>
 <span class="sd">                          a new column for sequence labels.</span>
@@ -697,24 +697,24 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        state_fips : list or str</span>
+<span class="sd">        state_fips : list or str, optional</span>
 <span class="sd">            string or list of strings of two-digit fips codes defining states</span>
 <span class="sd">            to include in the study area.</span>
-<span class="sd">        county_fips : list or str</span>
+<span class="sd">        county_fips : list or str, optional</span>
 <span class="sd">            string or list of strings of five-digit fips codes defining</span>
 <span class="sd">            counties to include in the study area.</span>
-<span class="sd">        msa_fips : type</span>
+<span class="sd">        msa_fips : list or str, optional</span>
 <span class="sd">            string or list of strings of fips codes defining</span>
 <span class="sd">            MSAs to include in the study area.</span>
-<span class="sd">        fips : type</span>
+<span class="sd">        fips : list or str, optional</span>
 <span class="sd">            string or list of strings of five-digit fips codes defining</span>
 <span class="sd">            counties to include in the study area.</span>
-<span class="sd">        boundary: geopandas.GeoDataFrame</span>
+<span class="sd">        boundary: geopandas.GeoDataFrame, optional</span>
 <span class="sd">            geodataframe that defines the total extent of the study area.</span>
 <span class="sd">            This will be used to clip tracts lazily by selecting all</span>
 <span class="sd">            `GeoDataFrame.representative_point()`s that intersect the</span>
 <span class="sd">            boundary gdf</span>
-<span class="sd">        years : list of ints</span>
+<span class="sd">        years : list of ints, required</span>
 <span class="sd">            list of years to include in the study data</span>
 <span class="sd">            (the default is [1990, 2000, 2010]).</span>
 
@@ -806,27 +806,27 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        state_fips : list or str</span>
+<span class="sd">        state_fips : list or str, optional</span>
 <span class="sd">            string or list of strings of two-digit fips codes defining states</span>
 <span class="sd">            to include in the study area.</span>
-<span class="sd">        county_fips : list or str</span>
+<span class="sd">        county_fips : list or str, optional</span>
 <span class="sd">            string or list of strings of five-digit fips codes defining</span>
 <span class="sd">            counties to include in the study area.</span>
-<span class="sd">        msa_fips : type</span>
+<span class="sd">        msa_fips : list or str, optional</span>
 <span class="sd">            string or list of strings of fips codes defining</span>
 <span class="sd">            MSAs to include in the study area.</span>
-<span class="sd">        fips : type</span>
+<span class="sd">        fips : list or str, optional</span>
 <span class="sd">            string or list of strings of five-digit fips codes defining</span>
 <span class="sd">            counties to include in the study area.</span>
-<span class="sd">        boundary: geopandas.GeoDataFrame</span>
+<span class="sd">        boundary: geopandas.GeoDataFrame, optional</span>
 <span class="sd">            geodataframe that defines the total extent of the study area.</span>
 <span class="sd">            This will be used to clip tracts lazily by selecting all</span>
 <span class="sd">            `GeoDataFrame.representative_point()`s that intersect the</span>
 <span class="sd">            boundary gdf</span>
-<span class="sd">        years : list of ints</span>
+<span class="sd">        years : list of ints, required</span>
 <span class="sd">            list of years to include in the study data</span>
 <span class="sd">            (the default is 2015).</span>
-<span class="sd">        dataset: str</span>
+<span class="sd">        dataset: str, required</span>
 <span class="sd">            which LODES dataset should be used to create the Community.</span>
 <span class="sd">            Options are &#39;wac&#39; for workplace area characteristics or &#39;rac&#39; for</span>
 <span class="sd">            residence area characteristics. The default is workplace.</span>

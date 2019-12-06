@@ -425,7 +425,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        pandas.DataFrame.</span>
+<span class="sd">        pandas.DataFrame or geopandas.GeoDataFrame</span>
 <span class="sd">            2000 tracts as a geodataframe or as a dataframe with geometry</span>
 <span class="sd">            stored as well-known binary on the &#39;wkb&#39; column.</span>
 
@@ -451,7 +451,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        pandas.DataFrame.</span>
+<span class="sd">        pandas.DataFrame or geopandas.GeoDataFrame</span>
 <span class="sd">            2010 tracts as a geodataframe or as a dataframe with geometry</span>
 <span class="sd">            stored as well-known binary on the &#39;wkb&#39; column.</span>
 
@@ -478,7 +478,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        geopandas.GeoDataFrame</span>
+<span class="sd">        pandas.DataFrame or geopandas.GeoDataFrame</span>
 <span class="sd">            2010 MSAs as a geodataframe or as a dataframe with geometry</span>
 <span class="sd">            stored as well-known binary on the &#39;wkb&#39; column.</span>
 
@@ -499,7 +499,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        geopandas.GeoDataFrame</span>
+<span class="sd">        pandas.DataFrame or geopandas.GeoDataFrame</span>
 <span class="sd">            US States as a geodataframe or as a dataframe with geometry</span>
 <span class="sd">            stored as well-known binary on the &#39;wkb&#39; column.</span>
 
@@ -525,7 +525,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_convert_gdf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">administrative</span><span class="p">[</span><span class="s2">&quot;counties.parquet&quot;</span><span class="p">]())</span>
 
-    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">msa_definitions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;2010 Metropolitan Statistical Area definitions.</span>
 
@@ -540,7 +539,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">administrative</span><span class="p">[</span><span class="s2">&quot;msa_definitions.parquet&quot;</span><span class="p">]()</span>
 
-    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ltdb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Longitudinal Tract Database (LTDB).</span>
 
@@ -558,7 +556,6 @@
                 <span class="s2">&quot;using the `store_ltdb` function&quot;</span>
             <span class="p">)</span>
 
-    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ncdb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Geolytics Neighborhood Change Database (NCDB).</span>
 
@@ -576,13 +573,12 @@
                 <span class="s2">&quot;using the `store_ncdb` function&quot;</span>
             <span class="p">)</span>
 
-    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">codebook</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Codebook.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        pandas.DataFrame.</span>
+<span class="sd">        pandas.DataFrame</span>
 <span class="sd">            codebook that stores variable names, definitions, and formulas.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
