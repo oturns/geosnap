@@ -4,7 +4,19 @@
 
 <h2 align="center" style="margin-top:-10px">The Geospatial Neighborhood Analysis Visualizer</h2> 
 
-`geosnap-viz` has a highly interactive and dynamic user-interface that makes it easier to explore, model, analyze, and visualize the social and spatial dynamics of neighborhoods.
+`geosnap-viz` has a highly interactive and dynamic user-interface that makes it easier to explore, model, analyze, and visualize the social and spatial dynamics of neighborhoods. geosnap-viz visualizes data from census and American communisty survey (ACS) visualizes results of several spatial statistcs that help to study spatiotemporal neighborhood changes. Here is the list of a sptial and sptial statistics analysis geosnap-viz provides:
+- Clustering with Affinity Propagation
+- Clustering with Gaussian Mixture Model
+- Clustering with Hierarchical DBSCAN
+- K-Means clustering.
+- spectral clustering
+- Agglomerative clustering using Ward linkage.
+- AZP clustering algorithm
+- Max-p clustering algorithm [DAR12]
+- SKATER spatial clustering algorithm.
+- Spatially encouraged spectral clustering
+- Agglomerative clustering using Ward linkage with a spatial connectivity
+- Index of Neighborhood Change 
 
 `geosnap-viz` utilizes data and analysis layers provided by  [“The Geospatial Neighborhood Analysis Packages”](https://github.com/spatialucr/geosnap) (written in python), and combines them with a visualization layer written in Javascript, Html and CSS. The visualization layer is made of open-source JavaScript libraries such as Leaflet, Plotly, and D3.
 
