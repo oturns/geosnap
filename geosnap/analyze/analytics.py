@@ -39,7 +39,7 @@ def cluster(
     verbose=False,
     time_var="year",
     id_var="geoid",
-    scaler=StandardScaler(),
+    scaler='std',
     pooling="fixed",
     **kwargs,
 ):
