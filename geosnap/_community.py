@@ -141,8 +141,8 @@ class Community:
         best_model=False,
         columns=None,
         verbose=False,
-        return_model=False,
-        scaler=None,
+        scaler='std',
+        pooling='fixed',
         **kwargs,
     ):
         """Create a geodemographic typology by running a cluster analysis on the study area's neighborhood attributes.
@@ -163,6 +163,12 @@ class Community:
         scaler : None or scaler from sklearn.preprocessing, optional
             a scikit-learn preprocessing class that will be used to rescale the
             data. Defaults to sklearn.preprocessing.StandardScaler
+        pooling : ["fixed", "pooled", "unique"], optional (default='fixed')
+            How to treat temporal data when applying scaling. Options include:
+            * fixed : scaling is fixed to each time period
+            * pooled : data are pooled across all time periods
+            * unique : if scaling, apply the scaler to each time period, then generate
+            clusters unique to each time period.
 
         Returns
         -------
@@ -179,8 +185,8 @@ class Community:
             best_model=best_model,
             columns=columns,
             verbose=verbose,
-            return_model=return_model,
             scaler=scaler,
+            pooling=pooling,
             **kwargs,
         )
 
