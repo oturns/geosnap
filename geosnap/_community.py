@@ -718,7 +718,7 @@ class Community:
         years = list(set(years))
 
         if msa_fips:
-            msa_counties = datasets.msa_definitions[
+            msa_counties = datasets.msa_definitions()[
                 datasets.msa_definitions()["CBSA Code"] == msa_fips
             ]["stcofips"].tolist()
 
