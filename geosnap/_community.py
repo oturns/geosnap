@@ -165,10 +165,10 @@ class Community:
             data. Defaults to sklearn.preprocessing.StandardScaler
         pooling : ["fixed", "pooled", "unique"], optional (default='fixed')
             How to treat temporal data when applying scaling. Options include:
+
             * fixed : scaling is fixed to each time period
             * pooled : data are pooled across all time periods
-            * unique : if scaling, apply the scaler to each time period, then generate
-            clusters unique to each time period.
+            * unique : if scaling, apply the scaler to each time period, then generate clusters unique to each time period.
 
         Returns
         -------
