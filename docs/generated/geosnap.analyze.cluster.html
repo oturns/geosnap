@@ -122,7 +122,7 @@
 <h1>geosnap.analyze.cluster<a class="headerlink" href="#geosnap-analyze-cluster" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="geosnap.analyze.cluster">
-<code class="sig-prename descclassname">geosnap.analyze.</code><code class="sig-name descname">cluster</code><span class="sig-paren">(</span><em class="sig-param">gdf</em>, <em class="sig-param">n_clusters=6</em>, <em class="sig-param">method=None</em>, <em class="sig-param">best_model=False</em>, <em class="sig-param">columns=None</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">time_var='year'</em>, <em class="sig-param">id_var='geoid'</em>, <em class="sig-param">scaler=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/analyze/analytics.html#cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.analyze.cluster" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">geosnap.analyze.</code><code class="sig-name descname">cluster</code><span class="sig-paren">(</span><em class="sig-param">gdf</em>, <em class="sig-param">n_clusters=6</em>, <em class="sig-param">method=None</em>, <em class="sig-param">best_model=False</em>, <em class="sig-param">columns=None</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">time_var='year'</em>, <em class="sig-param">id_var='geoid'</em>, <em class="sig-param">scaler='std'</em>, <em class="sig-param">pooling='fixed'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/analyze/analytics.html#cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.analyze.cluster" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a geodemographic typology by running a cluster analysis on the study area’s neighborhood attributes.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -148,6 +148,14 @@ over time. In a wide-form dataset, this would be the unique index</p>
 </dd>
 <dt><strong>scaler</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">scaler</span></code> from <a class="reference external" href="https://scikit-learn.org/stable/modules/classes.html#module-sklearn.preprocessing" title="(in scikit-learn v0.22)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.preprocessing</span></code></a>, optional</span></dt><dd><p>a scikit-learn preprocessing class that will be used to rescale the
 data. Defaults to sklearn.preprocessing.StandardScaler</p>
+</dd>
+<dt><strong>pooling</strong><span class="classifier">[“fixed”, “pooled”, “unique”], optional (default=’fixed’)</span></dt><dd><p>How to treat temporal data when applying scaling. Options include:</p>
+<ul class="simple">
+<li><p>fixed : scaling is fixed to each time period</p></li>
+<li><p>pooled : data are pooled across all time periods</p></li>
+<li><p>unique : if scaling, apply the scaler to each time period, then generate
+clusters unique to each time period.</p></li>
+</ul>
 </dd>
 </dl>
 </dd>
