@@ -4,19 +4,36 @@
 
 <h2 align="center" style="margin-top:-10px">The Geospatial Neighborhood Analysis Visualizer</h2> 
 
-`geosnap-viz` has a highly interactive and dynamic user-interface that makes it easier to explore, model, analyze, and visualize the social and spatial dynamics of neighborhoods.
+`GEOSNAP-VIZ` has a highly interactive and dynamic user-interface that makes it easier to explore, model, analyze, and visualize the social and spatial dynamics of neighborhoods. GEOSNAP-VIZ visualizes not only data from census and American communisty survey (ACS), but also results of several spatial statistcs that help to study spatiotemporal neighborhood changes. Here is the list of sptial and statistical analyses that `GEOSNAP-VIZ` provides:
 
-`geosnap-viz` utilizes data and analysis layers provided by  [“The Geospatial Neighborhood Analysis Packages”](https://github.com/spatialucr/geosnap) (written in python), and combines them with a visualization layer written in Javascript, Html and CSS. The visualization layer is made of open-source JavaScript libraries such as Leaflet, Plotly, and D3.
+- Clustering with Affinity Propagation
+- Clustering with Gaussian Mixture Model
+- Clustering with Hierarchical DBSCAN
+- K-Means clustering.
+- spectral clustering
+- Agglomerative clustering using Ward linkage.
+- AZP clustering algorithm
+- Max-p clustering algorithm 
+- SKATER spatial clustering algorithm.
+- Spatially encouraged spectral clustering
+- Agglomerative clustering using Ward linkage with a spatial connectivity
+- Sequence Analysis
+- Index of Neighborhood Change 
 
-`geosnap-viz` consists of GEOSNAP2ACM (Adaptive Choropleth Mapper) and GOESNA2NAM (Neighborhood Analysis Mapper). GEOSNAP2ACM and GEOSNAP2NAM are open source GIS software packages that support (1) querying Race/Ethnicity, Socioeconomic and Demographic variables, (2) data exploration, (3) neighborhood delineation and analysis, and (4) user-interactive and dynamic visualization. Python3 (comes with Anaconda3) and Jupyter Notebook are required to run them. For visualization, Firefox  or Google Chrome work best. It has not been tested in Internet Explorer (IE).
+`GEOSNAP-VIZ` consists of GEOSNAP2ACM (Adaptive Choropleth Mapper) and GOESNA2NAM (Neighborhood Analysis Mapper). GEOSNAP2ACM and GEOSNAP2NAM are open source GIS software packages that support (1) querying Race/Ethnicity, Socioeconomic and Demographic variables, (2) data exploration, (3) neighborhood delineation and analysis, and (4) user-interactive and dynamic visualization.
 
-- GEOSNAP2ACM is one of the modules in GEOSNAP and includes data and visualization layers of GEOSNAP. GEOSNAP2ACM contains modules for Step1: Data Exploration – (1) Adaptive Choropleth Mapper (ACM), (2) ACM with Correlogram, (3) ACM with Scatter plot, (4) ACM with Time Series, and (5) ACM with PCP.
+- GEOSNAP2ACM contains modules Data Exploration – (1) Adaptive Choropleth Mapper (ACM), (2) ACM with Correlogram, (3) ACM with Scatter plot, (4) ACM with Time Series, and (5) ACM with PCP.
 
-- GEOSNAP2NAM is one of the modules in GEOSNAP and includes data, analysis and visualization layers of GEOSNAP. GEOSNAP2NAM contains modules for Step2: Data Delineation and Step3: Neighborhood Analysis - (1) Maps of Neighborhood with a Stacked Chart, (2) Maps of INC and Neighborhoods, (3) Maps of Neighborhood with Parallel Categories Diagram, and (4) Maps of Neighborhood with Chord Diagram.
+- GEOSNAP2NAM contains modules for Data Delineation and Step3: Neighborhood Analysis - (1) Maps of Neighborhood with a Stacked Chart, (2) Maps of INC and Neighborhoods, (3) Maps of Neighborhood with Parallel Categories Diagram, and (4) Maps of Neighborhood with Chord Diagram.
+
+Both GEOSNAP2ACM and GEOSNAP2NAM utilize data  and  sptial and statistical analyses from GeoSpatial Neighborhood Analysis Package (GEOSNAP) which are written in Python,  and combines them with a visualization layer written in Javascript, Html and CSS. The visualization layer is made of open-source JavaScript libraries such as Leaflet, Plotly, and D3. 
+
 
 ### Prerequisites
 
-GEOSNAP2ACM and GEOSNAP2NAM utilize the GeoSpatial Neighborhood Analysis Package (GEOSNAP). This packages must be installed. The installation instruction is available at: https://github.com/spatialucr/geosnap 
+ Python3 (comes with Anaconda3) and Jupyter Notebook are required to run GEOSNAP2ACM and GEOSNAP2NAM. For visualization, Firefox  or Google Chrome work best. It has not been tested in Internet Explorer (IE).
+
+GEOSNAP must be installed in order to run GEOSNAP2ACM and GEOSNAP2NAM. The installation instruction is available at: https://github.com/spatialucr/geosnap. 
 
 First-time users need to download LTDB data which are input for both GEOSNAP2ACM and GEONSNAP2NAM
 - Download LTDB data and create the folder, “downloads” in the GEOSNAP2ACM. https://s4.ad.brown.edu/projects/diversity/Researcher/LTDB.htm
@@ -25,56 +42,57 @@ First-time users need to download LTDB data which are input for both GEOSNAP2ACM
 
 ### Getting Started
 
-Run Jupyter notebook examples below to learn how to use GEOSNAP2ACM and GEOSNAP2NAN. Each folder has examples like below
+Run Jupyter notebook examples below to learn how to use GEOSNAP2ACM and GEOSNAP2NAN. Each folder has example output like below.
 #### GEOSNAP2ACM 
-- ACM_SD_ACM_only : The output of ACM_only.ipynb. 
-It visualizes selected variables by using Adaptive Choropleth Mapper.
-Video demo: http://sarasen.asuscomm.com/ACM
+ 1. ACM_SD_ACM_only : The output of ACM_only.ipynb. 
+<br />It visualizes selected variables by using Adaptive Choropleth Mapper.
+<br />Video demo: http://sarasen.asuscomm.com/ACM
 
-- ACM_SD_correlogram: The output of ACM_correlogram.ipynb. 
-It visualizes the matrix of scatter plots.
-Video demo: http://osnap.cloud/~suhan/videos/ACM_SD_correlogram_1
-Advanced options: http://osnap.cloud/~suhan/videos/ACM_SD_correlogram_2
+ 2. ACM_SD_correlogram: The output of ACM_correlogram.ipynb. 
+<br />It visualizes the matrix of scatter plots.
+<br />Video demo: http://osnap.cloud/~suhan/videos/ACM_SD_correlogram_1
+<br />Advanced options: http://osnap.cloud/~suhan/videos/ACM_SD_correlogram_2
 
-- ACM_SD_Scatter : The output of  ACM_ScatterPlot.ipynb. 
-It visualizes only two scatter plots, but it has more interactive features than ACM_correlogram.
-Video demo: http://osnap.cloud/~suhan/videos/ACM_SD_Scatter_1
+ 3. ACM_SD_Scatter : The output of  ACM_ScatterPlot.ipynb. 
+<br />It visualizes only two scatter plots, but it has more interactive features than ACM_correlogram.
+<br />Video demo: http://osnap.cloud/~suhan/videos/ACM_SD_Scatter_1
 
-- ACM_SD_TimeSeries : The output of ACM_TimeSeries.ipynb
-It visualizes the temporal change of the selected variables. 
-Video demo:
+ 4. ACM_SD_TimeSeries : The output of ACM_TimeSeries.ipynb
+<br />It visualizes the temporal change of the selected variables. 
+<br />Video demo:
 
-- ACM_SD_ParallelCoordinates : The output of  ACM_ParallelCoordinates.ipynb
-It visualizes the relationships among multiple variables.
-Video demo:
+ 5. ACM_SD_ParallelCoordinates : The output of  ACM_ParallelCoordinates.ipynb
+<br />It visualizes the relationships among multiple variables.
+<br />Video demo:
 
 #### GEOSNAP2NAM
-- NAM_SD_eveything : The output of GEOSNAP2NAM.ipynb 
-This example visualizes all charts and maps including the result of sequence analysis (Just like an image above). Visualizing everything like this creates too many maps and charts. So it is hard to understand what is what. From this reason, charts and maps are divided into the four examples of output visualization below
-Video demo: http://osnap.cloud/~suhan/videos/NAM_SD_everything
-
-- NAM_US_0_INC: The output of GEOSNAP2NAM0_INC_whole.ipynb 
-This example computes INC value of all metro areas in the US and visualize the result using the Adaptive Choropleth Mapper (ACM). Please note metro id is displayed on the top right corner of the map. The metro id can be used to create each of map visualization below from #3 to #6.
-
-- NAM_SD_1_neighborhood : The output of  GEOSNAP2NAM1_neighborhood.ipynb 
-This example visualizes the spatiotemporal change of neighborhood (clustering result)
-Video demo: http://osnap.cloud/~suhan/videos/NAM_SD_1_neighborhood
-
-- NAM_SD_2_INC_neighborhood : The output of GEOSNAP2NAM2_INC_neighborhood.ipynb  
-This example visualizes a map of the index of neighborhood change with maps showing the spatiotemporal change of neighborhood.
- Video demo: http://osnap.cloud/~suhan/videos/NAM_SD_2_INC_neighborhood
 
 
-- NAM_SD_3_sequence_neighborhood_categoriesDiagram : The output of  GEOSNAP2NAM3_sequence_neighborhood_categoriesDiagram.ipynb
-This example visualizes the parallel categorical diagram with maps showing the spatiotemporal change of neighborhood.
-Video demo: http://osnap.cloud/~suhan/videos/NAM_SD_3_sequence_neighborhood_categoriesDiagram
+ 1. NAM_SD_eveything : The output of GEOSNAP2NAM.ipynb 
+<br />This example visualizes all charts and maps including the result of sequence analysis (Just like an image above). Visualizing everything like this creates too many maps and charts. So it is hard to understand what is what. From this reason, charts and maps are divided into the four examples of output visualization below
+<br />Video demo: http://osnap.cloud/~suhan/videos/NAM_SD_everything
 
-- NAM_SD_4_sequence_neighborhood_chordDiagram : The output of GEOSNAP2NAM4_sequence_neighborhood_chordDiagram.ipynb
-This example visualizes the chord diagram with maps showing the spatiotemporal change of neighborhood. 
- Video demo: http://osnap.cloud/~suhan/videos/NAM_SD_4_sequence_neighborhood_chordDiagram
+ 2. NAM_US_0_INC: The output of GEOSNAP2NAM0_INC_whole.ipynb 
+<br />This example computes INC value of all metro areas in the US and visualize the result using the Adaptive Choropleth Mapper (ACM). Please note that metro id is displayed on the top right corner of the map. The metro id can be used to create each of map visualization below from #3 to #6. Note: This is computing intensive. Once you run it, you will see the program bar -0.1%, which means that it is querying the data (takes 2 - 3 minutes). Once the querying is done, the progress bar shows how much percent the computatino is done.
+
+ 3. NAM_SD_1_neighborhood : The output of  GEOSNAP2NAM1_neighborhood.ipynb 
+<br />This example visualizes the spatiotemporal change of neighborhood (clustering result)
+<br />Video demo: http://osnap.cloud/~suhan/videos/NAM_SD_1_neighborhood
+
+ 4. NAM_SD_2_INC_neighborhood : The output of GEOSNAP2NAM2_INC_neighborhood.ipynb
+<br />This example visualizes a map of the index of neighborhood change with maps showing the spatiotemporal change of neighborhood.
+<br /> Video demo: http://osnap.cloud/~suhan/videos/NAM_SD_2_INC_neighborhood
+
+ 5. NAM_SD_3_sequence_neighborhood_categoriesDiagram : The output of  GEOSNAP2NAM3_sequence_neighborhood_categoriesDiagram.ipynb
+<br />This example visualizes the parallel categorical diagram with maps showing the spatiotemporal change of neighborhood.
+<br />Video demo: http://osnap.cloud/~suhan/videos/NAM_SD_3_sequence_neighborhood_categoriesDiagram
+
+ 6. NAM_SD_4_sequence_neighborhood_chordDiagram : The output of GEOSNAP2NAM4_sequence_neighborhood_chordDiagram.ipynb
+<br />This example visualizes the chord diagram with maps showing the spatiotemporal change of neighborhood. 
+<br /> Video demo: http://osnap.cloud/~suhan/videos/NAM_SD_4_sequence_neighborhood_chordDiagram
 
  
-In the source code, the lines below should be executed only for the first run to write LTDB data downloaded in the previous step to your disk. In source code, the lines below are commented out. Remove # in each of the lines and comment out again after the first run. This process takes about 10 - 15 minutes. But you do not need to repeat it from the second run.
+In the source code, the lines below should be executed only for the first run to write LTDB data downloaded in the previous step to your disk. The lines below are commented out. Remove # in each of the lines and comment out again after the first run. This process takes about 10 - 15 minutes. But you do not need to repeat it from the second run.
 ```
 sample = "downloads/LTDB_Std_All_Sample.zip"
 full = "downloads/LTDB_Std_All_fullcount.zip"
@@ -95,7 +113,7 @@ When “Adaptive_Choropleth_Mapper_viz(param)” is executed in each of the exam
 
 ## Authors
 
-GEOSNAP2ACM and GEOSNAP2NAM have been developed by Su Yeon Han, Sergio Rey, Eli Knaap, Sergio Rey and other members at Center for Geospatial Sciences at University of California, Riverside
+GEOSNAP2ACM and GEOSNAP2NAM have been developed by Su Yeon Han, Sergio Rey, Elijah Knaap, Wei Kang and other members at Center for Geospatial Sciences at University of California, Riverside
 
 ## License
 
