@@ -33,7 +33,7 @@ Both GEOSNAP2ACM and GEOSNAP2NAM utilize data  and  sptial and statistical analy
 
  Python3 (comes with Anaconda3) and Jupyter Notebook are required to run GEOSNAP2ACM and GEOSNAP2NAM. For visualization, Firefox  or Google Chrome work best. It has not been tested in Internet Explorer (IE).
 
-GEOSNAP must be installed in order to run GEOSNAP2ACM and GEOSNAP2NAM. The installation instruction is available at: https://github.com/spatialucr/geosnap. T
+GEOSNAP must be installed in order to run GEOSNAP2ACM and GEOSNAP2NAM. The installation instruction is available at: https://github.com/spatialucr/geosnap. 
 
 First-time users need to download LTDB data which are input for both GEOSNAP2ACM and GEONSNAP2NAM
 - Download LTDB data and create the folder, “downloads” in the GEOSNAP2ACM. https://s4.ad.brown.edu/projects/diversity/Researcher/LTDB.htm
@@ -42,7 +42,7 @@ First-time users need to download LTDB data which are input for both GEOSNAP2ACM
 
 ### Getting Started
 
-Run Jupyter notebook examples below to learn how to use GEOSNAP2ACM and GEOSNAP2NAN. Each folder has examples like below
+Run Jupyter notebook examples below to learn how to use GEOSNAP2ACM and GEOSNAP2NAN. Each folder has example output like below.
 #### GEOSNAP2ACM 
 - ACM_SD_ACM_only : The output of ACM_only.ipynb. 
 <br />It visualizes selected variables by using Adaptive Choropleth Mapper.
