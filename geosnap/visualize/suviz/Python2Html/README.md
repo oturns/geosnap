@@ -4,7 +4,7 @@
 
 <h2 align="center" style="margin-top:-10px">The Geospatial Neighborhood Analysis Visualizer</h2> 
 
-`GEOSNAP-VIZ` has a highly interactive and dynamic user-interface that makes it easier to explore, model, analyze, and visualize the social and spatial dynamics of neighborhoods. GEOSNAP-VIZ visualizes not only data from census and American communisty survey (ACS), but also results of several spatial statistcs that help to study spatiotemporal neighborhood changes. Here is the list of a sptial and statistical analysis geosnap-viz provides:
+`GEOSNAP-VIZ` has a highly interactive and dynamic user-interface that makes it easier to explore, model, analyze, and visualize the social and spatial dynamics of neighborhoods. GEOSNAP-VIZ visualizes not only data from census and American communisty survey (ACS), but also results of several spatial statistcs that help to study spatiotemporal neighborhood changes. Here is the list of sptial and statistical analyses that `GEOSNAP-VIZ` provides:
 
 - Clustering with Affinity Propagation
 - Clustering with Gaussian Mixture Model
