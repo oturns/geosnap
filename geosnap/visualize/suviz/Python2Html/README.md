@@ -20,8 +20,7 @@
 - Sequence Analysis
 - Index of Neighborhood Change 
 
-`GEOSNAP-VIZ` consists of  and GOESNA2NAM (Neighborhood Analysis Mapper). GEOSNAP2ACM and GEOSNAP2NAM are open source GIS software packages that support (1) querying Race/Ethnicity, Socioeconomic and Demographic variables, (2) data exploration, (3) neighborhood delineation and analysis, and (4) user-interactive and dynamic visualization. Python3 (comes with Anaconda3) and Jupyter Notebook are required to run them. For visualization, Firefox  or Google Chrome work best. It has not been tested in Internet Explorer (IE).
-
+`GEOSNAP-VIZ` consists of GEOSNAP2ACM (Adaptive Choropleth Mapper) and GOESNA2NAM (Neighborhood Analysis Mapper). GEOSNAP2ACM and GEOSNAP2NAM are open source GIS software packages that support (1) querying Race/Ethnicity, Socioeconomic and Demographic variables, (2) data exploration, (3) neighborhood delineation and analysis, and (4) user-interactive and dynamic visualization.
 
 - GEOSNAP2ACM contains modules for Step1: Data Exploration – (1) Adaptive Choropleth Mapper (ACM), (2) ACM with Correlogram, (3) ACM with Scatter plot, (4) ACM with Time Series, and (5) ACM with PCP.
 
@@ -31,6 +30,8 @@ Both GEOSNAP2ACM and GEOSNAP2NAM utilize data  and  sptial and statistical analy
 
 
 ### Prerequisites
+
+ Python3 (comes with Anaconda3) and Jupyter Notebook are required to run them. For visualization, Firefox  or Google Chrome work best. It has not been tested in Internet Explorer (IE).
 
 GEOSNAP must be installed in order to run GEOSNAP2ACM and GEOSNAP2NAM. The installation instruction is available at: https://github.com/spatialucr/geosnap. T
 
