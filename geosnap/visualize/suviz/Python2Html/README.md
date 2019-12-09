@@ -44,51 +44,51 @@ First-time users need to download LTDB data which are input for both GEOSNAP2ACM
 
 Run Jupyter notebook examples below to learn how to use GEOSNAP2ACM and GEOSNAP2NAN. Each folder has example output like below.
 #### GEOSNAP2ACM 
-- ACM_SD_ACM_only : The output of ACM_only.ipynb. 
+ 1. ACM_SD_ACM_only : The output of ACM_only.ipynb. 
 <br />It visualizes selected variables by using Adaptive Choropleth Mapper.
 <br />Video demo: http://sarasen.asuscomm.com/ACM
 
-- ACM_SD_correlogram: The output of ACM_correlogram.ipynb. 
+ 2. ACM_SD_correlogram: The output of ACM_correlogram.ipynb. 
 <br />It visualizes the matrix of scatter plots.
 <br />Video demo: http://osnap.cloud/~suhan/videos/ACM_SD_correlogram_1
 <br />Advanced options: http://osnap.cloud/~suhan/videos/ACM_SD_correlogram_2
 
-- ACM_SD_Scatter : The output of  ACM_ScatterPlot.ipynb. 
+ 3. ACM_SD_Scatter : The output of  ACM_ScatterPlot.ipynb. 
 <br />It visualizes only two scatter plots, but it has more interactive features than ACM_correlogram.
 <br />Video demo: http://osnap.cloud/~suhan/videos/ACM_SD_Scatter_1
 
-- ACM_SD_TimeSeries : The output of ACM_TimeSeries.ipynb
+ 4. ACM_SD_TimeSeries : The output of ACM_TimeSeries.ipynb
 <br />It visualizes the temporal change of the selected variables. 
 <br />Video demo:
 
-- ACM_SD_ParallelCoordinates : The output of  ACM_ParallelCoordinates.ipynb
+ 5. ACM_SD_ParallelCoordinates : The output of  ACM_ParallelCoordinates.ipynb
 <br />It visualizes the relationships among multiple variables.
 <br />Video demo:
 
 #### GEOSNAP2NAM
 
 
-- NAM_SD_eveything : The output of GEOSNAP2NAM.ipynb 
+ 1. NAM_SD_eveything : The output of GEOSNAP2NAM.ipynb 
 <br />This example visualizes all charts and maps including the result of sequence analysis (Just like an image above). Visualizing everything like this creates too many maps and charts. So it is hard to understand what is what. From this reason, charts and maps are divided into the four examples of output visualization below
 <br />Video demo: http://osnap.cloud/~suhan/videos/NAM_SD_everything
 
-- NAM_US_0_INC: The output of GEOSNAP2NAM0_INC_whole.ipynb 
-<br />This example computes INC value of all metro areas in the US and visualize the result using the Adaptive Choropleth Mapper (ACM). Please note metro id is displayed on the top right corner of the map. The metro id can be used to create each of map visualization below from #3 to #6. Note: This is computing intensive. Once you run it, you will see the program bar -0.1%, which means that it is querying the data (takes 2 - 3 minutes). Once the querying is done, the progress bar shows how much percent the computatino is done.
+ 2. NAM_US_0_INC: The output of GEOSNAP2NAM0_INC_whole.ipynb 
+<br />This example computes INC value of all metro areas in the US and visualize the result using the Adaptive Choropleth Mapper (ACM). Please note that metro id is displayed on the top right corner of the map. The metro id can be used to create each of map visualization below from #3 to #6. Note: This is computing intensive. Once you run it, you will see the program bar -0.1%, which means that it is querying the data (takes 2 - 3 minutes). Once the querying is done, the progress bar shows how much percent the computatino is done.
 
-- NAM_SD_1_neighborhood : The output of  GEOSNAP2NAM1_neighborhood.ipynb 
+ 3. NAM_SD_1_neighborhood : The output of  GEOSNAP2NAM1_neighborhood.ipynb 
 <br />This example visualizes the spatiotemporal change of neighborhood (clustering result)
 <br />Video demo: http://osnap.cloud/~suhan/videos/NAM_SD_1_neighborhood
 
-- NAM_SD_2_INC_neighborhood : The output of GEOSNAP2NAM2_INC_neighborhood.ipynb  
+ 4. NAM_SD_2_INC_neighborhood : The output of GEOSNAP2NAM2_INC_neighborhood.ipynb  
 <br />This example visualizes a map of the index of neighborhood change with maps showing the spatiotemporal change of neighborhood.
 <br /> Video demo: http://osnap.cloud/~suhan/videos/NAM_SD_2_INC_neighborhood
 
 
-- NAM_SD_3_sequence_neighborhood_categoriesDiagram : The output of  GEOSNAP2NAM3_sequence_neighborhood_categoriesDiagram.ipynb
+ 5. NAM_SD_3_sequence_neighborhood_categoriesDiagram : The output of  GEOSNAP2NAM3_sequence_neighborhood_categoriesDiagram.ipynb
 <br />This example visualizes the parallel categorical diagram with maps showing the spatiotemporal change of neighborhood.
 <br />Video demo: http://osnap.cloud/~suhan/videos/NAM_SD_3_sequence_neighborhood_categoriesDiagram
 
-- NAM_SD_4_sequence_neighborhood_chordDiagram : The output of GEOSNAP2NAM4_sequence_neighborhood_chordDiagram.ipynb
+ 6. NAM_SD_4_sequence_neighborhood_chordDiagram : The output of GEOSNAP2NAM4_sequence_neighborhood_chordDiagram.ipynb
 <br />This example visualizes the chord diagram with maps showing the spatiotemporal change of neighborhood. 
 <br /> Video demo: http://osnap.cloud/~suhan/videos/NAM_SD_4_sequence_neighborhood_chordDiagram
 
