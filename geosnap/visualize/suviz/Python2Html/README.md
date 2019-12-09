@@ -79,10 +79,9 @@ Run Jupyter notebook examples below to learn how to use GEOSNAP2ACM and GEOSNAP2
 <br />This example visualizes the spatiotemporal change of neighborhood (clustering result)
 <br />Video demo: http://osnap.cloud/~suhan/videos/NAM_SD_1_neighborhood
 
- 4. NAM_SD_2_INC_neighborhood : The output of GEOSNAP2NAM2_INC_neighborhood.ipynb  
+ 4. NAM_SD_2_INC_neighborhood : The output of GEOSNAP2NAM2_INC_neighborhood.ipynb
 <br />This example visualizes a map of the index of neighborhood change with maps showing the spatiotemporal change of neighborhood.
 <br /> Video demo: http://osnap.cloud/~suhan/videos/NAM_SD_2_INC_neighborhood
-
 
  5. NAM_SD_3_sequence_neighborhood_categoriesDiagram : The output of  GEOSNAP2NAM3_sequence_neighborhood_categoriesDiagram.ipynb
 <br />This example visualizes the parallel categorical diagram with maps showing the spatiotemporal change of neighborhood.
@@ -93,7 +92,7 @@ Run Jupyter notebook examples below to learn how to use GEOSNAP2ACM and GEOSNAP2
 <br /> Video demo: http://osnap.cloud/~suhan/videos/NAM_SD_4_sequence_neighborhood_chordDiagram
 
  
-In the source code, the lines below should be executed only for the first run to write LTDB data downloaded in the previous step to your disk. In source code, the lines below are commented out. Remove # in each of the lines and comment out again after the first run. This process takes about 10 - 15 minutes. But you do not need to repeat it from the second run.
+In the source code, the lines below should be executed only for the first run to write LTDB data downloaded in the previous step to your disk. The lines below are commented out. Remove # in each of the lines and comment out again after the first run. This process takes about 10 - 15 minutes. But you do not need to repeat it from the second run.
 ```
 sample = "downloads/LTDB_Std_All_Sample.zip"
 full = "downloads/LTDB_Std_All_fullcount.zip"
@@ -114,7 +113,7 @@ When “Adaptive_Choropleth_Mapper_viz(param)” is executed in each of the exam
 
 ## Authors
 
-GEOSNAP2ACM and GEOSNAP2NAM have been developed by Su Yeon Han, Sergio Rey, Eli Knaap, Sergio Rey and other members at Center for Geospatial Sciences at University of California, Riverside
+GEOSNAP2ACM and GEOSNAP2NAM have been developed by Su Yeon Han, Sergio Rey, Elijah Knaap, Wei Kang and other members at Center for Geospatial Sciences at University of California, Riverside
 
 ## License
 
