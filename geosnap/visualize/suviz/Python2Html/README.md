@@ -68,7 +68,7 @@ This example visualizes all charts and maps including the result of sequence ana
 Video demo: http://osnap.cloud/~suhan/videos/NAM_SD_everything
 
 - NAM_US_0_INC: The output of GEOSNAP2NAM0_INC_whole.ipynb 
-This example computes INC value of all metro areas in the US and visualize the result using the Adaptive Choropleth Mapper (ACM). Please note metro id is displayed on the top right corner of the map. The metro id can be used to create each of map visualization below from #3 to #6.
+This example computes INC value of all metro areas in the US and visualize the result using the Adaptive Choropleth Mapper (ACM). Please note metro id is displayed on the top right corner of the map. The metro id can be used to create each of map visualization below from #3 to #6. Note: This is computing intensive. Once you run it, you will see the program bar -0.1% means that it is querying the data (takes 2 - 3 minutes) Once the querying is done, the progress bar shows how much percent the computatino is done.
 
 - NAM_SD_1_neighborhood : The output of  GEOSNAP2NAM1_neighborhood.ipynb 
 This example visualizes the spatiotemporal change of neighborhood (clustering result)
