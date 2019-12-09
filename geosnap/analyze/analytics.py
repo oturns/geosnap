@@ -152,6 +152,7 @@ def cluster(
             {model_name: labels, time_var: data[time_var], id_var: data[id_var]}
         )
         clusters.set_index([time_var, id_var], inplace=True)
+        clusters = clusters[~clusters.index.duplicated(keep='first')]
         gdf = gdf.join(clusters, how="left")
         gdf = gdf.reset_index()
         results = ModelResults(

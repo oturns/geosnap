@@ -760,16 +760,20 @@ class Community:
         dfs = []
         if isinstance(names, str):
             names = [names]
-        for name in names:
-            for year in years:
+        for year in years:
+            for name in names:
                 df = get_lehd(dataset=dataset, year=year, state=name)
-                if year < 2010:
-                    df = gdf00.merge(df, on="geoid", how="left")
-                else:
-                    df = gdf.merge(df, on="geoid", how="left")
-                df["year"] = year
-                dfs.append(df)
+            if year < 2010:
+                df = gdf00.merge(df, on="geoid", how="left")
+            else:
+                df = gdf.merge(df, on="geoid", how="left")
+            df["year"] = year
+            dfs.append(df)
         gdf = pd.concat(dfs)
+        gdf.set_index(['geoid', 'year'], inplace=True)
+        gdf = gdf[~gdf.index.duplicated(keep='first')]
+        gdf.reset_index(inplace=True)
+
 
         if isinstance(boundary, gpd.GeoDataFrame):
             if boundary.crs != gdf.crs:
