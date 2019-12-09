@@ -6,6 +6,7 @@
 
 
 `GEOSNAP-VIZ` has a highly interactive and dynamic user-interface that makes it easier to explore, model, analyze, and visualize the social and spatial dynamics of neighborhoods. GEOSNAP-VIZ visualizes not only data from census and American communisty survey (ACS), but also results of several spatial statistcs that help to study spatiotemporal neighborhood changes. Here is the list of a sptial and statistical analysis geosnap-viz provides:
+
 - Clustering with Affinity Propagation
 - Clustering with Gaussian Mixture Model
 - Clustering with Hierarchical DBSCAN
@@ -17,9 +18,10 @@
 - SKATER spatial clustering algorithm.
 - Spatially encouraged spectral clustering
 - Agglomerative clustering using Ward linkage with a spatial connectivity
+- Sequence Analysis
 - Index of Neighborhood Change 
 
-`GEOSNAP-VIZ` utilizes data and analysis layers provided by  [“The Geospatial Neighborhood Analysis Packages”](https://github.com/spatialucr/geosnap) (written in python), and combines them with a visualization layer written in Javascript, Html and CSS. The visualization layer is made of open-source JavaScript libraries such as Leaflet, Plotly, and D3.
+`GEOSNAP-VIZ` utilizes data and analysis layers provided by <a href="https://github.com/spatialucr/geosnap" target="_blank">The Geospatial Neighborhood Analysis Packages</a> (written in python), and combines them with a visualization layer written in Javascript, Html and CSS. The visualization layer is made of open-source JavaScript libraries such as Leaflet, Plotly, and D3.
 
 `GEOSNAP-VIZ` consists of GEOSNAP2ACM (Adaptive Choropleth Mapper) and GOESNA2NAM (Neighborhood Analysis Mapper). GEOSNAP2ACM and GEOSNAP2NAM are open source GIS software packages that support (1) querying Race/Ethnicity, Socioeconomic and Demographic variables, (2) data exploration, (3) neighborhood delineation and analysis, and (4) user-interactive and dynamic visualization. Python3 (comes with Anaconda3) and Jupyter Notebook are required to run them. For visualization, Firefox  or Google Chrome work best. It has not been tested in Internet Explorer (IE).
 
