@@ -762,15 +762,20 @@ class Community:
             names = [names]
         for name in names:
             for year in years:
-                df = get_lehd(dataset=dataset, year=year, state=name)
-                df["year"] = year
+                try:
+                    df = get_lehd(dataset=dataset, year=year, state=name)
+                    df["year"] = year
+                except ValueError:
+                    warn(f'{name.upper()} {year} not found!')
+                    break
                 if year < 2010:
-                    df = gdf00.merge(gdf00, on="geoid", how="inner")
+                    df = gdf00.merge(df, on="geoid", how="inner")
                 else:
                     df = gdf.merge(df, on="geoid", how="inner")
                 df = df.set_index(['geoid', 'year'])
                 dfs.append(df)
-        out = pd.concat(dfs)
+
+        out = pd.concat(dfs, sort=True)
         out = out[~out.index.duplicated(keep='first')]
         out = out.reset_index()
 
