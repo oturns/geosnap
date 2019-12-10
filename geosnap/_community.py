@@ -141,8 +141,8 @@ class Community:
         best_model=False,
         columns=None,
         verbose=False,
-        scaler='std',
-        pooling='fixed',
+        scaler="std",
+        pooling="fixed",
         **kwargs,
     ):
         """Create a geodemographic typology by running a cluster analysis on the study area's neighborhood attributes.
@@ -740,16 +740,23 @@ class Community:
         if any(year < 2010 for year in years):
             gdf00 = datasets.blocks_2000(states=states, fips=(tuple(allfips)))
             gdf00 = gdf00.drop(columns=["year"])
+            gdf00 = _fips_filter(
+                state_fips=state_fips,
+                county_fips=county_fips,
+                msa_fips=msa_fips,
+                fips=fips,
+                data=gdf00,
+            )
+            if isinstance(boundary, gpd.GeoDataFrame):
+                if boundary.crs != gdf00.crs:
+                    warn(
+                        "Unable to determine whether boundary CRS is WGS84 "
+                        "if this produces unexpected results, try reprojecting"
+                    )
+                gdf00 = gdf00[gdf00.representative_point().intersects(boundary.unary_union)]
+
         gdf = datasets.blocks_2010(states=states, fips=(tuple(allfips)))
         gdf = gdf.drop(columns=["year"])
-
-        # grab state abbreviations
-        names = (
-            _fipstable[_fipstable["FIPS Code"].isin(states)]["State Abbreviation"]
-            .str.lower()
-            .tolist()
-        )
-
         gdf = _fips_filter(
             state_fips=state_fips,
             county_fips=county_fips,
@@ -757,35 +764,41 @@ class Community:
             fips=fips,
             data=gdf,
         )
-        dfs = []
-        if isinstance(names, str):
-            names = [names]
-        for name in names:
-            for year in years:
-                try:
-                    df = get_lehd(dataset=dataset, year=year, state=name)
-                    df["year"] = year
-                except ValueError:
-                    warn(f'{name.upper()} {year} not found!')
-                    break
-                if year < 2010:
-                    df = gdf00.merge(df, on="geoid", how="inner")
-                else:
-                    df = gdf.merge(df, on="geoid", how="inner")
-                df = df.set_index(['geoid', 'year'])
-                dfs.append(df)
-
-        out = pd.concat(dfs, sort=True)
-        out = out[~out.index.duplicated(keep='first')]
-        out = out.reset_index()
-
         if isinstance(boundary, gpd.GeoDataFrame):
             if boundary.crs != gdf.crs:
                 warn(
                     "Unable to determine whether boundary CRS is WGS84 "
                     "if this produces unexpected results, try reprojecting"
                 )
-            out = out[out.representative_point().intersects(boundary.unary_union)]
+            gdf = gdf[gdf.representative_point().intersects(boundary.unary_union)]
+
+        # grab state abbreviations
+        names = (
+            _fipstable[_fipstable["FIPS Code"].isin(states)]["State Abbreviation"]
+            .str.lower()
+            .tolist()
+        )
+        if isinstance(names, str):
+            names = [names]
+
+        dfs = []
+        for name in names:
+            for year in years:
+                try:
+                    df = get_lehd(dataset=dataset, year=year, state=name)
+                    df["year"] = year
+                    if year < 2010:
+                        df = gdf00.merge(df, on="geoid", how="inner")
+                    else:
+                        df = gdf.merge(df, on="geoid", how="inner")
+                    df = df.set_index(["geoid", "year"])
+                    dfs.append(df)
+                except ValueError:
+                    warn(f"{name.upper()} {year} not found!")
+                    pass
+        out = pd.concat(dfs, sort=True)
+        out = out[~out.index.duplicated(keep="first")]
+        out = out.reset_index()
 
         return cls(gdf=out, harmonized=False)
 
