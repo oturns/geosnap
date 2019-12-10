@@ -1,1 +1,2 @@
-include geosnap/data/variables.csv
+include requirements*
+include io/*.csv

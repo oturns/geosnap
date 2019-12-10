@@ -16,7 +16,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="geosnap.Community.sequence" href="geosnap.Community.sequence.html" />
-    <link rel="prev" title="geosnap.Community.from_ncdb" href="geosnap.Community.from_ncdb.html" />
+    <link rel="prev" title="geosnap.Community.cluster_spatial" href="geosnap.Community.cluster_spatial.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -70,7 +70,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../api.html#io-module">IO Module</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../api.html#the-community-class">The Community Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#analyze-module">Analyze Module</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../api.html#harmonize-module">Harmonize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#harmonize-module">Harmonize Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#visualize-module">Visualize Module</a></li>
 </ul>
 </li>
@@ -122,7 +122,7 @@
 <h1>geosnap.Community.harmonize<a class="headerlink" href="#geosnap-community-harmonize" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
 <dt id="geosnap.Community.harmonize">
-<code class="sig-prename descclassname">Community.</code><code class="sig-name descname">harmonize</code><span class="sig-paren">(</span><em class="sig-param">self, target_year=None, weights_method='area', extensive_variables=None, intensive_variables=None, allocate_total=True, raster='nlcd_2011', codes=[21, 22, 23, 24], force_crs_match=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/_community.html#Community.harmonize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.Community.harmonize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">Community.</code><code class="sig-name descname">harmonize</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">target_year=None</em>, <em class="sig-param">weights_method='area'</em>, <em class="sig-param">extensive_variables=None</em>, <em class="sig-param">intensive_variables=None</em>, <em class="sig-param">allocate_total=True</em>, <em class="sig-param">raster='nlcd_2011'</em>, <em class="sig-param">codes='developed'</em>, <em class="sig-param">force_crs_match=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/_community.html#Community.harmonize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.Community.harmonize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Standardize inconsistent boundaries into time-static ones.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -130,42 +130,39 @@
 <dt><strong>target_year: int</strong></dt><dd><p>Polygons from this year will become the target boundaries for
 spatial interpolation.</p>
 </dd>
-<dt><strong>weights_method</strong><span class="classifier">string</span></dt><dd><p>The method that the harmonization will be conducted. This can be
+<dt><strong>weights_method</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>The method that the harmonization will be conducted. This can be
 set to:</p>
 <blockquote>
-<div><dl class="simple">
-<dt>“area”<span class="classifier">harmonization according to</span></dt><dd><p>area weights.</p>
-</dd>
-<dt>“land_type_area”<span class="classifier">harmonization according to</span></dt><dd><p>the Land Types considered
-‘populated’ areas.</p>
-</dd>
-</dl>
-<p>“land_type_Poisson_regression”  : NOT YET INTRODUCED.
-“land_type_Gaussian_regression” : NOT YET INTRODUCED.</p>
+<div><ul class="simple">
+<li><p>“area”                          : harmonization according to area weights.</p></li>
+<li><p>“land_type_area”                : harmonization according to the Land Types considered ‘populated’ areas.</p></li>
+<li><p>“land_type_Poisson_regression”  : NOT YET INTRODUCED.</p></li>
+<li><p>“land_type_Gaussian_regression” : NOT YET INTRODUCED.</p></li>
+</ul>
 </div></blockquote>
 </dd>
-<dt><strong>extensive_variables</strong><span class="classifier">list</span></dt><dd><p>extensive variables to be used in interpolation.</p>
+<dt><strong>extensive_variables</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a></span></dt><dd><p>extensive variables to be used in interpolation.</p>
 </dd>
 <dt><strong>intensive_variables</strong><span class="classifier">type</span></dt><dd><p>intensive variables to be used in interpolation.</p>
 </dd>
-<dt><strong>allocate_total</strong><span class="classifier">boolean</span></dt><dd><p>True if total value of source area should be allocated.
+<dt><strong>allocate_total</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bltin-boolean-values" title="(in Python v3.8)"><span class="xref std std-ref">bool</span></a></span></dt><dd><p>True if total value of source area should be allocated.
 False if denominator is area of i. Note that the two cases
 would be identical when the area of the source polygon is
 exhausted by intersections. See (3) in Notes for more details</p>
 </dd>
-<dt><strong>raster_path</strong><span class="classifier">str</span></dt><dd><p>path to the raster image that has the types of each pixel in the
+<dt><strong>raster_path</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>path to the raster image that has the types of each pixel in the
 spatial context. Only taken into consideration for harmonization
 raster based.</p>
 </dd>
-<dt><strong>codes</strong><span class="classifier">list</span></dt><dd><p>pixel values that should be included in the regression (the default is [21, 22, 23, 24]).</p>
+<dt><strong>codes</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">ints</span></code></span></dt><dd><p>pixel values that should be included in the regression (the default “developed” includes [21, 22, 23, 24]).</p>
 </dd>
-<dt><strong>force_crs_match</strong><span class="classifier">bool</span></dt><dd><p>whether source and target dataframes should be reprojected to match (the default is True).</p>
+<dt><strong>force_crs_match</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bltin-boolean-values" title="(in Python v3.8)"><span class="xref std std-ref">bool</span></a></span></dt><dd><p>whether source and target dataframes should be reprojected to match (the default is True).</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>None</dt><dd><p>New data are added to the input Community</p>
+<dt><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a></dt><dd><p>New data are added to the input Community</p>
 </dd>
 </dl>
 </dd>
@@ -194,7 +191,7 @@ raster based.</p>
     </p>
     <p>
         &copy; Copyright 2018, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.<br/>
     </p>
   </div>
 </footer>

@@ -15,8 +15,8 @@ def transition(
 
     Parameters
     ----------
-    gdf             : (geo)DataFrame
-                      Long-form (geo)DataFrame containing neighborhood
+    gdf             : geopandas.GeoDataFrame or pandas.DataFrame
+                      Long-form geopandas.GeoDataFrame or pandas.DataFrame containing neighborhood
                       attributes with a column defining neighborhood clusters.
     cluster_col     : string or int
                       Column name for the neighborhood segmentation, such as
@@ -35,16 +35,15 @@ def transition(
                       number of permutations for use in randomization based
                       inference (the default is 0).
 
-    Return
-    ------
-    mar             : object
-                      if w_type=None, return a giddy.markov.Markov instance;
-                      if w_type is given, return a
-                      giddy.markov.Spatial_Markov instance.
+    Returns
+    --------
+    mar             : giddy.markov.Markov instance or giddy.markov.Spatial_Markov
+                      if w_type=None, a classic Markov instance is returned. 
+                      if w_type is given, a Spatial_Markov instance is returned.
 
     Examples
     --------
-    >>> from geosnap.data import Community
+    >>> from geosnap import Community
     >>> columbus = Community.from_ltdb(msa_fips=columbusfips)
     >>> columbus1 = columbus.cluster(columns=['median_household_income',
     ... 'p_poverty_rate', 'p_edu_college_greater', 'p_unemployment_rate'],
@@ -118,8 +117,8 @@ def sequence(
 
     Parameters
     ----------
-    gdf             : (geo)DataFrame
-                      Long-form (geo)DataFrame containing neighborhood
+    gdf             : geopandas.GeoDataFrame or pandas.DataFrame
+                      Long-form geopandas.GeoDataFrame or pandas.DataFrame containing neighborhood
                       attributes with a column defining neighborhood clusters.
     cluster_col     : string or int
                       Column name for the neighborhood segmentation, such as
@@ -151,10 +150,10 @@ def sequence(
                       Column identifying the unique id of spatial units.
                       Default is "geoid".
 
-    Return
-    ------
-    gdf_temp        : (geo)DataFrame
-                      (geo)DataFrame with a new column for sequence
+    Returns
+    --------
+    gdf_temp        : geopandas.GeoDataFrame or pandas.DataFrame
+                      geopandas.GeoDataFrame or pandas.DataFrame with a new column for sequence
                       labels.
     df_wide         : pandas.DataFrame
                       Wide-form DataFrame with k (k is the number of periods)

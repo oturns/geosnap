@@ -5,11 +5,10 @@ import os
 import pathlib
 from warnings import warn
 
-from appdirs import user_data_dir
-
 import geopandas as gpd
 import pandas as pd
 import quilt3
+from appdirs import user_data_dir
 from requests.exceptions import Timeout
 from shapely import wkb, wkt
 
@@ -27,9 +26,7 @@ except ImportError:
 
 
 class _Map(dict):
-    """
-    tabbable dict
-    """
+    """tabbable dict."""
 
     def __init__(self, *args, **kwargs):
         super(_Map, self).__init__(*args, **kwargs)
@@ -83,7 +80,7 @@ def _convert_gdf(df):
 
     Returns
     -------
-    gpd.GeoDataFrame
+    geopandas.GeoDataFrame
         geodataframe with converted `geometry` column.
 
     """
@@ -106,8 +103,14 @@ def _convert_gdf(df):
     return df
 
 
-class DataStore(object):
-    """Storage for geosnap data. Currently supports US Census data."""
+class DataStore:
+    """Storage for geosnap data. Currently supports US Census data.
+
+        Unless otherwise noted, data are collected from the U.S. Census Bureau's TIGER/LINE Files
+        https://www.census.gov/cgi-bin/geo/shapefiles/index.php?year=2018 and converted to
+        parquet files.
+
+    """
 
     def __init__(self):
         """Instantiate a new DataStore object."""
@@ -157,7 +160,7 @@ class DataStore(object):
 
         return atts
 
-    def blocks_2000(self, states=None, convert=True):
+    def blocks_2000(self, states=None, convert=True, fips=None):
         """Census blocks for 2000.
 
         Parameters
@@ -170,7 +173,7 @@ class DataStore(object):
         Returns
         -------
         type
-        pandas.DataFrame or geopandas.GeoDataFrame.
+        pandas.DataFrame or geopandas.GeoDataFrame
             2000 blocks as a geodataframe or as a dataframe with geometry
             stored as well-known binary on the 'wkb' column.
 
@@ -202,7 +205,9 @@ class DataStore(object):
             states = [states]
         blks = {}
         for state in states:
-            blks[state] = blocks_2000["{state}.parquet".format(state=state)]()
+            blks[state] = blocks_2000[f"{state}.parquet"]()
+            if fips:
+                blks[state] = blks[state][blks[state]["geoid"].str.startswith(fips)]
             blks[state]["year"] = 2000
         blocks = list(blks.values())
         blocks = pd.concat(blocks, sort=True)
@@ -210,7 +215,7 @@ class DataStore(object):
             return _convert_gdf(blocks)
         return blocks
 
-    def blocks_2010(self, states=None, convert=True):
+    def blocks_2010(self, states=None, convert=True, fips=None):
         """Census blocks for 2010.
 
         Parameters
@@ -223,7 +228,7 @@ class DataStore(object):
         Returns
         -------
         type
-        pandas.DataFrame or geopandas.GeoDataFrame.
+        pandas.DataFrame or geopandas.GeoDataFrame
             2010 blocks as a geodataframe or as a dataframe with geometry
             stored as well-known binary on the 'wkb' column.
 
@@ -254,7 +259,10 @@ class DataStore(object):
             states = [states]
         blks = {}
         for state in states:
-            blks[state] = blocks_2010["{state}.parquet".format(state=state)]()
+            blks[state] = blocks_2010[f"{state}.parquet"]()
+            if fips:
+                blks[state] = blks[state][blks[state]["geoid"].str.startswith(fips)]
+
             blks[state]["year"] = 2010
         blocks = list(blks.values())
         blocks = pd.concat(blocks, sort=True)
@@ -274,7 +282,7 @@ class DataStore(object):
 
         Returns
         -------
-        pandas.DataFrame or geopandas.GeoDataFrame.
+        pandas.DataFrame or geopandas.GeoDataFrame
             1990 tracts as a geodataframe or as a dataframe with geometry
             stored as well-known binary on the 'wkb' column.
 
@@ -300,7 +308,7 @@ class DataStore(object):
 
         Returns
         -------
-        pandas.DataFrame.
+        pandas.DataFrame or geopandas.GeoDataFrame
             2000 tracts as a geodataframe or as a dataframe with geometry
             stored as well-known binary on the 'wkb' column.
 
@@ -326,7 +334,7 @@ class DataStore(object):
 
         Returns
         -------
-        pandas.DataFrame.
+        pandas.DataFrame or geopandas.GeoDataFrame
             2010 tracts as a geodataframe or as a dataframe with geometry
             stored as well-known binary on the 'wkb' column.
 
@@ -343,6 +351,9 @@ class DataStore(object):
     def msas(self, convert=True):
         """Metropolitan Statistical Areas as drawn in 2010.
 
+        Data come from the U.S. Census Bureau's most recent TIGER/LINE files
+        https://www.census.gov/cgi-bin/geo/shapefiles/index.php?year=2018&layergroup=Core+Based+Statistical+Areas
+
         Parameters
         ----------
         convert : bool
@@ -350,7 +361,7 @@ class DataStore(object):
 
         Returns
         -------
-        geopandas.GeoDataFrame.
+        pandas.DataFrame or geopandas.GeoDataFrame
             2010 MSAs as a geodataframe or as a dataframe with geometry
             stored as well-known binary on the 'wkb' column.
 
@@ -371,7 +382,7 @@ class DataStore(object):
 
         Returns
         -------
-        geopandas.GeoDataFrame.
+        pandas.DataFrame or geopandas.GeoDataFrame
             US States as a geodataframe or as a dataframe with geometry
             stored as well-known binary on the 'wkb' column.
 
@@ -390,16 +401,18 @@ class DataStore(object):
 
         Returns
         -------
-        geopandas.GeoDataFrame.
+        geopandas.GeoDataFrame
             2010 counties as a geodataframe or as a dataframe with geometry
             stored as well-known binary on the 'wkb' column.
 
         """
         return _convert_gdf(self.administrative["counties.parquet"]())
 
-    @property
     def msa_definitions(self):
         """2010 Metropolitan Statistical Area definitions.
+
+        Data come from the U.S. Census Bureau's most recent delineation files, available at
+        https://www.census.gov/geographies/reference-files/time-series/demo/metro-micro/delineation-files.html
 
         Returns
         -------
@@ -409,7 +422,6 @@ class DataStore(object):
         """
         return self.administrative["msa_definitions.parquet"]()
 
-    @property
     def ltdb(self):
         """Longitudinal Tract Database (LTDB).
 
@@ -427,7 +439,6 @@ class DataStore(object):
                 "using the `store_ltdb` function"
             )
 
-    @property
     def ncdb(self):
         """Geolytics Neighborhood Change Database (NCDB).
 
@@ -445,13 +456,12 @@ class DataStore(object):
                 "using the `store_ncdb` function"
             )
 
-    @property
     def codebook(self):
         """Codebook.
 
         Returns
         -------
-        pandas.DataFrame.
+        pandas.DataFrame
             codebook that stores variable names, definitions, and formulas.
 
         """

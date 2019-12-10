@@ -100,14 +100,15 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#analyze-module">Analyze Module</a><ul>
+<li><a class="reference internal" href="#neighborhood-clustering-methods">Neighborhood Clustering Methods</a><ul>
 <li><a class="reference internal" href="#clustering-algorithms">Clustering algorithms</a><ul>
 <li><a class="reference internal" href="#classic-aspatial-clustering">Classic (aspatial) Clustering</a></li>
-<li><a class="reference internal" href="#spatial-clustering">Spatial Clustering</a><ul>
-<li><a class="reference internal" href="#neighborhod-dynamics-methods">Neighborhod Dynamics Methods</a></li>
+<li><a class="reference internal" href="#spatial-clustering">Spatial Clustering</a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li><a class="reference internal" href="#neighborhood-dynamics-methods">Neighborhood Dynamics Methods</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#harmonize-module">Harmonize Module</a></li>
@@ -190,29 +191,29 @@ including U.S. Census data from 1990-2010, LEHD data from any vintage, and exter
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.datasets.html#geosnap.datasets" title="geosnap.datasets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets</span></code></a></p></td>
 <td><p>Storage for geosnap data.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.datasets.blocks_2000.html#geosnap.datasets.blocks_2000" title="geosnap.datasets.blocks_2000"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets.blocks_2000</span></code></a>([states, convert])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.datasets.blocks_2000.html#geosnap.datasets.blocks_2000" title="geosnap.datasets.blocks_2000"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets.blocks_2000</span></code></a>([states, convert, fips])</p></td>
 <td><p>Census blocks for 2000.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.datasets.blocks_2010.html#geosnap.datasets.blocks_2010" title="geosnap.datasets.blocks_2010"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets.blocks_2010</span></code></a>([states, convert])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.datasets.blocks_2010.html#geosnap.datasets.blocks_2010" title="geosnap.datasets.blocks_2010"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets.blocks_2010</span></code></a>([states, convert, fips])</p></td>
 <td><p>Census blocks for 2010.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.datasets.codebook.html#geosnap.datasets.codebook" title="geosnap.datasets.codebook"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets.codebook</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.datasets.codebook.html#geosnap.datasets.codebook" title="geosnap.datasets.codebook"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets.codebook</span></code></a>()</p></td>
+<td><p>Codebook.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.datasets.counties.html#geosnap.datasets.counties" title="geosnap.datasets.counties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets.counties</span></code></a>()</p></td>
 <td><p>Nationwide counties as drawn in 2010.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.datasets.ltdb.html#geosnap.datasets.ltdb" title="geosnap.datasets.ltdb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets.ltdb</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.datasets.ltdb.html#geosnap.datasets.ltdb" title="geosnap.datasets.ltdb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets.ltdb</span></code></a>()</p></td>
+<td><p>Longitudinal Tract Database (LTDB).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.datasets.msa_definitions.html#geosnap.datasets.msa_definitions" title="geosnap.datasets.msa_definitions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets.msa_definitions</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.datasets.msa_definitions.html#geosnap.datasets.msa_definitions" title="geosnap.datasets.msa_definitions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets.msa_definitions</span></code></a>()</p></td>
+<td><p>2010 Metropolitan Statistical Area definitions.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.datasets.msas.html#geosnap.datasets.msas" title="geosnap.datasets.msas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets.msas</span></code></a>([convert])</p></td>
 <td><p>Metropolitan Statistical Areas as drawn in 2010.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.datasets.ncdb.html#geosnap.datasets.ncdb" title="geosnap.datasets.ncdb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets.ncdb</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.datasets.ncdb.html#geosnap.datasets.ncdb" title="geosnap.datasets.ncdb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets.ncdb</span></code></a>()</p></td>
+<td><p>Geolytics Neighborhood Change Database (NCDB).</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.datasets.states.html#geosnap.datasets.states" title="geosnap.datasets.states"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datasets.states</span></code></a>([convert])</p></td>
 <td><p>States.</p></td>
@@ -301,6 +302,8 @@ then using analytical methods upon the community</p>
 </div>
 <div class="section" id="analyze-module">
 <h2>Analyze Module<a class="headerlink" href="#analyze-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="neighborhood-clustering-methods">
+<h3>Neighborhood Clustering Methods<a class="headerlink" href="#neighborhood-clustering-methods" title="Permalink to this headline">¶</a></h3>
 <p>Model neighborhood differentiation using multivariate clustering algorithms</p>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -309,7 +312,7 @@ then using analytical methods upon the community</p>
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.analyze.cluster.html#geosnap.analyze.cluster" title="geosnap.analyze.cluster"><code class="xref py py-obj docutils literal notranslate"><span class="pre">analyze.cluster</span></code></a>(gdf[, n_clusters, method, …])</p></td>
-<td><p>Create a geodemographic typology by running a cluster analysis on the</p></td>
+<td><p>Create a geodemographic typology by running a cluster analysis on the study area’s neighborhood attributes.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.analyze.cluster_spatial.html#geosnap.analyze.cluster_spatial" title="geosnap.analyze.cluster_spatial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">analyze.cluster_spatial</span></code></a>(gdf[, n_clusters, …])</p></td>
 <td><p>Create a <em>spatial</em> geodemographic typology by running a cluster analysis on the metro area’s neighborhood attributes and including a contiguity constraint.</p></td>
@@ -317,10 +320,10 @@ then using analytical methods upon the community</p>
 </tbody>
 </table>
 <div class="section" id="clustering-algorithms">
-<h3>Clustering algorithms<a class="headerlink" href="#clustering-algorithms" title="Permalink to this headline">¶</a></h3>
+<h4>Clustering algorithms<a class="headerlink" href="#clustering-algorithms" title="Permalink to this headline">¶</a></h4>
 <p>The following algorithms may be passed to <cite>geosnap.analyze.cluster</cite> or <cite>geosnap.analyze.cluster_spatial</cite> but they should not be called directly</p>
 <div class="section" id="classic-aspatial-clustering">
-<h4>Classic (aspatial) Clustering<a class="headerlink" href="#classic-aspatial-clustering" title="Permalink to this headline">¶</a></h4>
+<h5>Classic (aspatial) Clustering<a class="headerlink" href="#classic-aspatial-clustering" title="Permalink to this headline">¶</a></h5>
 <table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
@@ -331,16 +334,16 @@ then using analytical methods upon the community</p>
 <td><p>Clustering with Affinity Propagation.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.analyze.analytics.gaussian_mixture.html#geosnap.analyze.analytics.gaussian_mixture" title="geosnap.analyze.analytics.gaussian_mixture"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gaussian_mixture</span></code></a>(X[, n_clusters, …])</p></td>
-<td><p>Clustering with Gaussian Mixture Model</p></td>
+<td><p>Clustering with Gaussian Mixture Model.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.analyze.analytics.hdbscan.html#geosnap.analyze.analytics.hdbscan" title="geosnap.analyze.analytics.hdbscan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hdbscan</span></code></a>(X[, min_cluster_size, gen_min_span_tree])</p></td>
-<td><p>Clustering with Hierarchical DBSCAN</p></td>
+<td><p>Clustering with Hierarchical DBSCAN.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.analyze.analytics.kmeans.html#geosnap.analyze.analytics.kmeans" title="geosnap.analyze.analytics.kmeans"><code class="xref py py-obj docutils literal notranslate"><span class="pre">kmeans</span></code></a>(X, n_clusters[, init, n_init, …])</p></td>
 <td><p>K-Means clustering.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.analyze.analytics.spectral.html#geosnap.analyze.analytics.spectral" title="geosnap.analyze.analytics.spectral"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spectral</span></code></a>(X, n_clusters[, eigen_solver, …])</p></td>
-<td><p>Short summary.</p></td>
+<td><p>Spectral Clustering.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.analyze.analytics.ward.html#geosnap.analyze.analytics.ward" title="geosnap.analyze.analytics.ward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ward</span></code></a>(X[, n_clusters])</p></td>
 <td><p>Agglomerative clustering using Ward linkage.</p></td>
@@ -349,7 +352,7 @@ then using analytical methods upon the community</p>
 </table>
 </div>
 <div class="section" id="spatial-clustering">
-<h4>Spatial Clustering<a class="headerlink" href="#spatial-clustering" title="Permalink to this headline">¶</a></h4>
+<h5>Spatial Clustering<a class="headerlink" href="#spatial-clustering" title="Permalink to this headline">¶</a></h5>
 <table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
@@ -357,24 +360,27 @@ then using analytical methods upon the community</p>
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.analyze.analytics.azp.html#geosnap.analyze.analytics.azp" title="geosnap.analyze.analytics.azp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">azp</span></code></a>(X, w[, n_clusters])</p></td>
-<td><p>AZP clustering algorithm</p></td>
+<td><p>AZP clustering algorithm.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.analyze.analytics.max_p.html#geosnap.analyze.analytics.max_p" title="geosnap.analyze.analytics.max_p"><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_p</span></code></a>(X, w[, threshold_variable, threshold])</p></td>
-<td><p>Max-p clustering algorithm <a class="reference internal" href="references.html#duque2012" id="id1">[DAR12]</a></p></td>
+<td><p>Max-p clustering algorithm <a class="reference internal" href="references.html#duque2012" id="id1">[DAR12]</a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.analyze.analytics.skater.html#geosnap.analyze.analytics.skater" title="geosnap.analyze.analytics.skater"><code class="xref py py-obj docutils literal notranslate"><span class="pre">skater</span></code></a>(X, w[, n_clusters, floor, trace, islands])</p></td>
 <td><p>SKATER spatial clustering algorithm.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.analyze.analytics.spenc.html#geosnap.analyze.analytics.spenc" title="geosnap.analyze.analytics.spenc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spenc</span></code></a>(X, w[, n_clusters, gamma])</p></td>
-<td><p>Spatially encouraged spectral clustering</p></td>
+<td><p>Spatially encouraged spectral clustering.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.analyze.analytics.ward_spatial.html#geosnap.analyze.analytics.ward_spatial" title="geosnap.analyze.analytics.ward_spatial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ward_spatial</span></code></a>(X, w[, n_clusters])</p></td>
-<td><p>Agglomerative clustering using Ward linkage with a spatial connectivity</p></td>
+<td><p>Agglomerative clustering using Ward linkage with a spatial connectivity constraint.</p></td>
 </tr>
 </tbody>
 </table>
-<div class="section" id="neighborhod-dynamics-methods">
-<h5>Neighborhod Dynamics Methods<a class="headerlink" href="#neighborhod-dynamics-methods" title="Permalink to this headline">¶</a></h5>
+</div>
+</div>
+</div>
+<div class="section" id="neighborhood-dynamics-methods">
+<h3>Neighborhood Dynamics Methods<a class="headerlink" href="#neighborhood-dynamics-methods" title="Permalink to this headline">¶</a></h3>
 <p>Model neighborhood change using optimal-matching algorithms or spatial discrete markov chains</p>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -395,8 +401,6 @@ then using analytical methods upon the community</p>
 </table>
 </div>
 </div>
-</div>
-</div>
 <div class="section" id="harmonize-module">
 <span id="harmonize-api"></span><h2>Harmonize Module<a class="headerlink" href="#harmonize-module" title="Permalink to this headline">¶</a></h2>
 <table class="longtable docutils align-default">
@@ -405,8 +409,8 @@ then using analytical methods upon the community</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.Community.harmonize.html#geosnap.Community.harmonize" title="geosnap.Community.harmonize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.harmonize</span></code></a>(self[, target_year, …])</p></td>
-<td><p>Standardize inconsistent boundaries into time-static ones.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.harmonize.harmonize.html#geosnap.harmonize.harmonize" title="geosnap.harmonize.harmonize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">harmonize.harmonize</span></code></a>(raw_community[, …])</p></td>
+<td><p>Use spatial interpolation to standardize neighborhood boundaries over time.</p></td>
 </tr>
 </tbody>
 </table>
@@ -450,7 +454,7 @@ then using analytical methods upon the community</p>
     </p>
     <p>
         &copy; Copyright 2018, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.<br/>
     </p>
   </div>
 </footer>

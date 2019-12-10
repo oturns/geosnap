@@ -122,57 +122,57 @@
 <h1>geosnap.analyze.cluster_spatial<a class="headerlink" href="#geosnap-analyze-cluster-spatial" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="geosnap.analyze.cluster_spatial">
-<code class="sig-prename descclassname">geosnap.analyze.</code><code class="sig-name descname">cluster_spatial</code><span class="sig-paren">(</span><em class="sig-param">gdf</em>, <em class="sig-param">n_clusters=6</em>, <em class="sig-param">spatial_weights='rook'</em>, <em class="sig-param">method=None</em>, <em class="sig-param">columns=None</em>, <em class="sig-param">threshold_variable='count'</em>, <em class="sig-param">threshold=10</em>, <em class="sig-param">time_var='year'</em>, <em class="sig-param">id_var='geoid'</em>, <em class="sig-param">scaler=None</em>, <em class="sig-param">weights_kwargs=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/analyze/analytics.html#cluster_spatial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.analyze.cluster_spatial" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">geosnap.analyze.</code><code class="sig-name descname">cluster_spatial</code><span class="sig-paren">(</span><em class="sig-param">gdf</em>, <em class="sig-param">n_clusters=6</em>, <em class="sig-param">spatial_weights='rook'</em>, <em class="sig-param">method=None</em>, <em class="sig-param">columns=None</em>, <em class="sig-param">threshold_variable='count'</em>, <em class="sig-param">threshold=10</em>, <em class="sig-param">time_var='year'</em>, <em class="sig-param">id_var='geoid'</em>, <em class="sig-param">scaler='std'</em>, <em class="sig-param">weights_kwargs=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/analyze/analytics.html#cluster_spatial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.analyze.cluster_spatial" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a <em>spatial</em> geodemographic typology by running a cluster
 analysis on the metro area’s neighborhood attributes and including a
 contiguity constraint.</p>
-<dl class="field-list simple">
+<dl class="field-list">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>gdf</strong><span class="classifier">geopandas.GeoDataFrame</span></dt><dd><p>long-form geodataframe holding neighborhood attribute and geometry data.</p>
+<dd class="field-odd"><dl>
+<dt><strong>gdf</strong><span class="classifier"><a class="reference external" href="https://geopandas.readthedocs.io/en/latest/reference/geopandas.GeoDataFrame.html#geopandas.GeoDataFrame" title="(in GeoPandas v0.6.1+26.gca6e5e7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geopandas.GeoDataFrame</span></code></a></span></dt><dd><p>long-form geodataframe holding neighborhood attribute and geometry data.</p>
 </dd>
-<dt><strong>n_clusters</strong><span class="classifier">int</span></dt><dd><p>the number of clusters to model. The default is 6).</p>
+<dt><strong>n_clusters</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>the number of clusters to model. The default is 6).</p>
 </dd>
-<dt><strong>spatial_weights</strong><span class="classifier">str (‘queen’ or ‘rook’) or libpysal.weights object</span></dt><dd><p>spatial weights matrix specification`. By default, geosnap will calculate Rook
-weights, but you can also pass a <cite>libpysal.weights</cite> object for more control
+<dt><strong>spatial_weights</strong><span class="classifier">[‘queen’, ‘rook’] or <a class="reference external" href="https://pysal.org/libpysal/generated/libpysal.weights.W.html#libpysal.weights.W" title="(in libpysal v4.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">libpysal.weights.W</span></code></a> <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">object</span></code></a></span></dt><dd><p>spatial weights matrix specification`. By default, geosnap will calculate Rook
+weights, but you can also pass a libpysal.weights.W object for more control
 over the specification.</p>
 </dd>
-<dt><strong>method</strong><span class="classifier">str</span></dt><dd><p>the clustering algorithm used to identify neighborhood types</p>
+<dt><strong>method</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a> <code class="xref py py-obj docutils literal notranslate"><span class="pre">in</span></code> [‘ward_spatial’, ‘spenc’, ‘skater’, ‘azp’, ‘max_p’]</span></dt><dd><p>the clustering algorithm used to identify neighborhood types</p>
 </dd>
-<dt><strong>columns</strong><span class="classifier">list-like</span></dt><dd><p>subset of columns on which to apply the clustering</p>
+<dt><strong>columns</strong><span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/glossary.html#term-array-like" title="(in NumPy v1.17)"><span>array_like</span></a></span></dt><dd><p>subset of columns on which to apply the clustering</p>
 </dd>
-<dt><strong>threshold_variable</strong><span class="classifier">str</span></dt><dd><p>for max-p, which variable should define <cite>p</cite>. The default is “count”,
+<dt><strong>threshold_variable</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>for max-p, which variable should define <cite>p</cite>. The default is “count”,
 which will grow regions until the threshold number of polygons have
 been aggregated</p>
 </dd>
-<dt><strong>threshold</strong><span class="classifier">numeric</span></dt><dd><p>threshold to use for max-p clustering (the default is 10).</p>
+<dt><strong>threshold</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numeric</span></code></span></dt><dd><p>threshold to use for max-p clustering (the default is 10).</p>
 </dd>
-<dt><strong>time_var: str</strong></dt><dd><p>which column on the dataframe defines time and or sequencing of the
+<dt><strong>time_var</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>which column on the dataframe defines time and or sequencing of the
 long-form data. Default is “year”</p>
 </dd>
-<dt><strong>id_var: str</strong></dt><dd><p>which column on the long-form dataframe identifies the stable units
+<dt><strong>id_var</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>which column on the long-form dataframe identifies the stable units
 over time. In a wide-form dataset, this would be the unique index</p>
 </dd>
-<dt><strong>weights_kwargs: dict</strong></dt><dd><p>If passing a <cite>libpysal.weights</cite> instance to spatial_weights, these additional
+<dt><strong>weights_kwargs</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">dict</span></code></a></span></dt><dd><p>If passing a libpysal.weights.W instance to spatial_weights, these additional
 keyword arguments that will be passed to the weights constructor</p>
 </dd>
-<dt><strong>scaler: str or sklearn.preprocessing.Scaler</strong></dt><dd><p>a scikit-learn preprocessing class that will be used to rescale the
-data. Defaults to StandardScaler</p>
+<dt><strong>scaler</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">scaler</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">class</span></code> from <a class="reference external" href="https://scikit-learn.org/stable/modules/classes.html#module-sklearn.preprocessing" title="(in scikit-learn v0.22)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.preprocessing</span></code></a></span></dt><dd><p>a scikit-learn preprocessing class that will be used to rescale the
+data. Defaults to sklearn.preprocessing.StandardScaler</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>gdf</strong><span class="classifier">geopandas.GeoDataFrame</span></dt><dd><p>GeoDataFrame with a column of neighborhood cluster labels
+<dd class="field-even"><dl>
+<dt><strong>gdf</strong><span class="classifier"><a class="reference external" href="https://geopandas.readthedocs.io/en/latest/reference/geopandas.GeoDataFrame.html#geopandas.GeoDataFrame" title="(in GeoPandas v0.6.1+26.gca6e5e7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geopandas.GeoDataFrame</span></code></a></span></dt><dd><p>GeoDataFrame with a column of neighborhood cluster labels
 appended as a new column. If cluster method exists as a column on the DataFrame
 then the column will be incremented.</p>
 </dd>
-<dt><strong>models</strong><span class="classifier">dict of named tuples</span></dt><dd><p>tab-completable dictionary of named tuples keyed on the Community’s time variable
+<dt><strong>models</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">dict</span></code></a> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">named</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">tuples</span></code></span></dt><dd><p>tab-completable dictionary of named tuples keyed on the Community’s time variable
 (e.g. year). The tuples store model results and have attributes X, columns, labels,
 instance, W, which store the input matrix, column labels, fitted model instance,
 and spatial weights matrix</p>
 </dd>
-<dt><strong>model_name</strong><span class="classifier">str</span></dt><dd><p>name of model to be stored in a Community</p>
+<dt><strong>model_name</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>name of model to be stored in a Community</p>
 </dd>
 </dl>
 </dd>
@@ -201,7 +201,7 @@ and spatial weights matrix</p>
     </p>
     <p>
         &copy; Copyright 2018, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.<br/>
     </p>
   </div>
 </footer>
