@@ -760,20 +760,19 @@ class Community:
         dfs = []
         if isinstance(names, str):
             names = [names]
-        for year in years:
-            for name in names:
+        for name in names:
+            for year in years:
                 df = get_lehd(dataset=dataset, year=year, state=name)
-            if year < 2010:
-                df = gdf00.merge(df, on="geoid", how="left")
-            else:
-                df = gdf.merge(df, on="geoid", how="left")
-            df["year"] = year
-            dfs.append(df)
-        gdf = pd.concat(dfs)
-        gdf.set_index(['geoid', 'year'], inplace=True)
-        gdf = gdf[~gdf.index.duplicated(keep='first')]
-        gdf.reset_index(inplace=True)
-
+                df["year"] = year
+                if year < 2010:
+                    df = gdf00.merge(gdf00, on="geoid", how="inner")
+                else:
+                    df = gdf.merge(df, on="geoid", how="inner")
+                df = df.set_index(['geoid', 'year'])
+                dfs.append(df)
+        out = pd.concat(dfs)
+        out = out[~out.index.duplicated(keep='first')]
+        out = out.reset_index()
 
         if isinstance(boundary, gpd.GeoDataFrame):
             if boundary.crs != gdf.crs:
@@ -781,9 +780,9 @@ class Community:
                     "Unable to determine whether boundary CRS is WGS84 "
                     "if this produces unexpected results, try reprojecting"
                 )
-            gdf = gdf[gdf.representative_point().intersects(boundary.unary_union)]
+            out = out[out.representative_point().intersects(boundary.unary_union)]
 
-        return cls(gdf=gdf, harmonized=False)
+        return cls(gdf=out, harmonized=False)
 
     @classmethod
     def from_geodataframes(cls, gdfs=None):
