@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>geosnap.analyze.cluster &#8212; geosnap v0.0.2 Manual</title>
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pysal-styles.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../../../_static/geosnap.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/geosnap.svg"></span>
+          geosnap</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.2</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../installation.html">Installation</a></li>
+                <li><a href="../../../api.html">API</a></li>
+                <li><a href="https://spatialucr.github.io/geosnap-guide/">User Guide</a></li>
+                <li><a href="../../../references.html">References</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#installing-released-version">Installing released version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#installing-development-version">Installing development version</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#io-module">IO Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#the-community-class">The Community Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#analyze-module">Analyze Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#harmonize-module">Harmonize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#visualize-module">Visualize Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for geosnap.analyze.cluster</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">warnings</span> <span class="k">import</span> <span class="n">warn</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">region.max_p_regions.heuristics</span> <span class="k">import</span> <span class="n">MaxPRegionsHeu</span>
+<span class="kn">from</span> <span class="nn">region.p_regions.azp</span> <span class="k">import</span> <span class="n">AZP</span>
+<span class="kn">from</span> <span class="nn">region.skater.skater</span> <span class="k">import</span> <span class="n">Spanning_Forest</span>
+<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">AffinityPropagation</span><span class="p">,</span>
+    <span class="n">AgglomerativeClustering</span><span class="p">,</span>
+    <span class="n">KMeans</span><span class="p">,</span>
+    <span class="n">MiniBatchKMeans</span><span class="p">,</span>
+    <span class="n">SpectralClustering</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">sklearn.mixture</span> <span class="k">import</span> <span class="n">GaussianMixture</span>
+<span class="kn">from</span> <span class="nn">spenc</span> <span class="k">import</span> <span class="n">SPENC</span>
+
+<span class="c1"># Sklearn a-spatial models</span>
+
+
+<div class="viewcode-block" id="ward"><a class="viewcode-back" href="../../../generated/geosnap.analyze.analytics.ward.html#geosnap.analyze.analytics.ward">[docs]</a><span class="k">def</span> <span class="nf">ward</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Agglomerative clustering using Ward linkage.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X  : array-like</span>
+<span class="sd">        n x k attribute data</span>
+
+<span class="sd">    n_clusters : int, optional, default: 8</span>
+<span class="sd">        The number of clusters to form.</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    model: sklearn AgglomerativeClustering instance</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">AgglomerativeClustering</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">,</span> <span class="n">linkage</span><span class="o">=</span><span class="s2">&quot;ward&quot;</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span></div>
+
+
+<div class="viewcode-block" id="kmeans"><a class="viewcode-back" href="../../../generated/geosnap.analyze.analytics.kmeans.html#geosnap.analyze.analytics.kmeans">[docs]</a><span class="k">def</span> <span class="nf">kmeans</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span>
+    <span class="n">n_clusters</span><span class="p">,</span>
+    <span class="n">init</span><span class="o">=</span><span class="s2">&quot;k-means++&quot;</span><span class="p">,</span>
+    <span class="n">n_init</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">max_iter</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+    <span class="n">tol</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">copy_x</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">n_jobs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+    <span class="n">precompute_distances</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;K-Means clustering.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X  : array-like</span>
+<span class="sd">         n x k attribute data</span>
+
+<span class="sd">    n_clusters : int, optional, default: 8</span>
+<span class="sd">        The number of clusters to form as well as the number of centroids to</span>
+<span class="sd">        generate.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    model: sklearn KMeans instance</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">12000</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">MiniBatchKMeans</span><span class="p">(</span>
+            <span class="n">n_clusters</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">,</span>
+            <span class="n">init</span><span class="o">=</span><span class="n">init</span><span class="p">,</span>
+            <span class="n">n_init</span><span class="o">=</span><span class="n">n_init</span><span class="p">,</span>
+            <span class="n">max_iter</span><span class="o">=</span><span class="n">max_iter</span><span class="p">,</span>
+            <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span>
+            <span class="n">n_clusters</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">,</span>
+            <span class="n">init</span><span class="o">=</span><span class="s2">&quot;k-means++&quot;</span><span class="p">,</span>
+            <span class="n">n_init</span><span class="o">=</span><span class="n">n_init</span><span class="p">,</span>
+            <span class="n">max_iter</span><span class="o">=</span><span class="n">max_iter</span><span class="p">,</span>
+            <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">,</span>
+            <span class="n">precompute_distances</span><span class="o">=</span><span class="n">precompute_distances</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">,</span>
+            <span class="n">copy_x</span><span class="o">=</span><span class="n">copy_x</span><span class="p">,</span>
+            <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span>
+            <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithm</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span></div>
+
+
+<div class="viewcode-block" id="affinity_propagation"><a class="viewcode-back" href="../../../generated/geosnap.analyze.analytics.affinity_propagation.html#geosnap.analyze.analytics.affinity_propagation">[docs]</a><span class="k">def</span> <span class="nf">affinity_propagation</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span>
+    <span class="n">damping</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+    <span class="n">preference</span><span class="o">=-</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="n">max_iter</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+    <span class="n">convergence_iter</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
+    <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">affinity</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Clustering with Affinity Propagation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X  : array-like</span>
+<span class="sd">         n x k attribute data</span>
+
+<span class="sd">    preference :  array-like, shape (n_samples,) or float, optional,</span>
+<span class="sd">                  default: None</span>
+<span class="sd">        The preference parameter passed to scikit-learn&#39;s affinity propagation</span>
+<span class="sd">        algorithm</span>
+
+<span class="sd">    damping: float, optional, default: 0.8</span>
+<span class="sd">        The damping parameter passed to scikit-learn&#39;s affinity propagation</span>
+<span class="sd">        algorithm</span>
+
+<span class="sd">    max_iter : int, optional, default: 1000</span>
+<span class="sd">        Maximum number of iterations</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    model: sklearn AffinityPropagation instance</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">AffinityPropagation</span><span class="p">(</span>
+        <span class="n">preference</span><span class="o">=</span><span class="n">preference</span><span class="p">,</span>
+        <span class="n">damping</span><span class="o">=</span><span class="n">damping</span><span class="p">,</span>
+        <span class="n">max_iter</span><span class="o">=</span><span class="n">max_iter</span><span class="p">,</span>
+        <span class="n">convergence_iter</span><span class="o">=</span><span class="n">convergence_iter</span><span class="p">,</span>
+        <span class="n">copy</span><span class="o">=</span><span class="n">copy</span><span class="p">,</span>
+        <span class="n">affinity</span><span class="o">=</span><span class="n">affinity</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span></div>
+
+
+<div class="viewcode-block" id="spectral"><a class="viewcode-back" href="../../../generated/geosnap.analyze.analytics.spectral.html#geosnap.analyze.analytics.spectral">[docs]</a><span class="k">def</span> <span class="nf">spectral</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span>
+    <span class="n">n_clusters</span><span class="p">,</span>
+    <span class="n">eigen_solver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">n_init</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">gamma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">affinity</span><span class="o">=</span><span class="s2">&quot;rbf&quot;</span><span class="p">,</span>
+    <span class="n">n_neighbors</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">eigen_tol</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">assign_labels</span><span class="o">=</span><span class="s2">&quot;kmeans&quot;</span><span class="p">,</span>
+    <span class="n">degree</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">coef0</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">kernel_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Short summary.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : arral-like</span>
+<span class="sd">        n x k attribute data</span>
+<span class="sd">    n_clusters : type</span>
+<span class="sd">        The number of clusters to form as well as the number of centroids to</span>
+<span class="sd">        generate.</span>
+<span class="sd">    eigen_solver : type</span>
+<span class="sd">        Description of parameter `eigen_solver` (the default is None).</span>
+<span class="sd">    random_state : type</span>
+<span class="sd">        Description of parameter `random_state` (the default is None).</span>
+<span class="sd">    n_init : type</span>
+<span class="sd">        Description of parameter `n_init` (the default is 10).</span>
+<span class="sd">    gamma : type</span>
+<span class="sd">        Description of parameter `gamma` (the default is 1.0).</span>
+<span class="sd">    affinity : type</span>
+<span class="sd">        Description of parameter `affinity` (the default is &#39;rbf&#39;).</span>
+<span class="sd">    n_neighbors : type</span>
+<span class="sd">        Description of parameter `n_neighbors` (the default is 10).</span>
+<span class="sd">    eigen_tol : type</span>
+<span class="sd">        Description of parameter `eigen_tol` (the default is 0.0).</span>
+<span class="sd">    assign_labels : type</span>
+<span class="sd">        Description of parameter `assign_labels` (the default is &#39;kmeans&#39;).</span>
+<span class="sd">    degree : type</span>
+<span class="sd">        Description of parameter `degree` (the default is 3).</span>
+<span class="sd">    coef0 : type</span>
+<span class="sd">        Description of parameter `coef0` (the default is 1).</span>
+<span class="sd">    kernel_params : type</span>
+<span class="sd">        Description of parameter `kernel_params` (the default is None).</span>
+<span class="sd">    n_jobs : type</span>
+<span class="sd">        Description of parameter `n_jobs` (the default is -1).</span>
+<span class="sd">    **kwargs : type</span>
+<span class="sd">        Description of parameter `**kwargs`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    model: sklearn SpectralClustering instance</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">SpectralClustering</span><span class="p">(</span>
+        <span class="n">n_clusters</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">,</span>
+        <span class="n">eigen_solver</span><span class="o">=</span><span class="n">eigen_solver</span><span class="p">,</span>
+        <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">,</span>
+        <span class="n">n_init</span><span class="o">=</span><span class="n">n_init</span><span class="p">,</span>
+        <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">,</span>
+        <span class="n">affinity</span><span class="o">=</span><span class="n">affinity</span><span class="p">,</span>
+        <span class="n">n_neighbors</span><span class="o">=</span><span class="n">n_neighbors</span><span class="p">,</span>
+        <span class="n">eigen_tol</span><span class="o">=</span><span class="n">eigen_tol</span><span class="p">,</span>
+        <span class="n">assign_labels</span><span class="o">=</span><span class="n">assign_labels</span><span class="p">,</span>
+        <span class="n">degree</span><span class="o">=</span><span class="n">degree</span><span class="p">,</span>
+        <span class="n">coef0</span><span class="o">=</span><span class="n">coef0</span><span class="p">,</span>
+        <span class="n">kernel_params</span><span class="o">=</span><span class="n">kernel_params</span><span class="p">,</span>
+        <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span></div>
+
+
+<div class="viewcode-block" id="gaussian_mixture"><a class="viewcode-back" href="../../../generated/geosnap.analyze.analytics.gaussian_mixture.html#geosnap.analyze.analytics.gaussian_mixture">[docs]</a><span class="k">def</span> <span class="nf">gaussian_mixture</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span>
+    <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">covariance_type</span><span class="o">=</span><span class="s2">&quot;full&quot;</span><span class="p">,</span>
+    <span class="n">best_model</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">max_clusters</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Clustering with Gaussian Mixture Model</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    X  : array-like</span>
+<span class="sd">        n x k attribute data</span>
+
+<span class="sd">    n_clusters : int, optional, default: 5</span>
+<span class="sd">        The number of clusters to form.</span>
+
+<span class="sd">    covariance_type: str, optional, default: &quot;full&quot;&quot;</span>
+<span class="sd">        The covariance parameter passed to scikit-learn&#39;s GaussianMixture</span>
+<span class="sd">        algorithm</span>
+
+<span class="sd">    best_model: bool, optional, default: False</span>
+<span class="sd">        Option for finding endogenous K according to Bayesian Information</span>
+<span class="sd">        Criterion</span>
+
+<span class="sd">    max_clusters: int, optional, default:10</span>
+<span class="sd">        The max number of clusters to test if using `best_model` option</span>
+
+<span class="sd">    random_state: int, optional, default: None</span>
+<span class="sd">        The seed used to generate replicable results</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    model: sklearn GaussianMixture instance</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">random_state</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;Note: Gaussian Mixture Clustering is probabilistic--</span><span class="se">\</span>
+<span class="s2">cluster labels may be different for different runs. If you need consistency,</span><span class="se">\</span>
+<span class="s2">you should set the `random_state` parameter&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">best_model</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+
+        <span class="c1"># selection routine from</span>
+        <span class="c1"># https://plot.ly/scikit-learn/plot-gmm-selection/</span>
+        <span class="n">lowest_bic</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">infty</span>
+        <span class="n">bic</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">maxn</span> <span class="o">=</span> <span class="n">max_clusters</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">n_components_range</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">maxn</span><span class="p">)</span>
+        <span class="n">cv_types</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;spherical&quot;</span><span class="p">,</span> <span class="s2">&quot;tied&quot;</span><span class="p">,</span> <span class="s2">&quot;diag&quot;</span><span class="p">,</span> <span class="s2">&quot;full&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">cv_type</span> <span class="ow">in</span> <span class="n">cv_types</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">n_components</span> <span class="ow">in</span> <span class="n">n_components_range</span><span class="p">:</span>
+                <span class="c1"># Fit a Gaussian mixture with EM</span>
+                <span class="n">gmm</span> <span class="o">=</span> <span class="n">GaussianMixture</span><span class="p">(</span>
+                    <span class="n">n_components</span><span class="o">=</span><span class="n">n_components</span><span class="p">,</span>
+                    <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">,</span>
+                    <span class="n">covariance_type</span><span class="o">=</span><span class="n">cv_type</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">gmm</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+                <span class="n">bic</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gmm</span><span class="o">.</span><span class="n">bic</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">bic</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">lowest_bic</span><span class="p">:</span>
+                    <span class="n">lowest_bic</span> <span class="o">=</span> <span class="n">bic</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">best_gmm</span> <span class="o">=</span> <span class="n">gmm</span>
+
+        <span class="n">bic</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">bic</span><span class="p">)</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">best_gmm</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">GaussianMixture</span><span class="p">(</span>
+            <span class="n">n_components</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">,</span>
+            <span class="n">covariance_type</span><span class="o">=</span><span class="n">covariance_type</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">labels_</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span></div>
+
+
+<div class="viewcode-block" id="hdbscan"><a class="viewcode-back" href="../../../generated/geosnap.analyze.analytics.hdbscan.html#geosnap.analyze.analytics.hdbscan">[docs]</a><span class="k">def</span> <span class="nf">hdbscan</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">min_cluster_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">gen_min_span_tree</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Clustering with Hierarchical DBSCAN</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : array-like</span>
+<span class="sd">         n x k attribute data</span>
+
+<span class="sd">    min_cluster_size : int, default: 5</span>
+<span class="sd">        the minimum number of points necessary to generate a cluster</span>
+
+<span class="sd">    gen_min_span_tree : bool</span>
+<span class="sd">        Description of parameter `gen_min_span_tree` (the default is True).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    model: hdbscan HDBSCAN instance</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">hdbscan</span> <span class="k">import</span> <span class="n">HDBSCAN</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+            <span class="s2">&quot;You must have the hdbscan package installed to use this function&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">model</span> <span class="o">=</span> <span class="n">HDBSCAN</span><span class="p">(</span><span class="n">min_cluster_size</span><span class="o">=</span><span class="n">min_cluster_size</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span></div>
+
+
+<span class="c1"># Spatially Explicit/Encouraged Methods</span>
+
+
+<div class="viewcode-block" id="ward_spatial"><a class="viewcode-back" href="../../../generated/geosnap.analyze.analytics.ward_spatial.html#geosnap.analyze.analytics.ward_spatial">[docs]</a><span class="k">def</span> <span class="nf">ward_spatial</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Agglomerative clustering using Ward linkage with a spatial connectivity</span>
+<span class="sd">       constraint</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : array-like</span>
+<span class="sd">         n x k attribute data</span>
+
+<span class="sd">    w : PySAL W instance</span>
+<span class="sd">        spatial weights matrix</span>
+
+<span class="sd">    n_clusters : int, optional, default: 5</span>
+<span class="sd">        The number of clusters to form.</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    model: sklearn AgglomerativeClustering instance</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">model</span> <span class="o">=</span> <span class="n">AgglomerativeClustering</span><span class="p">(</span>
+        <span class="n">n_clusters</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">,</span> <span class="n">connectivity</span><span class="o">=</span><span class="n">w</span><span class="o">.</span><span class="n">sparse</span><span class="p">,</span> <span class="n">linkage</span><span class="o">=</span><span class="s2">&quot;ward&quot;</span>
+    <span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span></div>
+
+
+<div class="viewcode-block" id="spenc"><a class="viewcode-back" href="../../../generated/geosnap.analyze.analytics.spenc.html#geosnap.analyze.analytics.spenc">[docs]</a><span class="k">def</span> <span class="nf">spenc</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Spatially encouraged spectral clustering</span>
+
+<span class="sd">    :cite:`wolf2018`</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : array-like</span>
+<span class="sd">         n x k attribute data</span>
+
+<span class="sd">    w : PySAL W instance</span>
+<span class="sd">        spatial weights matrix</span>
+
+<span class="sd">    n_clusters : int, optional, default: 5</span>
+<span class="sd">        The number of clusters to form.</span>
+
+<span class="sd">    gamma : int, default:1</span>
+<span class="sd">        TODO.</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    model: spenc SPENC instance</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">SPENC</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">)</span>
+
+    <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">w</span><span class="o">.</span><span class="n">sparse</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span></div>
+
+
+<div class="viewcode-block" id="skater"><a class="viewcode-back" href="../../../generated/geosnap.analyze.analytics.skater.html#geosnap.analyze.analytics.skater">[docs]</a><span class="k">def</span> <span class="nf">skater</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">floor</span><span class="o">=-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">trace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">islands</span><span class="o">=</span><span class="s2">&quot;increase&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;SKATER spatial clustering algorithm.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : array-like</span>
+<span class="sd">         n x k attribute data</span>
+
+<span class="sd">    w : PySAL W instance</span>
+<span class="sd">        spatial weights matrix</span>
+
+<span class="sd">    n_clusters : int, optional, default: 5</span>
+<span class="sd">        The number of clusters to form.</span>
+
+<span class="sd">    floor : type</span>
+<span class="sd">        TODO.</span>
+
+<span class="sd">    trace : type</span>
+<span class="sd">        TODO.</span>
+
+<span class="sd">    islands : type</span>
+<span class="sd">        TODO.</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    model: skater SKATER instance</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Spanning_Forest</span><span class="p">()</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">n_clusters</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">quorum</span><span class="o">=</span><span class="n">floor</span><span class="p">,</span> <span class="n">trace</span><span class="o">=</span><span class="n">trace</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">labels_</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">current_labels_</span>
+    <span class="k">return</span> <span class="n">model</span></div>
+
+
+<div class="viewcode-block" id="azp"><a class="viewcode-back" href="../../../generated/geosnap.analyze.analytics.azp.html#geosnap.analyze.analytics.azp">[docs]</a><span class="k">def</span> <span class="nf">azp</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;AZP clustering algorithm</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : array-like</span>
+<span class="sd">         n x k attribute data</span>
+
+<span class="sd">    w : PySAL W instance</span>
+<span class="sd">        spatial weights matrix</span>
+
+<span class="sd">    n_clusters : int, optional, default: 5</span>
+<span class="sd">        The number of clusters to form.</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    model: region AZP instance</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">model</span> <span class="o">=</span> <span class="n">AZP</span><span class="p">()</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">fit_from_w</span><span class="p">(</span><span class="n">attr</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="n">w</span><span class="p">,</span> <span class="n">n_regions</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span></div>
+
+
+<div class="viewcode-block" id="max_p"><a class="viewcode-back" href="../../../generated/geosnap.analyze.analytics.max_p.html#geosnap.analyze.analytics.max_p">[docs]</a><span class="k">def</span> <span class="nf">max_p</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">threshold_variable</span><span class="o">=</span><span class="s2">&quot;count&quot;</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Max-p clustering algorithm</span>
+<span class="sd">    :cite:`Duque2012`</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : array-like</span>
+<span class="sd">         n x k attribute data</span>
+
+<span class="sd">    w : PySAL W instance</span>
+<span class="sd">        spatial weights matrix</span>
+
+<span class="sd">    threshold_variable : str, default:&quot;count&quot;</span>
+<span class="sd">        attribute variable to use as floor when calculate</span>
+
+<span class="sd">    threshold : int, default:10</span>
+<span class="sd">        integer that defines the upper limit of a variable that can be grouped</span>
+<span class="sd">        into a single region</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    model: region MaxPRegionsHeu instance</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">MaxPRegionsHeu</span><span class="p">()</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">fit_from_w</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">X</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">threshold_variable</span><span class="p">,</span> <span class="n">threshold</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2018, geosnap developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

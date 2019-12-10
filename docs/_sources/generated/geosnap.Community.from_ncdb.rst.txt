@@ -1,0 +1,6 @@
+geosnap.Community.from\_ncdb
+============================
+
+.. currentmodule:: geosnap
+
+.. automethod:: Community.from_ncdb

@@ -1,0 +1,6 @@
+geosnap.analyze.transition
+==========================
+
+.. currentmodule:: geosnap.analyze
+
+.. autofunction:: transition

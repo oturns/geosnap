@@ -1,0 +1,6 @@
+geosnap.io.store\_ltdb
+======================
+
+.. currentmodule:: geosnap.io
+
+.. autofunction:: store_ltdb

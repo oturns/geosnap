@@ -1,9 +1,11 @@
-import pandas as pd
+"""Use spatial interpolation to standardize neighborhood boundaries over time."""
+
 import geopandas as gpd
+import pandas as pd
 from tobler.area_weighted import (
+    area_interpolate,
     area_interpolate_binning,
     area_tables_raster,
-    area_interpolate,
 )
 from tobler.util.util import _check_presence_of_crs
 
@@ -21,12 +23,11 @@ def harmonize(
     index="geoid",
     time_col="year",
 ):
-    """
-    Harmonize Multiples GeoData Sources with different approaches
+    r"""
+    Use spatial interpolation to standardize neighborhood boundaries over time.
 
     Parameters
     ----------
-
     raw_community : list
         Multiple GeoDataFrames given by a list (see (1) in Notes).
 
@@ -78,7 +79,6 @@ def harmonize(
 
     Notes
     -----
-
     1) Each GeoDataFrame of raw_community is assumed to have a 'year' column
        Also, all GeoDataFrames must have the same Coordinate Reference System (CRS).
 
@@ -109,8 +109,8 @@ def harmonize(
         w_{i,j} = a_{i,j} / \sum_k a_{k,j}
 
     """
-    if len(extensive_variables) == 0 and len(intensive_variables) == 0:
-        raise (
+    if extensive_variables is None and intensive_variables is None:
+        raise ValueError(
             "You must pass a set of extensive and/or intensive variables to interpolate"
         )
 
@@ -138,24 +138,31 @@ def harmonize(
             )
 
         elif weights_method == "land_type_area":
+            try:
 
-            area_tables_raster_fitted = area_tables_raster(
-                source_df,
-                target_df.copy(),
-                raster_path=raster,
-                codes=codes,
-                force_crs_match=force_crs_match,
-            )
+                area_tables_raster_fitted = area_tables_raster(
+                    source_df,
+                    target_df.copy(),
+                    raster_path=raster,
+                    codes=codes,
+                    force_crs_match=force_crs_match,
+                )
 
-            # In area_interpolate, the resulting variable has same lenght as target_df
-            interpolation = area_interpolate(
-                source_df,
-                target_df.copy(),
-                extensive_variables=extensive_variables,
-                intensive_variables=intensive_variables,
-                allocate_total=allocate_total,
-                tables=area_tables_raster_fitted,
-            )
+                # In area_interpolate, the resulting variable has same lenght as target_df
+                interpolation = area_interpolate(
+                    source_df,
+                    target_df.copy(),
+                    extensive_variables=extensive_variables,
+                    intensive_variables=intensive_variables,
+                    allocate_total=allocate_total,
+                    tables=area_tables_raster_fitted,
+                )
+            except IOError:
+                raise IOError(
+                    "You must have NLCD raster data installed locally to use the"
+                    "`land_type_area` method. You can install it using the"
+                    "`tobler.data.store_rasters()` function from the `tobler` package"
+                )
         else:
             raise ValueError('weights_method must of one of ["area", "land_type_area"]')
 

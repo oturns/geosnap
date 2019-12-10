@@ -1,0 +1,6 @@
+geosnap.datasets.ltdb
+=====================
+
+.. currentmodule:: geosnap
+
+.. autoattribute:: datasets.ltdb
