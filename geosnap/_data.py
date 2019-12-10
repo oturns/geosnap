@@ -207,7 +207,6 @@ class DataStore:
         for state in states:
             blks[state] = blocks_2000[f"{state}.parquet"]()
             if fips:
-                print(fips)
                 blks[state] = blks[state][blks[state]["geoid"].str.startswith(fips)]
             blks[state]["year"] = 2000
         blocks = list(blks.values())

@@ -261,9 +261,9 @@ def gaussian_mixture(
     """
     if random_state is None:
         warn(
-            "Note: Gaussian Mixture Clustering is probabilistic--\
-             cluster labels may be different for different runs. If you need consistency,\
-             you should set the `random_state` parameter"
+            "Note: Gaussian Mixture Clustering is probabilistic--"
+            "cluster labels may be different for different runs. If you need consistency, "
+            "you should set the `random_state` parameter"
         )
 
     if best_model is True:
