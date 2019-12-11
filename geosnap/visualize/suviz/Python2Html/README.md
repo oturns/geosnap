@@ -27,7 +27,7 @@
 
 - GEOSNAP2ACM contains modules Data Exploration – (1) Adaptive Choropleth Mapper (ACM), (2) ACM with Correlogram, (3) ACM with Scatter plot, (4) ACM with Time Series, and (5) ACM with PCP.
 
-- GEOSNAP2NAM contains modules for Data Delineation and Step3: Neighborhood Analysis - (1) Maps of Neighborhood with a Stacked Chart, (2) Maps of INC and Neighborhoods, (3) Maps of Neighborhood with Parallel Categories Diagram, and (4) Maps of Neighborhood with Chord Diagram.
+- GEOSNAP2NAM contains modules for Data Delineation and Neighborhood Analysis - (1) Maps of Neighborhood with a Stacked Chart, (2) Maps of INC and Neighborhoods, (3) Maps of Neighborhood with Parallel Categories Diagram, and (4) Maps of Neighborhood with Chord Diagram.
 
 Both GEOSNAP2ACM and GEOSNAP2NAM utilize data  and  sptial and statistical analyses from GeoSpatial Neighborhood Analysis Package (GEOSNAP) which are written in Python,  and combines them with a visualization layer written in Javascript, Html and CSS. The visualization layer is made of open-source JavaScript libraries such as Leaflet, Plotly, and D3. 
 
