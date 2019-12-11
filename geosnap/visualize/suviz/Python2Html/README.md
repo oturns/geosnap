@@ -4,27 +4,30 @@
 
 <h2 align="center" style="margin-top:-10px">The Geospatial Neighborhood Analysis Package Visualizer</h2> 
 
-`GEOSNAP-VIZ` has a highly interactive and dynamic user-interface that makes it easier to explore, model, analyze, and visualize the social and spatial dynamics of neighborhoods. GEOSNAP-VIZ visualizes not only data from census and American communisty survey (ACS), but also results of several spatial statistcs that help to study spatiotemporal neighborhood changes. Here is the list of sptial and statistical analyses that `GEOSNAP-VIZ` provides:
-
-- Clustering with Affinity Propagation
-- Clustering with Gaussian Mixture Model
-- Clustering with Hierarchical DBSCAN
-- K-Means clustering.
-- spectral clustering
-- Agglomerative clustering using Ward linkage.
-- AZP clustering algorithm
-- Max-p clustering algorithm 
-- SKATER spatial clustering algorithm.
-- Spatially encouraged spectral clustering
-- Agglomerative clustering using Ward linkage with a spatial connectivity
-- Sequence Analysis
-- Index of Neighborhood Change 
+`GEOSNAP-VIZ` has a highly interactive and dynamic user-interface that makes it easier to explore, model, analyze, and visualize the social and spatial dynamics of neighborhoods. GEOSNAP-VIZ visualizes not only data from census and American communisty survey (ACS), but also results of several spatial statistcs that help to study spatiotemporal neighborhood changes. Here is the list of sptial and statistical analyses that `GEOSNAP-VIZ` provides [1]:
+ #### Neighborhood Clustering Methods
+  ##### Classic (aspatial) Clustering
+  	- Clustering with Affinity Propagation
+  	- Clustering with Gaussian Mixture Model
+  	- Clustering with Hierarchical DBSCAN
+  	- K-Means clustering.
+  	- spectral clustering
+  	- Agglomerative clustering using Ward linkage
+  ##### Spatial Clustering  
+  	- AZP clustering algorithm
+  	- Max-p clustering algorithm 
+  	- SKATER spatial clustering algorithm.
+  	- Spatially encouraged spectral clustering
+  	- Agglomerative clustering using Ward linkage with a spatial connectivity
+  #### Neighborhood Dynamics Methods
+  	- Index of Neighborhood Change (INC): Local Indicator of Neighborhhod Change
+  	- Sequence Analysis: Pairwise sequence analysis and sequence clustering
 
 `GEOSNAP-VIZ` consists of GEOSNAP2ACM (Adaptive Choropleth Mapper) and GOESNA2NAM (Neighborhood Analysis Mapper). GEOSNAP2ACM and GEOSNAP2NAM are open source GIS software packages that support (1) querying Race/Ethnicity, Socioeconomic and Demographic variables, (2) data exploration, (3) neighborhood delineation and analysis, and (4) user-interactive and dynamic visualization.
 
 - GEOSNAP2ACM contains modules Data Exploration – (1) Adaptive Choropleth Mapper (ACM), (2) ACM with Correlogram, (3) ACM with Scatter plot, (4) ACM with Time Series, and (5) ACM with PCP.
 
-- GEOSNAP2NAM contains modules for Data Delineation and Step3: Neighborhood Analysis - (1) Maps of Neighborhood with a Stacked Chart, (2) Maps of INC and Neighborhoods, (3) Maps of Neighborhood with Parallel Categories Diagram, and (4) Maps of Neighborhood with Chord Diagram.
+- GEOSNAP2NAM contains modules for Data Delineation and Neighborhood Analysis - (1) Maps of Neighborhood with a Stacked Chart, (2) Maps of INC and Neighborhoods, (3) Maps of Neighborhood with Parallel Categories Diagram, and (4) Maps of Neighborhood with Chord Diagram.
 
 Both GEOSNAP2ACM and GEOSNAP2NAM utilize data  and  sptial and statistical analyses from GeoSpatial Neighborhood Analysis Package (GEOSNAP) which are written in Python,  and combines them with a visualization layer written in Javascript, Html and CSS. The visualization layer is made of open-source JavaScript libraries such as Leaflet, Plotly, and D3. 
 
@@ -102,6 +105,9 @@ store_census()
 
 When “Adaptive_Choropleth_Mapper_viz(param)” is executed in each of the examples above, the web-browser automatically opens and shows the visualization result. The web-browser is supposed to open automatically. However, if you cannot find the browser opened, run the visualization output by drag and drop ACM_XXXX/index.html or NAM_XXXX/index.html on your browser.
 
+### Refernces
+
+[1] geosnap API reference. URL: https://spatialucr.github.io/geosnap/api.html
 
 ## Built With
 
