@@ -105,6 +105,8 @@ store_census()
 
 When “Adaptive_Choropleth_Mapper_viz(param)” is executed in each of the examples above, the web-browser automatically opens and shows the visualization result. The web-browser is supposed to open automatically. However, if you cannot find the browser opened, run the visualization output by drag and drop ACM_XXXX/index.html or NAM_XXXX/index.html on your browser.
 
+Click [here](https://docs.google.com/document/d/1ifBeubg0RKBr4Dh9pUONq7GZ8c_9ZnxgwIbBjkRQRmU/edit?usp=sharing) to see User's Manual
+
 ### Refernces
 
 [1] geosnap API reference. URL: https://spatialucr.github.io/geosnap/api.html
