@@ -1,0 +1,9 @@
+.leaflet-lasso-active {
+    cursor: crosshair;
+    user-select: none;
+}
+
+.leaflet-lasso-active .leaflet-interactive {
+    cursor: crosshair;
+    pointer-events: none;
+}

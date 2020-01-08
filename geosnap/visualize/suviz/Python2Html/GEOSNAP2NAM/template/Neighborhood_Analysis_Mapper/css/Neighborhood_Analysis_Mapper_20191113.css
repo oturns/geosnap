@@ -1,0 +1,211 @@
+		//#map0 {
+		//	width: 1200px;
+		//	height: 800px;
+		//}
+		//html, body { width: 2550px; height: 100%; margin: 0; }
+		#mapContainer {   height: 600px; width: 100%;  }
+		.mapArea { width: 500px; height: 100%; float: left;  }
+		.mapAreaLast { width: 500px; height: 100%; float: left;  }
+		.map     { width: 500px; height: 500px; }
+		//.densityChart { width: 490px; height: 500px; margin: 3px; border: 2px solid gray; }
+		//.densityPeriod { width: 490px; height: 500px; margin: 3px; border: 2px solid #FFA500; }
+		//.densityCluster { width: 490px; height: 500px; margin: 3px; border: 2px solid #00FA9A; }
+		.chart { width: 490px; height: 500px; margin: 10px 3px 3px 3px; }
+		.densityINC { border: 2px solid gray; }
+		.densityPeriod { border: 2px solid #FFA500; }
+		.densityCluster { border: 2px solid #00FA9A; }
+		.mapAArea { width: 1000px; height: 100%; }
+		.mapA     { width: 1000px; height: 400px; margin: 0px 0px 0px;}
+        //.syncbutton {
+        //    background-color: white;
+        //    width: 30px;
+        //    height: 30px;
+        //    align-items: center;
+        //    justify-content: center;
+		//	position: relative;
+		//	z-index: 999;   
+		//	left:10px;
+		//	top: 460px;
+        //}
+		.MapBetween { width: 10px; height: 100%; float: left; background-color: white; }
+		header {background:white; color:black; height:50px;}
+		//input_year {background: red;color:black; height:50px;}
+		//input_state {background: red;color:black; height:50px;}			
+		//section {background: green; height:820px; }
+		//section {background: white; height:820px; }
+		//footer {background:red; height:820px;}
+		footer {background:white; height:680px;}
+		.info {
+			padding: 6px 8px;
+			font: 14px/16px Arial, Helvetica, sans-serif;
+			background: white;
+			background: rgba(255,255,255,0.8);
+			box-shadow: 0 0 15px rgba(0,0,0,0.2);
+			border-radius: 5px;
+		}
+		.info h4 {
+			margin: 0 0 5px;
+			color: #777;
+		}
+		.infolegend span {
+			//width: 18px;
+			height:15px;
+			float: right;
+			margin-right: 1px;
+			//border-style: solid;
+			//border-width: 1px;
+			opacity: 0.7;
+		}
+		.infolegend i {
+			width: 16px;
+			height:12px;
+			float: right;
+			margin-top: 2px;
+			font-size: x-small;
+			text-align: center;
+			border-color: black;
+			border-style: solid;
+			border-width: 1px;
+			opacity: 0.7;
+		}
+
+		.legend {
+			font-size: x-small;	/***************************************************************************************/		
+			text-align: left;
+			line-height: 12px;  /***************************************************************************************/
+			color: #555;
+		}
+		.legend i {
+			width: 10px;  /***************************************************************************************/
+			height:10px;  /***************************************************************************************/
+			float: left;
+			margin-right: 1px; /***************************************************************************************/
+			opacity: 0.7;
+		}
+		
+		html {
+		font-family: sans-serif;
+		}
+		
+		//form {
+		//width: 280px;
+		//margin: 0 auto;
+		//}
+		
+		//div {
+		//margin-bottom: 10px;
+		//}
+		
+		fieldset {
+		background: white;
+		border: 2px solid grey;
+		}
+		
+		legend {
+			padding: 10px;
+			font-size:medium;
+			background: grey;
+			color: white;
+		}
+
+		.quadbox{
+			//width: 310px;
+			margin: 0 auto;
+		}
+		
+		#input_area_box1 {
+			width: 320px;
+			//height:760px;
+			//background-color:#FFFACD;
+			margin-bottom: 10px;
+			font-size:small;
+			float: left;
+		}
+		#input_area_box2 {
+			width: 320px;
+			//height:760px;
+			//background-color:#F0FFFF;
+			margin-bottom: 10px;
+			font-size:small;
+			float: left;
+		}
+		#input_area_box3 {
+			width: 320px;
+			//height:760px;
+			//background-color:#D8BFD8;
+			margin-bottom: 10px;
+			font-size:small;
+			float: left;
+		}	
+		#input_area_box4 {
+			width: 320px;
+			//height:760px;
+			//background-color:#FFFACD;
+			margin-bottom: 10px;
+			font-size:small;
+			float: left;
+		}
+
+		#ajaxBusy {
+			display: none;
+			margin: 0px 0px 0px -50px; /* left margin is half width of the div, to centre it */
+			padding: 30px 10px 10px 10px;
+			position: absolute;
+			left: 30%;
+			top: 325px;
+			width: 500px;
+			height: 500px;
+			text-align: center;
+			//background-color:#9ACD32;
+			//background: #e8e8e8 url(images/ajax-loader.gif) no-repeat center center;
+			background: url(images/ajax_loader_blue_350.gif) no-repeat center center;
+			border: 0px solid #000;
+		}
+
+		#ajaxBusy2 {
+			display: none;
+			margin: 0px 0px 0px -50px; /* left margin is half width of the div, to centre it */
+			padding: 30px 10px 10px 10px;
+			position: absolute;
+			left: 30%;
+			top: 1225px;
+			width: 500px;
+			height: 500px;
+			text-align: center;
+			//background-color:#9ACD32;
+			//background: #e8e8e8 url(images/ajax-loader.gif) no-repeat center center;
+			background: url(images/ajax_loader_blue_350.gif) no-repeat center center;
+			border: 0px solid #000;
+		}
+		
+		.borderMaps{
+			border-color: blue;
+			border-width: 3px;
+			border-style: solid;
+		}
+		
+		.line_through{
+			text-decoration: line-through;
+			color: grey;
+		}
+		
+		.line_none{
+			text-decoration: none;
+			color: blue;
+		}
+
+		.clearfix:after { contnt:"."; display:block; visibility:hidden; height:0; clear:both; }
+		.clearfix { display: inline-block; }
+		
+		.backLayer {
+			display:none;
+			background-color:black; 
+			position:absolute;
+			left:0px;
+			top:0px;
+			z-index:9000;        // very large number, very very on top
+		}
+		
+		.stackedArea {
+			opacity: 0.7;
+		}

@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+  		<script type="text/javascript" src="../../dist/ss.js"></script>
+			<script type="text/javascript" src="../../dist/Numpy.js"></script>
+			<script type="text/javascript" src="../../dist/PolySolve.js"></script>
+			<script type="text/javascript" src="../../dist/Scipy.js"></script>
+			<script type="text/javascript">
+				function ready() {
+					var ls = numpy.linspace(2.0,3.0,5);
+
+					var response = document.getElementById('response');
+			    response.innerHTML = ls;
+				}
+			</script>
+	</head>
+	<body onload='ready()'>
+		<p>Testing linspace</p>
+		<p>numpy.linspace(2.0, 3.0, 5)</p>
+		<span id='response'></span>
+	</body>
+</html>
