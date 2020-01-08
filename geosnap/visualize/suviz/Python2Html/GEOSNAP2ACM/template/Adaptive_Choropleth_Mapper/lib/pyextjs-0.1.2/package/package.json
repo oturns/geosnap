@@ -1,0 +1,44 @@
+{
+   "name": "pyextjs",
+   "version": "0.1.2",
+   "description": "Python Extension Packages in Javascript (Numpy, Scipy)",
+   "main": "src/PyExtJS.js",
+   "_id": "pyextjs@0.1.2",
+   "keywords": [
+       "numpy",
+       "scipy",
+       "matrix",
+       "linear",
+       "algebra",
+       "science",
+       "numerical"
+   ],
+   "maintainers": [
+       {
+           "name": "Alvaro Fernandez",
+           "email": "fernandezajp@gmail.com",
+           "web": "http://www.alvarofernandez.info"
+       }
+   ],
+   "author": "Alvaro Fernandez",
+   "bugs": {
+       "web": "https://github.com/fernandezajp/PyExtJs/issues"
+   },
+   "licenses": [
+       {
+           "type": "MIT",
+           "url": "https://opensource.org/licenses/MIT"
+       }
+   ],
+   "readmeFilename": "README.md",
+   "repositories": [
+       {
+           "type": "git",
+           "url": "https://github.com/fernandezajp/PyExtJS.git"
+       }
+   ],
+   "dependencies": {
+     "jsdom": ">=9.4.2",
+     "cloneextend": ">=0.0.3"
+   }
+}
