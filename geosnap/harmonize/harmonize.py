@@ -168,11 +168,11 @@ def harmonize(
 
         profiles = []
         if extensive_variables:
-            profile = pd.DataFrame(interpolation[0], columns=extensive_variables)
+            profile = interpolation[extensive_variables]
             profiles.append(profile)
 
         if intensive_variables:
-            profile = pd.DataFrame(interpolation[1], columns=intensive_variables)
+            profile = interpolation[intensive_variables]
             profiles.append(profile)
 
         profile = pd.concat(profiles, sort=True)
