@@ -17,5 +17,5 @@ dash-bootstrap-components
 tqdm
 quilt3
 region>=0.2.1
-pyarrow =0.13
+pyarrow==0.13
 tobler
