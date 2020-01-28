@@ -29,8 +29,6 @@ before_install:
     conda config --set safety_checks disabled
     conda create --name TEST python=$PY --file requirements.txt --file requirements_docs.txt --file requirements_tests.txt
     source activate TEST
-    pip install -U https://github.com/pysal/tobler/archive/master.zip 
-    pip install -U https://github.com/pysal/region/archive/master.zip 
     conda info --all
 install:
   - pip install -e . --no-deps --force-reinstall
