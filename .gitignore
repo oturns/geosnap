@@ -17,3 +17,6 @@ snap/tests/.ipynb_checkpoints/
 **/.jupyter
 **/.ipython
 **/.local
+**/.vscode
+**/build/
+**/dist/
