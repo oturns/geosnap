@@ -1,18 +1,31 @@
 language: minimal
-
-sudo: false
 os:
   - linux
   - osx
   - windows
 
+sudo: false
 matrix:
   fast_finish: true
   include:
-    - name: "python-3.6"
+    - name: "linux-python-3.6"
       env: PY=3.6
-    - name: "python-3.7"
+      os: "linux"
+    - name: "linux-python-3.7"
       env: PY=3.7
+      os: "linux"
+    - name: "osx-python-3.6"
+      env: PY=3.6
+      os: "osx"
+    - name: "osx-python-3.7"
+      env: PY=3.7
+      os: "osx"
+    - name: "win-python-3.6"
+      env: PY=3.6
+      os: "windows"
+    - name: "win-python-3.7"
+      env: PY=3.7
+      os: "windows"
     - name: "tarball"
       env: PY=3.7
 
