@@ -58,8 +58,6 @@ def setup_package():
         license="BSD",
         py_modules=["geosnap"],
         packages=find_packages(),
-        setup_requires=["pytest-runner"],
-        tests_require=["pytest"],
         keywords=["spatial statistics", "neighborhoods", "demography"],
         classifiers=[
             "Development Status :: 3 - Alpha",
@@ -77,7 +75,6 @@ def setup_package():
         ],
         install_requires=install_reqs,
         extras_require=extras_reqs,
-        cmdclass={"build_py": build_py},
         include_package_data=True,
         package_data={"geosnap": ["io/variables.csv", "io/stfipstable.csv", "io/lodes.csv"]},
         python_requires=">3.5",
