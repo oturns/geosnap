@@ -29,18 +29,18 @@ matrix:
 before_install:
   # Install miniconda and create TEST env.
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-      wget https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh
-      bash miniconda.sh -b -p $HOME/miniconda
-      export PATH="$HOME/miniconda/bin:$PATH"
+      wget https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh;
+      bash miniconda.sh -b -p $HOME/miniconda;
+      export PATH="$HOME/miniconda/bin:$PATH";
     fi
   - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
-      wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-      bash miniconda.sh -b -p $HOME/miniconda
-      export PATH="$HOME/miniconda/bin:$PATH"
+      wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+      bash miniconda.sh -b -p $HOME/miniconda;
+      export PATH="$HOME/miniconda/bin:$PATH";
     fi
   - if [[ $TRAVIS_OS_NAME == 'windows' ]]; then
-      choco install wget
-      choco install anaconda3 --params '"/AddToPath
+      choco install wget;
+      choco install anaconda3 --params '"/AddToPath;
     fi
   - |
     wget -q $LTDB_SAMPLE -O ltdb_sample.zip
