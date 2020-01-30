@@ -8,22 +8,22 @@ sudo: false
 matrix:
   fast_finish: true
   include:
-    - name: "linux-python-3.6"
+    - name: "python-3.6-linux"
       env: PY=3.6
       os: "linux"
-    - name: "linux-python-3.7"
+    - name: "python-3.7-linux"
       env: PY=3.7
       os: "linux"
-    - name: "osx-python-3.6"
+    - name: "python-3.6-osx"
       env: PY=3.6
       os: "osx"
-    - name: "osx-python-3.7"
+    - name: "python-3.7-osx"
       env: PY=3.7
       os: "osx"
-    - name: "win-python-3.6"
+    - name: "python-3.6-win"
       env: PY=3.6
       os: "windows"
-    - name: "win-python-3.7"
+    - name: "python-3.7-win"
       env: PY=3.7
       os: "windows"
     - name: "tarball"
