@@ -18,16 +18,28 @@ matrix:
     - name: "python-3.6-win"
       env: PY=3.6
       os: "windows"
+      sudo: true
     - name: "python-3.7-win"
       env: PY=3.7
       os: "windows"
+      sudo: true
     - name: "tarball"
       env: PY=3.7
 
 before_install:
   # Install miniconda and create TEST env.
+  - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+      wget https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh
+    fi
+  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
+      wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+    fi
+  - if [[ $TRAVIS_OS_NAME == 'windows' ]]; then
+      choco install wget
+      wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe -O miniconda.sh
+      start /wait "" Miniconda3-latest-Windows-x86_64.exe /InstallationType=JustMe /RegisterPython=0 /S /D=%UserProfile%\Miniconda3`
+    fi
   - |
-    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
     wget -q $LTDB_SAMPLE -O ltdb_sample.zip
     wget -q $LTDB_FULLCOUNT -O ltdb_full.zip
     wget -q $NCDB -O ncdb.csv
