@@ -41,7 +41,7 @@ def explore(data="census"):
     external_stylesheets = [dbc.themes.JOURNAL]
 
     opts = []
-    for colname in datasets.codebook.variable:
+    for colname in datasets.codebook().variable:
         val = colname
         if colname.startswith("n_"):
             colname = colname[1:]
