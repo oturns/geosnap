@@ -58,8 +58,6 @@ def setup_package():
         license="BSD",
         py_modules=["geosnap"],
         packages=find_packages(),
-        setup_requires=["pytest-runner"],
-        tests_require=["pytest"],
         keywords=["spatial statistics", "neighborhoods", "demography"],
         classifiers=[
             "Development Status :: 3 - Alpha",
