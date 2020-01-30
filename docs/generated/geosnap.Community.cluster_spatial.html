@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>geosnap.Community.cluster_spatial &#8212; geosnap v0.0.2 Manual</title>
+    <title>geosnap.Community.cluster_spatial &#8212; geosnap v0.1.0 Manual</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/pysal-styles.css" />
@@ -39,7 +39,7 @@
         </button>
         <a class="navbar-brand" href="../index.html"><span><img src="../_static/geosnap.svg"></span>
           geosnap</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -129,7 +129,7 @@
 <dd class="field-odd"><dl>
 <dt><strong>n_clusters</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, required</span></dt><dd><p>the number of clusters to model. The default is 6).</p>
 </dd>
-<dt><strong>spatial_weights</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a> (‘queen’ or ‘rook’) or <a class="reference external" href="https://pysal.org/libpysal/generated/libpysal.weights.W.html#libpysal.weights.W" title="(in libpysal v4.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">libpysal.weights.W</span></code></a> instance, optional</span></dt><dd><p>spatial weights matrix specification` (the default is “rook”). If ‘rook’ or ‘queen’
+<dt><strong>spatial_weights</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a> (‘queen’ or ‘rook’) or <a class="reference external" href="https://pysal.org/libpysal/generated/libpysal.weights.W.html#libpysal.weights.W" title="(in libpysal v4.2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">libpysal.weights.W</span></code></a> instance, optional</span></dt><dd><p>spatial weights matrix specification` (the default is “rook”). If ‘rook’ or ‘queen’
 then contiguity weights will be constructed internally, otherwise pass a
 libpysal.weights.W with additional arguments specified in weights_kwargs</p>
 </dd>
