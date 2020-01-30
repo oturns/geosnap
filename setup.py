@@ -6,7 +6,7 @@ from distutils.command.build_py import build_py
 
 import os
 
-with open("README.md") as file:
+with open("README.md", encoding="utf8") as file:
     long_description = file.read()
 
 # Get __version__ from libpysal/__init__.py without importing the package
