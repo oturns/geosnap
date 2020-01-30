@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>geosnap.harmonize.harmonize &#8212; geosnap v0.0.2 Manual</title>
+    <title>geosnap.harmonize.harmonize &#8212; geosnap v0.1.0 Manual</title>
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/pysal-styles.css" />
@@ -37,7 +37,7 @@
         </button>
         <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/geosnap.svg"></span>
           geosnap</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -284,11 +284,11 @@
 
         <span class="n">profiles</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">extensive_variables</span><span class="p">:</span>
-            <span class="n">profile</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">interpolation</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="n">extensive_variables</span><span class="p">)</span>
+            <span class="n">profile</span> <span class="o">=</span> <span class="n">interpolation</span><span class="p">[</span><span class="n">extensive_variables</span><span class="p">]</span>
             <span class="n">profiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">profile</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">intensive_variables</span><span class="p">:</span>
-            <span class="n">profile</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">interpolation</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="n">intensive_variables</span><span class="p">)</span>
+            <span class="n">profile</span> <span class="o">=</span> <span class="n">interpolation</span><span class="p">[</span><span class="n">intensive_variables</span><span class="p">]</span>
             <span class="n">profiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">profile</span><span class="p">)</span>
 
         <span class="n">profile</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">profiles</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>

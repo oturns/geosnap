@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>geosnap._community &#8212; geosnap v0.0.2 Manual</title>
+    <title>geosnap._community &#8212; geosnap v0.1.0 Manual</title>
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/pysal-styles.css" />
@@ -37,7 +37,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html"><span><img src="../../_static/geosnap.svg"></span>
           geosnap</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -257,8 +257,8 @@
         <span class="n">best_model</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">scaler</span><span class="o">=</span><span class="s1">&#39;std&#39;</span><span class="p">,</span>
-        <span class="n">pooling</span><span class="o">=</span><span class="s1">&#39;fixed&#39;</span><span class="p">,</span>
+        <span class="n">scaler</span><span class="o">=</span><span class="s2">&quot;std&quot;</span><span class="p">,</span>
+        <span class="n">pooling</span><span class="o">=</span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create a geodemographic typology by running a cluster analysis on the study area&#39;s neighborhood attributes.</span>
@@ -856,16 +856,23 @@
         <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">year</span> <span class="o">&lt;</span> <span class="mi">2010</span> <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">years</span><span class="p">):</span>
             <span class="n">gdf00</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">blocks_2000</span><span class="p">(</span><span class="n">states</span><span class="o">=</span><span class="n">states</span><span class="p">,</span> <span class="n">fips</span><span class="o">=</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">allfips</span><span class="p">)))</span>
             <span class="n">gdf00</span> <span class="o">=</span> <span class="n">gdf00</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">])</span>
+            <span class="n">gdf00</span> <span class="o">=</span> <span class="n">_fips_filter</span><span class="p">(</span>
+                <span class="n">state_fips</span><span class="o">=</span><span class="n">state_fips</span><span class="p">,</span>
+                <span class="n">county_fips</span><span class="o">=</span><span class="n">county_fips</span><span class="p">,</span>
+                <span class="n">msa_fips</span><span class="o">=</span><span class="n">msa_fips</span><span class="p">,</span>
+                <span class="n">fips</span><span class="o">=</span><span class="n">fips</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">gdf00</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">boundary</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">boundary</span><span class="o">.</span><span class="n">crs</span> <span class="o">!=</span> <span class="n">gdf00</span><span class="o">.</span><span class="n">crs</span><span class="p">:</span>
+                    <span class="n">warn</span><span class="p">(</span>
+                        <span class="s2">&quot;Unable to determine whether boundary CRS is WGS84 &quot;</span>
+                        <span class="s2">&quot;if this produces unexpected results, try reprojecting&quot;</span>
+                    <span class="p">)</span>
+                <span class="n">gdf00</span> <span class="o">=</span> <span class="n">gdf00</span><span class="p">[</span><span class="n">gdf00</span><span class="o">.</span><span class="n">representative_point</span><span class="p">()</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">boundary</span><span class="o">.</span><span class="n">unary_union</span><span class="p">)]</span>
+
         <span class="n">gdf</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">blocks_2010</span><span class="p">(</span><span class="n">states</span><span class="o">=</span><span class="n">states</span><span class="p">,</span> <span class="n">fips</span><span class="o">=</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">allfips</span><span class="p">)))</span>
         <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">])</span>
-
-        <span class="c1"># grab state abbreviations</span>
-        <span class="n">names</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">_fipstable</span><span class="p">[</span><span class="n">_fipstable</span><span class="p">[</span><span class="s2">&quot;FIPS Code&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">states</span><span class="p">)][</span><span class="s2">&quot;State Abbreviation&quot;</span><span class="p">]</span>
-            <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-            <span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-        <span class="p">)</span>
-
         <span class="n">gdf</span> <span class="o">=</span> <span class="n">_fips_filter</span><span class="p">(</span>
             <span class="n">state_fips</span><span class="o">=</span><span class="n">state_fips</span><span class="p">,</span>
             <span class="n">county_fips</span><span class="o">=</span><span class="n">county_fips</span><span class="p">,</span>
@@ -873,20 +880,6 @@
             <span class="n">fips</span><span class="o">=</span><span class="n">fips</span><span class="p">,</span>
             <span class="n">data</span><span class="o">=</span><span class="n">gdf</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">names</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">years</span><span class="p">:</span>
-                <span class="n">df</span> <span class="o">=</span> <span class="n">get_lehd</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">year</span><span class="o">=</span><span class="n">year</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">year</span> <span class="o">&lt;</span> <span class="mi">2010</span><span class="p">:</span>
-                    <span class="n">df</span> <span class="o">=</span> <span class="n">gdf00</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">df</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
-                <span class="n">df</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">year</span>
-                <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-        <span class="n">gdf</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">)</span>
-
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">boundary</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">boundary</span><span class="o">.</span><span class="n">crs</span> <span class="o">!=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">crs</span><span class="p">:</span>
                 <span class="n">warn</span><span class="p">(</span>
@@ -895,7 +888,35 @@
                 <span class="p">)</span>
             <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="p">[</span><span class="n">gdf</span><span class="o">.</span><span class="n">representative_point</span><span class="p">()</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">boundary</span><span class="o">.</span><span class="n">unary_union</span><span class="p">)]</span>
 
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">gdf</span><span class="o">=</span><span class="n">gdf</span><span class="p">,</span> <span class="n">harmonized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+        <span class="c1"># grab state abbreviations</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">_fipstable</span><span class="p">[</span><span class="n">_fipstable</span><span class="p">[</span><span class="s2">&quot;FIPS Code&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">states</span><span class="p">)][</span><span class="s2">&quot;State Abbreviation&quot;</span><span class="p">]</span>
+            <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">names</span><span class="p">]</span>
+
+        <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">years</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">get_lehd</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">year</span><span class="o">=</span><span class="n">year</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+                    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">year</span>
+                    <span class="k">if</span> <span class="n">year</span> <span class="o">&lt;</span> <span class="mi">2010</span><span class="p">:</span>
+                        <span class="n">df</span> <span class="o">=</span> <span class="n">gdf00</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;inner&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">df</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;inner&quot;</span><span class="p">)</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span> <span class="s2">&quot;year&quot;</span><span class="p">])</span>
+                    <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;{name.upper()} </span><span class="si">{year}</span><span class="s2"> not found!&quot;</span><span class="p">)</span>
+                    <span class="k">pass</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="o">~</span><span class="n">out</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">duplicated</span><span class="p">(</span><span class="n">keep</span><span class="o">=</span><span class="s2">&quot;first&quot;</span><span class="p">)]</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">gdf</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="n">harmonized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Community.from_geodataframes"><a class="viewcode-back" href="../../generated/geosnap.Community.from_geodataframes.html#geosnap.Community.from_geodataframes">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_geodataframes</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">gdfs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>

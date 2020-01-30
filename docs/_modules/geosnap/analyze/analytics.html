@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>geosnap.analyze.analytics &#8212; geosnap v0.0.2 Manual</title>
+    <title>geosnap.analyze.analytics &#8212; geosnap v0.1.0 Manual</title>
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/pysal-styles.css" />
@@ -37,7 +37,7 @@
         </button>
         <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/geosnap.svg"></span>
           geosnap</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -268,6 +268,7 @@
             <span class="p">{</span><span class="n">model_name</span><span class="p">:</span> <span class="n">labels</span><span class="p">,</span> <span class="n">time_var</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="n">time_var</span><span class="p">],</span> <span class="n">id_var</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="n">id_var</span><span class="p">]}</span>
         <span class="p">)</span>
         <span class="n">clusters</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">time_var</span><span class="p">,</span> <span class="n">id_var</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">clusters</span> <span class="o">=</span> <span class="n">clusters</span><span class="p">[</span><span class="o">~</span><span class="n">clusters</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">duplicated</span><span class="p">(</span><span class="n">keep</span><span class="o">=</span><span class="s1">&#39;first&#39;</span><span class="p">)]</span>
         <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
         <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
         <span class="n">results</span> <span class="o">=</span> <span class="n">ModelResults</span><span class="p">(</span>

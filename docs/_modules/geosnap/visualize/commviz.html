@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>geosnap.visualize.commviz &#8212; geosnap v0.0.2 Manual</title>
+    <title>geosnap.visualize.commviz &#8212; geosnap v0.1.0 Manual</title>
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/pysal-styles.css" />
@@ -37,7 +37,7 @@
         </button>
         <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/geosnap.svg"></span>
           geosnap</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -157,7 +157,7 @@
     <span class="n">external_stylesheets</span> <span class="o">=</span> <span class="p">[</span><span class="n">dbc</span><span class="o">.</span><span class="n">themes</span><span class="o">.</span><span class="n">JOURNAL</span><span class="p">]</span>
 
     <span class="n">opts</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">colname</span> <span class="ow">in</span> <span class="n">datasets</span><span class="o">.</span><span class="n">codebook</span><span class="o">.</span><span class="n">variable</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">colname</span> <span class="ow">in</span> <span class="n">datasets</span><span class="o">.</span><span class="n">codebook</span><span class="p">()</span><span class="o">.</span><span class="n">variable</span><span class="p">:</span>
         <span class="n">val</span> <span class="o">=</span> <span class="n">colname</span>
         <span class="k">if</span> <span class="n">colname</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;n_&quot;</span><span class="p">):</span>
             <span class="n">colname</span> <span class="o">=</span> <span class="n">colname</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>

@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>geosnap._data &#8212; geosnap v0.0.2 Manual</title>
+    <title>geosnap._data &#8212; geosnap v0.1.0 Manual</title>
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/pysal-styles.css" />
@@ -37,7 +37,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html"><span><img src="../../_static/geosnap.svg"></span>
           geosnap</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -323,7 +323,6 @@
         <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">states</span><span class="p">:</span>
             <span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">=</span> <span class="n">blocks_2000</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{state}</span><span class="s2">.parquet&quot;</span><span class="p">]()</span>
             <span class="k">if</span> <span class="n">fips</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="n">fips</span><span class="p">)</span>
                 <span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">=</span> <span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">][</span><span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">][</span><span class="s2">&quot;geoid&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">fips</span><span class="p">)]</span>
             <span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">][</span><span class="s2">&quot;year&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2000</span>
         <span class="n">blocks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">blks</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
