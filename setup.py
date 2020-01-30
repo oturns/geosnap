@@ -75,7 +75,6 @@ def setup_package():
         ],
         install_requires=install_reqs,
         extras_require=extras_reqs,
-        cmdclass={"build_py": build_py},
         include_package_data=True,
         package_data={"geosnap": ["io/variables.csv", "io/stfipstable.csv", "io/lodes.csv"]},
         python_requires=">3.5",
