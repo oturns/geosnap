@@ -18,11 +18,9 @@ matrix:
     - name: "python-3.6-win"
       env: PY=3.6
       os: "windows"
-      sudo: true
     - name: "python-3.7-win"
       env: PY=3.7
       os: "windows"
-      sudo: true
     - name: "tarball"
       env: PY=3.7
 
@@ -40,7 +38,7 @@ before_install:
     fi
   - if [[ $TRAVIS_OS_NAME == 'windows' ]]; then
       choco install wget;
-      choco install anaconda3 --params '"/AddToPath;
+      choco install miniconda3 --params="'/AddToPath:1'";
     fi
   - |
     wget -q $LTDB_SAMPLE -O ltdb_sample.zip
