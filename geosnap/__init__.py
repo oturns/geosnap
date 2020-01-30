@@ -1,3 +1,5 @@
+__version__ = "0.1.0"
+
 r"""
 
 geosnap: Geospatial Neighborhood Analysis Package.
@@ -21,7 +23,6 @@ io
     ingest, store, and manipulate spatiotemporal neighborhood data
 
 """
-__version__ = "0.0.2"
 
 # __version__ has to be define in the first line
 

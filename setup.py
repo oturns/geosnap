@@ -9,11 +9,11 @@ import os
 with open("README.md") as file:
     long_description = file.read()
 
-MAJOR = 0
-MINOR = 1
-MICRO = 0
-ISRELEASED = False
-VERSION = "%d.%d.%d" % (MAJOR, MINOR, MICRO)
+# Get __version__ from libpysal/__init__.py without importing the package
+# __version__ has to be defined in the first line
+with open('geosnap/__init__.py', 'r') as f:
+    exec(f.readline())
+
 
 # BEFORE importing distutils, remove MANIFEST. distutils doesn't properly
 # update it when the contents of directories change.
@@ -47,7 +47,7 @@ def setup_package():
 
     setup(
         name="geosnap",
-        version=VERSION,
+        version=__version__,
         description="Geospatial Neighborhood Analysis Package",
         long_description=long_description,
         long_description_content_type="text/markdown",
