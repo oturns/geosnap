@@ -19,7 +19,7 @@ because of some long-standing challenges, including that
 
 - there is no formal definition of a
   [“neighborhood”](https://www.cnu.org/publicsquare/2019/01/29/once-and-future-neighborhood) so
-  identifying and modeling them is frought with uncertainty
+  identifying and modeling them is fraught with uncertainty
 - many different physical and social data can characterize a neighborhood (e.g. its
   proximity to the urban core, its share of residents with a high school education, or the
   median price of its apartments) so there are countless ways to model neighborhoods by
@@ -45,6 +45,21 @@ works with any data you provide, any place in the world.
 <p align="center">
 <img width=75% src='docs/figs/Washington-Arlington-Alexandria_DC-VA-MD-WV.gif' alt='DC Transitions' style=' display: block; margin-left: auto; margin-right: auto;'/>
 </p>
+
+## Installation
+
+The recommended method for installing geosnap is with
+[anaconda](https://www.anaconda.com/download/). 
+
+```bash
+conda install -c conda-forge geosnap
+```
+
+`geosnap` is alaso available on PyPI and can be install with pip via
+
+```bash
+pip install geosnap
+```
 
 ## User Guide 
 See the [User Guide](https://spatialucr.github.io/geosnap-guide/) for a
@@ -274,11 +289,11 @@ By default, the dashboard will launch with built-in census data, but if you've s
 
 Many more visualization features coming soon
 
+## Development
 
-## Installation
+geosnap development is hosted on [github](https://github.com/spatialucr/geosnap)
 
-The recommended method for installing geosnap is with
-[anaconda](https://www.anaconda.com/download/). To get started with the development version,
+To get started with the development version,
 clone this repository or download it manually then `cd` into the directory and run the
 following commands:
 
@@ -287,13 +302,7 @@ conda env create -f environment.yml
 conda activate geosnap 
 python setup.py develop
 ```
-
-This will download the appropriate dependencies and install geosnap in its own conda
-environment.
-
-## Development
-
-geosnap development is hosted on [github](https://github.com/spatialucr/geosnap)
+This will download the appropriate dependencies and install geosnap in its own conda environment.
 
 ## Bug reports
 
