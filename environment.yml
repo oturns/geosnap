@@ -12,7 +12,7 @@ dependencies:
   - matplotlib
   - scikit-learn
   - seaborn
-  - pyarrow =0.13
+  - pyarrow >=0.14.1
   - appdirs
   - dash
   - dash-bootstrap-components
