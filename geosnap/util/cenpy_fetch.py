@@ -61,7 +61,7 @@ def fetch_acs(
                 if (
                     output_dir
                     and skip_existing
-                    and os.path.exists(output_dir + f"{fname}.parquet")
+                    and os.path.exists(output_dir + f"/{fname}.parquet")
                 ):
                     pass
                 else:
@@ -71,7 +71,7 @@ def fetch_acs(
                         )
                         dfs.append(df)
                         if output_dir:
-                            df.to_parquet(f"{fname}.parquet")
+                            df.to_parquet(f"{output_dir}/{fname}.parquet")
                     except:
                         tqdm.write("{state} failed".format(state=state))
                 pbar.update(1)
