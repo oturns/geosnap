@@ -3,12 +3,15 @@
 import pandas
 import sys
 from tqdm.auto import tqdm
-
+import os
 
 from .._data import datasets
 from cenpy import products
 
-def fetch_acs(level="tract", state="all", year=2017, output_dir=None):
+
+def fetch_acs(
+    level="tract", state="all", year=2017, output_dir=None, skip_existing=True
+):
     """Collect the variables defined in `geosnap.datasets.codebook` from the Census API.
 
     Parameters
@@ -26,6 +29,8 @@ def fetch_acs(level="tract", state="all", year=2017, output_dir=None):
         Directory that intermediate parquet files will be written to. This is useful
         if the data request is large and the connection to the Census API fails while
         building the entire query.
+    skip_existing : bool
+        If caching files to disk, whether to overwrite existing files or skip them
 
     Returns
     -------
@@ -43,9 +48,7 @@ def fetch_acs(level="tract", state="all", year=2017, output_dir=None):
 
     acsvars = process_columns(_variables["acs"].dropna())
 
-    evalcols = [
-        normalize_relation(rel) for rel in _variables["acs"].dropna().tolist()
-    ]
+    evalcols = [normalize_relation(rel) for rel in _variables["acs"].dropna().tolist()]
 
     varnames = _variables.dropna(subset=["acs"])["variable"]
     evals = [parts[0] + "=" + parts[1] for parts in zip(varnames, evalcols)]
@@ -54,16 +57,23 @@ def fetch_acs(level="tract", state="all", year=2017, output_dir=None):
         dfs = []
         with tqdm(total=len(states), file=sys.stdout) as pbar:
             for state in states.sort_values(by="name").name.tolist():
-                try:
-                    df = products.ACS(year).from_state(
-                        state, level=level, variables=acsvars.copy()
-                    )
-                    dfs.append(df)
-                    if output_dir:
-                        name = state.name.replace(" ", "_")
-                        df.to_parquet(f"{name}.parquet")
-                except:
-                    tqdm.write("{state} failed".format(state=state))
+                fname = state.name.replace(" ", "_")
+                if (
+                    output_dir
+                    and skip_existing
+                    and os.path.exists(output_dir + f"{fname}.parquet")
+                ):
+                    pass
+                else:
+                    try:
+                        df = products.ACS(year).from_state(
+                            state, level=level, variables=acsvars.copy()
+                        )
+                        dfs.append(df)
+                        if output_dir:
+                            df.to_parquet(f"{fname}.parquet")
+                    except:
+                        tqdm.write("{state} failed".format(state=state))
                 pbar.update(1)
         df = pandas.concat(dfs)
     else:
@@ -87,6 +97,7 @@ def fetch_acs(level="tract", state="all", year=2017, output_dir=None):
     keeps = [col for col in df.columns if col in _variables.variable.tolist()]
     df = df[keeps]
     return df
+
 
 def process_columns(input_columns):
     # prepare by taking all sum-of-columns as lists
@@ -113,6 +124,7 @@ def process_columns(input_columns):
         else:
             outcols.append(col)
     return outcols
+
 
 def normalize_relation(relation):
     parts = relation.split("+")
