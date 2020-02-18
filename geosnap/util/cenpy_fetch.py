@@ -8,7 +8,7 @@ from tqdm.auto import tqdm
 from .._data import datasets
 from cenpy import products
 
-def fetch_acs(level="tract", state="all", year=2017):
+def fetch_acs(level="tract", state="all", year=2017, output_dir=None):
     """Collect the variables defined in `geosnap.datasets.codebook` from the Census API.
 
     Parameters
@@ -22,6 +22,10 @@ def fetch_acs(level="tract", state="all", year=2017):
         a combined dataframe.
     year : int
         ACS release year to query (the default is 2017).
+    output_dir : str
+        Directory that intermediate parquet files will be written to. This is useful
+        if the data request is large and the connection to the Census API fails while
+        building the entire query.
 
     Returns
     -------
@@ -55,6 +59,9 @@ def fetch_acs(level="tract", state="all", year=2017):
                         state, level=level, variables=acsvars.copy()
                     )
                     dfs.append(df)
+                    if output_dir:
+                        name = state.name.replace(" ", "_")
+                        df.to_parquet(f"{name}.parquet")
                 except:
                     tqdm.write("{state} failed".format(state=state))
                 pbar.update(1)
