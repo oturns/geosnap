@@ -192,4 +192,4 @@ p_poverty_rate_black,percentage of blacks in poverty,p_poverty_rate_black=n_pove
 p_poverty_rate_hispanic,percentage of Hispanics in poverty,p_poverty_rate_hispanic=n_poverty_hispanic / n_poverty_determined_persons*100,phpov,,,,,,,Socioeconomic Status,
 p_poverty_rate_native,percentage of Native Americans in poverty,p_poverty_rate_native=n_poverty_native / n_poverty_determined_persons*100,pnapov,,,,,,,Socioeconomic Status,
 p_poverty_rate_asian,percentage of Asian and Pacific Islanders in poverty,p_poverty_rate_asian=n_poverty_asian / n_poverty_determined_persons*100,papov,RASPR,,,,,,Socioeconomic Status,
-n_total_pop,total population,,pop,TRCTPOP,SF1,P0010001,SF1,P001001,B00001_001E,total population,
+n_total_pop,total population,,pop,TRCTPOP,SF1,P0010001,SF1,P001001,B01003_001E,total population,

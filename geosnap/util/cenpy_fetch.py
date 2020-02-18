@@ -45,8 +45,7 @@ def fetch_acs(
     >>> dc = fetch_acs('District of Columbia', year=2015)
 
     """
-    if output_dir:
-        output_dir = Path(output_dir)
+
     states = datasets.states()
 
     _variables = datasets.codebook().copy()
@@ -63,10 +62,11 @@ def fetch_acs(
         with tqdm(total=len(states), file=sys.stdout) as pbar:
             for state in states.sort_values(by="name").name.tolist():
                 fname = state.replace(" ", "_")
+                pth = Path(output_dir, f"{fname}.parquet")
                 if (
                     output_dir
                     and skip_existing
-                    and output_dir.joinpath(f"{fname}.parquet").exists()
+                    and pth.exists()
                 ):
                     pass
                 else:
@@ -76,7 +76,7 @@ def fetch_acs(
                         )
                         dfs.append(df)
                         if output_dir:
-                            df.to_parquet(output_dir.joinpath(f"{fname}.parquet"))
+                            df.to_parquet(pth)
                     except:
                         tqdm.write("{state} failed".format(state=state))
                 pbar.update(1)
