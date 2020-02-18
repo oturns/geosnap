@@ -7,10 +7,11 @@ import os
 
 from .._data import datasets
 from cenpy import products
-
+from cenpy import set_sitekey
+from pathlib import Path
 
 def fetch_acs(
-    level="tract", state="all", year=2017, output_dir=None, skip_existing=True
+    level="tract", state="all", year=2017, output_dir=None, skip_existing=True, return_geometry=False
 ):
     """Collect the variables defined in `geosnap.datasets.codebook` from the Census API.
 
@@ -31,6 +32,8 @@ def fetch_acs(
         building the entire query.
     skip_existing : bool
         If caching files to disk, whether to overwrite existing files or skip them
+    return_geometry : bool
+        whether to return geometry data from the Census API
 
     Returns
     -------
@@ -42,6 +45,8 @@ def fetch_acs(
     >>> dc = fetch_acs('District of Columbia', year=2015)
 
     """
+    if output_dir:
+        output_dir = Path(output_dir)
     states = datasets.states()
 
     _variables = datasets.codebook().copy()
@@ -61,24 +66,24 @@ def fetch_acs(
                 if (
                     output_dir
                     and skip_existing
-                    and os.path.exists(output_dir + f"/{fname}.parquet")
+                    and output_dir.joinpath(f"{fname}.parquet").exists()
                 ):
                     pass
                 else:
                     try:
                         df = products.ACS(year).from_state(
-                            state, level=level, variables=acsvars.copy()
+                            state, level=level, variables=acsvars.copy(), return_geometry=return_geometry
                         )
                         dfs.append(df)
                         if output_dir:
-                            df.to_parquet(f"{output_dir}/{fname}.parquet")
+                            df.to_parquet(output_dir.joinpath(f"{fname}.parquet"))
                     except:
                         tqdm.write("{state} failed".format(state=state))
                 pbar.update(1)
         df = pandas.concat(dfs)
     else:
         df = products.ACS(year).from_state(
-            name=state, level=level, variables=acsvars.copy()
+            name=state, level=level, variables=acsvars.copy(), return_geometry=return_geometry
         )
 
     df.set_index("GEOID", inplace=True)
