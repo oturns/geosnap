@@ -57,7 +57,7 @@ def fetch_acs(
         dfs = []
         with tqdm(total=len(states), file=sys.stdout) as pbar:
             for state in states.sort_values(by="name").name.tolist():
-                fname = state.name.replace(" ", "_")
+                fname = state.replace(" ", "_")
                 if (
                     output_dir
                     and skip_existing
