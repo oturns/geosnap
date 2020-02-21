@@ -5,7 +5,6 @@ import sys
 from tqdm.auto import tqdm
 import os
 
-from .._data import datasets
 from cenpy import products
 from cenpy import set_sitekey
 from pathlib import Path
@@ -45,6 +44,7 @@ def fetch_acs(
     >>> dc = fetch_acs('District of Columbia', year=2015)
 
     """
+    from .._data import datasets
 
     states = datasets.states()
 
