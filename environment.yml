@@ -12,14 +12,14 @@ dependencies:
   - matplotlib
   - scikit-learn
   - seaborn
-  - pyarrow =0.13
+  - pyarrow >=0.14.1
   - appdirs
   - dash
   - dash-bootstrap-components
   - palettable
   - pip
   - tqdm
-  - quilt3
+  - quilt3 ==3.1.8
   - xlrd
   - region >=0.2.0
   - tobler
