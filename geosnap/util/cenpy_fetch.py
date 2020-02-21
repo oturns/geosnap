@@ -50,9 +50,9 @@ def fetch_acs(
 
     _variables = datasets.codebook().copy()
 
-    acsvars = process_columns(_variables["acs"].dropna())
+    acsvars = _process_columns(_variables["acs"].dropna())
 
-    evalcols = [normalize_relation(rel) for rel in _variables["acs"].dropna().tolist()]
+    evalcols = [_normalize_relation(rel) for rel in _variables["acs"].dropna().tolist()]
 
     varnames = _variables.dropna(subset=["acs"])["variable"]
     evals = [parts[0] + "=" + parts[1] for parts in zip(varnames, evalcols)]
@@ -104,7 +104,7 @@ def fetch_acs(
     return df
 
 
-def process_columns(input_columns):
+def _process_columns(input_columns):
     # prepare by taking all sum-of-columns as lists
     outcols_processing = [s.replace("+", ",") for s in input_columns]
     outcols = []
@@ -131,7 +131,7 @@ def process_columns(input_columns):
     return outcols
 
 
-def normalize_relation(relation):
+def _normalize_relation(relation):
     parts = relation.split("+")
     if len(parts) == 1:
         if ":" not in relation:
