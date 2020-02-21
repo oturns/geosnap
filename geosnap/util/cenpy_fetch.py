@@ -139,7 +139,7 @@ def _normalize_relation(relation):
         else:
             relation = parts[0]
     else:
-        relation = "+".join([normalize_relation(rel.strip()) for rel in parts])
+        relation = "+".join([_normalize_relation(rel.strip()) for rel in parts])
     if ":" in relation:
         start, stop = relation.split(":")
         stem = start[:-3]
