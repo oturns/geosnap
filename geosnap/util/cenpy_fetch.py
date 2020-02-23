@@ -64,9 +64,9 @@ def fetch_acs(
             for state in states.sort_values(by="name").name.tolist():
                 fname = state.replace(" ", "_")
                 pth = Path(output_dir, f"{fname}.parquet")
-                if not(
-                    skip_existing
-                    and pth.exists()
+                if (
+                    not skip_existing and 
+                    not pth.exists()
                 ):
                     try:
                         df = products.ACS(year).from_state(
@@ -77,8 +77,8 @@ def fetch_acs(
                             df.to_parquet(pth)
                     except:
                         tqdm.write("{state} failed".format(state=state))
-                    else:
-                        print(f"skipping {fname}")
+                else:
+                    print(f"skipping {fname}")
                 pbar.update(1)
         df = pandas.concat(dfs)
     else:
