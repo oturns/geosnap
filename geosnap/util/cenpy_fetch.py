@@ -65,9 +65,13 @@ def fetch_acs(
                 fname = state.replace(" ", "_")
                 pth = Path(output_dir, f"{fname}.parquet")
                 if (
-                    not skip_existing and 
-                    not pth.exists()
+                    skip_existing and
+                    pth.exists()
                 ):
+                    print(f"skipping {fname}")
+                    pass
+
+                else:
                     try:
                         df = products.ACS(year).from_state(
                             state, level=level, variables=acsvars.copy(), return_geometry=return_geometry
@@ -77,8 +81,7 @@ def fetch_acs(
                             df.to_parquet(pth)
                     except:
                         tqdm.write("{state} failed".format(state=state))
-                else:
-                    print(f"skipping {fname}")
+
                 pbar.update(1)
         df = pandas.concat(dfs)
     else:
