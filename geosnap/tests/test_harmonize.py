@@ -1,5 +1,6 @@
 from numpy.testing import assert_allclose
-
+import os
+import quilt3
 from geosnap import Community
 
 local_raster = os.path.join(os.getcwd(), "nlcd_2011.tif")    # portability
