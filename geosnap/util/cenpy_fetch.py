@@ -9,6 +9,7 @@ from cenpy import products
 from cenpy import set_sitekey
 from pathlib import Path
 
+
 def fetch_acs(
     level="tract", state="all", year=2017, output_dir=None, skip_existing=True, return_geometry=False
 ):
@@ -63,13 +64,11 @@ def fetch_acs(
             for state in states.sort_values(by="name").name.tolist():
                 fname = state.replace(" ", "_")
                 pth = Path(output_dir, f"{fname}.parquet")
-                if (
+                if not(
                     output_dir
                     and skip_existing
                     and pth.exists()
                 ):
-                    pass
-                else:
                     try:
                         df = products.ACS(year).from_state(
                             state, level=level, variables=acsvars.copy(), return_geometry=return_geometry
@@ -79,6 +78,8 @@ def fetch_acs(
                             df.to_parquet(pth)
                     except:
                         tqdm.write("{state} failed".format(state=state))
+                    else:
+                        continue
                 pbar.update(1)
         df = pandas.concat(dfs)
     else:
