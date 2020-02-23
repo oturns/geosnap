@@ -2,6 +2,11 @@ from numpy.testing import assert_allclose
 
 from geosnap import Community
 
+local_raster = os.path.join(os.getcwd(), "nlcd_2011.tif")    # portability
+if not os.path.exists(local_raster):
+    p = quilt3.Package.browse("rasters/nlcd", "s3://quilt-cgs")
+    p["nlcd_2011.tif"].fetch()
+
 
 def test_harmonize_area():
     la = Community.from_census(county_fips="06037")
@@ -10,6 +15,7 @@ def test_harmonize_area():
         2000,
         extensive_variables=["n_total_housing_units"],
         intensive_variables=["p_vacant_housing_units"],
+        raster=local_raster
     )
 
     assert_allclose(
@@ -38,6 +44,7 @@ def test_harmonize_area_weighted():
         extensive_variables=["n_total_housing_units"],
         intensive_variables=["p_vacant_housing_units"],
         weights_method="land_type_area",
+        raster=local_raster
     )
     assert harmonized_nlcd_weighted.gdf.n_total_housing_units.sum() == 900620.0
     assert_allclose(

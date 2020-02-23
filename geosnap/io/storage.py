@@ -32,7 +32,7 @@ except ImportError:
     storage = quilt3.Package()
 
 
-def store_census():
+def store_census(dest=None):
     """Save census data to the local quilt package storage.
 
     Returns
@@ -43,11 +43,11 @@ def store_census():
         is 3.05 GB.
 
     """
-    quilt3.Package.install("census/tracts_cartographic", "s3://quilt-cgs")
-    quilt3.Package.install("census/administrative", "s3://quilt-cgs")
+    quilt3.Package.install("census/tracts_cartographic", "s3://quilt-cgs", dest=dest)
+    quilt3.Package.install("census/administrative", "s3://quilt-cgs", dest=dest)
 
 
-def store_blocks_2000():
+def store_blocks_2000(dest=None):
     """Save census 2000 census block data to the local quilt package storage.
 
     Returns
@@ -57,10 +57,10 @@ def store_blocks_2000():
         in place of streaming data for all census queries.
 
     """
-    quilt3.Package.install("census/blocks_2000", "s3://quilt-cgs")
+    quilt3.Package.install("census/blocks_2000", "s3://quilt-cgs", dest=dest)
 
 
-def store_blocks_2010():
+def store_blocks_2010(dest=None):
     """Save census 2010 census block data to the local quilt package storage.
 
     Returns
@@ -70,7 +70,7 @@ def store_blocks_2010():
         in place of streaming data for all census queries.
 
     """
-    quilt3.Package.install("census/blocks_2010", "s3://quilt-cgs")
+    quilt3.Package.install("census/blocks_2010", "s3://quilt-cgs", dest=dest)
 
 
 def store_ltdb(sample, fullcount):
