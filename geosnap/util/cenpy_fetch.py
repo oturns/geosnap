@@ -65,8 +65,7 @@ def fetch_acs(
                 fname = state.replace(" ", "_")
                 pth = Path(output_dir, f"{fname}.parquet")
                 if not(
-                    output_dir
-                    and skip_existing
+                    skip_existing
                     and pth.exists()
                 ):
                     try:
@@ -79,7 +78,7 @@ def fetch_acs(
                     except:
                         tqdm.write("{state} failed".format(state=state))
                     else:
-                        continue
+                        print(f"skipping {fname}")
                 pbar.update(1)
         df = pandas.concat(dfs)
     else:
