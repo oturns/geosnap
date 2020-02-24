@@ -11,7 +11,12 @@ from pathlib import Path
 
 
 def fetch_acs(
-    level="tract", state="all", year=2017, output_dir=None, skip_existing=True, return_geometry=False
+    level="tract",
+    state="all",
+    year=2017,
+    output_dir=None,
+    skip_existing=True,
+    return_geometry=False,
 ):
     """Collect the variables defined in `geosnap.datasets.codebook` from the Census API.
 
@@ -48,15 +53,8 @@ def fetch_acs(
     from .._data import datasets
 
     states = datasets.states()
-
     _variables = datasets.codebook().copy()
-
     acsvars = _process_columns(_variables["acs"].dropna())
-
-    evalcols = [_normalize_relation(rel) for rel in _variables["acs"].dropna().tolist()]
-
-    varnames = _variables.dropna(subset=["acs"])["variable"]
-    evals = [parts[0] + "=" + parts[1] for parts in zip(varnames, evalcols)]
 
     if state == "all":
         dfs = []
@@ -64,17 +62,17 @@ def fetch_acs(
             for state in states.sort_values(by="name").name.tolist():
                 fname = state.replace(" ", "_")
                 pth = Path(output_dir, f"{fname}.parquet")
-                if (
-                    skip_existing and
-                    pth.exists()
-                ):
+                if skip_existing and pth.exists():
                     print(f"skipping {fname}")
                     pass
 
                 else:
                     try:
                         df = products.ACS(year).from_state(
-                            state, level=level, variables=acsvars.copy(), return_geometry=return_geometry
+                            state,
+                            level=level,
+                            variables=acsvars.copy(),
+                            return_geometry=return_geometry,
                         )
                         dfs.append(df)
                         if output_dir:
@@ -86,8 +84,28 @@ def fetch_acs(
         df = pandas.concat(dfs)
     else:
         df = products.ACS(year).from_state(
-            name=state, level=level, variables=acsvars.copy(), return_geometry=return_geometry
+            name=state,
+            level=level,
+            variables=acsvars.copy(),
+            return_geometry=return_geometry,
         )
+
+    return df
+
+
+def process_acs(df):
+    """Calculate variables from the geosnap codebook
+    
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        DataFrame contining raw census data (as processed by `fetch_acs`)
+    """
+    from .._data import datasets
+
+    _variables = datasets.codebook().copy()
+    varnames = _variables.dropna(subset=["acs"])["variable"]
+    evals = [parts[0] + "=" + parts[1] for parts in zip(varnames, evalcols)]
 
     df.set_index("GEOID", inplace=True)
     df = df.apply(lambda x: pandas.to_numeric(x, errors="coerce"), axis=1)
@@ -104,7 +122,6 @@ def fetch_acs(
             print(str(row) + " " + str(e))
     keeps = [col for col in df.columns if col in _variables.variable.tolist()]
     df = df[keeps]
-    return df
 
 
 def _process_columns(input_columns):
