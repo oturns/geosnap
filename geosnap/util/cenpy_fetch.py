@@ -104,6 +104,9 @@ def process_acs(df):
     from .._data import datasets
 
     _variables = datasets.codebook().copy()
+    evalcols = [
+            normalize_relation(rel) for rel in _variables["acs"].dropna().tolist()
+        ]
     varnames = _variables.dropna(subset=["acs"])["variable"]
     evals = [parts[0] + "=" + parts[1] for parts in zip(varnames, evalcols)]
 
