@@ -122,6 +122,7 @@ def process_acs(df):
             print(str(row) + " " + str(e))
     keeps = [col for col in df.columns if col in _variables.variable.tolist()]
     df = df[keeps]
+    return df
 
 
 def _process_columns(input_columns):
