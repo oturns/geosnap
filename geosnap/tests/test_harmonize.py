@@ -5,7 +5,7 @@ from geosnap import Community
 
 local_raster = os.path.join(os.getcwd(), "nlcd_2011.tif")    # portability
 if not os.path.exists(local_raster):
-    p = quilt3.Package.browse("rasters/nlcd", "s3://quilt-cgs")
+    p = quilt3.Package.browse("rasters/nlcd", "s3://spatial-ucr")
     p["nlcd_2011.tif"].fetch()
 
 
