@@ -3,14 +3,22 @@
 Installation
 ===============
 
-geosnap supports python `3.5`_ and `3.6`_ only. Please make sure that you are
+``geosnap`` supports python `3.5`_ and `3.6`_ only. Please make sure that you are
 operating in a python 3 environment.
 
-Installing released version
----------------------------
+Installing a released version
+------------------------------
+``geosnap`` is available on both conda and pip, and can be installed with either
 
-geosnap has not yet been released on the `Python Package Index`_. 
+.. code-block:: bash
 
+    conda install -c conda-forge geosnap
+
+or
+
+.. code-block:: bash
+
+    pip install geosnap
 
 Installing development version
 ------------------------------
