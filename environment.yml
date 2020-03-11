@@ -19,7 +19,7 @@ dependencies:
   - palettable
   - pip
   - tqdm
-  - quilt3 ==3.1.8
+  - quilt3 >=3.1.11
   - xlrd
   - region >=0.2.0
   - tobler

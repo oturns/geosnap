@@ -124,10 +124,10 @@ class DataStore:
             )
             try:
                 tracts_cartographic = quilt3.Package.browse(
-                    "census/tracts_cartographic", "s3://quilt-cgs"
+                    "census/tracts_cartographic", "s3://spatial-ucr"
                 )
                 administrative = quilt3.Package.browse(
-                    "census/administrative", "s3://quilt-cgs"
+                    "census/administrative", "s3://spatial-ucr"
                 )
 
             except Timeout:
@@ -188,7 +188,7 @@ class DataStore:
             )
             try:
                 blocks_2000 = quilt3.Package.browse(
-                    "census/blocks_2000", "s3://quilt-cgs"
+                    "census/blocks_2000", "s3://spatial-ucr"
                 )
 
             except Timeout:
@@ -243,7 +243,7 @@ class DataStore:
             )
             try:
                 blocks_2010 = quilt3.Package.browse(
-                    "census/blocks_2010", "s3://quilt-cgs"
+                    "census/blocks_2010", "s3://spatial-ucr"
                 )
 
             except Timeout:
