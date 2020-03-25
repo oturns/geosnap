@@ -89,13 +89,10 @@ class Community:
         weights_method : string
             The method that the harmonization will be conducted. This can be
             set to:
-                "area"                          : harmonization according to
-                                                  area weights.
-                "land_type_area"                : harmonization according to
-                                                  the Land Types considered
-                                                  'populated' areas.
-                "land_type_Poisson_regression"  : NOT YET INTRODUCED.
-                "land_type_Gaussian_regression" : NOT YET INTRODUCED.
+                * "area"                          : harmonization according to area weights.
+                * "land_type_area"                : harmonization according to the Land Types considered 'populated' areas.
+                * "land_type_Poisson_regression"  : NOT YET INTRODUCED.
+                * "land_type_Gaussian_regression" : NOT YET INTRODUCED.
         extensive_variables : list
             extensive variables to be used in interpolation.
         intensive_variables : type
@@ -144,38 +141,40 @@ class Community:
         best_model=False,
         columns=None,
         verbose=False,
-        return_model=False,
-        scaler=None,
+        scaler="std",
+        pooling="fixed",
         **kwargs,
     ):
         """Create a geodemographic typology by running a cluster analysis on the study area's neighborhood attributes.
 
         Parameters
         ----------
-        gdf : pandas.DataFrame
-            long-form (geo)DataFrame containing neighborhood attributes
-        n_clusters : int
+        n_clusters : int, required
             the number of clusters to model. The default is 6).
-        method : str
+        method : str in ['kmeans', 'ward', 'affinity_propagation', 'spectral', 'gaussian_mixture', 'hdbscan'], required
             the clustering algorithm used to identify neighborhood types
-        best_model : bool
+        best_model : bool, optional
             if using a gaussian mixture model, use BIC to choose the best
             n_clusters. (the default is False).
-        columns : list-like
+        columns : array-like, required
             subset of columns on which to apply the clustering
-        verbose : bool
+        verbose : bool, optional
             whether to print warning messages (the default is False).
-        return_model : bool
-            whether to return the underlying cluster model instance for further
-            analysis
-        scaler: str or sklearn.preprocessing.Scaler
+        scaler : None or scaler from sklearn.preprocessing, optional
             a scikit-learn preprocessing class that will be used to rescale the
-            data. Defaults to StandardScaler
+            data. Defaults to sklearn.preprocessing.StandardScaler
+        pooling : ["fixed", "pooled", "unique"], optional (default='fixed')
+            How to treat temporal data when applying scaling. Options include:
+
+            * fixed : scaling is fixed to each time period
+            * pooled : data are pooled across all time periods
+            * unique : if scaling, apply the scaler to each time period, then generate clusters unique to each time period.
 
         Returns
         -------
-        pandas.DataFrame with a column of neighborhood cluster labels appended
-        as a new column. Will overwrite columns of the same name.
+        geosnap.Community
+            a copy of input Community with neighborhood cluster labels appended
+            as a new column. If the cluster is already present, the name will be incremented
 
         """
         harmonized = self.harmonized
@@ -186,8 +185,8 @@ class Community:
             best_model=best_model,
             columns=columns,
             verbose=verbose,
-            return_model=return_model,
             scaler=scaler,
+            pooling=pooling,
             **kwargs,
         )
 
@@ -216,40 +215,35 @@ class Community:
 
         Parameters
         ----------
-        gdf : geopandas.GeoDataFrame
-            long-form geodataframe holding neighborhood attribute and geometry data.
-        n_clusters : int
+        n_clusters : int, required
             the number of clusters to model. The default is 6).
-        spatial_weights : str ('queen' or 'rook') or `libpysal.weights` instance
+        spatial_weights : str ('queen' or 'rook') or libpysal.weights.W instance, optional
             spatial weights matrix specification` (the default is "rook"). If 'rook' or 'queen'
             then contiguity weights will be constructed internally, otherwise pass a
-            `libpysal.weights` with additional arguments specified in weights_kwargs
-        weights_kwargs: dict
-            If passing a `libpysal.weights` instance to spatial_weights, these additional
+            libpysal.weights.W with additional arguments specified in weights_kwargs
+        weights_kwargs : dict, optional
+            If passing a libpysal.weights.W instance to spatial_weights, these additional
             keyword arguments that will be passed to the weights constructor
-        method : str
+        method : str in ['ward_spatial', 'spenc', 'skater', 'azp', 'max_p'], required
             the clustering algorithm used to identify neighborhood types
-        best_model : type
-            Description of parameter `best_model` (the default is False).
-        columns : list-like
+        columns : array-like, required
             subset of columns on which to apply the clustering
-        threshold_variable : str
+        threshold_variable : str, required if using max-p, optional otherwise
             for max-p, which variable should define `p`. The default is "count",
             which will grow regions until the threshold number of polygons have
             been aggregated
-        threshold : numeric
+        threshold : numeric, optional
             threshold to use for max-p clustering (the default is 10).
-        return_model : bool
-            whether to return the underlying cluster model instance for further
-            analysis
-        scaler: str or sklearn.preprocessing.Scaler
+        scaler : None or scaler from sklearn.preprocessing, optional
             a scikit-learn preprocessing class that will be used to rescale the
-            data. Defaults to StandardScaler
+            data. Defaults to sklearn.preprocessing.StandardScaler
 
         Returns
         -------
-        geopandas.GeoDataFrame with a column of neighborhood cluster labels
-        appended as a new column. Will overwrite columns of the same name.
+        geosnap.Community
+            a copy of input Community with neighborhood cluster labels appended
+            as a new column. If the cluster is already present, the name will be incremented
+
 
         """
         harmonized = self.harmonized
@@ -308,10 +302,9 @@ class Community:
 
         Returns
         ---------
-        mar             : object
-                          if w_type=None, return a giddy.markov.Markov instance;
-                          if w_type is given, return a
-                          giddy.markov.Spatial_Markov instance.
+        mar             : giddy.markov.Markov or giddy.markov.Spatial_Markov
+                          if w_type=None, return a classic Markov instance;
+                          if w_type is given, return a Spatial_Markov instance
 
         """
         mar = _transition(
@@ -374,8 +367,8 @@ class Community:
                           Column identifying the unique id of spatial units.
                           Default is "geoid".
 
-        Return
-        ------
+        Returns
+        -------
         gdf_new         : Community instance
                           New Community instance with attribute "gdf" having
                           a new column for sequence labels.
@@ -429,13 +422,13 @@ class Community:
         county_fips : list or str
             string or list of strings of five-digit fips codes defining
             counties to include in the study area.
-        msa_fips : type
+        msa_fips : list or str
             string or list of strings of fips codes defining
             MSAs to include in the study area.
-        fips : type
+        fips : list or str
             string or list of strings of five-digit fips codes defining
             counties to include in the study area.
-        boundary: geopandas.GeoDataFrame
+        boundary : geopandas.GeoDataFrame
             geodataframe that defines the total extent of the study area.
             This will be used to clip tracts lazily by selecting all
             `GeoDataFrame.representative_point()`s that intersect the
@@ -455,7 +448,7 @@ class Community:
             years = [1970, 1980, 1990, 2000, 2010]
         if isinstance(boundary, gpd.GeoDataFrame):
             tracts = datasets.tracts_2010()[["geoid", "geometry"]]
-            ltdb = datasets.ltdb.reset_index()
+            ltdb = datasets.ltdb().reset_index()
             if boundary.crs != tracts.crs:
                 warn(
                     "Unable to determine whether boundary CRS is WGS84 "
@@ -469,7 +462,7 @@ class Community:
 
         else:
             gdf = _from_db(
-                data=datasets.ltdb,
+                data=datasets.ltdb(),
                 state_fips=state_fips,
                 county_fips=county_fips,
                 msa_fips=msa_fips,
@@ -507,13 +500,13 @@ class Community:
         county_fips : list or str
             string or list of strings of five-digit fips codes defining
             counties to include in the study area.
-        msa_fips : type
+        msa_fips : list or str
             string or list of strings of fips codes defining
             MSAs to include in the study area.
-        fips : type
+        fips : list or str
             string or list of strings of five-digit fips codes defining
             counties to include in the study area.
-        boundary: geopandas.GeoDataFrame
+        boundary : geopandas.GeoDataFrame
             geodataframe that defines the total extent of the study area.
             This will be used to clip tracts lazily by selecting all
             `GeoDataFrame.representative_point()`s that intersect the
@@ -532,7 +525,7 @@ class Community:
             years = [1970, 1980, 1990, 2000, 2010]
         if isinstance(boundary, gpd.GeoDataFrame):
             tracts = datasets.tracts_2010()[["geoid", "geometry"]]
-            ncdb = datasets.ncdb.reset_index()
+            ncdb = datasets.ncdb().reset_index()
             if boundary.crs != tracts.crs:
                 warn(
                     "Unable to determine whether boundary CRS is WGS84 "
@@ -546,7 +539,7 @@ class Community:
 
         else:
             gdf = _from_db(
-                data=datasets.ncdb,
+                data=datasets.ncdb(),
                 state_fips=state_fips,
                 county_fips=county_fips,
                 msa_fips=msa_fips,
@@ -578,24 +571,24 @@ class Community:
 
         Parameters
         ----------
-        state_fips : list or str
+        state_fips : list or str, optional
             string or list of strings of two-digit fips codes defining states
             to include in the study area.
-        county_fips : list or str
+        county_fips : list or str, optional
             string or list of strings of five-digit fips codes defining
             counties to include in the study area.
-        msa_fips : type
+        msa_fips : list or str, optional
             string or list of strings of fips codes defining
             MSAs to include in the study area.
-        fips : type
+        fips : list or str, optional
             string or list of strings of five-digit fips codes defining
             counties to include in the study area.
-        boundary: geopandas.GeoDataFrame
+        boundary : geopandas.GeoDataFrame, optional
             geodataframe that defines the total extent of the study area.
             This will be used to clip tracts lazily by selecting all
             `GeoDataFrame.representative_point()`s that intersect the
             boundary gdf
-        years : list of ints
+        years : list of ints, required
             list of years to include in the study data
             (the default is [1990, 2000, 2010]).
 
@@ -612,8 +605,8 @@ class Community:
 
         msa_states = []
         if msa_fips:
-            msa_states += datasets.msa_definitions[
-                datasets.msa_definitions["CBSA Code"] == msa_fips
+            msa_states += datasets.msa_definitions()[
+                datasets.msa_definitions()["CBSA Code"] == msa_fips
             ]["stcofips"].tolist()
         msa_states = [i[:2] for i in msa_states]
 
@@ -687,30 +680,30 @@ class Community:
 
         Parameters
         ----------
-        state_fips : list or str
+        state_fips : list or str, optional
             string or list of strings of two-digit fips codes defining states
             to include in the study area.
-        county_fips : list or str
+        county_fips : list or str, optional
             string or list of strings of five-digit fips codes defining
             counties to include in the study area.
-        msa_fips : type
+        msa_fips : list or str, optional
             string or list of strings of fips codes defining
             MSAs to include in the study area.
-        fips : type
+        fips : list or str, optional
             string or list of strings of five-digit fips codes defining
             counties to include in the study area.
-        boundary: geopandas.GeoDataFrame
+        boundary : geopandas.GeoDataFrame, optional
             geodataframe that defines the total extent of the study area.
             This will be used to clip tracts lazily by selecting all
             `GeoDataFrame.representative_point()`s that intersect the
             boundary gdf
-        years : list of ints
+        years : list of ints, required
             list of years to include in the study data
             (the default is 2015).
-        dataset: str
+        dataset : str, required
             which LODES dataset should be used to create the Community.
             Options are 'wac' for workplace area characteristics or 'rac' for
-            residence area characteristics. The default is workplace.
+            residence area characteristics. The default is "wac" for workplace.
 
         Returns
         -------
@@ -725,8 +718,8 @@ class Community:
         years = list(set(years))
 
         if msa_fips:
-            msa_counties = datasets.msa_definitions[
-                datasets.msa_definitions["CBSA Code"] == msa_fips
+            msa_counties = datasets.msa_definitions()[
+                datasets.msa_definitions()["CBSA Code"] == msa_fips
             ]["stcofips"].tolist()
 
         else:
@@ -747,16 +740,23 @@ class Community:
         if any(year < 2010 for year in years):
             gdf00 = datasets.blocks_2000(states=states, fips=(tuple(allfips)))
             gdf00 = gdf00.drop(columns=["year"])
+            gdf00 = _fips_filter(
+                state_fips=state_fips,
+                county_fips=county_fips,
+                msa_fips=msa_fips,
+                fips=fips,
+                data=gdf00,
+            )
+            if isinstance(boundary, gpd.GeoDataFrame):
+                if boundary.crs != gdf00.crs:
+                    warn(
+                        "Unable to determine whether boundary CRS is WGS84 "
+                        "if this produces unexpected results, try reprojecting"
+                    )
+                gdf00 = gdf00[gdf00.representative_point().intersects(boundary.unary_union)]
+
         gdf = datasets.blocks_2010(states=states, fips=(tuple(allfips)))
         gdf = gdf.drop(columns=["year"])
-
-        # grab state abbreviations
-        names = (
-            _fipstable[_fipstable["FIPS Code"].isin(states)]["State Abbreviation"]
-            .str.lower()
-            .tolist()
-        )
-
         gdf = _fips_filter(
             state_fips=state_fips,
             county_fips=county_fips,
@@ -764,20 +764,6 @@ class Community:
             fips=fips,
             data=gdf,
         )
-        dfs = []
-        if isinstance(names, str):
-            names = [names]
-        for name in names:
-            for year in years:
-                df = get_lehd(dataset=dataset, year=year, state=name)
-                if year < 2010:
-                    df = gdf00.merge(df, on="geoid", how="left")
-                else:
-                    df = gdf.merge(df, on="geoid", how="left")
-                df["year"] = year
-                dfs.append(df)
-        gdf = pd.concat(dfs)
-
         if isinstance(boundary, gpd.GeoDataFrame):
             if boundary.crs != gdf.crs:
                 warn(
@@ -786,7 +772,35 @@ class Community:
                 )
             gdf = gdf[gdf.representative_point().intersects(boundary.unary_union)]
 
-        return cls(gdf=gdf, harmonized=False)
+        # grab state abbreviations
+        names = (
+            _fipstable[_fipstable["FIPS Code"].isin(states)]["State Abbreviation"]
+            .str.lower()
+            .tolist()
+        )
+        if isinstance(names, str):
+            names = [names]
+
+        dfs = []
+        for name in names:
+            for year in years:
+                try:
+                    df = get_lehd(dataset=dataset, year=year, state=name)
+                    df["year"] = year
+                    if year < 2010:
+                        df = gdf00.merge(df, on="geoid", how="inner")
+                    else:
+                        df = gdf.merge(df, on="geoid", how="inner")
+                    df = df.set_index(["geoid", "year"])
+                    dfs.append(df)
+                except ValueError:
+                    warn(f"{name.upper()} {year} not found!")
+                    pass
+        out = pd.concat(dfs, sort=True)
+        out = out[~out.index.duplicated(keep="first")]
+        out = out.reset_index()
+
+        return cls(gdf=out, harmonized=False)
 
     @classmethod
     def from_geodataframes(cls, gdfs=None):
@@ -794,7 +808,7 @@ class Community:
 
         Parameters
         ----------
-        gdfs : list-like
+        gdfs : list-like of geopandas.GeoDataFrames
             list of geodataframes that hold attribute and geometry data for
             a study area. Each geodataframe must have neighborhood
             attribute data, geometry data, and a time column that defines

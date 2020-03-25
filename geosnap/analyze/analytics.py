@@ -39,35 +39,43 @@ def cluster(
     verbose=False,
     time_var="year",
     id_var="geoid",
-    scaler=None,
+    scaler='std',
+    pooling="fixed",
     **kwargs,
 ):
     """Create a geodemographic typology by running a cluster analysis on the study area's neighborhood attributes.
 
     Parameters
     ----------
-    gdf : pandas.DataFrame
-        long-form (geo)DataFrame containing neighborhood attributes
-    n_clusters : int
+    gdf : geopandas.GeoDataFrame, required
+        long-form GeoDataFrame containing neighborhood attributes
+    n_clusters : int, required
         the number of clusters to model. The default is 6).
-    method : str
+    method : str in ['kmeans', 'ward', 'affinity_propagation', 'spectral','gaussian_mixture', 'hdbscan'], required
         the clustering algorithm used to identify neighborhood types
-    best_model : bool
+    best_model : bool, optional
         if using a gaussian mixture model, use BIC to choose the best
         n_clusters. (the default is False).
-    columns : list-like
+    columns : list-like, required
         subset of columns on which to apply the clustering
-    verbose : bool
+    verbose : bool, optional
         whether to print warning messages (the default is False).
-    time_var: str
+    time_var : str, optional
         which column on the dataframe defines time and or sequencing of the
         long-form data. Default is "year"
-    id_var: str
+    id_var : str, optional
         which column on the long-form dataframe identifies the stable units
         over time. In a wide-form dataset, this would be the unique index
-    scaler: str or sklearn.preprocessing.Scaler
+    scaler : None or scaler from sklearn.preprocessing, optional
         a scikit-learn preprocessing class that will be used to rescale the
-        data. Defaults to StandardScaler
+        data. Defaults to sklearn.preprocessing.StandardScaler
+    pooling : ["fixed", "pooled", "unique"], optional (default='fixed')
+        How to treat temporal data when applying scaling. Options include:
+
+        * fixed : scaling is fixed to each time period
+        * pooled : data are pooled across all time periods
+        * unique : if scaling, apply the scaler to each time period, then generate
+          clusters unique to each time period.
 
     Returns
     -------
@@ -84,31 +92,6 @@ def cluster(
         name of model to be stored in a Community
 
     """
-    # if we already have a column named after the clustering method, then increment it.
-    if method in gdf.columns.tolist():
-        model_name = method + str(len(gdf.columns[gdf.columns.str.startswith(method)]))
-    else:
-        model_name = method
-    if not columns:
-        raise ValueError("You must provide a subset of columns as input")
-    if not method:
-        raise ValueError("You must choose a clustering algorithm to use")
-
-    times = gdf[time_var].unique()
-    gdf = gdf.set_index([time_var, id_var])
-
-    # this is the dataset we'll operate on
-    data = gdf.copy()[columns]
-    data = data.dropna(how="any", subset=columns)
-
-    # if the user doesn't specify, use the standard scalar
-    if not scaler:
-        scaler = StandardScaler()
-    for time in times:
-        data.loc[time] = scaler.fit_transform(data.loc[time].values)
-    # the rescalar can create nans if a column has no variance, so fill with 0
-    data = data.fillna(0)
-
     specification = {
         "ward": ward,
         "kmeans": kmeans,
@@ -117,23 +100,101 @@ def cluster(
         "spectral": spectral,
         "hdbscan": hdbscan,
     }
+    if scaler == "std":
+        scaler = StandardScaler()
+    if method not in specification.keys():
+        raise ValueError(
+            "`method` must of one of ['kmeans', 'ward', 'affinity_propagation', 'spectral', 'gaussian_mixture', 'hdbscan']"
+        )
 
-    # run the cluster model then join the labels back to the original data
-    model = specification[method](
-        data, n_clusters=n_clusters, best_model=best_model, verbose=verbose, **kwargs
-    )
-    labels = model.labels_.astype(str)
-    data = data.reset_index()
-    clusters = pd.DataFrame(
-        {model_name: labels, time_var: data[time_var], id_var: data[id_var]}
-    )
-    clusters.set_index([time_var, id_var], inplace=True)
-    gdf = gdf.join(clusters, how="left")
-    gdf = gdf.reset_index()
-    results = ModelResults(
-        X=data.values, columns=columns, labels=model.labels_, instance=model, W=None
-    )
-    return gdf, results, model_name
+    # if we already have a column named after the clustering method, then increment it.
+    if method in gdf.columns.tolist():
+        model_name = method + str(len(gdf.columns[gdf.columns.str.startswith(method)]))
+    else:
+        model_name = method
+    if not columns:
+        raise ValueError("You must provide a subset of columns as input")
+
+    times = gdf[time_var].unique()
+    gdf = gdf.set_index([time_var, id_var])
+
+    # this is the dataset we'll operate on
+    data = gdf.copy()[columns]
+    data = data.dropna(how="any", subset=columns)
+
+    if scaler:
+
+        if pooling in ["fixed", "unique"]:
+            # if fixed (or unique), scale within each time period
+            for time in times:
+                data.loc[time] = scaler.fit_transform(data.loc[time].values)
+
+        elif pooling == "pooled":
+            # if pooled, scale the whole series at once
+            data.loc[:, columns] = scaler.fit_transform(data.values)
+
+    # the rescalar can create nans if a column has no variance, so fill with 0
+    data = data.fillna(0)
+
+    if pooling != "unique":
+
+        # run the cluster model then join the labels back to the original data
+        model = specification[method](
+            data,
+            n_clusters=n_clusters,
+            best_model=best_model,
+            verbose=verbose,
+            **kwargs,
+        )
+        labels = model.labels_.astype(str)
+        data = data.reset_index()
+        clusters = pd.DataFrame(
+            {model_name: labels, time_var: data[time_var], id_var: data[id_var]}
+        )
+        clusters.set_index([time_var, id_var], inplace=True)
+        clusters = clusters[~clusters.index.duplicated(keep='first')]
+        gdf = gdf.join(clusters, how="left")
+        gdf = gdf.reset_index()
+        results = ModelResults(
+            X=data.values, columns=columns, labels=model.labels_, instance=model, W=None
+        )
+        return gdf, results, model_name
+
+    elif pooling == 'unique':
+        models = _Map()
+        gdf[model_name] = np.nan
+        data = data.reset_index()
+
+        for time in times:
+
+            df = data[data[time_var] == time]
+
+            model = specification[method](
+                df[columns],
+                n_clusters=n_clusters,
+                best_model=best_model,
+                verbose=verbose,
+                **kwargs,
+            )
+
+            labels = model.labels_.astype(str)
+            clusters = pd.DataFrame(
+                {model_name: labels, time_var: time, id_var: df[id_var]}
+            )
+            clusters.set_index([time_var, id_var], inplace=True)
+            gdf.update(clusters)
+            results = ModelResults(
+                X=df[columns].values,
+                columns=columns,
+                labels=model.labels_,
+                instance=model,
+                W=None
+            )
+            models[time] = results
+
+        gdf = gdf.reset_index()
+
+        return gdf, models, model_name
 
 
 def cluster_spatial(
@@ -146,7 +207,7 @@ def cluster_spatial(
     threshold=10,
     time_var="year",
     id_var="geoid",
-    scaler=None,
+    scaler="std",
     weights_kwargs=None,
     **kwargs,
 ):
@@ -160,13 +221,13 @@ def cluster_spatial(
         long-form geodataframe holding neighborhood attribute and geometry data.
     n_clusters : int
         the number of clusters to model. The default is 6).
-    spatial_weights : str ('queen' or 'rook') or libpysal.weights object
+    spatial_weights : ['queen', 'rook'] or libpysal.weights.W object
         spatial weights matrix specification`. By default, geosnap will calculate Rook
-        weights, but you can also pass a `libpysal.weights` object for more control
+        weights, but you can also pass a libpysal.weights.W object for more control
         over the specification.
-    method : str
+    method : str in ['ward_spatial', 'spenc', 'skater', 'azp', 'max_p']
         the clustering algorithm used to identify neighborhood types
-    columns : list-like
+    columns : array-like
         subset of columns on which to apply the clustering
     threshold_variable : str
         for max-p, which variable should define `p`. The default is "count",
@@ -174,18 +235,18 @@ def cluster_spatial(
         been aggregated
     threshold : numeric
         threshold to use for max-p clustering (the default is 10).
-    time_var: str
+    time_var : str
         which column on the dataframe defines time and or sequencing of the
         long-form data. Default is "year"
-    id_var: str
+    id_var : str
         which column on the long-form dataframe identifies the stable units
         over time. In a wide-form dataset, this would be the unique index
-    weights_kwargs: dict
-        If passing a `libpysal.weights` instance to spatial_weights, these additional
+    weights_kwargs : dict
+        If passing a libpysal.weights.W instance to spatial_weights, these additional
         keyword arguments that will be passed to the weights constructor
-    scaler: str or sklearn.preprocessing.Scaler
+    scaler : None or scaler class from sklearn.preprocessing
         a scikit-learn preprocessing class that will be used to rescale the
-        data. Defaults to StandardScaler
+        data. Defaults to sklearn.preprocessing.StandardScaler
 
     Returns
     -------
@@ -204,6 +265,18 @@ def cluster_spatial(
         name of model to be stored in a Community
 
     """
+    specification = {
+        "azp": azp,
+        "spenc": spenc,
+        "ward_spatial": ward_spatial,
+        "skater": skater,
+        "max_p": max_p,
+    }
+    if method not in specification.keys():
+        raise ValueError(
+            "`method` must be one of  ['ward_spatial', 'spenc', 'skater', 'azp', 'max_p']"
+        )
+
     if method in gdf.columns.tolist():
         model_name = method + str(len(gdf.columns[gdf.columns.str.startswith(method)]))
     else:
@@ -212,6 +285,8 @@ def cluster_spatial(
         raise ValueError("You must provide a subset of columns as input")
     if not method:
         raise ValueError("You must choose a clustering algorithm to use")
+    if scaler == "std":
+        scaler = StandardScaler()
 
     times = gdf[time_var].unique()
     gdf = gdf.set_index([time_var, id_var])
@@ -226,27 +301,18 @@ def cluster_spatial(
     else:
         W = spatial_weights
 
-    specification = {
-        "azp": azp,
-        "spenc": spenc,
-        "ward_spatial": ward_spatial,
-        "skater": skater,
-        "max_p": max_p,
-    }
-
-    # if the user doesn't specify, use the standard scalar
-    if not scaler:
-        scaler = StandardScaler()
-
     models = _Map()
     ws = {}
     clusters = []
     gdf[model_name] = np.nan
+
     # loop over each time period, standardize the data and build a weights matrix
     for time in times:
         df = data.loc[time].dropna(how="any", subset=columns).reset_index()
         df[time_var] = time
-        df[columns] = scaler.fit_transform(df[columns].values)
+
+        if scaler:
+            df[columns] = scaler.fit_transform(df[columns].values)
 
         if weights_kwargs:
             w0 = W.from_dataframe(df, **weights_kwargs)

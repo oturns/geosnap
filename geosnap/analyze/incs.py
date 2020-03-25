@@ -39,8 +39,8 @@ def linc(labels_sequence):
     """Local Indicator of Neighborhood Change
 
 
-    Arguments
-    ---------
+    Parameters
+    -----------
     labels_sequence: sequence of neighborhood labels (n,t)
                    n areas in t periods
                    first element is a list of neighborhood labels per area in

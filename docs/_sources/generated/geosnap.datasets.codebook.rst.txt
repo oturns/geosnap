@@ -3,4 +3,4 @@ geosnap.datasets.codebook
 
 .. currentmodule:: geosnap
 
-.. autoattribute:: datasets.codebook
+.. automethod:: datasets.codebook

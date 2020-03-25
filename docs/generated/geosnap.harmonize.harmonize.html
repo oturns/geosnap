@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>geosnap.harmonize.harmonize &#8212; geosnap v0.1.6 Manual</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pysal-styles.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/geosnap.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="geosnap.visualize.indexplot_seq" href="geosnap.visualize.indexplot_seq.html" />
+    <link rel="prev" title="geosnap.analyze.transition" href="geosnap.analyze.transition.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.12.4.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.4.1/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html"><span><img src="../_static/geosnap.svg"></span>
+          geosnap</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.6</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../installation.html">Installation</a></li>
+                <li><a href="../api.html">API</a></li>
+                <li><a href="https://spatialucr.github.io/geosnap-guide/">User Guide</a></li>
+                <li><a href="../references.html">References</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#installing-a-released-version">Installing a released version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#installing-development-version">Installing development version</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../api.html#io-module">IO Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#the-community-class">The Community Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#analyze-module">Analyze Module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#harmonize-module">Harmonize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#visualize-module">Visualize Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">geosnap.harmonize.harmonize</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <div class="section" id="geosnap-harmonize-harmonize">
+<h1>geosnap.harmonize.harmonize<a class="headerlink" href="#geosnap-harmonize-harmonize" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="geosnap.harmonize.harmonize">
+<code class="sig-prename descclassname">geosnap.harmonize.</code><code class="sig-name descname">harmonize</code><span class="sig-paren">(</span><em class="sig-param">raw_community, target_year=None, weights_method='area', extensive_variables=None, intensive_variables=None, allocate_total=True, raster='nlcd_2011', codes=[21, 22, 23, 24], force_crs_match=True, index='geoid', time_col='year'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/harmonize/harmonize.html#harmonize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.harmonize.harmonize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use spatial interpolation to standardize neighborhood boundaries over time.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>raw_community</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">geopandas.GeoDataFrames</span></code></span></dt><dd><p>Multiple GeoDataFrames given by a list (see (1) in Notes).</p>
+</dd>
+<dt><strong>target_year</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>The target year that represents the bondaries of all datasets generated
+in the harmonization. Could be, for example ‘2010’.</p>
+</dd>
+<dt><strong>weights_method</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><dl class="simple">
+<dt>The method that the harmonization will be conducted. This can be set to:</dt><dd><ul class="simple">
+<li><p>“area”                          : harmonization according to area weights.</p></li>
+<li><p>“land_type_area”                : harmonization according to the Land Types considered ‘populated’ areas.</p></li>
+<li><p>“land_type_Poisson_regression”  : NOT YET INTRODUCED.</p></li>
+<li><p>“land_type_Gaussian_regression” : NOT YET INTRODUCED.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>extensive_variables</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a></span></dt><dd><p>The names of variables in each dataset of raw_community that contains
+extensive variables to be harmonized (see (2) in Notes).</p>
+</dd>
+<dt><strong>intensive_variables</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a></span></dt><dd><p>The names of variables in each dataset of raw_community that contains
+intensive variables to be harmonized (see (2) in Notes).</p>
+</dd>
+<dt><strong>allocate_total</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bltin-boolean-values" title="(in Python v3.8)"><span class="xref std std-ref">bool</span></a></span></dt><dd><p>True if total value of source area should be allocated.
+False if denominator is area of i. Note that the two cases
+would be identical when the area of the source polygon is
+exhausted by intersections. See (3) in Notes for more details.</p>
+</dd>
+<dt><strong>raster</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>the path to the associated raster image that has the types of
+each pixel in the spatial context.
+Only taken into consideration for harmonization raster based.</p>
+</dd>
+<dt><strong>codes</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">an</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">integer</span></code> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">codes</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">values</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">that</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">should</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">be</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">considered</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">as</span></code></span></dt><dd><p>‘populated’. Since this draw inspiration using the National Land Cover
+Database (NLCD), the default is 21 (Developed, Open Space),
+22 (Developed, Low Intensity), 23 (Developed, Medium Intensity) and
+24 (Developed, High Intensity). The description of each code can be
+found here:
+<a class="reference external" href="https://www.mrlc.gov/sites/default/files/metadata/landcover.html">https://www.mrlc.gov/sites/default/files/metadata/landcover.html</a>
+Only taken into consideration for harmonization raster based.</p>
+</dd>
+<dt><strong>force_crs_match</strong><span class="classifier">bool. <code class="xref py py-obj docutils literal notranslate"><span class="pre">Default</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">is</span></code> True.</span></dt><dd><p>Wheter the Coordinate Reference System (CRS) of the polygon will be
+reprojected to the CRS of the raster file. It is recommended to
+leave this argument True.
+Only taken into consideration for harmonization raster based.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ol class="arabic simple">
+<li><p>Each GeoDataFrame of raw_community is assumed to have a ‘year’ column
+Also, all GeoDataFrames must have the same Coordinate Reference System (CRS).</p></li>
+</ol>
+<p>2) A quick explanation of extensive and intensive variables can be found
+here: <a class="reference external" href="http://ibis.geog.ubc.ca/courses/geob370/notes/intensive_extensive.htm">http://ibis.geog.ubc.ca/courses/geob370/notes/intensive_extensive.htm</a></p>
+<ol class="arabic" start="3">
+<li><p>For an extensive variable, the estimate at target polygon j (default case) is:</p>
+<blockquote>
+<div><p>v_j = sum_i v_i w_{i,j}</p>
+<p>w_{i,j} = a_{i,j} / sum_k a_{i,k}</p>
+<p>If the area of the source polygon is not exhausted by intersections with
+target polygons and there is reason to not allocate the complete value of
+an extensive attribute, then setting allocate_total=False will use the
+following weights:</p>
+<p>v_j = sum_i v_i w_{i,j}</p>
+<p>w_{i,j} = a_{i,j} / a_i</p>
+<p>where a_i is the total area of source polygon i.</p>
+<p>For an intensive variable, the estimate at target polygon j is:</p>
+<p>v_j = sum_i v_i w_{i,j}</p>
+<p>w_{i,j} = a_{i,j} / sum_k a_{k,j}</p>
+</div></blockquote>
+</li>
+</ol>
+</dd></dl>
+
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="../_sources/generated/geosnap.harmonize.harmonize.rst.txt"
+     rel="nofollow">Source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2018, geosnap developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

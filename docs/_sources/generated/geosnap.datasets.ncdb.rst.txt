@@ -3,4 +3,4 @@ geosnap.datasets.ncdb
 
 .. currentmodule:: geosnap
 
-.. autoattribute:: datasets.ncdb
+.. automethod:: datasets.ncdb

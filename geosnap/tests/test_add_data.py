@@ -10,13 +10,13 @@ store_ncdb = io.store_ncdb
 def test_store_ltdb():
 
     store_ltdb(sample=path + "/ltdb_sample.zip", fullcount=path + "/ltdb_full.zip")
-    assert datasets.ltdb.shape == (330388, 192)
+    assert datasets.ltdb().shape == (330388, 192)
 
 
 def test_store_ncdb():
 
     store_ncdb(path + "/ncdb.csv")
-    assert datasets.ncdb.shape == (328633, 77)
+    assert datasets.ncdb().shape == (328633, 77)
 
 
 def test_get_lehd():

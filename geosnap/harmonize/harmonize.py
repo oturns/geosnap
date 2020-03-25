@@ -4,9 +4,9 @@ import geopandas as gpd
 import pandas as pd
 from tobler.area_weighted import (
     area_interpolate,
-    area_interpolate_binning,
     area_tables_raster,
 )
+from tobler.area_weighted import _slow_area_interpolate
 from tobler.util.util import _check_presence_of_crs
 
 
@@ -28,7 +28,7 @@ def harmonize(
 
     Parameters
     ----------
-    raw_community : list
+    raw_community : list of geopandas.GeoDataFrames
         Multiple GeoDataFrames given by a list (see (1) in Notes).
 
     target_year : string
@@ -37,10 +37,10 @@ def harmonize(
 
     weights_method : string
         The method that the harmonization will be conducted. This can be set to:
-            "area"                          : harmonization according to area weights.
-            "land_type_area"                : harmonization according to the Land Types considered 'populated' areas.
-            "land_type_Poisson_regression"  : NOT YET INTRODUCED.
-            "land_type_Gaussian_regression" : NOT YET INTRODUCED.
+            * "area"                          : harmonization according to area weights.
+            * "land_type_area"                : harmonization according to the Land Types considered 'populated' areas.
+            * "land_type_Poisson_regression"  : NOT YET INTRODUCED.
+            * "land_type_Gaussian_regression" : NOT YET INTRODUCED.
 
     extensive_variables : list
         The names of variables in each dataset of raw_community that contains
@@ -129,7 +129,7 @@ def harmonize(
         if weights_method == "area":
 
             # In area_interpolate, the resulting variable has same lenght as target_df
-            interpolation = area_interpolate_binning(
+            interpolation = area_interpolate(
                 source_df,
                 target_df.copy(),
                 extensive_variables=extensive_variables,
@@ -149,7 +149,7 @@ def harmonize(
                 )
 
                 # In area_interpolate, the resulting variable has same lenght as target_df
-                interpolation = area_interpolate(
+                interpolation = _slow_area_interpolate(
                     source_df,
                     target_df.copy(),
                     extensive_variables=extensive_variables,
@@ -168,11 +168,11 @@ def harmonize(
 
         profiles = []
         if extensive_variables:
-            profile = pd.DataFrame(interpolation[0], columns=extensive_variables)
+            profile = interpolation[extensive_variables]
             profiles.append(profile)
 
         if intensive_variables:
-            profile = pd.DataFrame(interpolation[1], columns=intensive_variables)
+            profile = interpolation[intensive_variables]
             profiles.append(profile)
 
         profile = pd.concat(profiles, sort=True)

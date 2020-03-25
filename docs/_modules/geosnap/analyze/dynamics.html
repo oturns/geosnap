@@ -3,15 +3,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>geosnap.analyze.dynamics &#8212; geosnap v0.0.2 Manual</title>
+    <title>geosnap.analyze.dynamics &#8212; geosnap v0.1.6 Manual</title>
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/pysal-styles.css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
     <link rel="shortcut icon" href="../../../_static/geosnap.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -19,9 +19,9 @@
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../../_static/js/jquery-1.12.4.min.js "></script>
 <script type="text/javascript" src="../../../_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-3.4.1/js/bootstrap.min.js "></script>
 <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js "></script>
 
   </head><body>
@@ -37,7 +37,7 @@
         </button>
         <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/geosnap.svg"></span>
           geosnap</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.6</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -60,7 +60,7 @@
       aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#installing-released-version">Installing released version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#installing-a-released-version">Installing a released version</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../installation.html#installing-development-version">Installing development version</a></li>
 </ul>
 </li>
@@ -116,11 +116,11 @@
   <h1>Source code for geosnap.analyze.dynamics</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Transition and sequence analysis of neighborhood change.&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">giddy.markov</span> <span class="k">import</span> <span class="n">Markov</span><span class="p">,</span> <span class="n">Spatial_Markov</span>
-<span class="kn">from</span> <span class="nn">giddy.sequence</span> <span class="k">import</span> <span class="n">Sequence</span>
-<span class="kn">from</span> <span class="nn">libpysal.weights.contiguity</span> <span class="k">import</span> <span class="n">Queen</span><span class="p">,</span> <span class="n">Rook</span>
-<span class="kn">from</span> <span class="nn">libpysal.weights.distance</span> <span class="k">import</span> <span class="n">KNN</span><span class="p">,</span> <span class="n">Kernel</span>
-<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="k">import</span> <span class="n">AgglomerativeClustering</span>
+<span class="kn">from</span> <span class="nn">giddy.markov</span> <span class="kn">import</span> <span class="n">Markov</span><span class="p">,</span> <span class="n">Spatial_Markov</span>
+<span class="kn">from</span> <span class="nn">giddy.sequence</span> <span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">from</span> <span class="nn">libpysal.weights.contiguity</span> <span class="kn">import</span> <span class="n">Queen</span><span class="p">,</span> <span class="n">Rook</span>
+<span class="kn">from</span> <span class="nn">libpysal.weights.distance</span> <span class="kn">import</span> <span class="n">KNN</span><span class="p">,</span> <span class="n">Kernel</span>
+<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">AgglomerativeClustering</span>
 
 
 <div class="viewcode-block" id="transition"><a class="viewcode-back" href="../../../generated/geosnap.analyze.transition.html#geosnap.analyze.transition">[docs]</a><span class="k">def</span> <span class="nf">transition</span><span class="p">(</span>
@@ -131,8 +131,8 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    gdf             : (geo)DataFrame</span>
-<span class="sd">                      Long-form (geo)DataFrame containing neighborhood</span>
+<span class="sd">    gdf             : geopandas.GeoDataFrame or pandas.DataFrame</span>
+<span class="sd">                      Long-form geopandas.GeoDataFrame or pandas.DataFrame containing neighborhood</span>
 <span class="sd">                      attributes with a column defining neighborhood clusters.</span>
 <span class="sd">    cluster_col     : string or int</span>
 <span class="sd">                      Column name for the neighborhood segmentation, such as</span>
@@ -151,16 +151,15 @@
 <span class="sd">                      number of permutations for use in randomization based</span>
 <span class="sd">                      inference (the default is 0).</span>
 
-<span class="sd">    Return</span>
-<span class="sd">    ------</span>
-<span class="sd">    mar             : object</span>
-<span class="sd">                      if w_type=None, return a giddy.markov.Markov instance;</span>
-<span class="sd">                      if w_type is given, return a</span>
-<span class="sd">                      giddy.markov.Spatial_Markov instance.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    --------</span>
+<span class="sd">    mar             : giddy.markov.Markov instance or giddy.markov.Spatial_Markov</span>
+<span class="sd">                      if w_type=None, a classic Markov instance is returned. </span>
+<span class="sd">                      if w_type is given, a Spatial_Markov instance is returned.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; from geosnap.data import Community</span>
+<span class="sd">    &gt;&gt;&gt; from geosnap import Community</span>
 <span class="sd">    &gt;&gt;&gt; columbus = Community.from_ltdb(msa_fips=columbusfips)</span>
 <span class="sd">    &gt;&gt;&gt; columbus1 = columbus.cluster(columns=[&#39;median_household_income&#39;,</span>
 <span class="sd">    ... &#39;p_poverty_rate&#39;, &#39;p_edu_college_greater&#39;, &#39;p_unemployment_rate&#39;],</span>
@@ -234,8 +233,8 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    gdf             : (geo)DataFrame</span>
-<span class="sd">                      Long-form (geo)DataFrame containing neighborhood</span>
+<span class="sd">    gdf             : geopandas.GeoDataFrame or pandas.DataFrame</span>
+<span class="sd">                      Long-form geopandas.GeoDataFrame or pandas.DataFrame containing neighborhood</span>
 <span class="sd">                      attributes with a column defining neighborhood clusters.</span>
 <span class="sd">    cluster_col     : string or int</span>
 <span class="sd">                      Column name for the neighborhood segmentation, such as</span>
@@ -267,10 +266,10 @@
 <span class="sd">                      Column identifying the unique id of spatial units.</span>
 <span class="sd">                      Default is &quot;geoid&quot;.</span>
 
-<span class="sd">    Return</span>
-<span class="sd">    ------</span>
-<span class="sd">    gdf_temp        : (geo)DataFrame</span>
-<span class="sd">                      (geo)DataFrame with a new column for sequence</span>
+<span class="sd">    Returns</span>
+<span class="sd">    --------</span>
+<span class="sd">    gdf_temp        : geopandas.GeoDataFrame or pandas.DataFrame</span>
+<span class="sd">                      geopandas.GeoDataFrame or pandas.DataFrame with a new column for sequence</span>
 <span class="sd">                      labels.</span>
 <span class="sd">    df_wide         : pandas.DataFrame</span>
 <span class="sd">                      Wide-form DataFrame with k (k is the number of periods)</span>
@@ -333,7 +332,7 @@
     </p>
     <p>
         &copy; Copyright 2018, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
     </p>
   </div>
 </footer>

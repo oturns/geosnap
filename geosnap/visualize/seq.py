@@ -21,8 +21,8 @@ def indexplot_seq(df_traj, clustering,
     """
     Function for index plot of neighborhood sequences within each cluster.
 
-    Arguments
-    ---------
+    Parameters
+    ----------
     df_traj      : dataframe
                    dataframe of trajectories
     clustering   : str
