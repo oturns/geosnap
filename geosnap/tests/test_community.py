@@ -8,9 +8,8 @@ try:
     LTDB = os.environ["LTDB_SAMPLE"]
     NCDB = os.environ["NCDB"]
 except:
-    SKIP_LTDB = True
-    SKIP_NCDB = True
-
+    LTDB=None
+    NCDB=None
 
 def test_Community_from_cbsa():
 
@@ -24,7 +23,7 @@ def test_Community_from_stcofips():
     assert mn.gdf.shape == (3881, 195)
 
 
-@pytest.mark.skipif(SKIP_NCDB, reason="unable to locate NCDB data")
+@pytest.mark.skipif(not NCDB, reason="unable to locate NCDB data")
 def test_Community_from_indices():
 
     chi = Community.from_ncdb(fips=["17031", "17019"])
