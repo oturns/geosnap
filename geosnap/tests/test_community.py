@@ -1,5 +1,15 @@
 from geosnap import Community, datasets
+import pytest
+import os
 
+
+path = os.environ["DLPATH"]
+try:
+    LTDB = os.environ["LTDB_SAMPLE"]
+    NCDB = os.environ["NCDB"]
+except:
+    LTDB=None
+    NCDB=None
 
 def test_Community_from_cbsa():
 
@@ -12,7 +22,7 @@ def test_Community_from_stcofips():
     mn = Community.from_census(state_fips="27", county_fips=["26001", "26002"])
     assert mn.gdf.shape == (3881, 195)
 
-
+@pytest.mark.skipif(not NCDB, reason="unable to locate NCDB data")
 def test_Community_from_indices():
 
     chi = Community.from_ncdb(fips=["17031", "17019"])
@@ -40,7 +50,7 @@ def test_Community_from_gdfs():
 
     assert Community.from_geodataframes([t90, t00]).gdf.shape == (380, 192)
 
-
+@pytest.mark.skipif(not LTDB, reason="unable to locate NCDB data")
 def test_Community_from_lodes():
     dc = Community.from_lodes(state_fips="11", years=[2010, 2015])
     assert dc.gdf.shape == (6046, 57)
