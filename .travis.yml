@@ -32,6 +32,8 @@ before_install:
     conda info --all
 install:
   - pip install -e . --no-deps --force-reinstall
+  - if [[ $TRAVIS_JOB_NAME == python-* ]]; then
+    python -c "import os;from geosnap import io;path = os.environ['DLPATH'];io.store_ltdb(sample=path + '/ltdb_sample.zip', fullcount=path + '/ltdb_full.zip')"; 
 
 script:
   - if [[ $TRAVIS_JOB_NAME == python-* ]]; then
