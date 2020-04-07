@@ -36,7 +36,6 @@ install:
 script:
   - if [[ $TRAVIS_JOB_NAME == python-* ]]; then
       travis_wait 45 pytest --ignore=examples/ --ignore=geosnap/util/  --ignore=geosnap/visualize/ --cov geosnap; 
-      jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 --ExecutePreprocessor.kernel_name=python3 examples/*.ipynb;
     fi
   - if [[ $TRAVIS_JOB_NAME == 'tarball' ]]; then
       pip wheel . -w dist --no-deps ;
@@ -54,4 +53,7 @@ notifications:
         on_failure: always 
 
 after_success:
+  - if [[ $TRAVIS_JOB_NAME == python-* ]]; then
+      jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 --ExecutePreprocessor.kernel_name=python3 examples/*.ipynb;
+    fi
   - coveralls
