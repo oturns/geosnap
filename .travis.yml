@@ -33,7 +33,7 @@ before_install:
 install:
   - pip install -e . --no-deps --force-reinstall
   - if [[ $TRAVIS_JOB_NAME == python-* ]]; then
-    python tests/get_data.py
+    python geosnap/tests/get_data.py
 
 script:
   - if [[ $TRAVIS_JOB_NAME == python-* ]]; then
