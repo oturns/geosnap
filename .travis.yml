@@ -32,8 +32,7 @@ before_install:
     conda info --all
 install:
   - pip install -e . --no-deps --force-reinstall
-  - if [[ $TRAVIS_JOB_NAME == python-* ]]; then
-    python geosnap/tests/get_data.py
+  - python geosnap/tests/get_data.py
 
 script:
   - if [[ $TRAVIS_JOB_NAME == python-* ]]; then
