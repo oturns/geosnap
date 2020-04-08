@@ -44,7 +44,7 @@ def transition(
     Examples
     --------
     >>> from geosnap import Community
-    >>> columbus = Community.from_ltdb(msa_fips=columbusfips)
+    >>> columbus = Community.from_ltdb(msa_fips="18140")
     >>> columbus1 = columbus.cluster(columns=['median_household_income',
     ... 'p_poverty_rate', 'p_edu_college_greater', 'p_unemployment_rate'],
     ... method='ward', n_clusters=6)
@@ -166,7 +166,7 @@ def sequence(
     Examples
     --------
     >>> from geosnap.data import Community
-    >>> columbus = Community.from_ltdb(msa_fips=columbusfips)
+    >>> columbus = Community.from_ltdb(msa_fips="18140")
     >>> columbus1 = columbus.cluster(columns=['median_household_income',
     ... 'p_poverty_rate', 'p_edu_college_greater', 'p_unemployment_rate'],
     ... method='ward', n_clusters=6)

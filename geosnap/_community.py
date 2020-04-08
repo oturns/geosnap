@@ -671,7 +671,7 @@ class Community:
     ):
         """Create a new Community from Census LEHD/LODES data.
 
-           Instiantiate a new Community from LODES data.
+           Instantiate a new Community from LODES data.
            Pass lists of states, counties, or any
            arbitrary FIPS codes to create a community. All fips code arguments
            are additive, so geosnap will include the largest unique set.
