@@ -1,32 +1,40 @@
 import numpy as np
-
+import os
 from geosnap import Community
 from geosnap.analyze import sequence, transition
 
 RTOL = 0.00001
 
-columbus = Community.from_ltdb(msa_fips="18140")
-columns = [
-    "median_household_income",
-    "p_poverty_rate",
-    "p_edu_college_greater",
-    "p_unemployment_rate",
-]
-columbus1 = columbus.cluster(
-    columns=[
-        "median_household_income",
-        "p_poverty_rate",
-        "p_edu_college_greater",
-        "p_unemployment_rate",
-    ],
-    method="ward",
-)
+import pytest 
+
+path = os.environ["DLPATH"]
+try:
+    LTDB = os.environ["LTDB_SAMPLE"]
+except:
+    LTDB=None
 
 
+@pytest.mark.skipif(not LTDB, reason="unable to locate LTDB data")
 def test_transition():
     """
     Testing transition modeling.
     """
+    columbus = Community.from_ltdb(msa_fips="18140")
+    columns = [
+        "median_household_income",
+        "p_poverty_rate",
+        "p_edu_college_greater",
+        "p_unemployment_rate",
+    ]
+    columbus1 = columbus.cluster(
+        columns=[
+            "median_household_income",
+            "p_poverty_rate",
+            "p_edu_college_greater",
+            "p_unemployment_rate",
+        ],
+        method="ward",
+    )
 
     # 1. Markov modeling
     m = transition(columbus1.gdf, cluster_col="ward")
@@ -57,11 +65,28 @@ def test_transition():
     )
     np.testing.assert_allclose(sm.P[0], smp, RTOL)
 
-
+@pytest.mark.skipif(not LTDB, reason="unable to locate LTDB data")
 def test_sequence():
     """
     Testing sequence modeling.
     """
+
+    columbus = Community.from_ltdb(msa_fips="18140")
+    columns = [
+        "median_household_income",
+        "p_poverty_rate",
+        "p_edu_college_greater",
+        "p_unemployment_rate",
+    ]
+    columbus1 = columbus.cluster(
+        columns=[
+            "median_household_income",
+            "p_poverty_rate",
+            "p_edu_college_greater",
+            "p_unemployment_rate",
+        ],
+        method="ward",
+    )
 
     # 1. Transition-orientied optimal matching
     output = sequence(

@@ -27,8 +27,8 @@ if not os.path.exists(data_dir):
 
 # look for local storage and create if missing
 try:
-    from quilt3.data.geosnap_data import storage
-except ImportError:
+    storage = quilt3.Package.browse("geosnap_data/storage")
+except FileNotFoundError:
     storage = quilt3.Package()
 
 

@@ -1,5 +1,15 @@
 from geosnap import Community, datasets
+import pytest
+import os
 
+
+path = os.environ["DLPATH"]
+try:
+    LTDB = os.environ["LTDB_SAMPLE"]
+    NCDB = os.environ["NCDB"]
+except:
+    LTDB=None
+    NCDB=None
 
 def test_Community_from_cbsa():
 
@@ -13,6 +23,7 @@ def test_Community_from_stcofips():
     assert mn.gdf.shape == (3881, 195)
 
 
+@pytest.mark.skipif(not NCDB, reason="unable to locate NCDB data")
 def test_Community_from_indices():
 
     chi = Community.from_ncdb(fips=["17031", "17019"])

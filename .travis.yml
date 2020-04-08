@@ -32,12 +32,11 @@ before_install:
     conda info --all
 install:
   - pip install -e . --no-deps --force-reinstall
+  - python geosnap/tests/get_data.py
 
 script:
   - if [[ $TRAVIS_JOB_NAME == python-* ]]; then
-      python -c "import os;from geosnap import io;path = os.environ['DLPATH'];io.store_ltdb(sample=path + '/ltdb_sample.zip', fullcount=path + '/ltdb_full.zip')"; 
       travis_wait 45 pytest --ignore=examples/ --ignore=geosnap/util/  --ignore=geosnap/visualize/ --cov geosnap; 
-      jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 --ExecutePreprocessor.kernel_name=python3 examples/*.ipynb;
     fi
   - if [[ $TRAVIS_JOB_NAME == 'tarball' ]]; then
       pip wheel . -w dist --no-deps ;
@@ -56,3 +55,6 @@ notifications:
 
 after_success:
   - coveralls
+  - if [[ $TRAVIS_JOB_NAME == python-* ]]; then
+      jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 --ExecutePreprocessor.kernel_name=python3 examples/*.ipynb;
+    fi

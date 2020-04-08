@@ -86,7 +86,7 @@ def adjust_inflation(df, columns, given_year, base_year=2015):
     """
     # get inflation adjustment table from BLS
     inflation = pd.read_excel(
-        "https://www.bls.gov/cpi/research-series/allitems.xlsx", skiprows=6
+        "https://www.bls.gov/cpi/research-series/allitems.xlsx", skiprows=5
     )
     inflation.columns = inflation.columns.str.lower()
     inflation.columns = inflation.columns.str.strip(".")
