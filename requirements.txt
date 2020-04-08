@@ -18,4 +18,4 @@ tqdm
 quilt3==3.1.8
 region>=0.2.1
 pyarrow>=0.14.1
-tobler
+tobler>=0.2.1
