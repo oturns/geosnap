@@ -1,5 +1,9 @@
 import os
-from geosnap import io
+
+try:
+    from geosnap import io
+except:
+    pass
 
 path = os.environ['DLPATH']
 
