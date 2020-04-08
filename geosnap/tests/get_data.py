@@ -1,7 +1,7 @@
-import os;
+import os
 from geosnap import io
 
-path = os.environ['DLPATH'];
+path = os.environ['DLPATH']
 
 try:
     io.store_ltdb(sample=path + '/ltdb_sample.zip', fullcount=path + '/ltdb_full.zip')
