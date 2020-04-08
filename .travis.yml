@@ -32,8 +32,9 @@ before_install:
     conda info --all
 install:
   - pip install -e . --no-deps --force-reinstall
-  - python geosnap/tests/get_data.py
-
+  - if [[ $TRAVIS_JOB_NAME == python-* ]]; then
+      python geosnap/tests/get_data.py
+    fi
 script:
   - if [[ $TRAVIS_JOB_NAME == python-* ]]; then
       travis_wait 45 pytest --ignore=examples/ --ignore=geosnap/util/  --ignore=geosnap/visualize/ --cov geosnap; 
@@ -54,7 +55,7 @@ notifications:
         on_failure: always 
 
 after_success:
+  - coveralls
   - if [[ $TRAVIS_JOB_NAME == python-* ]]; then
       jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 --ExecutePreprocessor.kernel_name=python3 examples/*.ipynb;
     fi
-  - coveralls
