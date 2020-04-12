@@ -35,6 +35,8 @@
        - shell: bash -l {0}
          run: pip install -e . --no-deps --force-reinstall
        - shell: bash -l {0}
+         run: export DLPATH=`pwd`
+       - shell: bash -l {0}
          run: python geosnap/tests/get_data.py
        - shell: bash -l {0}
          run: py.test -v geosnap --cov=geosnap --cov-report=xml
