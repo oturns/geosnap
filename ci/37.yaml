@@ -9,6 +9,7 @@ dependencies:
   - spenc
   - cenpy
   - geopandas
+  - hdbscan
   - matplotlib
   - scikit-learn
   - seaborn

@@ -12,6 +12,7 @@ dependencies:
   - matplotlib
   - scikit-learn
   - seaborn
+  - hdbscan
   - pyarrow >=0.14.1
   - appdirs
   - dash
