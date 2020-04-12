@@ -21,9 +21,9 @@
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../_static/js/jquery-1.12.4.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
 <script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="../_static/bootstrap-3.4.1/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
 <script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
 
   </head><body>
@@ -47,6 +47,7 @@
             
                 <li><a href="../installation.html">Installation</a></li>
                 <li><a href="../api.html">API</a></li>
+                <li><a href="../data.html">Data</a></li>
                 <li><a href="https://spatialucr.github.io/geosnap-guide/">User Guide</a></li>
                 <li><a href="../references.html">References</a></li>
             
@@ -75,6 +76,11 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data.html">Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../data.html#tabular-data">Tabular Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../data.html#geo-data">Geo Data</a></li>
+</ul>
+</li>
 </ul>
 </ul>
 </li>
@@ -127,7 +133,7 @@
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>gdf</strong><span class="classifier"><a class="reference external" href="https://geopandas.readthedocs.io/en/latest/reference/geopandas.GeoDataFrame.html#geopandas.GeoDataFrame" title="(in GeoPandas v0.7.0+9.ga646392)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geopandas.GeoDataFrame</span></code></a>, required</span></dt><dd><p>long-form GeoDataFrame containing neighborhood attributes</p>
+<dt><strong>gdf</strong><span class="classifier"><a class="reference external" href="https://geopandas.readthedocs.io/en/latest/reference/geopandas.GeoDataFrame.html#geopandas.GeoDataFrame" title="(in GeoPandas v0.7.0+19.gedf6e96)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geopandas.GeoDataFrame</span></code></a>, required</span></dt><dd><p>long-form GeoDataFrame containing neighborhood attributes</p>
 </dd>
 <dt><strong>n_clusters</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, required</span></dt><dd><p>the number of clusters to model. The default is 6).</p>
 </dd>
@@ -161,7 +167,7 @@ clusters unique to each time period.</p></li>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl>
-<dt><strong>gdf</strong><span class="classifier"><a class="reference external" href="https://geopandas.readthedocs.io/en/latest/reference/geopandas.GeoDataFrame.html#geopandas.GeoDataFrame" title="(in GeoPandas v0.7.0+9.ga646392)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geopandas.GeoDataFrame</span></code></a></span></dt><dd><p>GeoDataFrame with a column of neighborhood cluster labels
+<dt><strong>gdf</strong><span class="classifier"><a class="reference external" href="https://geopandas.readthedocs.io/en/latest/reference/geopandas.GeoDataFrame.html#geopandas.GeoDataFrame" title="(in GeoPandas v0.7.0+19.gedf6e96)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">geopandas.GeoDataFrame</span></code></a></span></dt><dd><p>GeoDataFrame with a column of neighborhood cluster labels
 appended as a new column. If cluster method exists as a column on the DataFrame
 then the column will be incremented.</p>
 </dd>

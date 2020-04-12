@@ -33,3 +33,4 @@ of geosnap in practice, see the `User Guide <https://spatialucr.github.io/geosna
    Installation <installation>
    API <api>
    References <references>
+   Data <data>

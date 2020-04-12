@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Installation &#8212; geosnap v0.1.6 Manual</title>
+    <title>Datasets &#8212; geosnap v0.1.6 Manual</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/pysal-styles.css" />
@@ -15,8 +15,7 @@
     <link rel="shortcut icon" href="_static/geosnap.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="API reference" href="api.html" />
-    <link rel="prev" title="The Geospatial Neighborhood Analysis Package" href="index.html" />
+    <link rel="prev" title="References" href="references.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -45,9 +44,9 @@
         <div class="collapse navbar-collapse nav-collapse">
           <ul class="nav navbar-nav">
             
-                <li><a href="#">Installation</a></li>
+                <li><a href="installation.html">Installation</a></li>
                 <li><a href="api.html">API</a></li>
-                <li><a href="data.html">Data</a></li>
+                <li><a href="#">Data</a></li>
                 <li><a href="https://spatialucr.github.io/geosnap-guide/">User Guide</a></li>
                 <li><a href="references.html">References</a></li>
             
@@ -62,9 +61,9 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#installing-a-released-version">Installing a released version</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#installing-development-version">Installing development version</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installing-a-released-version">Installing a released version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installing-development-version">Installing development version</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a><ul>
@@ -76,9 +75,9 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data.html">Data</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="data.html#tabular-data">Tabular Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data.html#geo-data">Geo Data</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#tabular-data">Tabular Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#geo-data">Geo Data</a></li>
 </ul>
 </li>
 </ul>
@@ -94,9 +93,9 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">Installation</a><ul>
-<li><a class="reference internal" href="#installing-a-released-version">Installing a released version</a></li>
-<li><a class="reference internal" href="#installing-development-version">Installing development version</a></li>
+<li><a class="reference internal" href="#">Datasets</a><ul>
+<li><a class="reference internal" href="#tabular-data">Tabular Data</a></li>
+<li><a class="reference internal" href="#geo-data">Geo Data</a></li>
 </ul>
 </li>
 </ul>
@@ -128,33 +127,64 @@
   <div class="row">
     <div class="body col-md-12 content" role="main">
       
-  <div class="section" id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<p><code class="docutils literal notranslate"><span class="pre">geosnap</span></code> supports python <a class="reference external" href="https://docs.python.org/3.5/">3.5</a> and <a class="reference external" href="https://docs.python.org/3.6/">3.6</a> only. Please make sure that you are
-operating in a python 3 environment.</p>
-<div class="section" id="installing-a-released-version">
-<h2>Installing a released version<a class="headerlink" href="#installing-a-released-version" title="Permalink to this headline">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">geosnap</span></code> is available on both conda and pip, and can be installed with either</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install -c conda-forge geosnap
-</pre></div>
+  <div class="section" id="datasets">
+<h1>Datasets<a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">geosnap</span></code> uses <a class="reference external" href="https://quiltdata.com">quilt</a> for data storage and delivery. or more information, see our <a class="reference external" href="https://open.quiltdata.com/b/spatial-ucr/tree/">public quilt bucket</a></p>
+<div class="section" id="tabular-data">
+<h2>Tabular Data<a class="headerlink" href="#tabular-data" title="Permalink to this headline">¶</a></h2>
+<p>To view the <a class="reference external" href="https://github.com/spatialucr/geosnap/blob/master/geosnap/io/variables.csv">codebook</a> for geosnap’s builtin datasets, use</p>
+<p><code class="docutils literal notranslate"><span class="pre">geosnap.io.codebook()</span></code></p>
+<p>which will return a pandas.DataFrame of variable names, definitions, formulas for intermediate variables, and translations to original sources.
+All variables are collected via the U.S. Census Bureau from either the decennial census, the American Community Survey, or the <a class="reference external" href="https://lehd.ces.census.gov/data/lodes/LODES7/">Longitudinal Employment Household Dynamics</a> dataset.</p>
 </div>
-<p>or</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install geosnap
-</pre></div>
-</div>
-</div>
-<div class="section" id="installing-development-version">
-<h2>Installing development version<a class="headerlink" href="#installing-development-version" title="Permalink to this headline">¶</a></h2>
-<p>The recommended method for installing geosnap is with <a class="reference external" href="https://www.anaconda.com/download/">anaconda</a>. To get started with the development version, clone this repository or download it manually then <cite>cd</cite> into the directory and run the following commands:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda env create -f environment.yml
-$ source activate geosnap
-$ python setup.py develop
-</pre></div>
-</div>
-<p>You can  also <a class="reference external" href="https://help.github.com/articles/fork-a-repo/">fork</a> the <a class="reference external" href="https://github.com/spatialucr/geosnap">spatialucr/geosnap</a> repo and create a local clone of
-your fork. By making changes
-to your local clone and submitting a pull request to <a class="reference external" href="https://github.com/spatialucr/geosnap">spatialucr/geosnap</a>, you can
-contribute to the geosnap development.</p>
+<div class="section" id="geo-data">
+<h2>Geo Data<a class="headerlink" href="#geo-data" title="Permalink to this headline">¶</a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 13%" />
+<col style="width: 87%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Data</p></th>
+<th class="head"><p>Source</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Blocks
+2000</p></td>
+<td><p><a class="reference external" href="https://www2.census.gov/geo/tiger/TIGER2010/TABBLOCK/2000/">https://www2.census.gov/geo/tiger/TIGER2010/TABBLOCK/2000/</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Blocks
+2010</p></td>
+<td><p><a class="reference external" href="https://www2.census.gov/geo/tiger/TIGER2018/TABBLOCK/">https://www2.census.gov/geo/tiger/TIGER2018/TABBLOCK/</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Tracts
+1990</p></td>
+<td><p><a class="reference external" href="https://www2.census.gov/geo/tiger/PREVGENZ/tr/tr90shp/">https://www2.census.gov/geo/tiger/PREVGENZ/tr/tr90shp/</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Tracts
+2000</p></td>
+<td><p><a class="reference external" href="https://www2.census.gov/geo/tiger/PREVGENZ/tr/tr00shp/">https://www2.census.gov/geo/tiger/PREVGENZ/tr/tr00shp/</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Tracts
+2010</p></td>
+<td><p><a class="reference external" href="https://www2.census.gov/geo/tiger/TIGER2018/TRACT/">https://www2.census.gov/geo/tiger/TIGER2018/TRACT/</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>MSA
+Defi
+nitions</p></td>
+<td><p>https:
+//www2.census.gov/programs-surveys/metro-micro/geographies
+/reference-files/2018/delineation-files/list1_Sep_2018.xls</p></td>
+</tr>
+<tr class="row-even"><td><p>In
+flation
+Adj
+ustment</p></td>
+<td><p><a class="reference external" href="https://www.bls.gov/cpi/research-series/allitems.xlsx">https://www.bls.gov/cpi/research-series/allitems.xlsx</a></p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 
@@ -171,7 +201,7 @@ contribute to the geosnap development.</p>
         <br/>
         
 <div id="sourcelink">
-  <a href="_sources/installation.rst.txt"
+  <a href="_sources/data.rst.txt"
      rel="nofollow">Source</a>
 </div>
       

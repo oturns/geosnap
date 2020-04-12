@@ -19,9 +19,9 @@
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../../_static/js/jquery-1.12.4.min.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
 <script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="../../_static/bootstrap-3.4.1/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
 <script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
 
   </head><body>
@@ -45,6 +45,7 @@
             
                 <li><a href="../../installation.html">Installation</a></li>
                 <li><a href="../../api.html">API</a></li>
+                <li><a href="../../data.html">Data</a></li>
                 <li><a href="https://spatialucr.github.io/geosnap-guide/">User Guide</a></li>
                 <li><a href="../../references.html">References</a></li>
             
@@ -73,6 +74,11 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data.html">Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../data.html#tabular-data">Tabular Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../data.html#geo-data">Geo Data</a></li>
+</ul>
+</li>
 </ul>
 </ul>
 </li>
@@ -136,8 +142,8 @@
 
 <span class="c1"># look for local storage and create if missing</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">quilt3.data.geosnap_data</span> <span class="kn">import</span> <span class="n">storage</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">storage</span> <span class="o">=</span> <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">browse</span><span class="p">(</span><span class="s2">&quot;geosnap_data/storage&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
     <span class="n">storage</span> <span class="o">=</span> <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="p">()</span>
 
 
@@ -230,13 +236,15 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Instantiate a new DataStore object.&quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>  <span class="c1"># if any of these aren&#39;t found, stream them insteead</span>
-            <span class="kn">from</span> <span class="nn">quilt3.data.census</span> <span class="kn">import</span> <span class="n">tracts_cartographic</span><span class="p">,</span> <span class="n">administrative</span>
-        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+
+        <span class="k">try</span><span class="p">:</span> <span class="c1"># if any of these aren&#39;t found, stream them insteead</span>
+            <span class="n">administrative</span> <span class="o">=</span> <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">browse</span><span class="p">(</span><span class="s2">&quot;census/administrative&quot;</span><span class="p">)</span>
+            <span class="n">tracts_cartographic</span> <span class="o">=</span> <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">browse</span><span class="p">(</span><span class="s2">&quot;census/tracts_cartographic&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
             <span class="n">warn</span><span class="p">(</span>
                 <span class="s2">&quot;Unable to locate local census data. Streaming instead.</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="s2">&quot;If you plan to use census data repeatedly you can store it locally &quot;</span>
-                <span class="s2">&quot;with the data.store_census function for better performance&quot;</span>
+                <span class="s2">&quot;with the io.store_census function for better performance&quot;</span>
             <span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">tracts_cartographic</span> <span class="o">=</span> <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">browse</span><span class="p">(</span>
@@ -251,7 +259,7 @@
                     <span class="s2">&quot;Unable to locate local census data and unable to reach s3 bucket.&quot;</span>
                     <span class="s2">&quot;You will be unable to use built-in data during this session. &quot;</span>
                     <span class="s2">&quot;If you need these data, please try downloading a local copy &quot;</span>
-                    <span class="s2">&quot;with the data.store_census function, then restart your &quot;</span>
+                    <span class="s2">&quot;with the io.store_census function, then restart your &quot;</span>
                     <span class="s2">&quot;python kernel and try again.&quot;</span>
                 <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tracts_cartographic</span> <span class="o">=</span> <span class="n">tracts_cartographic</span>
@@ -294,13 +302,13 @@
 <span class="sd">            stored as well-known binary on the &#39;wkb&#39; column.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>  <span class="c1"># if any of these aren&#39;t found, stream them insteead</span>
-            <span class="kn">from</span> <span class="nn">quilt3.data.census</span> <span class="kn">import</span> <span class="n">blocks_2000</span>
-        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">blocks_2000</span> <span class="o">=</span> <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">browse</span><span class="p">(</span><span class="s2">&quot;census/blocks_2000&quot;</span><span class="p">)</span> <span class="c1"># if any of these aren&#39;t found, stream them instead</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
             <span class="n">warn</span><span class="p">(</span>
                 <span class="s2">&quot;Unable to locate local census 2000 block data. Streaming instead.</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="s2">&quot;If you plan to use census data repeatedly you can store it locally &quot;</span>
-                <span class="s2">&quot;with the data.store_blocks_2000 function for better performance&quot;</span>
+                <span class="s2">&quot;with the io.store_blocks_2000 function for better performance&quot;</span>
             <span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">blocks_2000</span> <span class="o">=</span> <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">browse</span><span class="p">(</span>
@@ -311,7 +319,7 @@
                 <span class="n">warn</span><span class="p">(</span>
                     <span class="s2">&quot;Unable to locate local census data and unable to reach s3 bucket.&quot;</span>
                     <span class="s2">&quot;You will be unable to use built-in data during this session. &quot;</span>
-                    <span class="s2">&quot;Try downloading a local copy with the data.store_blocks_2000 function,&quot;</span>
+                    <span class="s2">&quot;Try downloading a local copy with the io.store_blocks_2000 function,&quot;</span>
                     <span class="s2">&quot;then restart your python kernel and try again.&quot;</span>
                 <span class="p">)</span>
 
@@ -349,13 +357,13 @@
 <span class="sd">            stored as well-known binary on the &#39;wkb&#39; column.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>  <span class="c1"># if any of these aren&#39;t found, stream them insteead</span>
-            <span class="kn">from</span> <span class="nn">quilt3.data.census</span> <span class="kn">import</span> <span class="n">blocks_2010</span>
-        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">blocks_2010</span> <span class="o">=</span> <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">browse</span><span class="p">(</span><span class="s2">&quot;census/blocks_2010&quot;</span><span class="p">)</span>  <span class="c1"># if any of these aren&#39;t found, stream them instead</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
             <span class="n">warn</span><span class="p">(</span>
                 <span class="s2">&quot;Unable to locate local census 2010 block data. Streaming instead.</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="s2">&quot;If you plan to use census data repeatedly you can store it locally &quot;</span>
-                <span class="s2">&quot;with the data.store_blocks_2010 function for better performance&quot;</span>
+                <span class="s2">&quot;with the io.store_blocks_2010 function for better performance&quot;</span>
             <span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">blocks_2010</span> <span class="o">=</span> <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">browse</span><span class="p">(</span>
@@ -367,7 +375,7 @@
                     <span class="s2">&quot;Unable to locate local census data and unable to reach s3 bucket.&quot;</span>
                     <span class="s2">&quot;You will be unable to use built-in data during this session. &quot;</span>
                     <span class="s2">&quot;If you need these data, please try downloading a local copy &quot;</span>
-                    <span class="s2">&quot;with the data.store_blocks_2010 function, then restart your &quot;</span>
+                    <span class="s2">&quot;with the io.store_blocks_2010 function, then restart your &quot;</span>
                     <span class="s2">&quot;python kernel and try again.&quot;</span>
                 <span class="p">)</span>
 
