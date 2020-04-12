@@ -1,4 +1,5 @@
 import os
+from warnings import warn
 from urllib.error import HTTPError
 
 import pandas as pd
@@ -85,9 +86,26 @@ def adjust_inflation(df, columns, given_year, base_year=2015):
 
     """
     # get inflation adjustment table from BLS
-    inflation = pd.read_excel(
-        "https://www.bls.gov/cpi/research-series/allitems.xlsx", skiprows=5
+
+    inflation = pd.read_parquet(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), "bls_inflation.parquet"
+        )
     )
+    try:
+        remote = pd.read_excel(
+            "https://www.bls.gov/cpi/research-series/allitems.xlsx", skiprows=5
+        )
+
+        if not inflation.equals(remote):
+            warn(
+                "Warning: local inflation adjustment table does not match remote copy from BLS!"
+            )
+    except Exception:
+        warn(
+            "Unable to read inflation adjustment table from BLS. Falling back to local copy"
+        )
+
     inflation.columns = inflation.columns.str.lower()
     inflation.columns = inflation.columns.str.strip(".")
     inflation = inflation.dropna(subset=["year"])
