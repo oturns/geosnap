@@ -1,0 +1,30 @@
+name: test
+channels:
+  - conda-forge
+dependencies:
+  - python=3.6
+  - pandas
+  - giddy >=2.2.1
+  - libpysal
+  - spenc
+  - cenpy
+  - geopandas
+  - matplotlib
+  - scikit-learn
+  - seaborn
+  - hdbscan
+  - pyarrow >=0.14.1
+  - appdirs
+  - dash
+  - dash-bootstrap-components
+  - palettable
+  - pip
+  - tqdm
+  - quilt3 >=3.1.11
+  - xlrd
+  - region >=0.2.0
+  - tobler >=0.2.1
+  # testing
+  - pytest
+  - pytest-cov
+  - codecov
