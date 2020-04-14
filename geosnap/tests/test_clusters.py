@@ -1,4 +1,5 @@
 from geosnap import Community, io
+import numpy as np
 
 reno = Community.from_census(msa_fips="39900")
 columns = ["median_household_income", "p_poverty_rate", "p_unemployment_rate"]
@@ -72,3 +73,12 @@ def test_skater():
 def test_azp():
     r = reno.cluster_spatial(columns=columns, method="azp", n_clusters=7)
     assert len(r.gdf.azp.unique()) == 8
+
+
+# Test seeding
+
+def test_seed():
+    np.random.seed(12345)
+    r = reno.cluster(columns=columns, method='ward')
+    card = r.gdf.groupby('ward').count()['geoid'].values
+    np.testing.assert_array_equal(card, [27, 83, 19, 51, 38,  7])
