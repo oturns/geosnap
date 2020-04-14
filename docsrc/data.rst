@@ -50,6 +50,11 @@ Geo Data
 | Tracts  | https://www2.census.gov/geo/tiger/TIGER2018/TRACT/         |
 | 2010    |                                                            |
 +---------+------------------------------------------------------------+
+| C       | https://www2.census.gov/geo/tiger/TIGER2018/COUNTY/        |
+| ounties |                                                            |
++---------+------------------------------------------------------------+
+| MSAs    | https://www2.census.gov/geo/tiger/TIGER2018/CBSA/          |
++---------+------------------------------------------------------------+
 | MSA     | https:                                                     |
 | Defi    | //www2.census.gov/programs-surveys/metro-micro/geographies |
 | nitions | /reference-files/2018/delineation-files/list1_Sep_2018.xls |
