@@ -10,7 +10,7 @@
    unittests:
      name: conda (${{ matrix.os }}, ${{ matrix.environment-file }})
      runs-on: ${{ matrix.os }}
-     timeout-minutes: 15
+     timeout-minutes: 30 
      strategy:
        matrix:
          os: ['macos-latest', 'ubuntu-latest']
@@ -38,4 +38,4 @@
          run: |
            export DLPATH=`pwd`
            python geosnap/tests/get_data.py
-           py.test -v geosnap --cov=geosnap --cov-report=xml
+           py.test -v geosnap --cov=geosnap --cov-report=XML
