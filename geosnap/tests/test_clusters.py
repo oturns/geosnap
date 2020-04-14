@@ -14,7 +14,6 @@ def test_gm():
 
 
 def test_ward():
-    io.store_census()
     r = reno.cluster(columns=columns, method="ward")
     assert len(r.gdf.ward.unique()) == 7
 
