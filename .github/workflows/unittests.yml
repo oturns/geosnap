@@ -39,9 +39,3 @@
            export DLPATH=`pwd`
            python geosnap/tests/get_data.py
            py.test -v geosnap --cov=geosnap --cov-report=xml
-       - name: codecov (${{ matrix.os }}, ${{ matrix.environment-file }})
-         uses: codecov/codecov-action@v1
-         with:
-           token: ${{ secrets.CODECOV_TOKEN }}
-           file: ./coverage.xml
-           name: geosnap-codecov
