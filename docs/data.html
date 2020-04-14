@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Datasets &#8212; geosnap v0.1.6 Manual</title>
+    <title>Built-In Datasets &#8212; geosnap v0.1.6 Manual</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/pysal-styles.css" />
@@ -93,7 +93,7 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">Datasets</a><ul>
+<li><a class="reference internal" href="#">Built-In Datasets</a><ul>
 <li><a class="reference internal" href="#tabular-data">Tabular Data</a></li>
 <li><a class="reference internal" href="#geo-data">Geo Data</a></li>
 </ul>
@@ -127,13 +127,24 @@
   <div class="row">
     <div class="body col-md-12 content" role="main">
       
-  <div class="section" id="datasets">
-<h1>Datasets<a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h1>
-<p><code class="docutils literal notranslate"><span class="pre">geosnap</span></code> uses <a class="reference external" href="https://quiltdata.com">quilt</a> for data storage and delivery. or more information, see our <a class="reference external" href="https://open.quiltdata.com/b/spatial-ucr/tree/">public quilt bucket</a></p>
+  <div class="section" id="built-in-datasets">
+<h1>Built-In Datasets<a class="headerlink" href="#built-in-datasets" title="Permalink to this headline">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">geosnap</span></code> has a lightweight installation footprint (the codebase clocks in at 174KB), but it also
+has access to several large, built-in datasets transparently, thanks to <a class="reference external" href="https://quiltdata.com">quilt</a>.
+We host a variety of U.S. Census, landsat imagery, and OSM road network data in our <a class="reference external" href="https://open.quiltdata.com/b/spatial-ucr/tree/">public quilt bucket</a>,
+and <code class="docutils literal notranslate"><span class="pre">geosnap</span></code> has convenience methods for building <code class="docutils literal notranslate"><span class="pre">Community</span></code> datasets from them.</p>
+<p>All built-in datasets are available as methods on the <code class="docutils literal notranslate"><span class="pre">geosnap.datasets</span></code> module. For more information, see the <a class="reference external" href="https://spatialucr.github.io/geosnap-guide/notebooks/01_getting_started.html">Getting Started</a> tutorial</p>
+<p>To keep its slender profile, <code class="docutils literal notranslate"><span class="pre">geosnap</span></code> is conservative about storing these data locally. By default, when you use built-in data, it is streamed from s3 via <code class="docutils literal notranslate"><span class="pre">quilt</span></code>.
+We store the data as efficient parquet files, and quilt provides access to them via Amazon’s <a class="reference external" href="https://registry.opendata.aws/spatial-ucr/">open data cloud</a>.
+This means that streaming data is relatively fast and efficient.</p>
+<p>If you plan to make repeated queries, or you need offline access to the data, <code class="docutils literal notranslate"><span class="pre">geosnap</span></code> also has functions
+for caching all the data locally (see the <a class="reference external" href="https://spatialucr.github.io/geosnap-guide/notebooks/01_getting_started.html">Getting Started</a> tutorial).
+Since we store everything in parquet, local storage is still highly efficient, and <code class="docutils literal notranslate"><span class="pre">geosnap</span></code> will use <a class="reference external" href="https://pypi.org/project/appdirs/">appdirs</a>
+to determine the best place to store the data on your machine.</p>
 <div class="section" id="tabular-data">
 <h2>Tabular Data<a class="headerlink" href="#tabular-data" title="Permalink to this headline">¶</a></h2>
 <p>To view the <a class="reference external" href="https://github.com/spatialucr/geosnap/blob/master/geosnap/io/variables.csv">codebook</a> for geosnap’s builtin datasets, use</p>
-<p><code class="docutils literal notranslate"><span class="pre">geosnap.io.codebook()</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">geosnap.datasets.codebook()</span></code></p>
 <p>which will return a pandas.DataFrame of variable names, definitions, formulas for intermediate variables, and translations to original sources.
 All variables are collected via the U.S. Census Bureau from either the decennial census, the American Community Survey, or the <a class="reference external" href="https://lehd.ces.census.gov/data/lodes/LODES7/">Longitudinal Employment Household Dynamics</a> dataset.</p>
 </div>

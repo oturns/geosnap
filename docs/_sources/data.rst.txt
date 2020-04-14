@@ -1,14 +1,30 @@
-Datasets
-===============
+Built-In Datasets
+========================
+
+``geosnap`` has a lightweight installation footprint (the codebase clocks in at 174KB), but it also
+has access to several large, built-in datasets transparently, thanks to `quilt <https://quiltdata.com>`_.  
+We host a variety of U.S. Census, landsat imagery, and OSM road network data in our `public quilt bucket  <https://open.quiltdata.com/b/spatial-ucr/tree/>`_, 
+and ``geosnap`` has convenience methods for building ``Community`` datasets from them. 
 
 
-``geosnap`` uses `quilt <https://quiltdata.com>`_ for data storage and delivery. or more information, see our `public quilt bucket  <https://open.quiltdata.com/b/spatial-ucr/tree/>`_
+All built-in datasets are available as methods on the ``geosnap.datasets`` module. For more information, see the `Getting Started <https://spatialucr.github.io/geosnap-guide/notebooks/01_getting_started.html>`_ tutorial
+
+To keep its slender profile, ``geosnap`` is conservative about storing these data locally. By default, when you use built-in data, it is streamed from s3 via ``quilt``.
+We store the data as efficient parquet files, and quilt provides access to them via Amazon's `open data cloud <https://registry.opendata.aws/spatial-ucr/>`_. 
+This means that streaming data is relatively fast and efficient. 
+
+
+If you plan to make repeated queries, or you need offline access to the data, ``geosnap`` also has functions
+for caching all the data locally (see the `Getting Started <https://spatialucr.github.io/geosnap-guide/notebooks/01_getting_started.html>`_ tutorial). 
+Since we store everything in parquet, local storage is still highly efficient, and ``geosnap`` will use `appdirs <https://pypi.org/project/appdirs/>`_
+to determine the best place to store the data on your machine.
+
 
 Tabular Data
 --------------
 To view the `codebook <https://github.com/spatialucr/geosnap/blob/master/geosnap/io/variables.csv>`_ for geosnap's builtin datasets, use 
 
-``geosnap.io.codebook()``
+``geosnap.datasets.codebook()``
 
 which will return a pandas.DataFrame of variable names, definitions, formulas for intermediate variables, and translations to original sources.
 All variables are collected via the U.S. Census Bureau from either the decennial census, the American Community Survey, or the `Longitudinal Employment Household Dynamics <https://lehd.ces.census.gov/data/lodes/LODES7/>`_ dataset.
