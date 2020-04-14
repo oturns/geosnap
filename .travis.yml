@@ -35,6 +35,7 @@ install:
   - python geosnap/tests/get_data.py
 
 
+
 script:
   - if [[ $TRAVIS_JOB_NAME == python-* ]]; then
       travis_wait 45 pytest --ignore=examples/ --ignore=geosnap/util/  --ignore=geosnap/visualize/ --cov geosnap; 
