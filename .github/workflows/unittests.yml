@@ -38,4 +38,4 @@
          run: |
            export DLPATH=`pwd`
            python geosnap/tests/get_data.py
-           py.test -v geosnap --cov=geosnap --cov-report=XML
+           py.test -v geosnap --cov=geosnap --cov-report=xml
