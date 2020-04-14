@@ -13,7 +13,7 @@
      timeout-minutes: 15
      strategy:
        matrix:
-         os: ['macos-latest', 'ubuntu-latest', 'windows-latest']
+         os: ['macos-latest', 'ubuntu-latest']
          environment-file: [ci/36.yaml, ci/37.yaml]
      steps:
        - uses: actions/checkout@v2
