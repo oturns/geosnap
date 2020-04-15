@@ -70,7 +70,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "geosnap"
-copyright = "2018, geosnap developers"
+copyright = "2020, geosnap developers"
 author = "geosnap developers"
 
 # The version info for the project you're documenting, acts as replacement for
