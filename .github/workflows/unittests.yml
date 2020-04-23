@@ -37,11 +37,9 @@
          run: pip install -e . --no-deps --force-reinstall
        - name: Download Data
          shell: bash -l {0}
-         run: conda install wget -y; wget -q "$COMBO_DATA" -O data.zip
+         run: conda install wget -y; wget -q "$COMBO_DATA" -O data.zip; unzip data.zip || echo "Unable to download data"
          env:
             COMBO_DATA: ${{ secrets.COMBO_DATA }}
-       - name: Unzip
-         run: unzip data.zip
        - name: Pytest
          shell: bash -l {0}
          run: |
