@@ -27,9 +27,9 @@ because of some long-standing challenges, including that
 - conceptually, neighborhoods evolve through both space and time, meaning their
   socially-construed boundaries can shift over time, as can their demographic makeup.
 - geographic tabulation units change boundaries over time, meaning the raw data are
-  aggregated to different areal units at differerent points in time.
+  aggregated to different areal units at different points in time.
 
-To address these challenges,`geosnap` provides a suite of tools for creating socio-spatial
+To address these challenges, `geosnap` provides a suite of tools for creating socio-spatial
 datasets, harmonizing those datasets into consistent set of time-static boundaries,
 modeling bespoke neighborhoods and prototypical neighborhood types, and modeling
 neighborhood change using classic and spatial statistical methods.
@@ -70,7 +70,6 @@ See the [API docs](https://spatialucr.github.io/geosnap/api.html) for a thorough
 
 
 ## Quickstart
-
 
 the `Community` class is geosnap’s central data construct that holds space-time neighborhood data.  
 You can create a `Community` from geosnap’s built-in data by passing a set of fips codes to a

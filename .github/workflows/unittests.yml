@@ -36,9 +36,15 @@
          run: pip install -e . --no-deps --force-reinstall
        - shell: bash -l {0}
          run: |
+           wget -q ${{ secrets.LTDB_SAMPLE }} -O ltdb_sample.zip
+           wget -q ${{ secrets.LTDB_FULLCOUNT }} -O ltdb_full.zip
+           wget -q ${{ secrets.NCDB }} -O ncdb.csv
+           export LTDB_SAMPLE=${{ secrets.LTDB_SAMPLE }}
+           export LTDB_FULL=${{ secrets.LTDB_FULL }}
+           export NCDB=${{ secrets.NCDB }}
            export DLPATH=`pwd`
            python geosnap/tests/get_data.py
-           py.test -v geosnap --cov=geosnap --cov-report=xml
+           pytest -v geosnap --cov=geosnap --cov-report=xml
        - name: codecov (${{ matrix.os }}, ${{ matrix.environment-file }})
          uses: codecov/codecov-action@v1
          with:
