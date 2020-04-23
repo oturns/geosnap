@@ -36,14 +36,14 @@
        - shell: bash -l {0}
          run: pip install -e . --no-deps --force-reinstall
        - name: Download Data
-         run: |
-           wget -q "$LTDB_SAMPLE" -O ltdb_sample.zip
-           wget -q "$LTDB_FULLCOUNT" -O ltdb_full.zip
-           wget -q "$NCDB" -O ncdb.csv
+         uses: wei/wget@v1
+         with:
+          args: |
+            -q "$COMBO_DATA" -O data.zip
          env:
-            LTDB_SAMPLE: ${{ secrets.LTDB_SAMPLE }}
-            LTDB_FULL: ${{ secrets.LTDB_FULL }}
-            NCDB: ${{ secrets.NCDB }}
+            NCDB: ${{ secrets.COMBO_DATA }}
+       - name: Unzip
+         run: unzip data.zip -d $GITHUB_WORKSPACE
        - name: Pytest
          shell: bash -l {0}
          run: |
@@ -51,6 +51,9 @@
            pytest -v geosnap --cov=geosnap --cov-report=xml
          env:
            DLPATH: ${{ env.GITHUB_WORKSPACE }}
+           LTDB_SAMPLE: 1
+           LTDB_FULL: 1
+           NCDB: 1
        - name: codecov (${{ matrix.os }}, ${{ matrix.environment-file }})
          uses: codecov/codecov-action@v1
          with:
