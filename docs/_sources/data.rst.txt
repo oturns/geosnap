@@ -41,19 +41,14 @@ Geo Data
 | Blocks  | https://www2.census.gov/geo/tiger/TIGER2018/TABBLOCK/      |
 | 2010    |                                                            |
 +---------+------------------------------------------------------------+
-| Tracts  | https://www2.census.gov/geo/tiger/PREVGENZ/tr/tr90shp/     |
-| 1990    |                                                            |
+| Tracts  | https://github.co                                          |
+| 1990    | m/loganpowell/census-geojson/tree/master/GeoJSON/500k/1990 |
 +---------+------------------------------------------------------------+
-| Tracts  | https://www2.census.gov/geo/tiger/PREVGENZ/tr/tr00shp/     |
-| 2000    |                                                            |
+| Tracts  | https://github.co                                          |
+| 2000    | m/loganpowell/census-geojson/tree/master/GeoJSON/500k/2000 |
 +---------+------------------------------------------------------------+
-| Tracts  | https://www2.census.gov/geo/tiger/TIGER2018/TRACT/         |
-| 2010    |                                                            |
-+---------+------------------------------------------------------------+
-| C       | https://www2.census.gov/geo/tiger/TIGER2018/COUNTY/        |
-| ounties |                                                            |
-+---------+------------------------------------------------------------+
-| MSAs    | https://www2.census.gov/geo/tiger/TIGER2018/CBSA/          |
+| Tracts  | https://github.co                                          |
+| 2010    | m/loganpowell/census-geojson/tree/master/GeoJSON/500k/2010 |
 +---------+------------------------------------------------------------+
 | MSA     | https:                                                     |
 | Defi    | //www2.census.gov/programs-surveys/metro-micro/geographies |

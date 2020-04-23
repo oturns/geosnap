@@ -9,13 +9,25 @@
 
  jobs:
    unittests:
-     name: conda (${{ matrix.os }}, ${{ matrix.environment-file }})
+     name: CI (${{ matrix.os }}-${{ matrix.environment-file }})
      runs-on: ${{ matrix.os }}
-     timeout-minutes: 60 
+     continue-on-error: ${{ matrix.experimental }}
+     timeout-minutes: 90 
      strategy:
        matrix:
-         os: ['macos-latest', 'ubuntu-latest']
+         os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
          environment-file: [ci/36.yaml, ci/37.yaml]
+         experimental: [false]
+         include:
+           - os: 'ubuntu-latest'
+             environment-file: ci/38.yaml
+             experimental: true
+           - os: 'macos-latest'
+             environment-file: ci/38.yaml
+             experimental: true
+           - os: 'windows-latest'
+             environment-file: ci/38.yaml
+             experimental: true
      steps:
        - uses: actions/checkout@v2
        - uses: goanpeca/setup-miniconda@v1
@@ -37,11 +49,9 @@
          run: pip install -e . --no-deps --force-reinstall
        - name: Download Data
          shell: bash -l {0}
-         run: conda install wget -y; wget -q "$COMBO_DATA" -O data.zip
+         run: python geosnap/tests/_dl_data.py
          env:
             COMBO_DATA: ${{ secrets.COMBO_DATA }}
-       - name: Unzip
-         run: unzip data.zip
        - name: Pytest
          shell: bash -l {0}
          run: |
@@ -49,9 +59,9 @@
            python geosnap/tests/get_data.py
            pytest -v geosnap --cov=geosnap --cov-report=xml
          env:
-           LTDB_SAMPLE: 1
-           LTDB_FULL: 1
-           NCDB: 1
+           LTDB_SAMPLE: ${{ secrets.COMBO_DATA }} # check whether we can pull secrets
+           LTDB_FULL: ${{ secrets.COMBO_DATA }}
+           NCDB: ${{ secrets.COMBO_DATA }}
        - name: codecov (${{ matrix.os }}, ${{ matrix.environment-file }})
          uses: codecov/codecov-action@v1
          with:
@@ -59,5 +69,6 @@
            file: ./coverage.xml
            name: geosnap-codecov
        - name: Notebook Tests
+         if: ${{ env.COMBO_DATA }}
          shell: bash -l {0}
          run: jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 --ExecutePreprocessor.kernel_name=python3 examples/*.ipynb;
