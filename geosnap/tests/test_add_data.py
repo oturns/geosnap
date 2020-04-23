@@ -2,6 +2,7 @@ import os
 import pytest 
 from geosnap import datasets, io
 
+path = os.environ["DLPATH"]
 try:
     LTDB = os.environ["LTDB_SAMPLE"]
     NCDB = os.environ["NCDB"]
@@ -14,13 +15,13 @@ store_ncdb = io.store_ncdb
 @pytest.mark.skipif(not LTDB, reason="unable to locate LTDB data")
 def test_store_ltdb():
 
-    store_ltdb(sample="/ltdb_sample.zip", fullcount="/ltdb_full.zip")
+    store_ltdb(sample=path + "/ltdb_sample.zip", fullcount=path + "/ltdb_full.zip")
     assert datasets.ltdb().shape == (330388, 192)
 
 @pytest.mark.skipif(not NCDB, reason="unable to locate Geolytics data")
 def test_store_ncdb():
 
-    store_ncdb("/ncdb.csv")
+    store_ncdb(path + "/ncdb.csv")
     assert datasets.ncdb().shape == (328633, 77)
 
 
