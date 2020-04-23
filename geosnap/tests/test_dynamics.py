@@ -7,7 +7,6 @@ RTOL = 0.00001
 
 import pytest 
 
-path = os.environ["DLPATH"]
 try:
     LTDB = os.environ["LTDB_SAMPLE"]
 except:

@@ -2,8 +2,6 @@ from geosnap import Community, datasets
 import pytest
 import os
 
-
-path = os.environ["DLPATH"]
 try:
     LTDB = os.environ["LTDB_SAMPLE"]
     NCDB = os.environ["NCDB"]
