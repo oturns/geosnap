@@ -4,7 +4,7 @@
 
 <h2 align="center" style="margin-top:-10px">The Geospatial Neighborhood Analysis Package</h2> 
 
-[![Build Status](https://travis-ci.com/spatialucr/geosnap.svg?branch=master)](https://travis-ci.com/spatialucr/geosnap)
+![.github/workflows/unittests.yml](https://github.com/knaaptime/geosnap/workflows/.github/workflows/unittests.yml/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/spatialucr/geosnap/badge.svg?branch=master)](https://coveralls.io/github/spatialucr/geosnap?branch=master&service=github)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/geosnap)
 ![PyPI](https://img.shields.io/pypi/v/geosnap)
