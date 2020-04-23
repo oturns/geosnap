@@ -9,7 +9,7 @@
 
  jobs:
    unittests:
-     name: conda (${{ matrix.os }}, ${{ matrix.environment-file }})
+     name: CI (${{ matrix.os }}-${{ matrix.environment-file }})
      runs-on: ${{ matrix.os }}
      continue-on-error: ${{ matrix.experimental }}
      timeout-minutes: 60 
@@ -21,6 +21,8 @@
          include:
            - os: 'windows-latest'
              experimental: true
+             environment-file: [ci/36.yaml, ci/37.yaml]
+
      steps:
        - uses: actions/checkout@v2
        - uses: goanpeca/setup-miniconda@v1
@@ -62,5 +64,6 @@
            file: ./coverage.xml
            name: geosnap-codecov
        - name: Notebook Tests
+         if: env.COMBO_DATA 
          shell: bash -l {0}
          run: jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 --ExecutePreprocessor.kernel_name=python3 examples/*.ipynb;
