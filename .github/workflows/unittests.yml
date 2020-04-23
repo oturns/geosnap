@@ -14,7 +14,7 @@
      strategy:
        matrix:
          os: ['macos-latest', 'ubuntu-latest']
-         environment-file: [ci/36.yaml, ci/37.yaml]
+         environment-file: [ci/36.yaml, ci/37.yaml, ci/38.yaml]
      steps:
        - uses: actions/checkout@v2
        - uses: goanpeca/setup-miniconda@v1
@@ -39,3 +39,10 @@
            export DLPATH=`pwd`
            python geosnap/tests/get_data.py
            py.test -v geosnap --cov=geosnap --cov-report=xml
+           jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 --ExecutePreprocessor.kernel_name=python3 examples/*.ipynb;
+       - name: codecov (${{ matrix.os }}, ${{ matrix.environment-file }})
+         uses: codecov/codecov-action@v1
+         with:
+           token: ${{ secrets.CODECOV_TOKEN }}
+           file: ./coverage.xml
+           name: spot-codecov
