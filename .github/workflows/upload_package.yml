@@ -48,7 +48,7 @@ jobs:
         prerelease: false
     - name: Get Asset name
       run: |
-        export $PKG=$(ls dist/)
+        export PKG=$(ls dist/)
         set -- $PKG
         echo "::set-env name=gz_path::$2"
     - name: Upload Release Asset
