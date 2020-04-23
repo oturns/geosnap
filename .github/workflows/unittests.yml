@@ -36,11 +36,12 @@
        - shell: bash -l {0}
          run: pip install -e . --no-deps --force-reinstall
        - name: Download Datasets
-         shell: bash -l {0}
-         run : |
-           wget -q "$LTDB_SAMPLE" -O ltdb_sample.zip
-           wget -q "$LTDB_FULLCOUNT" -O ltdb_full.zip
-           wget -q "$NCDB" -O ncdb.csv
+         uses: wei/wget@v1
+         with:
+          args: |
+            -q "$LTDB_SAMPLE" -O ltdb_sample.zip
+            -q "$LTDB_FULLCOUNT" -O ltdb_full.zip
+            -q "$NCDB" -O ncdb.csv
          env:
             LTDB_SAMPLE: ${{ secrets.LTDB_SAMPLE }}
             LTDB_FULL: ${{ secrets.LTDB_FULL }}
