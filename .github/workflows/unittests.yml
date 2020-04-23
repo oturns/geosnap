@@ -15,13 +15,12 @@
      timeout-minutes: 60 
      strategy:
        matrix:
-         os: ['macos-latest', 'ubuntu-latest']
+         os: ['macos-latest', 'ubuntu-latest', 'windows-latest']
          environment-file: [ci/36.yaml, ci/37.yaml]
          experimental: [false]
          include:
            - os: 'windows-latest'
              experimental: true
-             environment-file: [ci/36.yaml, ci/37.yaml]
 
      steps:
        - uses: actions/checkout@v2
@@ -64,6 +63,6 @@
            file: ./coverage.xml
            name: geosnap-codecov
        - name: Notebook Tests
-         if: env.COMBO_DATA 
+         if: ${{ env.COMBO_DATA }}
          shell: bash -l {0}
          run: jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 --ExecutePreprocessor.kernel_name=python3 examples/*.ipynb;
