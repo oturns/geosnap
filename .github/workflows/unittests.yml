@@ -38,10 +38,9 @@
        - name: Download Data
          uses: wei/wget@v1
          with:
-          args: |
-            -q "$COMBO_DATA" -O data.zip
+          args: -q "$COMBO_DATA" -O data.zip
          env:
-            NCDB: ${{ secrets.COMBO_DATA }}
+            COMBO_DATA: ${{ secrets.COMBO_DATA }}
        - name: Unzip
          run: unzip data.zip -d $GITHUB_WORKSPACE
        - name: Pytest
