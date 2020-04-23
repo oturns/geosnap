@@ -35,26 +35,14 @@
          run: conda config --show
        - shell: bash -l {0}
          run: pip install -e . --no-deps --force-reinstall
-       - name: Download LTDB Sample
-         uses: wei/wget@v1
-         with:
-          args: |
-            -q "$LTDB_SAMPLE" -O ltdb_sample.zip
+       - name: Download Data
+         run: |
+           wget -q "$LTDB_SAMPLE" -O ltdb_sample.zip
+           wget -q "$LTDB_FULLCOUNT" -O ltdb_full.zip
+           wget -q "$NCDB" -O ncdb.csv
          env:
             LTDB_SAMPLE: ${{ secrets.LTDB_SAMPLE }}
-       - name: Download LTDB Full
-         uses: wei/wget@v1
-         with:
-          args: |
-            -q "$LTDB_FULLCOUNT" -O ltdb_full.zip
-         env:
             LTDB_FULL: ${{ secrets.LTDB_FULL }}
-       - name: Download NCDB
-         uses: wei/wget@v1
-         with:
-          args: |
-            -q "$NCDB" -O ncdb.csv
-         env:
             NCDB: ${{ secrets.NCDB }}
        - name: Pytest
          shell: bash -l {0}
