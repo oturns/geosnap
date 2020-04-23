@@ -7,9 +7,7 @@ Running the full test suite requires the
 [installation](https://github.com/spatialucr/geosnap/blob/master/examples/01_getting_started.ipynb)
 of two proprietary datasets. It also requires four environment variables to be set:
 
-- `$NCDB` : the remote location (i.e. accessible via wget) of the NCDB zip
-- `$LTDB_SAMPLE` : the remote location (i.e. accessible via wget) of the LTDB sample zip
-- `$LTDB_FULLCOUNT` : the remote location (i.e. accessible via wget) of the LTDB fullcount zip
+- `$NCDB`, `$LTDB_SAMPLE`, `$LTDB_FULLCOUNT` : these just need to be set. Any value will do
 - `$DLPATH` : path to the local directory containing these files (i.e. after collecting from their remote locations in a prior CI phase)
 
 If those variables are not present, any tests dependent on LTDB or NCDB data will be skipped. Note
