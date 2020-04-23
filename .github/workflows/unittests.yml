@@ -38,7 +38,7 @@
        - name: Download Data
          shell: bash -l {0}
          run: |
-              python geosnap.tests/_dl_data.py
+              python geosnap/tests/_dl_data.py
                wget -q "$COMBO_DATA" -O data.zip; unzip data.zip || echo "Unable to download data"
          env:
             COMBO_DATA: ${{ secrets.COMBO_DATA }}
