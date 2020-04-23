@@ -36,9 +36,8 @@
        - shell: bash -l {0}
          run: pip install -e . --no-deps --force-reinstall
        - name: Download Data
-         uses: wei/wget@v1
-         with:
-          args: -q "$COMBO_DATA" -O data.zip
+         shell: bash -l {0}
+         run: conda install wget; wget -q "$COMBO_DATA" -O data.zip
          env:
             COMBO_DATA: ${{ secrets.COMBO_DATA }}
        - name: Unzip
