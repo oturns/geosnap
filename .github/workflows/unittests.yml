@@ -39,10 +39,12 @@
            export DLPATH=`pwd`
            python geosnap/tests/get_data.py
            py.test -v geosnap --cov=geosnap --cov-report=xml
-           jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 --ExecutePreprocessor.kernel_name=python3 examples/*.ipynb;
        - name: codecov (${{ matrix.os }}, ${{ matrix.environment-file }})
          uses: codecov/codecov-action@v1
          with:
            token: ${{ secrets.CODECOV_TOKEN }}
            file: ./coverage.xml
-           name: spot-codecov
+           name: geosnap-codecov
+       - name: Notebook Tests
+         shell: bash -l {0}
+         run: jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 --ExecutePreprocessor.kernel_name=python3 examples/*.ipynb;
