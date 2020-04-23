@@ -3,11 +3,7 @@ import pytest
 from geosnap import datasets, io
 from pathlib import PurePath
 
-try:
-    path = os.environ["GITHUB_WORKSPACE"]
-except Exception: 
-    path = os.getcwd()
-
+path = os.getcwd()
 
 try:
     LTDB = os.environ["LTDB_SAMPLE"]
