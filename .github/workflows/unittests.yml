@@ -37,7 +37,9 @@
          run: pip install -e . --no-deps --force-reinstall
        - name: Download Data
          shell: bash -l {0}
-         run: conda install wget -y; wget -q "$COMBO_DATA" -O data.zip; unzip data.zip || echo "Unable to download data"
+         run: |
+              python geosnap.tests/_dl_data.py
+               wget -q "$COMBO_DATA" -O data.zip; unzip data.zip || echo "Unable to download data"
          env:
             COMBO_DATA: ${{ secrets.COMBO_DATA }}
        - name: Pytest
@@ -47,9 +49,9 @@
            python geosnap/tests/get_data.py
            pytest -v geosnap --cov=geosnap --cov-report=xml
          env:
-           LTDB_SAMPLE: 1
-           LTDB_FULL: 1
-           NCDB: 1
+           LTDB_SAMPLE: ${{ secrets.COMBO_DATA }} # check whether we can pull secrets
+           LTDB_FULL: ${{ secrets.COMBO_DATA }}
+           NCDB: ${{ secrets.COMBO_DATA }}
        - name: codecov (${{ matrix.os }}, ${{ matrix.environment-file }})
          uses: codecov/codecov-action@v1
          with:
