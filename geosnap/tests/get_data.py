@@ -1,15 +1,15 @@
 import os
-
+from pathlib import PurePath
 try:
     from geosnap import io
 except:
     pass
 
-path = os.environ['DLPATH']
+path = os.environ['GITHUB_WORKSPACE']
 
 try:
-    io.store_ltdb(sample=path + '/ltdb_sample.zip', fullcount=path + '/ltdb_full.zip')
-    io.store_ncdb(path + "/ncdb.csv")
+    io.store_ltdb(sample=PurePath(path,'ltdb_sample.zip'), fullcount=PurePath(path,'ltdb_full.zip'))
+    io.store_ncdb(path + "ncdb.csv")
 
 except:
     pass
