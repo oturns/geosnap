@@ -1,5 +1,5 @@
 
-name: Upload Python Package
+name: Release Package
 
 on:
   push:
