@@ -4,7 +4,7 @@
 
 <h2 align="center" style="margin-top:-10px">The Geospatial Neighborhood Analysis Package</h2> 
 
-[![Build Status](https://travis-ci.com/spatialucr/geosnap.svg?branch=master)](https://travis-ci.com/spatialucr/geosnap)
+[![.github/workflows/unittests.yml](https://github.com/knaaptime/geosnap/workflows/.github/workflows/unittests.yml/badge.svg)](https://github.com/spatialucr/geosnap/actions?query=workflow%3A.github%2Fworkflows%2Funittests.yml)
 [![Coverage Status](https://coveralls.io/repos/github/spatialucr/geosnap/badge.svg?branch=master)](https://coveralls.io/github/spatialucr/geosnap?branch=master&service=github)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/geosnap)
 ![PyPI](https://img.shields.io/pypi/v/geosnap)
@@ -27,9 +27,9 @@ because of some long-standing challenges, including that
 - conceptually, neighborhoods evolve through both space and time, meaning their
   socially-construed boundaries can shift over time, as can their demographic makeup.
 - geographic tabulation units change boundaries over time, meaning the raw data are
-  aggregated to different areal units at differerent points in time.
+  aggregated to different areal units at different points in time.
 
-To address these challenges,`geosnap` provides a suite of tools for creating socio-spatial
+To address these challenges, `geosnap` provides a suite of tools for creating socio-spatial
 datasets, harmonizing those datasets into consistent set of time-static boundaries,
 modeling bespoke neighborhoods and prototypical neighborhood types, and modeling
 neighborhood change using classic and spatial statistical methods.
@@ -70,7 +70,6 @@ See the [API docs](https://spatialucr.github.io/geosnap/api.html) for a thorough
 
 
 ## Quickstart
-
 
 the `Community` class is geosnap’s central data construct that holds space-time neighborhood data.  
 You can create a `Community` from geosnap’s built-in data by passing a set of fips codes to a

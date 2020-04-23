@@ -1,3 +1,4 @@
+ name: Unit Tests 
  on:
    push:
      branches:
@@ -10,7 +11,7 @@
    unittests:
      name: conda (${{ matrix.os }}, ${{ matrix.environment-file }})
      runs-on: ${{ matrix.os }}
-     timeout-minutes: 30 
+     timeout-minutes: 60 
      strategy:
        matrix:
          os: ['macos-latest', 'ubuntu-latest']
@@ -34,8 +35,29 @@
          run: conda config --show
        - shell: bash -l {0}
          run: pip install -e . --no-deps --force-reinstall
-       - shell: bash -l {0}
+       - name: Download Data
+         shell: bash -l {0}
+         run: conda install wget -y; wget -q "$COMBO_DATA" -O data.zip
+         env:
+            COMBO_DATA: ${{ secrets.COMBO_DATA }}
+       - name: Unzip
+         run: unzip data.zip
+       - name: Pytest
+         shell: bash -l {0}
          run: |
            export DLPATH=`pwd`
            python geosnap/tests/get_data.py
-           py.test -v geosnap --cov=geosnap --cov-report=xml
+           pytest -v geosnap --cov=geosnap --cov-report=xml
+         env:
+           LTDB_SAMPLE: 1
+           LTDB_FULL: 1
+           NCDB: 1
+       - name: codecov (${{ matrix.os }}, ${{ matrix.environment-file }})
+         uses: codecov/codecov-action@v1
+         with:
+           token: ${{ secrets.CODECOV_TOKEN }}
+           file: ./coverage.xml
+           name: geosnap-codecov
+       - name: Notebook Tests
+         shell: bash -l {0}
+         run: jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 --ExecutePreprocessor.kernel_name=python3 examples/*.ipynb;
