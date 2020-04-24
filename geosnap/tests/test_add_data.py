@@ -3,7 +3,11 @@ import pytest
 from geosnap import datasets, io
 from pathlib import PurePath
 
-path = os.getcwd()
+try:
+    path = os.environ["GITHUB_WORKSPACE"]
+except Exception: 
+    path = os.getcwd()
+
 
 try:
     LTDB = os.environ["LTDB_SAMPLE"]
@@ -24,7 +28,7 @@ def test_store_ltdb():
 def test_store_ncdb():
 
     store_ncdb(PurePath(path, "ncdb.csv"))
-    assert datasets.ncdb().shape == (328633, 77)
+    assert datasets.ncdb().shape == (328633, 76)
 
 
 def test_get_lehd():
