@@ -22,7 +22,7 @@ store_ncdb = io.store_ncdb
 def test_store_ltdb():
 
     store_ltdb(sample=PurePath(path, "ltdb_sample.zip"), fullcount=PurePath(path, "ltdb_full.zip"))
-    assert datasets.ltdb().shape == (330388, 192)
+    assert datasets.ltdb().shape == (330388, 191)
 
 @pytest.mark.skipif(not NCDB, reason="unable to locate Geolytics data")
 def test_store_ncdb():
