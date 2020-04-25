@@ -25,7 +25,7 @@ def test_Community_from_stcofips():
 def test_Community_from_indices():
 
     chi = Community.from_ncdb(fips=["17031", "17019"])
-    assert chi.gdf.shape == (6797, 79)
+    assert chi.gdf.shape == (6797, 78)
 
 
 def test_Community_from_boundary():
