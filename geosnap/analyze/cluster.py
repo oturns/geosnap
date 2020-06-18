@@ -14,7 +14,17 @@ from sklearn.cluster import (
     SpectralClustering,
 )
 from sklearn.mixture import GaussianMixture
-from spenc import SPENC
+
+
+def _import_tryer(package, func, name):
+    try:
+        return exec(f"from {package} import {func}", globals(), globals())
+    except ImportError:
+        raise ImportError(
+            f"You must have the {name} package installed to use this clusterer "
+            "but it could not be imported."
+        )
+
 
 # Sklearn a-spatial models
 
@@ -53,7 +63,7 @@ def kmeans(
     n_jobs=None,
     algorithm="auto",
     precompute_distances="auto",
-    **kwargs
+    **kwargs,
 ):
     """K-Means clustering.
 
@@ -108,7 +118,7 @@ def affinity_propagation(
     copy=True,
     affinity="euclidean",
     verbose=False,
-    **kwargs
+    **kwargs,
 ):
     """Clustering with Affinity Propagation.
 
@@ -158,7 +168,7 @@ def spectral(
     coef0=1,
     kernel_params=None,
     n_jobs=-1,
-    **kwargs
+    **kwargs,
 ):
     """Spectral Clustering.
 
@@ -232,7 +242,7 @@ def gaussian_mixture(
     best_model=False,
     max_clusters=10,
     random_state=None,
-    **kwargs
+    **kwargs,
 ):
     """Clustering with Gaussian Mixture Model.
 
@@ -321,13 +331,7 @@ def hdbscan(X, min_cluster_size=5, gen_min_span_tree=True, **kwargs):
     fitted cluster instance: hdbscan.hdbscan.HDBSCAN
 
     """
-    try:
-        from hdbscan import HDBSCAN
-    except ImportError:
-        raise ImportError(
-            "You must have the hdbscan package installed to use this function"
-        )
-
+    _import_tryer("hdbscan", "HDBSCAN", "`hdbscan`")
     model = HDBSCAN(min_cluster_size=min_cluster_size)
     model.fit(X)
     return model
@@ -381,6 +385,8 @@ def spenc(X, w, n_clusters=5, gamma=1, **kwargs):
     fitted cluster instance: spenc.SPENC
 
     """
+    _import_tryer("spenc", "SPENC", "spenc")
+
     model = SPENC(n_clusters=n_clusters, gamma=gamma)
 
     model.fit(X, w.sparse)
