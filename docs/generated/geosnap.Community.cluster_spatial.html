@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>geosnap.Community.cluster_spatial &#8212; geosnap v0.3.1 Manual</title>
+    <title>geosnap.Community.cluster_spatial &#8212; geosnap v0.3.2 Manual</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/pysal-styles.css" />
@@ -39,7 +39,7 @@
         </button>
         <a class="navbar-brand" href="../index.html"><span><img src="../_static/geosnap.svg"></span>
           geosnap</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.3.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.3.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -144,7 +144,7 @@ keyword arguments that will be passed to the weights constructor</p>
 </dd>
 <dt><strong>method</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a> <code class="xref py py-obj docutils literal notranslate"><span class="pre">in</span></code> [‘ward_spatial’, ‘spenc’, ‘skater’, ‘azp’, ‘max_p’], required</span></dt><dd><p>the clustering algorithm used to identify neighborhood types</p>
 </dd>
-<dt><strong>columns</strong><span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/glossary.html#term-array-like" title="(in NumPy v1.17)"><span>array_like</span></a>, required</span></dt><dd><p>subset of columns on which to apply the clustering</p>
+<dt><strong>columns</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array-like" title="(in NumPy v1.18)"><span>array_like</span></a>, required</span></dt><dd><p>subset of columns on which to apply the clustering</p>
 </dd>
 <dt><strong>threshold_variable</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, required if using max-p, optional otherwise</span></dt><dd><p>for max-p, which variable should define <cite>p</cite>. The default is “count”,
 which will grow regions until the threshold number of polygons have
@@ -152,7 +152,7 @@ been aggregated</p>
 </dd>
 <dt><strong>threshold</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numeric</span></code>, optional</span></dt><dd><p>threshold to use for max-p clustering (the default is 10).</p>
 </dd>
-<dt><strong>scaler</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">scaler</span></code> from <a class="reference external" href="https://scikit-learn.org/stable/modules/classes.html#module-sklearn.preprocessing" title="(in scikit-learn v0.22)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.preprocessing</span></code></a>, optional</span></dt><dd><p>a scikit-learn preprocessing class that will be used to rescale the
+<dt><strong>scaler</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">scaler</span></code> from <a class="reference external" href="https://scikit-learn.org/stable/modules/classes.html#module-sklearn.preprocessing" title="(in scikit-learn v0.23)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.preprocessing</span></code></a>, optional</span></dt><dd><p>a scikit-learn preprocessing class that will be used to rescale the
 data. Defaults to sklearn.preprocessing.StandardScaler</p>
 </dd>
 </dl>

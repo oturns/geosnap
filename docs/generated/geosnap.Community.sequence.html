@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>geosnap.Community.sequence &#8212; geosnap v0.3.1 Manual</title>
+    <title>geosnap.Community.sequence &#8212; geosnap v0.3.2 Manual</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/pysal-styles.css" />
@@ -39,7 +39,7 @@
         </button>
         <a class="navbar-brand" href="../index.html"><span><img src="../_static/geosnap.svg"></span>
           geosnap</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.3.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.3.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -144,7 +144,7 @@ labels is a required input.</p>
 Clustering with Ward linkage is now used for clustering
 the sequences. Default is 5.</p>
 </dd>
-<dt><strong>subs_mat</strong><span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>(k,k), substitution cost matrix. Should be hollow (
+<dt><strong>subs_mat</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>(k,k), substitution cost matrix. Should be hollow (
 0 cost between the same type), symmetric and non-negative.</p>
 </dd>
 <dt><strong>dist_type</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>“hamming”: hamming distance (substitution only
@@ -173,11 +173,11 @@ Default is “geoid”.</p>
 <dt><strong>gdf_new</strong><span class="classifier"><a class="reference internal" href="geosnap.Community.html#geosnap.Community" title="geosnap.Community"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community</span></code></a> instance</span></dt><dd><p>New Community instance with attribute “gdf” having
 a new column for sequence labels.</p>
 </dd>
-<dt><strong>df_wide</strong><span class="classifier"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.0.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></span></dt><dd><p>Wide-form DataFrame with k (k is the number of periods)
+<dt><strong>df_wide</strong><span class="classifier"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.0.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></span></dt><dd><p>Wide-form DataFrame with k (k is the number of periods)
 columns of neighborhood types and 1 column of sequence
 labels.</p>
 </dd>
-<dt><strong>seq_dis_mat</strong><span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>(n,n), distance/dissimilarity matrix for each pair of
+<dt><strong>seq_dis_mat</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">array</span></code></a></span></dt><dd><p>(n,n), distance/dissimilarity matrix for each pair of
 sequences</p>
 </dd>
 </dl>

@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>geosnap.analyze.cluster &#8212; geosnap v0.3.1 Manual</title>
+    <title>geosnap.analyze.cluster &#8212; geosnap v0.3.2 Manual</title>
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/pysal-styles.css" />
@@ -37,7 +37,7 @@
         </button>
         <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/geosnap.svg"></span>
           geosnap</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.3.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.3.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -136,7 +136,17 @@
     <span class="n">SpectralClustering</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">sklearn.mixture</span> <span class="kn">import</span> <span class="n">GaussianMixture</span>
-<span class="kn">from</span> <span class="nn">spenc</span> <span class="kn">import</span> <span class="n">SPENC</span>
+
+
+<span class="k">def</span> <span class="nf">_import_tryer</span><span class="p">(</span><span class="n">package</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">exec</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;from </span><span class="si">{package}</span><span class="s2"> import </span><span class="si">{func}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">globals</span><span class="p">(),</span> <span class="nb">globals</span><span class="p">())</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;You must have the </span><span class="si">{name}</span><span class="s2"> package installed to use this clusterer &quot;</span>
+            <span class="s2">&quot;but it could not be imported.&quot;</span>
+        <span class="p">)</span>
+
 
 <span class="c1"># Sklearn a-spatial models</span>
 
@@ -175,7 +185,7 @@
     <span class="n">n_jobs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
     <span class="n">precompute_distances</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;K-Means clustering.</span>
 
@@ -230,7 +240,7 @@
     <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">affinity</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">,</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Clustering with Affinity Propagation.</span>
 
@@ -280,7 +290,7 @@
     <span class="n">coef0</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">kernel_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Spectral Clustering.</span>
 
@@ -354,7 +364,7 @@
     <span class="n">best_model</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">max_clusters</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
     <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Clustering with Gaussian Mixture Model.</span>
 
@@ -443,13 +453,7 @@
 <span class="sd">    fitted cluster instance: hdbscan.hdbscan.HDBSCAN</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">hdbscan</span> <span class="kn">import</span> <span class="n">HDBSCAN</span>
-    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-            <span class="s2">&quot;You must have the hdbscan package installed to use this function&quot;</span>
-        <span class="p">)</span>
-
+    <span class="n">_import_tryer</span><span class="p">(</span><span class="s2">&quot;hdbscan&quot;</span><span class="p">,</span> <span class="s2">&quot;HDBSCAN&quot;</span><span class="p">,</span> <span class="s2">&quot;`hdbscan`&quot;</span><span class="p">)</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">HDBSCAN</span><span class="p">(</span><span class="n">min_cluster_size</span><span class="o">=</span><span class="n">min_cluster_size</span><span class="p">)</span>
     <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">model</span></div>
@@ -503,6 +507,8 @@
 <span class="sd">    fitted cluster instance: spenc.SPENC</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_import_tryer</span><span class="p">(</span><span class="s2">&quot;spenc&quot;</span><span class="p">,</span> <span class="s2">&quot;SPENC&quot;</span><span class="p">,</span> <span class="s2">&quot;spenc&quot;</span><span class="p">)</span>
+
     <span class="n">model</span> <span class="o">=</span> <span class="n">SPENC</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">)</span>
 
     <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">w</span><span class="o">.</span><span class="n">sparse</span><span class="p">)</span>
