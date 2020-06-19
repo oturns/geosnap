@@ -128,7 +128,7 @@
 <h1>geosnap.Community.harmonize<a class="headerlink" href="#geosnap-community-harmonize" title="Permalink to this headline">¶</a></h1>
 <dl class="method">
 <dt id="geosnap.Community.harmonize">
-<code class="sig-prename descclassname">Community.</code><code class="sig-name descname">harmonize</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">target_year=None</em>, <em class="sig-param">weights_method='area'</em>, <em class="sig-param">extensive_variables=None</em>, <em class="sig-param">intensive_variables=None</em>, <em class="sig-param">allocate_total=True</em>, <em class="sig-param">raster='nlcd_2011'</em>, <em class="sig-param">codes='developed'</em>, <em class="sig-param">force_crs_match=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/_community.html#Community.harmonize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.Community.harmonize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">Community.</code><code class="sig-name descname">harmonize</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">target_year=None</em>, <em class="sig-param">weights_method='area'</em>, <em class="sig-param">extensive_variables=None</em>, <em class="sig-param">intensive_variables=None</em>, <em class="sig-param">allocate_total=True</em>, <em class="sig-param">raster=None</em>, <em class="sig-param">codes='developed'</em>, <em class="sig-param">force_crs_match=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/_community.html#Community.harmonize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.Community.harmonize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Standardize inconsistent boundaries into time-static ones.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -136,33 +136,48 @@
 <dt><strong>target_year: int</strong></dt><dd><p>Polygons from this year will become the target boundaries for
 spatial interpolation.</p>
 </dd>
-<dt><strong>weights_method</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>The method that the harmonization will be conducted. This can be
-set to:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>“area”                          : harmonization according to area weights.</p></li>
-<li><p>“land_type_area”                : harmonization according to the Land Types considered ‘populated’ areas.</p></li>
-<li><p>“land_type_Poisson_regression”  : NOT YET INTRODUCED.</p></li>
-<li><p>“land_type_Gaussian_regression” : NOT YET INTRODUCED.</p></li>
+<dt><strong>weights_method</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>The method that the harmonization will be conducted. This can be set to</p>
+<ul class="simple">
+<li><p>area :         harmonization using simple area-weighted interprolation.</p></li>
+<li><dl class="simple">
+<dt>dasymetric<span class="classifier">harmonization using area-weighted interpolation with raster-based</span></dt><dd><p>ancillary data such as &lt;<a class="reference external" href="https://www.mrlc.gov/data/nlcd-2016-land-cover-conus">https://www.mrlc.gov/data/nlcd-2016-land-cover-conus</a>&gt;
+to mask out uninhabited land.</p>
+</dd>
+</dl>
+</li>
 </ul>
-</div></blockquote>
 </dd>
-<dt><strong>extensive_variables</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a></span></dt><dd><p>extensive variables to be used in interpolation.</p>
+<dt><strong>extensive_variables</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a></span></dt><dd><p>The names of variables in each dataset of raw_community that contains
+extensive variables to be harmonized (see (2) in Notes).</p>
 </dd>
-<dt><strong>intensive_variables</strong><span class="classifier">type</span></dt><dd><p>intensive variables to be used in interpolation.</p>
+<dt><strong>intensive_variables</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a></span></dt><dd><p>The names of variables in each dataset of raw_community that contains
+intensive variables to be harmonized (see (2) in Notes).</p>
 </dd>
 <dt><strong>allocate_total</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bltin-boolean-values" title="(in Python v3.8)"><span class="xref std std-ref">bool</span></a></span></dt><dd><p>True if total value of source area should be allocated.
 False if denominator is area of i. Note that the two cases
 would be identical when the area of the source polygon is
-exhausted by intersections. See (3) in Notes for more details</p>
+exhausted by intersections. See (3) in Notes for more details.</p>
 </dd>
-<dt><strong>raster_path</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>path to the raster image that has the types of each pixel in the
-spatial context. Only taken into consideration for harmonization
-raster based.</p>
+<dt><strong>raster</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>the path to a local raster image to be used as a dasymetric mask. If using
+“dasymetric” as the weights method, this is a required argument.</p>
 </dd>
-<dt><strong>codes</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">ints</span></code></span></dt><dd><p>pixel values that should be included in the regression (the default “developed” includes [21, 22, 23, 24]).</p>
+<dt><strong>codes</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">ints</span></code></span></dt><dd><p>list of raster pixel values that should be considered as
+‘populated’. Default values are consistent with the National Land Cover
+Database (NLCD), and include</p>
+<ul class="simple">
+<li><p>21 (Developed, Open Space)</p></li>
+<li><p>22 (Developed, Low Intensity)</p></li>
+<li><p>23 (Developed, Medium Intensity)</p></li>
+<li><p>24 (Developed, High Intensity)</p></li>
+</ul>
+<p>The description of each code can be found here:
+&lt;<a class="reference external" href="https://www.mrlc.gov/sites/default/files/metadata/landcover.html">https://www.mrlc.gov/sites/default/files/metadata/landcover.html</a>&gt;
+Ignored if not using dasymetric harmonizatiton.</p>
 </dd>
-<dt><strong>force_crs_match</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bltin-boolean-values" title="(in Python v3.8)"><span class="xref std std-ref">bool</span></a></span></dt><dd><p>whether source and target dataframes should be reprojected to match (the default is True).</p>
+<dt><strong>force_crs_match</strong><span class="classifier">bool. <code class="xref py py-obj docutils literal notranslate"><span class="pre">Default</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">is</span></code> True.</span></dt><dd><p>Wheter the Coordinate Reference System (CRS) of the polygon will be
+reprojected to the CRS of the raster file. It is recommended to
+leave this argument True.
+Only taken into consideration for harmonization raster based.</p>
 </dd>
 </dl>
 </dd>
@@ -173,6 +188,27 @@ raster based.</p>
 </dl>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>1) A quick explanation of extensive and intensive variables can be found
+here: &lt;<a class="reference external" href="http://ibis.geog.ubc.ca/courses/geob370/notes/intensive_extensive.htm">http://ibis.geog.ubc.ca/courses/geob370/notes/intensive_extensive.htm</a>&gt;</p>
+<ol class="arabic" start="2">
+<li><p>For an extensive variable, the estimate at target polygon j (default case) is:</p>
+<blockquote>
+<div><p>v_j = sum_i v_i w_{i,j}</p>
+<p>w_{i,j} = a_{i,j} / sum_k a_{i,k}</p>
+<p>If the area of the source polygon is not exhausted by intersections with
+target polygons and there is reason to not allocate the complete value of
+an extensive attribute, then setting allocate_total=False will use the
+following weights:</p>
+<p>v_j = sum_i v_i w_{i,j}</p>
+<p>w_{i,j} = a_{i,j} / a_i</p>
+<p>where a_i is the total area of source polygon i.</p>
+<p>For an intensive variable, the estimate at target polygon j is:</p>
+<p>v_j = sum_i v_i w_{i,j}</p>
+<p>w_{i,j} = a_{i,j} / sum_k a_{k,j}</p>
+</div></blockquote>
+</li>
+</ol>
 </dd></dl>
 
 </div>

@@ -139,7 +139,7 @@
     <span class="n">extensive_variables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">intensive_variables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">allocate_total</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">raster</span><span class="o">=</span><span class="s2">&quot;nlcd_2011&quot;</span><span class="p">,</span>
+    <span class="n">raster</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">codes</span><span class="o">=</span><span class="p">[</span><span class="mi">21</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">24</span><span class="p">],</span>
     <span class="n">force_crs_match</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">index</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span>
@@ -159,10 +159,9 @@
 
 <span class="sd">    weights_method : string</span>
 <span class="sd">        The method that the harmonization will be conducted. This can be set to:</span>
-<span class="sd">            * &quot;area&quot;                          : harmonization according to area weights.</span>
-<span class="sd">            * &quot;land_type_area&quot;                : harmonization according to the Land Types considered &#39;populated&#39; areas.</span>
-<span class="sd">            * &quot;land_type_Poisson_regression&quot;  : NOT YET INTRODUCED.</span>
-<span class="sd">            * &quot;land_type_Gaussian_regression&quot; : NOT YET INTRODUCED.</span>
+<span class="sd">            * &quot;area&quot;                      : harmonization using simple area-weighted interprolation.</span>
+<span class="sd">            * &quot;dasymetric&quot;                : harmonization using area-weighted interpolation with raster-based</span>
+<span class="sd">                                            ancillary data to mask out uninhabited land.</span>
 
 <span class="sd">    extensive_variables : list</span>
 <span class="sd">        The names of variables in each dataset of raw_community that contains</span>
@@ -179,18 +178,18 @@
 <span class="sd">        exhausted by intersections. See (3) in Notes for more details.</span>
 
 <span class="sd">    raster : str</span>
-<span class="sd">        the path to the associated raster image that has the types of</span>
-<span class="sd">        each pixel in the spatial context.</span>
-<span class="sd">        Only taken into consideration for harmonization raster based.</span>
+<span class="sd">        the path to a local raster image to be used as a dasymetric mask. If using</span>
+<span class="sd">        &quot;dasymetric&quot; this is a required argument.</span>
 
-<span class="sd">    codes : an integer list of codes values that should be considered as</span>
+<span class="sd">    codes : list of ints</span>
+<span class="sd">        list of raster pixel values that should be considered as</span>
 <span class="sd">        &#39;populated&#39;. Since this draw inspiration using the National Land Cover</span>
 <span class="sd">        Database (NLCD), the default is 21 (Developed, Open Space),</span>
 <span class="sd">        22 (Developed, Low Intensity), 23 (Developed, Medium Intensity) and</span>
 <span class="sd">        24 (Developed, High Intensity). The description of each code can be</span>
 <span class="sd">        found here:</span>
 <span class="sd">        https://www.mrlc.gov/sites/default/files/metadata/landcover.html</span>
-<span class="sd">        Only taken into consideration for harmonization raster based.</span>
+<span class="sd">        Ignored if not using dasymetric harmonizatiton.</span>
 
 <span class="sd">    force_crs_match : bool. Default is True.</span>
 <span class="sd">        Wheter the Coordinate Reference System (CRS) of the polygon will be</span>
@@ -259,7 +258,7 @@
                 <span class="n">allocate_total</span><span class="o">=</span><span class="n">allocate_total</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="k">elif</span> <span class="n">weights_method</span> <span class="o">==</span> <span class="s2">&quot;land_type_area&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">weights_method</span> <span class="o">==</span> <span class="s2">&quot;dasymetric&quot;</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
 
                 <span class="n">area_tables_raster_fitted</span> <span class="o">=</span> <span class="n">area_tables_raster</span><span class="p">(</span>
@@ -281,12 +280,11 @@
                 <span class="p">)</span>
             <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span>
-                    <span class="s2">&quot;You must have NLCD raster data installed locally to use the&quot;</span>
-                    <span class="s2">&quot;`land_type_area` method. You can install it using the&quot;</span>
-                    <span class="s2">&quot;`tobler.data.store_rasters()` function from the `tobler` package&quot;</span>
+                    <span class="s2">&quot;Unable to locate raster. If using the `dasymetric` or model-based methods. You&quot;</span>
+                    <span class="s2">&quot;must provide a raster file and indicate which pixel values contain developed land&quot;</span>
                 <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;weights_method must of one of [&quot;area&quot;, &quot;land_type_area&quot;]&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;weights_method must of one of [&quot;area&quot;, &quot;dasymetric&quot;]&#39;</span><span class="p">)</span>
 
         <span class="n">profiles</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">extensive_variables</span><span class="p">:</span>

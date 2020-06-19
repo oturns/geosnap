@@ -88,11 +88,12 @@ class Community:
             spatial interpolation.
 
         weights_method : string
-            The method that the harmonization will be conducted. This can be set to:
-                * "area"          : harmonization using simple area-weighted interprolation.
-                * "dasymetric"    : harmonization using area-weighted interpolation with raster-based
-                                    ancillary data such as <https://www.mrlc.gov/data/nlcd-2016-land-cover-conus>
-                                    to mask out uninhabited land.
+            The method that the harmonization will be conducted. This can be set to
+
+            * area :         harmonization using simple area-weighted interprolation.
+            * dasymetric :   harmonization using area-weighted interpolation with raster-based
+                             ancillary data such as <https://www.mrlc.gov/data/nlcd-2016-land-cover-conus>
+                             to mask out uninhabited land.
 
         extensive_variables : list
             The names of variables in each dataset of raw_community that contains
@@ -115,10 +116,14 @@ class Community:
         codes : list of ints
             list of raster pixel values that should be considered as
             'populated'. Default values are consistent with the National Land Cover
-            Database (NLCD), and include 21 (Developed, Open Space),
-            22 (Developed, Low Intensity), 23 (Developed, Medium Intensity) and
-            24 (Developed, High Intensity). The description of each code can be
-            found here:
+            Database (NLCD), and include
+
+            * 21 (Developed, Open Space)
+            * 22 (Developed, Low Intensity)
+            * 23 (Developed, Medium Intensity)
+            * 24 (Developed, High Intensity)
+
+            The description of each code can be found here:
             <https://www.mrlc.gov/sites/default/files/metadata/landcover.html>
             Ignored if not using dasymetric harmonizatiton.
 
