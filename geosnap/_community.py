@@ -75,7 +75,7 @@ class Community:
         extensive_variables=None,
         intensive_variables=None,
         allocate_total=True,
-        raster="nlcd_2011",
+        raster=None,
         codes="developed",
         force_crs_match=True,
     ):
@@ -86,30 +86,76 @@ class Community:
         target_year: int
             Polygons from this year will become the target boundaries for
             spatial interpolation.
+
         weights_method : string
-            The method that the harmonization will be conducted. This can be
-            set to:
-                * "area"                          : harmonization according to area weights.
-                * "land_type_area"                : harmonization according to the Land Types considered 'populated' areas.
-                * "land_type_Poisson_regression"  : NOT YET INTRODUCED.
-                * "land_type_Gaussian_regression" : NOT YET INTRODUCED.
+            The method that the harmonization will be conducted. This can be set to:
+                * "area"          : harmonization using simple area-weighted interprolation.
+                * "dasymetric"    : harmonization using area-weighted interpolation with raster-based
+                                    ancillary data such as <https://www.mrlc.gov/data/nlcd-2016-land-cover-conus>
+                                    to mask out uninhabited land.
+
         extensive_variables : list
-            extensive variables to be used in interpolation.
-        intensive_variables : type
-            intensive variables to be used in interpolation.
-        allocate_total : boolean
+            The names of variables in each dataset of raw_community that contains
+            extensive variables to be harmonized (see (2) in Notes).
+
+        intensive_variables : list
+            The names of variables in each dataset of raw_community that contains
+            intensive variables to be harmonized (see (2) in Notes).
+
+        allocate_total : bool
             True if total value of source area should be allocated.
             False if denominator is area of i. Note that the two cases
             would be identical when the area of the source polygon is
-            exhausted by intersections. See (3) in Notes for more details
-        raster_path : str
-            path to the raster image that has the types of each pixel in the
-            spatial context. Only taken into consideration for harmonization
-            raster based.
+            exhausted by intersections. See (3) in Notes for more details.
+
+        raster : str
+            the path to a local raster image to be used as a dasymetric mask. If using
+            "dasymetric" as the weights method, this is a required argument.
+
         codes : list of ints
-            pixel values that should be included in the regression (the default "developed" includes [21, 22, 23, 24]).
-        force_crs_match : bool
-            whether source and target dataframes should be reprojected to match (the default is True).
+            list of raster pixel values that should be considered as
+            'populated'. Default values are consistent with the National Land Cover
+            Database (NLCD), and include 21 (Developed, Open Space),
+            22 (Developed, Low Intensity), 23 (Developed, Medium Intensity) and
+            24 (Developed, High Intensity). The description of each code can be
+            found here:
+            <https://www.mrlc.gov/sites/default/files/metadata/landcover.html>
+            Ignored if not using dasymetric harmonizatiton.
+
+        force_crs_match : bool. Default is True.
+            Wheter the Coordinate Reference System (CRS) of the polygon will be
+            reprojected to the CRS of the raster file. It is recommended to
+            leave this argument True.
+            Only taken into consideration for harmonization raster based.
+
+
+        Notes
+        -----
+        1) A quick explanation of extensive and intensive variables can be found
+        here: <http://ibis.geog.ubc.ca/courses/geob370/notes/intensive_extensive.htm>
+
+        2) For an extensive variable, the estimate at target polygon j (default case) is:
+
+            v_j = \sum_i v_i w_{i,j}
+
+            w_{i,j} = a_{i,j} / \sum_k a_{i,k}
+
+            If the area of the source polygon is not exhausted by intersections with
+            target polygons and there is reason to not allocate the complete value of
+            an extensive attribute, then setting allocate_total=False will use the
+            following weights:
+
+            v_j = \sum_i v_i w_{i,j}
+
+            w_{i,j} = a_{i,j} / a_i
+
+            where a_i is the total area of source polygon i.
+
+            For an intensive variable, the estimate at target polygon j is:
+
+            v_j = \sum_i v_i w_{i,j}
+
+            w_{i,j} = a_{i,j} / \sum_k a_{k,j}
 
         Returns
         -------
