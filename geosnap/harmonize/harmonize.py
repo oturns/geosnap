@@ -17,7 +17,7 @@ def harmonize(
     extensive_variables=None,
     intensive_variables=None,
     allocate_total=True,
-    raster="nlcd_2011",
+    raster=None,
     codes=[21, 22, 23, 24],
     force_crs_match=True,
     index="geoid",
@@ -37,10 +37,9 @@ def harmonize(
 
     weights_method : string
         The method that the harmonization will be conducted. This can be set to:
-            * "area"                          : harmonization according to area weights.
-            * "land_type_area"                : harmonization according to the Land Types considered 'populated' areas.
-            * "land_type_Poisson_regression"  : NOT YET INTRODUCED.
-            * "land_type_Gaussian_regression" : NOT YET INTRODUCED.
+            * "area"                      : harmonization using simple area-weighted interprolation.
+            * "dasymetric"                : harmonization using area-weighted interpolation with raster-based
+                                            ancillary data to mask out uninhabited land.
 
     extensive_variables : list
         The names of variables in each dataset of raw_community that contains
@@ -57,18 +56,18 @@ def harmonize(
         exhausted by intersections. See (3) in Notes for more details.
 
     raster : str
-        the path to the associated raster image that has the types of
-        each pixel in the spatial context.
-        Only taken into consideration for harmonization raster based.
+        the path to a local raster image to be used as a dasymetric mask. If using
+        "dasymetric" this is a required argument.
 
-    codes : an integer list of codes values that should be considered as
+    codes : list of ints
+        list of raster pixel values that should be considered as
         'populated'. Since this draw inspiration using the National Land Cover
         Database (NLCD), the default is 21 (Developed, Open Space),
         22 (Developed, Low Intensity), 23 (Developed, Medium Intensity) and
         24 (Developed, High Intensity). The description of each code can be
         found here:
         https://www.mrlc.gov/sites/default/files/metadata/landcover.html
-        Only taken into consideration for harmonization raster based.
+        Ignored if not using dasymetric harmonizatiton.
 
     force_crs_match : bool. Default is True.
         Wheter the Coordinate Reference System (CRS) of the polygon will be
@@ -137,7 +136,7 @@ def harmonize(
                 allocate_total=allocate_total,
             )
 
-        elif weights_method == "land_type_area":
+        elif weights_method == "dasymetric":
             try:
 
                 area_tables_raster_fitted = area_tables_raster(
@@ -159,12 +158,11 @@ def harmonize(
                 )
             except IOError:
                 raise IOError(
-                    "You must have NLCD raster data installed locally to use the"
-                    "`land_type_area` method. You can install it using the"
-                    "`tobler.data.store_rasters()` function from the `tobler` package"
+                    "Unable to locate raster. If using the `dasymetric` or model-based methods. You"
+                    "must provide a raster file and indicate which pixel values contain developed land"
                 )
         else:
-            raise ValueError('weights_method must of one of ["area", "land_type_area"]')
+            raise ValueError('weights_method must of one of ["area", "dasymetric"]')
 
         profiles = []
         if extensive_variables:

@@ -44,7 +44,7 @@ def test_harmonize_area_weighted():
         2000,
         extensive_variables=["n_total_housing_units"],
         intensive_variables=["p_vacant_housing_units"],
-        weights_method="land_type_area",
+        weights_method="dasymetric",
         raster=local_raster
     )
     assert harmonized_nlcd_weighted.gdf.n_total_housing_units.sum() == 900620.0

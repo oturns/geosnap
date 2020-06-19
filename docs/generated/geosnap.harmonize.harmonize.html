@@ -128,7 +128,7 @@
 <h1>geosnap.harmonize.harmonize<a class="headerlink" href="#geosnap-harmonize-harmonize" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="geosnap.harmonize.harmonize">
-<code class="sig-prename descclassname">geosnap.harmonize.</code><code class="sig-name descname">harmonize</code><span class="sig-paren">(</span><em class="sig-param">raw_community, target_year=None, weights_method='area', extensive_variables=None, intensive_variables=None, allocate_total=True, raster='nlcd_2011', codes=[21, 22, 23, 24], force_crs_match=True, index='geoid', time_col='year'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/harmonize/harmonize.html#harmonize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.harmonize.harmonize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">geosnap.harmonize.</code><code class="sig-name descname">harmonize</code><span class="sig-paren">(</span><em class="sig-param">raw_community, target_year=None, weights_method='area', extensive_variables=None, intensive_variables=None, allocate_total=True, raster=None, codes=[21, 22, 23, 24], force_crs_match=True, index='geoid', time_col='year'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/harmonize/harmonize.html#harmonize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.harmonize.harmonize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Use spatial interpolation to standardize neighborhood boundaries over time.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -140,10 +140,12 @@ in the harmonization. Could be, for example ‘2010’.</p>
 </dd>
 <dt><strong>weights_method</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><dl class="simple">
 <dt>The method that the harmonization will be conducted. This can be set to:</dt><dd><ul class="simple">
-<li><p>“area”                          : harmonization according to area weights.</p></li>
-<li><p>“land_type_area”                : harmonization according to the Land Types considered ‘populated’ areas.</p></li>
-<li><p>“land_type_Poisson_regression”  : NOT YET INTRODUCED.</p></li>
-<li><p>“land_type_Gaussian_regression” : NOT YET INTRODUCED.</p></li>
+<li><p>“area”                      : harmonization using simple area-weighted interprolation.</p></li>
+<li><dl class="simple">
+<dt>“dasymetric”<span class="classifier">harmonization using area-weighted interpolation with raster-based</span></dt><dd><p>ancillary data to mask out uninhabited land.</p>
+</dd>
+</dl>
+</li>
 </ul>
 </dd>
 </dl>
@@ -159,17 +161,17 @@ False if denominator is area of i. Note that the two cases
 would be identical when the area of the source polygon is
 exhausted by intersections. See (3) in Notes for more details.</p>
 </dd>
-<dt><strong>raster</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>the path to the associated raster image that has the types of
-each pixel in the spatial context.
-Only taken into consideration for harmonization raster based.</p>
+<dt><strong>raster</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>the path to a local raster image to be used as a dasymetric mask. If using
+“dasymetric” this is a required argument.</p>
 </dd>
-<dt><strong>codes</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">an</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">integer</span></code> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">codes</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">values</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">that</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">should</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">be</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">considered</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">as</span></code></span></dt><dd><p>‘populated’. Since this draw inspiration using the National Land Cover
+<dt><strong>codes</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">list</span></code></a> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">ints</span></code></span></dt><dd><p>list of raster pixel values that should be considered as
+‘populated’. Since this draw inspiration using the National Land Cover
 Database (NLCD), the default is 21 (Developed, Open Space),
 22 (Developed, Low Intensity), 23 (Developed, Medium Intensity) and
 24 (Developed, High Intensity). The description of each code can be
 found here:
 <a class="reference external" href="https://www.mrlc.gov/sites/default/files/metadata/landcover.html">https://www.mrlc.gov/sites/default/files/metadata/landcover.html</a>
-Only taken into consideration for harmonization raster based.</p>
+Ignored if not using dasymetric harmonizatiton.</p>
 </dd>
 <dt><strong>force_crs_match</strong><span class="classifier">bool. <code class="xref py py-obj docutils literal notranslate"><span class="pre">Default</span></code> <code class="xref py py-obj docutils literal notranslate"><span class="pre">is</span></code> True.</span></dt><dd><p>Wheter the Coordinate Reference System (CRS) of the polygon will be
 reprojected to the CRS of the raster file. It is recommended to
