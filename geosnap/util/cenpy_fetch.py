@@ -2,6 +2,7 @@
 
 import pandas
 import sys
+import geopandas as gpd
 from tqdm.auto import tqdm
 import os
 
@@ -11,12 +12,13 @@ from pathlib import Path
 
 
 def fetch_acs(
-    level="tract",
     state="all",
+    level="tract",
     year=2017,
     output_dir=None,
     skip_existing=True,
-    return_geometry=False,
+    return_geometry=True,
+    process_vars=True
 ):
     """Collect the variables defined in `geosnap.datasets.codebook` from the Census API.
 
@@ -42,8 +44,8 @@ def fetch_acs(
 
     Returns
     -------
-    type
-        pandas.DataFrame
+    pandas.DataFrame or geopandas.GeoDataFrame
+        Dataframe or GeoDataFrame containing variables from the geosnap codebook
 
     Examples
     -------
@@ -62,6 +64,7 @@ def fetch_acs(
             for state in states.sort_values(by="name").name.tolist():
                 fname = state.replace(" ", "_")
                 pth = Path(output_dir, f"{fname}.parquet")
+
                 if skip_existing and pth.exists():
                     print(f"skipping {fname}")
                     pass
@@ -69,11 +72,16 @@ def fetch_acs(
                 else:
                     try:
                         df = products.ACS(year).from_state(
-                            state,
+                            state=state,
                             level=level,
                             variables=acsvars.copy(),
                             return_geometry=return_geometry,
                         )
+                        if process_vars:
+                            processed = process_acs(df)
+                            if return_geometry:
+                                processed['geometry'] = df.geometry
+                                df = gpd.GeoDataFrame(processed)
                         dfs.append(df)
                         if output_dir:
                             df.to_parquet(pth)
@@ -84,18 +92,28 @@ def fetch_acs(
         df = pandas.concat(dfs)
     else:
         df = products.ACS(year).from_state(
-            name=state,
+            state=state,
             level=level,
             variables=acsvars.copy(),
             return_geometry=return_geometry,
         )
+
+        fname = state.replace(" ", "_")
+        pth = Path(output_dir, f"{fname}.parquet")
+
+        if process_vars:
+            processed = process_acs(df)
+            if return_geometry:
+                processed['geometry'] = df.geometry
+                df = gpd.GeoDataFrame(processed)
+            df.to_parquet(pth)
 
     return df
 
 
 def process_acs(df):
     """Calculate variables from the geosnap codebook
-    
+
     Parameters
     ----------
     df : pandas.DataFrame
