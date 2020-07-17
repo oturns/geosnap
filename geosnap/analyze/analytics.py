@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
-from libpysal.weights import attach_islands
+from libpysal.weights import attach_islands,W,lag_spatial
 from libpysal.weights.contiguity import Queen, Rook
 from libpysal.weights.distance import KNN
 
@@ -32,6 +32,7 @@ ModelResults = namedtuple(
 
 def cluster(
     gdf,
+    convert_egohood=False,
     n_clusters=6,
     method=None,
     best_model=False,
@@ -121,7 +122,24 @@ def cluster(
     # this is the dataset we'll operate on
     data = gdf.copy()[columns]
     data = data.dropna(how="any", subset=columns)
+    
+    if convert_egohood:
+        #construct a spatial weight object for the geodataframe
+        index = 0
+        w_neighborhood = dict()
+        w_weights = dict()
+        
+        for each_neigh in gdf['neighborhood']:
+            w_neighborhood[index] = each_neigh
+            w_weights[index] = list(np.ones(len(each_neigh)))
+            index += 1
 
+        w = W(w_neighborhood , w_weights)
+        
+        #replace the selected attribute of a primitive unit by its neighborhood average
+        for each_attr in data.columns:
+            data[each_attr] = lag_spatial(w, data[each_attr])
+    
     if scaler:
 
         if pooling in ["fixed", "unique"]:
