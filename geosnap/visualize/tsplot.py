@@ -3,7 +3,6 @@ Visualization method for time series plots.
 """
 
 import proplot as plot
-from os import path, mkdir
 
 __all__ = ["tsplot"]
 
@@ -29,12 +28,16 @@ k            : int, optional
                Default is 5.
 save_fig     : boolean, optional
                whether to save figure. Default is False.
+dpi          : int, optional
+               dpi of the saved image if save_fig=True
+               default is 500
 """
 
 
 def tsplot(community, column, title='',
            years=[], scheme='quantiles',
-           k=5,save_fig=False, **kwargs):
+           k=5,save_fig=False, dpi=500,
+           **kwargs):
     if not years:
         f, axs = plot.subplots(ncols=len(community.gdf.year.unique()))
         for i, year in enumerate(sorted(community.gdf.year.unique())):  # sort to prevent graphing out of order
@@ -54,9 +57,6 @@ def tsplot(community, column, title='',
     axs.axis('off')
 
     if save_fig:
-        dirName = "figures"
-        if not path.exists(dirName):
-            mkdir(dirName)
-        f.savefig(dirName+"/tsplot_%s.png" % (column),
-                    dpi=500, bbox_inches='tight')
+        f.savefig("tsplot_%s.png" % (column),
+                    dpi=dpi, bbox_inches='tight')
     return axs
