@@ -33,3 +33,4 @@ dependencies:
   - coverage
   - coveralls
   - pywget
+  - proplot
