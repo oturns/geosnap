@@ -11,13 +11,12 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 import seaborn as sns
 import copy
-from os import path, mkdir
 import pandas as pd
 
 def indexplot_seq(df_traj, clustering,
                   years=["1970", "1980", "1990", "2000", "2010"],
                   k=None, ncols=3, palette= "Set1",
-                  save_fig=False, fig_suffix="LA"):
+                  save_fig=False, fig_suffix="LA", dpi=500):
     """
     Function for index plot of neighborhood sequences within each cluster.
 
@@ -44,6 +43,8 @@ def indexplot_seq(df_traj, clustering,
                    whether to save figure. Default is False.
     fig_suffix   : str, optional
                    suffix of the saved figure name. Default is "LA".
+    dpi          : int, optional
+                   the dpi of the saved figure. Deafult is 500
 
     Examples
     --------
@@ -122,8 +123,5 @@ def indexplot_seq(df_traj, clustering,
     plt.tight_layout()
     # fig.tight_layout(rect=[0, 0, .9, 1])
     if save_fig:
-        dirName = "figures"
-        if not path.exists(dirName):
-            mkdir(dirName)
-        fig.savefig(dirName+"/%s_%s.png" % (clustering,fig_suffix),
-                    dpi=500, bbox_inches='tight')
+        fig.savefig("%s_%s.png" % (clustering,fig_suffix),
+                    dpi=dpi, bbox_inches='tight')
