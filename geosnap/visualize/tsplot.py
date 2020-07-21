@@ -59,3 +59,4 @@ def tsplot(community, column, title='',
             mkdir(dirName)
         f.savefig(dirName+"/tsplot_%s.png" % (column),
                     dpi=500, bbox_inches='tight')
+    return axs
