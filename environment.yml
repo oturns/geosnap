@@ -24,4 +24,5 @@ dependencies:
   - region >=0.2.0
   - tobler >=0.2.1
   - proplot
+  - contextily
   
