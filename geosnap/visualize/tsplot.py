@@ -37,7 +37,7 @@ legend_kwds  : dictionary, optional
                Default is 1 column on the bottom of the graph.
 ctxmap       : contextily map provider, optional
                contextily basemap. Set to False for no basemap.
-               Default is Stamen.TonerLite       
+               Default is OpenStreetMap.Mapnik       
 """
 
 
