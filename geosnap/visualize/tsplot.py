@@ -25,7 +25,8 @@ scheme       : string,optional
                matplotlib scheme to be used
                default is 'quantiles'
 k            : int, optional
-               number of bins to graph.
+               number of bins to graph. k may be ignored
+               or unnecessary for some schemes, like headtailbreaks, maxp, and maximum_breaks 
                Default is 5.
 save_fig     : boolean, optional
                whether to save figure. Default is False.
