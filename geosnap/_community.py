@@ -3,6 +3,7 @@ from warnings import warn
 
 import geopandas as gpd
 import pandas as pd
+import scikitplot as skplt
 
 from ._data import _Map, datasets
 from .analyze import cluster as _cluster
@@ -320,6 +321,30 @@ class Community:
         )  # keep any existing models in the input Community
         comm.models[model_name] = model
         return comm
+
+    def silplot(self, model_name=None, year=None, **kwargs):
+        """ Returns a silhouette plot of the model that is passed to it.
+
+        Parameters
+        ----------
+        model_name : str , required
+                     model to be silhouette plotted
+        year       : int, optional
+                     year to be plotted if model created with pooling=='unique'
+        kwargs     : **kwargs, optional
+                     pass through to plot_silhouette()
+        Returns
+        -------
+        silhouette plot of given model.
+
+        """
+        if not year:
+            plot = skplt.metrics.plot_silhouette(self.models[model_name].X, self.models[model_name].labels,
+                                                 **kwargs)
+        else:
+            plot = skplt.metrics.plot_silhouette(self.models[model_name][year].X, self.models[model_name][year].labels,
+                                                 **kwargs)
+        return plot
 
     def transition(
         self, cluster_col, time_var="year", id_var="geoid", w_type=None, permutations=0

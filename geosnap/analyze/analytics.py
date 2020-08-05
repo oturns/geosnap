@@ -1,7 +1,5 @@
 """Tools for the spatial analysis of neighborhood change."""
 
-from collections import namedtuple
-
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
@@ -25,9 +23,47 @@ from .cluster import (
     ward_spatial,
 )
 
-ModelResults = namedtuple(
-    "model", ["X", "columns", "labels", "instance", "W"], rename=False
-)
+
+class ModelResults:
+    """Stores data about cluster and cluster_spatial models.
+
+    Attributes
+    ----------
+    X: array-like
+        data used to compute model
+    columns: list-like
+        columns used in model
+    W: libpysal.weights.W 
+        libpysal spatial weights matrix used in model
+    labels: array-like
+        labels of each column
+    instance: instance of model class used to generate neighborhood labels.
+        fitted model instance, e.g sklearn.cluster.AgglomerativeClustering object 
+        or other model class used to estimate class labels
+
+    """
+    def __init__(self, X, columns, labels,instance,W,):
+        """Initialize a new ModelResults instance.
+
+        Parameters
+        ----------
+        X: array-like
+            data of the cluster
+        columns: list-like
+            columns used to compute model
+        W: libpysal.weights.W
+            libpysal spatial weights matrix used in model
+        labels: array-like
+            labels of each column
+        instance: AgglomerativeCluserting object, or other model specific object type
+            how many clusters model was computed with
+
+        """
+        self.columns = columns
+        self.X = X
+        self.W = W
+        self.instance = instance
+        self.labels = labels
 
 
 def cluster(

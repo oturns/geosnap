@@ -25,4 +25,4 @@ dependencies:
   - tobler >=0.2.1
   - proplot
   - contextily
-  
+  - scikit-plot
