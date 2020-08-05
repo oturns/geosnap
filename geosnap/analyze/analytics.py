@@ -51,8 +51,8 @@ class ModelResults:
             data of the cluster
         columns: list-like
             columns used to compute model
-        W: 'queen', 'rook', or pyasl spatial weights matrix
-            spatial weights matrix used in model
+        W: libpysal.weights.W
+            libpysal spatial weights matrix used in model
         labels: array-like
             labels of each column
         instance: AgglomerativeCluserting object, or other model specific object type
