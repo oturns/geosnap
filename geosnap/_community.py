@@ -329,8 +329,8 @@ class Community:
         ----------
         model_name : str , required
                      model to be silhouette plotted
-        year       : dict key, optional
-                     year of model if model has model for each year
+        year       : int, optional
+                     year to be plotted if model created with pooling=='unique'
         kwargs     : **kwargs, optional
                      pass through to plot_silhouette()
         Returns
