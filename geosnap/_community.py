@@ -322,7 +322,7 @@ class Community:
         comm.models[model_name] = model
         return comm
 
-    def silplot(self, model_name, year=None, **kwargs):
+    def silplot(self, model_name=None, year=None, **kwargs):
         """ Returns a silhouette plot of the model that is passed to it.
 
         Parameters
