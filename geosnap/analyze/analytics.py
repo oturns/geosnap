@@ -33,12 +33,13 @@ class ModelResults:
         data used to compute model
     columns: list-like
         columns used in model
-    W: 'queen', 'rook', or spatial weights matrix
-        spatial weights matrix used in model
+    W: libpysal.weights.W 
+        libpysal spatial weights matrix used in model
     labels: array-like
         labels of each column
-    instance: AgglomerativeCluserting object, or other model specific object type
-        how many clusters model was computed with
+    instance: instance of model class used to generate neighborhood labels.
+        fitted model instance, e.g sklearn.cluster.AgglomerativeClustering object 
+        or other model class used to estimate class labels
 
     """
     def __init__(self, X, columns, labels,instance,W,):
