@@ -35,3 +35,4 @@ dependencies:
   - pywget
   - proplot
   - contextily
+  - scikit-plot
