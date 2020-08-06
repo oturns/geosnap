@@ -1,8 +1,10 @@
 """A Community is a thin wrapper around a long-form time-series geodataframe."""
 from warnings import warn
 
+import contextily as ctx
 import geopandas as gpd
 import pandas as pd
+import proplot as plot
 import scikitplot as skplt
 
 from ._data import _Map, datasets
@@ -339,12 +341,84 @@ class Community:
 
         """
         if not year:
-            plot = skplt.metrics.plot_silhouette(self.models[model_name].X, self.models[model_name].labels,
+            fig = skplt.metrics.plot_silhouette(self.models[model_name].X, self.models[model_name].labels,
                                                  **kwargs)
         else:
-            plot = skplt.metrics.plot_silhouette(self.models[model_name][year].X, self.models[model_name][year].labels,
+            fig = skplt.metrics.plot_silhouette(self.models[model_name][year].X, self.models[model_name][year].labels,
                                                  **kwargs)
-        return plot
+        return fig
+
+    def tsplot(self, column, title='',
+               years=[], scheme='quantiles',
+               k=5, save_fig=False, dpi=500,
+               legend_kwds='default',
+               ctxmap=ctx.providers.OpenStreetMap.Mapnik,
+               **kwargs):
+        """
+        Function for plotting timeseries data from community objects.
+        Parameters
+        ----------
+        community    : community object
+                       community object
+        column       : str
+                       column to be graphed in a time series
+        title        : str, optional
+                       desired title of figure
+        years        : list, optional
+                       years to be graphed
+                       default is every year in dataframe.
+        scheme       : string,optional
+                       matplotlib scheme to be used
+                       default is 'quantiles'
+        k            : int, optional
+                       number of bins to graph. k may be ignored
+                       or unnecessary for some schemes, like headtailbreaks, maxp, and maximum_breaks
+                       Default is 5.
+        save_fig     : boolean, optional
+                       whether to save figure. Default is False.
+        dpi          : int, optional
+                       dpi of the saved image if save_fig=True
+                       default is 500
+        legend_kwds  : dictionary, optional
+                       parameters for the legend
+                       Default is 1 column on the bottom of the graph.
+        ctxmap       : contextily map provider, optional
+                       contextily basemap. Set to False for no basemap.
+                       Default is OpenStreetMap.Mapnik
+        """
+
+        if legend_kwds == 'default':
+            legend_kwds = {'ncols': 1, "loc": "b"}
+        if ctxmap:  # need to convert crs to mercator before graphing
+            self.gdf = self.gdf.to_crs(epsg=3857)
+        if not years:
+            f, axs = plot.subplots(ncols=len(self.gdf.year.unique()))
+            for i, year in enumerate(sorted(self.gdf.year.unique())):  # sort to prevent graphing out of order
+                self.gdf[self.gdf.year == year].plot(column=column, ax=axs[i], scheme=scheme, k=k, **kwargs,
+                                                               legend=True, legend_kwds=legend_kwds)
+                if ctxmap:  # need set basemap of each graph
+                    ctx.add_basemap(axs[i], source=ctxmap)
+                axs[i].format(title=year)
+        else:
+
+            f, axs = plot.subplots(ncols=len(years))
+            for i, year in enumerate(years):  # display in whatever order list is passed in
+                self.gdf[self.gdf.year == year].plot(column=column, ax=axs[i], scheme=scheme, k=k, **kwargs,
+                                                               legend=True, legend_kwds=legend_kwds)
+                if ctxmap:  # need set basemap of each graph
+                    ctx.add_basemap(axs[i], source=ctxmap)
+                axs[i].format(title=year)
+
+        if not title:  # only use title when passed
+            axs.format(suptitle=column)
+        else:
+            axs.format(suptitle=title)
+        axs.axis('off')
+
+        if save_fig:
+            f.savefig("tsplot_%s.png" % (column),
+                      dpi=dpi, bbox_inches='tight')
+        return axs
 
     def transition(
         self, cluster_col, time_var="year", id_var="geoid", w_type=None, permutations=0
