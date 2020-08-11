@@ -16,7 +16,7 @@ import pandas as pd
 def indexplot_seq(df_traj, clustering,
                   years=["1970", "1980", "1990", "2000", "2010"],
                   k=None, ncols=3, palette= "Set1",
-                  save_fig=False, fig_suffix="LA", dpi=500):
+                  save_fig=None, dpi=500):
     """
     Function for index plot of neighborhood sequences within each cluster.
 
@@ -39,10 +39,8 @@ def indexplot_seq(df_traj, clustering,
                    Name of palette or None to return current palette.
                    If a sequence, input colors are used but possibly
                    cycled and desaturated. Default is "Set1".
-    save_fig     : boolean, optional
-                   whether to save figure. Default is False.
-    fig_suffix   : str, optional
-                   suffix of the saved figure name. Default is "LA".
+    save_fig     : str, optional
+                   path to save figure if desired
     dpi          : int, optional
                    the dpi of the saved figure. Deafult is 500
 
@@ -123,5 +121,4 @@ def indexplot_seq(df_traj, clustering,
     plt.tight_layout()
     # fig.tight_layout(rect=[0, 0, .9, 1])
     if save_fig:
-        fig.savefig("%s_%s.png" % (clustering,fig_suffix),
-                    dpi=dpi, bbox_inches='tight')
+        fig.savefig(save_fig, dpi=dpi, bbox_inches='tight')
