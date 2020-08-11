@@ -350,7 +350,7 @@ class Community:
 
     def tsplot(self, column, title='',
                years=[], scheme='quantiles',
-               k=5, save_fig=False, dpi=500,
+               k=5, save_fig=None, dpi=500,
                legend_kwds='default',
                ctxmap=ctx.providers.OpenStreetMap.Mapnik,
                **kwargs):
@@ -374,8 +374,8 @@ class Community:
                        number of bins to graph. k may be ignored
                        or unnecessary for some schemes, like headtailbreaks, maxp, and maximum_breaks
                        Default is 5.
-        save_fig     : boolean, optional
-                       whether to save figure. Default is False.
+        save_fig     : str, optional
+                       path to save figure if desired.
         dpi          : int, optional
                        dpi of the saved image if save_fig=True
                        default is 500
@@ -416,10 +416,10 @@ class Community:
         axs.axis('off')
 
         if save_fig:
-            f.savefig("tsplot_%s.png" % (column),
-                      dpi=dpi, bbox_inches='tight')
+            f.savefig(save_fig, dpi=dpi, bbox_inches='tight')
         return axs
 
+    
     def transition(
         self, cluster_col, time_var="year", id_var="geoid", w_type=None, permutations=0
     ):
