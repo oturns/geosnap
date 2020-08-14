@@ -2,11 +2,8 @@
 
 import geopandas as gpd
 import pandas as pd
-from tobler.area_weighted import (
-    area_interpolate,
-    area_tables_raster,
-)
-from tobler.area_weighted import _slow_area_interpolate
+from tobler.area_weighted import area_interpolate
+from tobler.dasymetric import masked_area_interpolate
 from tobler.util.util import _check_presence_of_crs
 
 
@@ -112,6 +109,11 @@ def harmonize(
         raise ValueError(
             "You must pass a set of extensive and/or intensive variables to interpolate"
         )
+    if not extensive_variables:
+        extensive_variables = []
+    if not intensive_variables:
+        intensive_variables = []
+    all_vars = extensive_variables + intensive_variables
 
     _check_presence_of_crs(raw_community)
     dfs = raw_community.copy()
@@ -138,23 +140,14 @@ def harmonize(
 
         elif weights_method == "dasymetric":
             try:
-
-                area_tables_raster_fitted = area_tables_raster(
-                    source_df,
-                    target_df.copy(),
-                    raster_path=raster,
-                    codes=codes,
-                    force_crs_match=force_crs_match,
-                )
-
                 # In area_interpolate, the resulting variable has same lenght as target_df
-                interpolation = _slow_area_interpolate(
+                interpolation = masked_area_interpolate(
                     source_df,
                     target_df.copy(),
                     extensive_variables=extensive_variables,
                     intensive_variables=intensive_variables,
                     allocate_total=allocate_total,
-                    tables=area_tables_raster_fitted,
+                    raster=raster,
                 )
             except IOError:
                 raise IOError(
@@ -165,15 +158,9 @@ def harmonize(
             raise ValueError('weights_method must of one of ["area", "dasymetric"]')
 
         profiles = []
-        if extensive_variables:
-            profile = interpolation[extensive_variables]
-            profiles.append(profile)
+        profile = interpolation[all_vars]
+        profiles.append(profile)
 
-        if intensive_variables:
-            profile = interpolation[intensive_variables]
-            profiles.append(profile)
-
-        profile = pd.concat(profiles, sort=True)
         profile["geometry"] = target_df["geometry"]
         profile[index] = target_df[index]
         profile[time_col] = i
