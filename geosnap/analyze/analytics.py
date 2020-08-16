@@ -1,8 +1,10 @@
 """Tools for the spatial analysis of neighborhood change."""
 
+import esda
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import silhouette_samples
 
 from libpysal.weights import attach_islands
 from libpysal.weights.contiguity import Queen, Rook
@@ -42,7 +44,12 @@ class ModelResults:
         or other model class used to estimate class labels
 
     """
-    def __init__(self, X, columns, labels,instance,W,):
+
+    def __init__(self, X,
+                 columns,
+                 labels,
+                 instance,
+                 W):
         """Initialize a new ModelResults instance.
 
         Parameters
@@ -64,20 +71,37 @@ class ModelResults:
         self.W = W
         self.instance = instance
         self.labels = labels
+        self.nearest_labels = None
+        self.silhouettes = None
+        self.path_silhouettes = None
+        self.boundary_silhouettes = None
+
+    # Standalone funcs to calc these if you don't want to graph them
+    def sil_scores(self, **kwargs):
+        self.silhouettes = silhouette_samples(self.X, self.labels, **kwargs)
+
+    def nearest_label(self, **kwargs):
+        self.nearest_labels = esda.nearest_label(self.X, self.labels, **kwargs)
+
+    def boundary_sil(self, **kwargs):
+        self.boundary_silhouettes = esda.boundary_silhouette(self.X, self.labels, self.W, **kwargs)
+
+    def path_sil(self, **kwargs):
+        self.path_silhouettes = esda.path_silhouette(self.X, self.labels, self.W, **kwargs)
 
 
 def cluster(
-    gdf,
-    n_clusters=6,
-    method=None,
-    best_model=False,
-    columns=None,
-    verbose=False,
-    time_var="year",
-    id_var="geoid",
-    scaler='std',
-    pooling="fixed",
-    **kwargs,
+        gdf,
+        n_clusters=6,
+        method=None,
+        best_model=False,
+        columns=None,
+        verbose=False,
+        time_var="year",
+        id_var="geoid",
+        scaler='std',
+        pooling="fixed",
+        **kwargs,
 ):
     """Create a geodemographic typology by running a cluster analysis on the study area's neighborhood attributes.
 
@@ -202,7 +226,6 @@ def cluster(
         data = data.reset_index()
 
         for time in times:
-
             df = data[data[time_var] == time]
 
             model = specification[method](
@@ -234,18 +257,18 @@ def cluster(
 
 
 def cluster_spatial(
-    gdf,
-    n_clusters=6,
-    spatial_weights="rook",
-    method=None,
-    columns=None,
-    threshold_variable="count",
-    threshold=10,
-    time_var="year",
-    id_var="geoid",
-    scaler="std",
-    weights_kwargs=None,
-    **kwargs,
+        gdf,
+        n_clusters=6,
+        spatial_weights="rook",
+        method=None,
+        columns=None,
+        threshold_variable="count",
+        threshold=10,
+        time_var="year",
+        id_var="geoid",
+        scaler="std",
+        weights_kwargs=None,
+        **kwargs,
 ):
     """Create a *spatial* geodemographic typology by running a cluster
     analysis on the metro area's neighborhood attributes and including a
