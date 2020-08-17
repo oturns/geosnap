@@ -1,5 +1,4 @@
 """Tools for the spatial analysis of neighborhood change."""
-from warnings import warn
 
 import esda
 import numpy as np
