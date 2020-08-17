@@ -404,6 +404,7 @@ class Community:
                                                  alpha=.6, legend=True, **kwargs)
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
+        ax[1].axis('off')
         f.tight_layout()
         if save_fig:
             f.savefig(save_fig, dpi=dpi, bbox_inches='tight')
@@ -465,6 +466,8 @@ class Community:
             if ctxmap:
                 ctx.add_basemap(ax[0], source=ctxmap)
                 ctx.add_basemap(ax[1], source=ctxmap)
+        ax[0].axis('off')
+        ax[1].axis('off')
         f.tight_layout()
         if save_fig:
             f.savefig(save_fig, dpi=dpi, bbox_inches='tight')
@@ -520,6 +523,7 @@ class Community:
                                                  alpha=.6, legend=True, **kwargs)
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
+        ax[1].axis('off')
         f.tight_layout()
         if save_fig:
             f.savefig(save_fig, dpi=dpi, bbox_inches='tight')
@@ -579,6 +583,7 @@ class Community:
                                                  alpha=.6, legend=True, **kwargs)
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
+        ax[1].axis('off')
         f.tight_layout()
         if save_fig:
             f.savefig(save_fig, dpi=dpi, bbox_inches='tight')
