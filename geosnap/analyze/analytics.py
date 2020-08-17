@@ -1,4 +1,5 @@
 """Tools for the spatial analysis of neighborhood change."""
+from warnings import warn
 
 import esda
 import numpy as np
@@ -84,9 +85,13 @@ class ModelResults:
         self.nearest_labels = esda.nearest_label(self.X, self.labels, **kwargs)
 
     def boundary_sil(self, **kwargs):
+        assert self.W is not None, 'Model is aspatial (lacks a W object), but has been passed to a spatial diagnostic.' \
+                                   ' Try aspatial diagnostics like nearest_label() or sil_scores()'
         self.boundary_silhouettes = esda.boundary_silhouette(self.X, self.labels, self.W, **kwargs)
 
     def path_sil(self, **kwargs):
+        assert self.W is not None, 'Model is aspatial(lacks a W object), but has been passed to a spatial diagnostic.' \
+                                   ' Try aspatial diagnostics like nearest_label() or sil_scores()'
         self.path_silhouettes = esda.path_silhouette(self.X, self.labels, self.W, **kwargs)
 
 
