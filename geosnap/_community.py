@@ -381,18 +381,18 @@ class Community:
         silhouette scores mapped onto community geography
 
         """
-        f, ax = plt.subplots(1, 2, figsize=(12, 3))
-        if ctxmap:  # need to convert crs to mercator before graphing
-            self.gdf = self.gdf.to_crs(epsg=3857)
-            # Check for and use previously calculated values for graphs
-            # Comparing NumPy arrays with `and` is not allowed, while other solutions require error handling,
-            # so just check if object contains iterables as substitute for arrays existence.
+        # Check for and use previously calculated values for graphs
+        # Comparing NumPy arrays with `and` is not allowed, while other solutions require error handling,
+        # so just check if object contains iterables as substitute for arrays existence.
         if not isinstance(self.models[model_name].silhouettes and
                           self.models[model_name][year].silhouettes, Iterable):
             if not year:
                 self.models[model_name].sil_scores()
             else:
                 self.models[model_name][year].sil_scores()
+        f, ax = plt.subplots(1, 2, figsize=(12, 3))
+        if ctxmap:  # need to convert crs to mercator before graphing
+            self.gdf = self.gdf.to_crs(epsg=3857)
         if not year:
             ax[0].hist(self.models[model_name].silhouettes)
             self.gdf.plot(self.models[model_name].silhouettes, ax=ax[1], legend=True, **kwargs)
@@ -407,7 +407,7 @@ class Community:
         f.tight_layout()
         if save_fig:
             f.savefig(save_fig, dpi=dpi, bbox_inches='tight')
-        return f, ax
+        return ax
 
     def nearest_plot(self,
                      model_name=None,
@@ -440,9 +440,6 @@ class Community:
         and an array made up of the the model labels and nearest labels that was used to graph the values
 
         """
-        f, ax = plt.subplots(1, 2, figsize=(12, 3))
-        if ctxmap:  # need to convert crs to mercator before graphing
-            self.gdf = self.gdf.to_crs(epsg=3857)
         # If the user has already calculated, respect already calculated values
         if not isinstance(self.models[model_name].nearest_labels and
                           self.models[model_name][year].nearest_labels, Iterable):
@@ -450,6 +447,9 @@ class Community:
                 self.models[model_name].nearest_label()
             else:
                 self.models[model_name][year].nearest_label()
+        f, ax = plt.subplots(1, 2, figsize=(12, 3))
+        if ctxmap:  # need to convert crs to mercator before graphing
+            self.gdf = self.gdf.to_crs(epsg=3857)
         if not year:
             nearest_label_array = np.asarray(self.models[model_name].labels)[self.models[model_name].nearest_labels]
             self.gdf.plot(model_name, ax=ax[0], categorical=True)
@@ -468,7 +468,7 @@ class Community:
         f.tight_layout()
         if save_fig:
             f.savefig(save_fig, dpi=dpi, bbox_inches='tight')
-        return f, ax
+        return ax
 
     def pathsil_plot(self,
                      model_name=None,
@@ -500,15 +500,15 @@ class Community:
         path_silhouette scores of the passed model plotted onto community geography
 
         """
-        f, ax = plt.subplots(1, 2, figsize=(12, 3))
-        if ctxmap:  # need to convert crs to mercator before graphing
-            self.gdf = self.gdf.to_crs(epsg=3857)
         if not isinstance(self.models[model_name].path_silhouettes and
                           self.models[model_name][year].path_silhouettes, Iterable):
             if not year:
                 self.models[model_name].path_sil()
             else:
                 self.models[model_name][year].path_sil()
+        f, ax = plt.subplots(1, 2, figsize=(12, 3))
+        if ctxmap:  # need to convert crs to mercator before graphing
+            self.gdf = self.gdf.to_crs(epsg=3857)
         if not year:
             ax[0].hist(self.models[model_name].path_silhouettes)
             self.gdf.plot(self.models[model_name].path_silhouettes, ax=ax[1], legend=True, **kwargs)
@@ -523,7 +523,7 @@ class Community:
         f.tight_layout()
         if save_fig:
             f.savefig(save_fig, dpi=dpi, bbox_inches='tight')
-        return f, ax
+        return ax
 
     def boundarysil_plot(self,
                          model_name=None,
@@ -555,9 +555,6 @@ class Community:
         boundary_silhouette scores of the passed model plotted onto community geography
 
         """
-        f, ax = plt.subplots(1, 2, figsize=(12, 3))
-        if ctxmap:  # need to convert crs to mercator before graphing
-            self.gdf = self.gdf.to_crs(epsg=3857)
         # If the user has already calculated , respect already calculated values
         if not isinstance(self.models[model_name].boundary_silhouettes and
                           self.models[model_name][year].boundary_silhouettes, Iterable):
@@ -565,6 +562,9 @@ class Community:
                 self.models[model_name].boundary_sil()
             else:
                 self.models[model_name][year].boundary_sil()
+        f, ax = plt.subplots(1, 2, figsize=(12, 3))
+        if ctxmap:  # need to convert crs to mercator before graphing
+            self.gdf = self.gdf.to_crs(epsg=3857)
         # To make visualization of boundary_silhouettes informative we need to remove the graphing of zero values
         if not year:
             boundsil_series = pd.Series(self.models[model_name].boundary_silhouettes)
@@ -582,7 +582,7 @@ class Community:
         f.tight_layout()
         if save_fig:
             f.savefig(save_fig, dpi=dpi, bbox_inches='tight')
-        return f, ax
+        return ax
 
     def tsplot(self, column, title='',
                years=[], scheme='quantiles',
