@@ -355,6 +355,7 @@ class Community:
                       year=None,
                       ctxmap=ctx.providers.Stamen.TonerLite,
                       save_fig=None,
+                      figsize=(12, 3),
                       dpi=500,
                       **kwargs):
         """ Returns a plot of the silhouette scores of the model that is passed to it.
@@ -370,6 +371,9 @@ class Community:
                      Default is OpenStreetMap.Mapnik
         save_fig   : str, optional
                      path to save figure if desired.
+        figsize    : tuple, optional
+                     an order tuple where x is width and y is height
+                     default is 12 inches wide and 3 inches high
         dpi        : int, optional
                      dpi of the saved image if save_fig=True
                     default is 500
@@ -390,7 +394,7 @@ class Community:
         else:
             if self.models[model_name][year].silhouettes is None:
                 self.models[model_name][year].sil_scores()
-        f, ax = plt.subplots(1, 2, figsize=(12, 3))
+        f, ax = plt.subplots(1, 2, figsize=figsize)
         if ctxmap:  # need to convert crs to mercator before graphing
             self.gdf = self.gdf.to_crs(epsg=3857)
         if not year:
@@ -415,6 +419,7 @@ class Community:
                      year=None,
                      ctxmap=ctx.providers.Stamen.TonerLite,
                      save_fig=None,
+                     figsize=(12, 3),
                      dpi=500,
                      **kwargs):
         """ Returns a plot of the nearest_labels of the model that is passed to it.
@@ -430,6 +435,9 @@ class Community:
                      Default is OpenStreetMap.Mapnik
         save_fig   : str, optional
                      path to save figure if desired.
+        figsize    : tuple, optional
+                     an order tuple where x is width and y is height
+                     default is 12 inches wide and 3 inches high
         dpi        : int, optional
                      dpi of the saved image if save_fig=True
                      default is 500
@@ -448,7 +456,7 @@ class Community:
         else:
             if self.models[model_name][year].nearest_labels is None:
                 self.models[model_name][year].nearest_label()
-        f, ax = plt.subplots(1, 2, figsize=(12, 3))
+        f, ax = plt.subplots(1, 2, figsize=figsize)
         if ctxmap:  # need to convert crs to mercator before graphing
             self.gdf = self.gdf.to_crs(epsg=3857)
         if not year:
@@ -479,6 +487,7 @@ class Community:
                      year=None,
                      ctxmap=ctx.providers.Stamen.TonerLite,
                      save_fig=None,
+                     figsize=(12, 3),
                      dpi=500,
                      **kwargs):
         """ Returns a plot of the path_silhouettes of the model that is passed to it.
@@ -494,6 +503,9 @@ class Community:
                      Default is OpenStreetMap.Mapnik
         save_fig   : str, optional
                      path to save figure if desired.
+        figsize    : tuple, optional
+                     an order tuple where x is width and y is height
+                     default is 12 inches wide and 3 inches high
         dpi        : int, optional
                      dpi of the saved image if save_fig=True
                      default is 500
@@ -510,7 +522,7 @@ class Community:
         else:
             if self.models[model_name][year].path_silhouettes is None:
                 self.models[model_name][year].path_sil()
-        f, ax = plt.subplots(1, 2, figsize=(12, 3))
+        f, ax = plt.subplots(1, 2, figsize=figsize)
         if ctxmap:  # need to convert crs to mercator before graphing
             self.gdf = self.gdf.to_crs(epsg=3857)
         if not year:
@@ -535,6 +547,7 @@ class Community:
                          year=None,
                          ctxmap=ctx.providers.Stamen.TonerLite,
                          save_fig=None,
+                         figsize=(12, 3),
                          dpi=500,
                          **kwargs):
         """ Returns a plot of the boundary_silhouettes of the model that is passed to it.
@@ -567,7 +580,7 @@ class Community:
         else:
             if self.models[model_name][year].boundary_silhouettes is None:
                 self.models[model_name][year].boundary_sil()
-        f, ax = plt.subplots(1, 2, figsize=(12, 3))
+        f, ax = plt.subplots(1, 2, figsize=figsize)
         if ctxmap:  # need to convert crs to mercator before graphing
             self.gdf = self.gdf.to_crs(epsg=3857)
         # To make visualization of boundary_silhouettes informative we need to remove the graphing of zero values
