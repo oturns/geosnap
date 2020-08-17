@@ -356,6 +356,7 @@ class Community:
                       year=None,
                       ctxmap=ctx.providers.Stamen.TonerLite,
                       save_fig=None,
+                      dpi=500,
                       **kwargs):
         """ Returns a plot of the silhouette scores of the model that is passed to it.
 
@@ -370,6 +371,9 @@ class Community:
                      Default is OpenStreetMap.Mapnik
         save_fig   : str, optional
                      path to save figure if desired.
+        dpi        : int, optional
+                     dpi of the saved image if save_fig=True
+                    default is 500
         kwargs     : **kwargs, optional
                      pass through to matplotlib pyplot
         Returns
@@ -410,6 +414,7 @@ class Community:
                      year=None,
                      ctxmap=ctx.providers.Stamen.TonerLite,
                      save_fig=None,
+                     dpi=500,
                      **kwargs):
         """ Returns a plot of the nearest_labels of the model that is passed to it.
 
@@ -424,6 +429,9 @@ class Community:
                      Default is OpenStreetMap.Mapnik
         save_fig   : str, optional
                      path to save figure if desired.
+        dpi        : int, optional
+                     dpi of the saved image if save_fig=True
+                     default is 500
         kwargs     : **kwargs, optional
                      pass through to matplotlib pyplot
         Returns
@@ -467,6 +475,7 @@ class Community:
                      year=None,
                      ctxmap=ctx.providers.Stamen.TonerLite,
                      save_fig=None,
+                     dpi=500,
                      **kwargs):
         """ Returns a plot of the path_silhouettes of the model that is passed to it.
 
@@ -481,6 +490,9 @@ class Community:
                      Default is OpenStreetMap.Mapnik
         save_fig   : str, optional
                      path to save figure if desired.
+        dpi        : int, optional
+                     dpi of the saved image if save_fig=True
+                     default is 500
         kwargs     : **kwargs, optional
                      pass through to matplotlib pyplot
         Returns
@@ -518,6 +530,7 @@ class Community:
                          year=None,
                          ctxmap=ctx.providers.Stamen.TonerLite,
                          save_fig=None,
+                         dpi=500,
                          **kwargs):
         """ Returns a plot of the boundary_silhouettes of the model that is passed to it.
 
@@ -532,6 +545,9 @@ class Community:
                      Default is OpenStreetMap.Mapnik
         save_fig   : str, optional
                      path to save figure if desired.
+        dpi        : int, optional
+                     dpi of the saved image if save_fig=True
+                     default is 500
         kwargs     : **kwargs, optional
                      pass through to matplotlib pyplot
         Returns
