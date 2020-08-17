@@ -4,7 +4,6 @@ from warnings import warn
 import contextily as ctx
 import geopandas as gpd
 import pandas as pd
-import proplot as plot
 import scikitplot as skplt
 
 from ._data import _Map, datasets
@@ -386,6 +385,9 @@ class Community:
                        contextily basemap. Set to False for no basemap.
                        Default is OpenStreetMap.Mapnik
         """
+        # proplot needs to be used as a function-level import,
+        # as it influences all figures when imported at the top of the file
+        import proplot as plot
 
         if legend_kwds == 'default':
             legend_kwds = {'ncols': 1, "loc": "b"}
