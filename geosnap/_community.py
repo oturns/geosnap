@@ -1,5 +1,4 @@
 """A Community is a thin wrapper around a long-form time-series geodataframe."""
-from collections.abc import Iterable
 from warnings import warn
 
 import contextily as ctx
@@ -382,13 +381,14 @@ class Community:
 
         """
         # Check for and use previously calculated values for graphs
-        # Comparing NumPy arrays with `and` is not allowed, while other solutions require error handling,
-        # so just check if object contains iterables as substitute for arrays existence.
-        if not isinstance(self.models[model_name].silhouettes and
-                          self.models[model_name][year].silhouettes, Iterable):
-            if not year:
+        # Checking both arrays at the same time would be more efficient, but
+        # comparing NumPy arrays with `and` is not allowed, and many solutions that try to compare numpy arrays
+        # directly require error handling, so check if objects contain numpy arrays separately.
+        if not year:
+            if self.models[model_name].silhouettes is None:
                 self.models[model_name].sil_scores()
-            else:
+        else:
+            if self.models[model_name][year].silhouettes is None:
                 self.models[model_name][year].sil_scores()
         f, ax = plt.subplots(1, 2, figsize=(12, 3))
         if ctxmap:  # need to convert crs to mercator before graphing
@@ -442,11 +442,11 @@ class Community:
 
         """
         # If the user has already calculated, respect already calculated values
-        if not isinstance(self.models[model_name].nearest_labels and
-                          self.models[model_name][year].nearest_labels, Iterable):
-            if not year:
+        if not year:
+            if self.models[model_name].nearest_labels is None:
                 self.models[model_name].nearest_label()
-            else:
+        else:
+            if self.models[model_name][year].nearest_labels is None:
                 self.models[model_name][year].nearest_label()
         f, ax = plt.subplots(1, 2, figsize=(12, 3))
         if ctxmap:  # need to convert crs to mercator before graphing
@@ -459,7 +459,8 @@ class Community:
                 ctx.add_basemap(ax[0], source=ctxmap)
                 ctx.add_basemap(ax[1], source=ctxmap)
         else:
-            nearest_label_array = np.asarray(self.models[model_name][year].labels)[self.models[model_name][year].nearest_labels]
+            nearest_label_array = np.asarray(self.models[model_name][year].labels)[
+                self.models[model_name][year].nearest_labels]
             self.gdf.plot(model_name, ax=ax[0], legend=True, categorical=True)
             self.gdf[self.gdf.year == year].plot(nearest_label_array, ax=ax[1],
                                                  alpha=.6, legend=True, categorical=True, **kwargs)
@@ -503,11 +504,11 @@ class Community:
         path_silhouette scores of the passed model plotted onto community geography
 
         """
-        if not isinstance(self.models[model_name].path_silhouettes and
-                          self.models[model_name][year].path_silhouettes, Iterable):
-            if not year:
+        if not year:
+            if self.models[model_name].path_silhouettes is None:
                 self.models[model_name].path_sil()
-            else:
+        else:
+            if self.models[model_name][year].path_silhouettes is None:
                 self.models[model_name][year].path_sil()
         f, ax = plt.subplots(1, 2, figsize=(12, 3))
         if ctxmap:  # need to convert crs to mercator before graphing
@@ -560,11 +561,11 @@ class Community:
 
         """
         # If the user has already calculated , respect already calculated values
-        if not isinstance(self.models[model_name].boundary_silhouettes and
-                          self.models[model_name][year].boundary_silhouettes, Iterable):
-            if not year:
+        if not year:
+            if self.models[model_name].boundary_silhouettes is None:
                 self.models[model_name].boundary_sil()
-            else:
+        else:
+            if self.models[model_name][year].boundary_silhouettes is None:
                 self.models[model_name][year].boundary_sil()
         f, ax = plt.subplots(1, 2, figsize=(12, 3))
         if ctxmap:  # need to convert crs to mercator before graphing
