@@ -350,7 +350,7 @@ class Community:
                                                 **kwargs)
         return fig
 
-    def silscore_plot(self,
+    def plot_silscore(self,
                       model_name=None,
                       year=None,
                       ctxmap=ctx.providers.Stamen.TonerLite,
@@ -414,7 +414,7 @@ class Community:
             f.savefig(save_fig, dpi=dpi, bbox_inches='tight')
         return ax
 
-    def nearest_plot(self,
+    def plot_nearest(self,
                      model_name=None,
                      year=None,
                      ctxmap=ctx.providers.Stamen.TonerLite,
@@ -482,7 +482,7 @@ class Community:
             f.savefig(save_fig, dpi=dpi, bbox_inches='tight')
         return ax
 
-    def pathsil_plot(self,
+    def plot_pathsil(self,
                      model_name=None,
                      year=None,
                      ctxmap=ctx.providers.Stamen.TonerLite,
@@ -542,7 +542,7 @@ class Community:
             f.savefig(save_fig, dpi=dpi, bbox_inches='tight')
         return ax
 
-    def boundarysil_plot(self,
+    def plot_boundarysil(self,
                          model_name=None,
                          year=None,
                          ctxmap=ctx.providers.Stamen.TonerLite,
