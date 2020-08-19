@@ -63,7 +63,8 @@ class ModelResults:
             labels of each column
         instance: AgglomerativeCluserting object, or other model specific object type
             how many clusters model was computed with
-
+        model_type: string
+            says whether the model is spatial or aspatial (contains a W object)
         """
         self.columns = columns
         self.X = X
@@ -74,6 +75,10 @@ class ModelResults:
         self.silhouettes = None
         self.path_silhouettes = None
         self.boundary_silhouettes = None
+        if self.W is None:
+            self.model_type = 'aspatial'
+        else:
+            self.model_type = 'spatial'
 
     # Standalone funcs to calc these if you don't want to graph them
     def sil_scores(self, **kwargs):
@@ -89,7 +94,7 @@ class ModelResults:
         return self.nearest_labels
 
     def boundary_sil(self, **kwargs):
-        assert self.W is not None, 'Model is aspatial (lacks a W object), but has been passed to a spatial diagnostic.' \
+        assert self.model_type is 'spatial', 'Model is aspatial (lacks a W object), but has been passed to a spatial diagnostic.' \
                                    ' Try aspatial diagnostics like nearest_label() or sil_scores()'
         self.boundary_silhouettes = pd.DataFrame()
         self.boundary_silhouettes['boundary_silhouettes'] = esda.boundary_silhouette(self.X.values, self.labels, self.W, **kwargs)
@@ -97,7 +102,7 @@ class ModelResults:
         return self.boundary_silhouettes
 
     def path_sil(self, **kwargs):
-        assert self.W is not None, 'Model is aspatial(lacks a W object), but has been passed to a spatial diagnostic.' \
+        assert self.model_type is 'spatial', 'Model is aspatial(lacks a W object), but has been passed to a spatial diagnostic.' \
                                    ' Try aspatial diagnostics like nearest_label() or sil_scores()'
         self.path_silhouettes = pd.DataFrame()
         self.path_silhouettes['path_silhouettes'] = esda.path_silhouette(self.X.values, self.labels, self.W, **kwargs)
