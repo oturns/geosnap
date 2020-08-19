@@ -41,6 +41,16 @@ class ModelResults:
     instance: instance of model class used to generate neighborhood labels.
         fitted model instance, e.g sklearn.cluster.AgglomerativeClustering object
         or other model class used to estimate class labels
+    nearest_labels: dataframe
+        container for dataframe of nearest_labels
+    silhouettes: dataframe
+        container for dataframe of silhouette scores
+    path_silhouettes: dataframe
+        container for dataframe of path_silhouette scores
+    boundary_silhouettes: dataframe
+        container for dataframe of boundary_silhouette scores
+    model_type: string
+        says whether the model is spatial or aspatial (contains a W object)
 
     """
 
@@ -63,6 +73,14 @@ class ModelResults:
             labels of each column
         instance: AgglomerativeCluserting object, or other model specific object type
             how many clusters model was computed with
+        nearest_labels: dataframe
+            container for dataframe of nearest_labels
+        silhouettes: dataframe
+            container for dataframe of silhouette scores
+        path_silhouettes: dataframe
+            container for dataframe of path_silhouette scores
+        boundary_silhouettes: dataframe
+            container for dataframe of boundary_silhouette scores
         model_type: string
             says whether the model is spatial or aspatial (contains a W object)
         """
@@ -82,28 +100,59 @@ class ModelResults:
 
     # Standalone funcs to calc these if you don't want to graph them
     def sil_scores(self, **kwargs):
+        """
+        A function that calculates silhouette scores for the current model.
+        Allows passing of custom parameters if desired.
+        Returns
+        -------
+        silhouette scores stored in a dataframe accessible from `comm.models.['model_name'].silhouettes`
+        """
         self.silhouettes = pd.DataFrame()
         self.silhouettes['silhouettes'] = silhouette_samples(self.X.values, self.labels, **kwargs)
         self.silhouettes.index = self.X.index
         return self.silhouettes
 
     def nearest_label(self, **kwargs):
+        """
+        A function that calculates nearest_labels for the current model.
+        Allows passing of custom parameters if desired.
+        Returns
+        -------
+        nearest_labels stored in a dataframe accessible from:
+        `comm.models.['model_name'].nearest_labels`
+        """
         self.nearest_labels = pd.DataFrame()
         self.nearest_labels['nearest_label'] = esda.nearest_label(self.X.values, self.labels, **kwargs)
         self.nearest_labels.index = self.X.index
         return self.nearest_labels
 
     def boundary_sil(self, **kwargs):
+        """
+        A function that calculates boundary silhouette scores for the current model.
+        Allows passing of custom parameters if desired.
+        Returns
+        -------
+        boundary silhouette scores stored in a dataframe accessible from:
+        `comm.models.['model_name'].boundary_silhouettes`
+        """
         assert self.model_type is 'spatial', 'Model is aspatial (lacks a W object), but has been passed to a spatial diagnostic.' \
-                                   ' Try aspatial diagnostics like nearest_label() or sil_scores()'
+                                             ' Try aspatial diagnostics like nearest_label() or sil_scores()'
         self.boundary_silhouettes = pd.DataFrame()
         self.boundary_silhouettes['boundary_silhouettes'] = esda.boundary_silhouette(self.X.values, self.labels, self.W, **kwargs)
         self.boundary_silhouettes.index = self.X.index
         return self.boundary_silhouettes
 
     def path_sil(self, **kwargs):
+        """
+        A function that calculates path silhouette scores for the current model.
+        Allows passing of custom parameters if desired.
+        Returns
+        -------
+        path silhouette scores stored in a dataframe accessible from:
+        `comm.models.['model_name'].path_silhouettes`
+        """
         assert self.model_type is 'spatial', 'Model is aspatial(lacks a W object), but has been passed to a spatial diagnostic.' \
-                                   ' Try aspatial diagnostics like nearest_label() or sil_scores()'
+                                             ' Try aspatial diagnostics like nearest_label() or sil_scores()'
         self.path_silhouettes = pd.DataFrame()
         self.path_silhouettes['path_silhouettes'] = esda.path_silhouette(self.X.values, self.labels, self.W, **kwargs)
         self.path_silhouettes.index = self.X.index

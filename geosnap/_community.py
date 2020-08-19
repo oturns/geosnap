@@ -371,7 +371,7 @@ class Community:
                      year to be plotted if model created with pooling=='unique'
         ctxmap     : contextily map provider, optional
                      contextily basemap. Set to False for no basemap.
-                     Default is OpenStreetMap.Mapnik
+                     Default is ctx.providers.Stamen.TonerLite
         save_fig   : str, optional
                      path to save figure if desired.
         figsize    : tuple, optional
@@ -446,7 +446,7 @@ class Community:
                      year to be plotted if model created with pooling=='unique'
         ctxmap     : contextily map provider, optional
                      contextily basemap. Set to False for no basemap.
-                     Default is OpenStreetMap.Mapnik
+                     Default is ctx.providers.Stamen.TonerLite
         save_fig   : str, optional
                      path to save figure if desired.
         figsize    : tuple, optional
@@ -527,7 +527,7 @@ class Community:
                      year to be plotted if model created with pooling=='unique'
         ctxmap     : contextily map provider, optional
                      contextily basemap. Set to False for no basemap.
-                     Default is OpenStreetMap.Mapnik
+                     Default is ctx.providers.Stamen.TonerLite
         save_fig   : str, optional
                      path to save figure if desired.
         figsize    : tuple, optional
@@ -598,7 +598,7 @@ class Community:
                      year to be plotted if model created with pooling=='unique'
         ctxmap     : contextily map provider, optional
                      contextily basemap. Set to False for no basemap.
-                     Default is OpenStreetMap.Mapnik
+                     Default is ctx.providers.Stamen.TonerLite
         save_fig   : str, optional
                      path to save figure if desired.
         dpi        : int, optional
