@@ -1,5 +1,4 @@
 """Tools for the spatial analysis of neighborhood change."""
-
 import esda
 import numpy as np
 import pandas as pd
@@ -35,12 +34,12 @@ class ModelResults:
         data used to compute model
     columns: list-like
         columns used in model
-    W: libpysal.weights.W 
+    W: libpysal.weights.W
         libpysal spatial weights matrix used in model
     labels: array-like
         labels of each column
     instance: instance of model class used to generate neighborhood labels.
-        fitted model instance, e.g sklearn.cluster.AgglomerativeClustering object 
+        fitted model instance, e.g sklearn.cluster.AgglomerativeClustering object
         or other model class used to estimate class labels
 
     """
@@ -78,20 +77,32 @@ class ModelResults:
 
     # Standalone funcs to calc these if you don't want to graph them
     def sil_scores(self, **kwargs):
-        self.silhouettes = silhouette_samples(self.X, self.labels, **kwargs)
+        self.silhouettes = pd.DataFrame()
+        self.silhouettes['silhouettes'] = silhouette_samples(self.X.values, self.labels, **kwargs)
+        self.silhouettes.index = self.X.index
+        return self.silhouettes
 
     def nearest_label(self, **kwargs):
-        self.nearest_labels = esda.nearest_label(self.X, self.labels, **kwargs)
+        self.nearest_labels = pd.DataFrame()
+        self.nearest_labels['nearest_label'] = esda.nearest_label(self.X.values, self.labels, **kwargs)
+        self.nearest_labels.index = self.X.index
+        return self.nearest_labels
 
     def boundary_sil(self, **kwargs):
         assert self.W is not None, 'Model is aspatial (lacks a W object), but has been passed to a spatial diagnostic.' \
                                    ' Try aspatial diagnostics like nearest_label() or sil_scores()'
-        self.boundary_silhouettes = esda.boundary_silhouette(self.X, self.labels, self.W, **kwargs)
+        self.boundary_silhouettes = pd.DataFrame()
+        self.boundary_silhouettes['boundary_silhouettes'] = esda.boundary_silhouette(self.X.values, self.labels, self.W, **kwargs)
+        self.boundary_silhouettes.index = self.X.index
+        return self.boundary_silhouettes
 
     def path_sil(self, **kwargs):
         assert self.W is not None, 'Model is aspatial(lacks a W object), but has been passed to a spatial diagnostic.' \
                                    ' Try aspatial diagnostics like nearest_label() or sil_scores()'
-        self.path_silhouettes = esda.path_silhouette(self.X, self.labels, self.W, **kwargs)
+        self.path_silhouettes = pd.DataFrame()
+        self.path_silhouettes['path_silhouettes'] = esda.path_silhouette(self.X.values, self.labels, self.W, **kwargs)
+        self.path_silhouettes.index = self.X.index
+        return self.path_silhouettes
 
 
 def cluster(
@@ -220,7 +231,7 @@ def cluster(
         gdf = gdf.join(clusters, how="left")
         gdf = gdf.reset_index()
         results = ModelResults(
-            X=data.values, columns=columns, labels=model.labels_, instance=model, W=None
+            X=data.set_index([id_var, time_var]), columns=columns, labels=model.labels_, instance=model, W=None
         )
         return gdf, results, model_name
 
@@ -247,7 +258,7 @@ def cluster(
             clusters.set_index([time_var, id_var], inplace=True)
             gdf.update(clusters)
             results = ModelResults(
-                X=df[columns].values,
+                X=df.set_index([id_var, time_var]),
                 columns=columns,
                 labels=model.labels_,
                 instance=model,
@@ -413,7 +424,7 @@ def cluster_spatial(
         clusters.set_index([time_var, id_var], inplace=True)
         gdf.update(clusters)
         results = ModelResults(
-            X=df[columns].values,
+            X=df.set_index([id_var, time_var]).drop('geometry', axis=1),
             columns=columns,
             labels=model.labels_,
             instance=model,

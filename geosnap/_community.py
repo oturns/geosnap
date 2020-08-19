@@ -357,8 +357,11 @@ class Community:
                       save_fig=None,
                       figsize=(12, 3),
                       dpi=500,
+                      time_var='year',
+                      id_var='geoid',
                       **kwargs):
-        """ Returns a plot of the silhouette scores of the model that is passed to it.
+        """ Returns a plot of the silhouette scores of the model that is passed to it
+            by creating a table join of the models silhouettes object and community gdf
 
         Parameters
         ----------
@@ -377,6 +380,12 @@ class Community:
         dpi        : int, optional
                      dpi of the saved image if save_fig=True
                     default is 500
+        time_var   : string, optional
+                     the column in the community gdf that identifies time period
+                     default is 'year' from US census data
+        id_var     : string, optional
+                     column in gdf that identifies geographic units
+                     default is 'geoid' from US census data
         kwargs     : **kwargs, optional
                      pass through to matplotlib pyplot
         Returns
@@ -398,14 +407,17 @@ class Community:
         if ctxmap:  # need to convert crs to mercator before graphing
             self.gdf = self.gdf.to_crs(epsg=3857)
         if not year:
-            ax[0].hist(self.models[model_name].silhouettes)
-            self.gdf.plot(self.models[model_name].silhouettes, ax=ax[1], legend=True, **kwargs)
+            ax[0].hist(self.models[model_name].silhouettes['silhouettes'])
+            self.gdf.join(
+                self.models[model_name].silhouettes, on=[id_var, time_var]).plot(
+                'silhouettes', ax=ax[1], alpha=.5, legend=True, **kwargs)
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
         else:
-            ax[0].hist(self.models[model_name][year].silhouettes)
-            self.gdf[self.gdf.year == year].plot(self.models[model_name][year].silhouettes, ax=ax[1],
-                                                 alpha=.6, legend=True, **kwargs)
+            ax[0].hist(self.models[model_name][year].silhouettes['silhouettes'])
+            self.gdf[self.gdf.year == year].join(
+                self.models[model_name][year].silhouettes, on=[id_var, time_var]).plot(
+                'silhouettes', ax=ax[1], alpha=.5, legend=True, **kwargs)
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
         ax[1].axis('off')
@@ -421,6 +433,8 @@ class Community:
                      save_fig=None,
                      figsize=(12, 3),
                      dpi=500,
+                     time_var='year',
+                     id_var='geoid',
                      **kwargs):
         """ Returns a plot of the nearest_labels of the model that is passed to it.
 
@@ -441,6 +455,12 @@ class Community:
         dpi        : int, optional
                      dpi of the saved image if save_fig=True
                      default is 500
+        time_var   : string, optional
+                     the column in the community gdf that identifies time period
+                     default is 'year' from US census data
+        id_var     : string, optional
+                     column in gdf that identifies geographic units
+                     default is 'geoid' from US census data
         kwargs     : **kwargs, optional
                      pass through to matplotlib pyplot
         Returns
@@ -460,18 +480,23 @@ class Community:
         if ctxmap:  # need to convert crs to mercator before graphing
             self.gdf = self.gdf.to_crs(epsg=3857)
         if not year:
-            nearest_label_array = np.asarray(self.models[model_name].labels)[self.models[model_name].nearest_labels]
-            self.gdf.plot(model_name, ax=ax[0], categorical=True)
-            self.gdf.plot(nearest_label_array, ax=ax[1], legend=True, **kwargs)
+            temp_df = self.gdf.join(self.models[model_name].nearest_labels, on=[id_var, time_var])
+            temp_df = temp_df[['nearest_label', 'geometry', model_name]]
+            temp_df.set_index(model_name, inplace=True)
+            temp_df['nearest_label'] = temp_df['nearest_label']
+            self.gdf.plot(model_name, ax=ax[0], alpha=.5, legend=True, categorical=True)
+            temp_df.plot('nearest_label', ax=ax[1], legend=True, categorical=True, alpha=.5, **kwargs)
             if ctxmap:
                 ctx.add_basemap(ax[0], source=ctxmap)
                 ctx.add_basemap(ax[1], source=ctxmap)
         else:
-            nearest_label_array = np.asarray(self.models[model_name][year].labels)[
-                self.models[model_name][year].nearest_labels]
-            self.gdf.plot(model_name, ax=ax[0], legend=True, categorical=True)
-            self.gdf[self.gdf.year == year].plot(nearest_label_array, ax=ax[1],
-                                                 alpha=.6, legend=True, categorical=True, **kwargs)
+            temp_df = self.gdf.join(self.models[model_name][year].nearest_labels, on=[id_var, time_var])
+            temp_df = temp_df[['nearest_label', time_var, 'geometry', model_name]]
+            temp_df.set_index(model_name, inplace=True)
+            temp_df['nearest_label'] = temp_df['nearest_label']
+            self.gdf[self.gdf.year == year].plot(model_name, ax=ax[0], alpha=.5, legend=True, categorical=True)
+            temp_df[temp_df.year == year].plot('nearest_label', ax=ax[1],
+                                                 alpha=.5, legend=True, categorical=True, **kwargs)
             if ctxmap:
                 ctx.add_basemap(ax[0], source=ctxmap)
                 ctx.add_basemap(ax[1], source=ctxmap)
@@ -489,6 +514,8 @@ class Community:
                      save_fig=None,
                      figsize=(12, 3),
                      dpi=500,
+                     time_var='year',
+                     id_var='geoid',
                      **kwargs):
         """ Returns a plot of the path_silhouettes of the model that is passed to it.
 
@@ -509,6 +536,12 @@ class Community:
         dpi        : int, optional
                      dpi of the saved image if save_fig=True
                      default is 500
+        time_var   : string, optional
+                     the column in the community gdf that identifies time period
+                     default is 'year' from US census data
+        id_var     : string, optional
+                     column in gdf that identifies geographic units
+                     default is 'geoid' from US census data
         kwargs     : **kwargs, optional
                      pass through to matplotlib pyplot
         Returns
@@ -526,14 +559,17 @@ class Community:
         if ctxmap:  # need to convert crs to mercator before graphing
             self.gdf = self.gdf.to_crs(epsg=3857)
         if not year:
-            ax[0].hist(self.models[model_name].path_silhouettes)
-            self.gdf.plot(self.models[model_name].path_silhouettes, ax=ax[1], legend=True, **kwargs)
+            ax[0].hist(self.models[model_name].path_silhouettes['path_silhouettes'])
+            self.gdf.join(
+                self.models[model_name][year].path_silhouettes, on=[id_var, time_var]).plot(
+                'path_silhouettes', ax=ax[1], alpha=.5, legend=True, **kwargs)
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
         else:
-            ax[0].hist(self.models[model_name][year].path_silhouettes)
-            self.gdf[self.gdf.year == year].plot(self.models[model_name][year].path_silhouettes, ax=ax[1],
-                                                 alpha=.6, legend=True, **kwargs)
+            ax[0].hist(self.models[model_name][year].path_silhouettes['path_silhouettes'])
+            self.gdf[self.gdf.year == year].join(
+                self.models[model_name][year].path_silhouettes, on=[id_var, time_var]).plot(
+                'path_silhouettes', ax=ax[1], alpha=.5, legend=True, **kwargs)
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
         ax[1].axis('off')
@@ -549,6 +585,8 @@ class Community:
                          save_fig=None,
                          figsize=(12, 3),
                          dpi=500,
+                         time_var='year',
+                         id_var='geoid',
                          **kwargs):
         """ Returns a plot of the boundary_silhouettes of the model that is passed to it.
 
@@ -566,6 +604,12 @@ class Community:
         dpi        : int, optional
                      dpi of the saved image if save_fig=True
                      default is 500
+        time_var   : string, optional
+                     the column in the community gdf that identifies time period
+                     default is 'year' from US census data
+        id_var     : string, optional
+                     column in gdf that identifies geographic units
+                     default is 'geoid' from US census data
         kwargs     : **kwargs, optional
                      pass through to matplotlib pyplot
         Returns
@@ -585,16 +629,19 @@ class Community:
             self.gdf = self.gdf.to_crs(epsg=3857)
         # To make visualization of boundary_silhouettes informative we need to remove the graphing of zero values
         if not year:
-            boundsil_series = pd.Series(self.models[model_name].boundary_silhouettes)
-            ax[0].hist(boundsil_series[boundsil_series != 0])
-            self.gdf.plot(self.models[model_name].boundary_silhouettes, ax=ax[1], legend=True, **kwargs)
+            ax[0].hist(
+                self.models[model_name].boundary_silhouettes['boundary_silhouettes'][self.models[model_name].boundary_silhouettes['boundary_silhouettes'] != 0])
+            self.gdf.join(
+                self.models[model_name][year].boundary_silhouettes, on=[id_var, time_var]).plot(
+                'boundary_silhouettes', ax=ax[1], alpha=.5, legend=True, **kwargs)
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
         else:
-            boundsil_series = pd.Series(self.models[model_name][year].boundary_silhouettes)
-            ax[0].hist(boundsil_series[boundsil_series != 0])
-            self.gdf[self.gdf.year == year].plot(self.models[model_name][year].boundary_silhouettes, ax=ax[1],
-                                                 alpha=.6, legend=True, **kwargs)
+            ax[0].hist(
+                self.models[model_name][year].boundary_silhouettes['boundary_silhouettes'][self.models[model_name][year].boundary_silhouettes['boundary_silhouettes'] != 0])
+            self.gdf[self.gdf.year == year].join(
+                self.models[model_name][year].boundary_silhouettes, on=[id_var, time_var]).plot(
+                'boundary_silhouettes', ax=ax[1], alpha=.5, legend=True, **kwargs)
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
         ax[1].axis('off')
