@@ -343,10 +343,10 @@ class Community:
 
         """
         if not year:
-            fig = skplt.metrics.plot_silhouette(self.models[model_name].X, self.models[model_name].labels,
+            fig = skplt.metrics.plot_silhouette(self.models[model_name].X.values, self.models[model_name].labels,
                                                 **kwargs)
         else:
-            fig = skplt.metrics.plot_silhouette(self.models[model_name][year].X, self.models[model_name][year].labels,
+            fig = skplt.metrics.plot_silhouette(self.models[model_name][year].X.values, self.models[model_name][year].labels,
                                                 **kwargs)
         return fig
 
