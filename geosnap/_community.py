@@ -4,7 +4,6 @@ from warnings import warn
 import contextily as ctx
 import geopandas as gpd
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import proplot as plot
 import scikitplot as skplt
@@ -483,7 +482,6 @@ class Community:
             temp_df = self.gdf.join(self.models[model_name].nearest_labels, on=[id_var, time_var])
             temp_df = temp_df[['nearest_label', 'geometry', model_name]]
             temp_df.set_index(model_name, inplace=True)
-            temp_df['nearest_label'] = temp_df['nearest_label']
             self.gdf.plot(model_name, ax=ax[0], alpha=.5, legend=True, categorical=True)
             temp_df.plot('nearest_label', ax=ax[1], legend=True, categorical=True, alpha=.5, **kwargs)
             if ctxmap:
@@ -493,7 +491,6 @@ class Community:
             temp_df = self.gdf.join(self.models[model_name][year].nearest_labels, on=[id_var, time_var])
             temp_df = temp_df[['nearest_label', time_var, 'geometry', model_name]]
             temp_df.set_index(model_name, inplace=True)
-            temp_df['nearest_label'] = temp_df['nearest_label']
             self.gdf[self.gdf.year == year].plot(model_name, ax=ax[0], alpha=.5, legend=True, categorical=True)
             temp_df[temp_df.year == year].plot('nearest_label', ax=ax[1],
                                                  alpha=.5, legend=True, categorical=True, **kwargs)
