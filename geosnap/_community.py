@@ -351,6 +351,8 @@ class Community:
                years=[], scheme='quantiles',
                k=5, save_fig=None, dpi=500,
                legend_kwds='default',
+               ncols=None,
+               nrows=None,
                ctxmap=ctx.providers.OpenStreetMap.Mapnik,
                **kwargs):
         """
@@ -381,6 +383,14 @@ class Community:
         legend_kwds  : dictionary, optional
                        parameters for the legend
                        Default is 1 column on the bottom of the graph.
+        ncols        : int, optional
+                       number of columns in the figure
+                       if passing ncols, nrows must also be passed
+                       default is None
+        nrows        : int, optional
+                       number of rows in the figure
+                       if passing nrows, ncols must also be passed
+                       default is None
         ctxmap       : contextily map provider, optional
                        contextily basemap. Set to False for no basemap.
                        Default is OpenStreetMap.Mapnik
@@ -394,7 +404,10 @@ class Community:
         if ctxmap:  # need to convert crs to mercator before graphing
             self.gdf = self.gdf.to_crs(epsg=3857)
         if not years:
-            f, axs = plot.subplots(ncols=len(self.gdf.year.unique()))
+            if nrows is None and ncols is None:
+                f, axs = plot.subplots(ncols=len(self.gdf.year.unique()))
+            else:
+                f, axs = plot.subplots(ncols=ncols, nrows=nrows)
             for i, year in enumerate(sorted(self.gdf.year.unique())):  # sort to prevent graphing out of order
                 self.gdf[self.gdf.year == year].plot(column=column, ax=axs[i], scheme=scheme, k=k, **kwargs,
                                                                legend=True, legend_kwds=legend_kwds)
@@ -402,8 +415,10 @@ class Community:
                     ctx.add_basemap(axs[i], source=ctxmap)
                 axs[i].format(title=year)
         else:
-
-            f, axs = plot.subplots(ncols=len(years))
+            if nrows is None and ncols is None:
+                f, axs = plot.subplots(ncols=len(years))
+            else:
+                f, axs = plot.subplots(ncols=ncols, nrows=nrows)
             for i, year in enumerate(years):  # display in whatever order list is passed in
                 self.gdf[self.gdf.year == year].plot(column=column, ax=axs[i], scheme=scheme, k=k, **kwargs,
                                                                legend=True, legend_kwds=legend_kwds)
@@ -421,7 +436,6 @@ class Community:
             f.savefig(save_fig, dpi=dpi, bbox_inches='tight')
         return axs
 
-    
     def transition(
         self, cluster_col, time_var="year", id_var="geoid", w_type=None, permutations=0
     ):
