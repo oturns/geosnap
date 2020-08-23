@@ -356,6 +356,7 @@ class Community:
                       save_fig=None,
                       figsize=(12, 3),
                       alpha=.5,
+                      title='',
                       dpi=500,
                       time_var='year',
                       id_var='geoid',
@@ -380,6 +381,9 @@ class Community:
         alpha      : float, optional
                      how transparent the plotted objects are
                      Default is 0.5
+        title      : string, optional
+                     title of figure
+                     default is no title
         dpi        : int, optional
                      dpi of the saved image if save_fig=True
                     default is 500
@@ -424,7 +428,11 @@ class Community:
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
         ax[1].axis('off')
-        f.tight_layout()
+        #  using both tight_layout() and passing title makes plots and title overlap, so only use one
+        if title:
+            f.suptitle(title)
+        else:
+            f.tight_layout()
         if save_fig:
             f.savefig(save_fig, dpi=dpi, bbox_inches='tight')
         return ax
@@ -435,6 +443,7 @@ class Community:
                      ctxmap=ctx.providers.Stamen.TonerLite,
                      save_fig=None,
                      figsize=(12, 3),
+                     title='',
                      alpha=.5,
                      dpi=500,
                      time_var='year',
@@ -456,6 +465,9 @@ class Community:
         figsize    : tuple, optional
                      an order tuple where x is width and y is height
                      default is 12 inches wide and 3 inches high
+        title      : string, optional
+                     title of figure
+                     default is no title
         alpha      : float, optional
                      how transparent the plotted objects are
                      Default is 0.5
@@ -507,7 +519,10 @@ class Community:
                 ctx.add_basemap(ax[1], source=ctxmap)
         ax[0].axis('off')
         ax[1].axis('off')
-        f.tight_layout()
+        if title:
+            f.suptitle(title)
+        else:
+            f.tight_layout()
         if save_fig:
             f.savefig(save_fig, dpi=dpi, bbox_inches='tight')
         return ax
@@ -518,6 +533,7 @@ class Community:
                      ctxmap=ctx.providers.Stamen.TonerLite,
                      save_fig=None,
                      figsize=(12, 3),
+                     title='',
                      alpha=.5,
                      dpi=500,
                      time_var='year',
@@ -539,6 +555,9 @@ class Community:
         figsize    : tuple, optional
                      an order tuple where x is width and y is height
                      default is 12 inches wide and 3 inches high
+        title      : string, optional
+                     title of figure
+                     default is no title
         alpha      : float, optional
                      how transparent the plotted objects are
                      Default is 0.5
@@ -582,7 +601,10 @@ class Community:
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
         ax[1].axis('off')
-        f.tight_layout()
+        if title:
+            f.suptitle(title)
+        else:
+            f.tight_layout()
         if save_fig:
             f.savefig(save_fig, dpi=dpi, bbox_inches='tight')
         return ax
@@ -593,6 +615,7 @@ class Community:
                          ctxmap=ctx.providers.Stamen.TonerLite,
                          save_fig=None,
                          figsize=(12, 3),
+                         title='',
                          alpha=.5,
                          dpi=500,
                          time_var='year',
@@ -612,6 +635,9 @@ class Community:
         figsize    : tuple, optional
                      an order tuple where x is width and y is height
                      default is 12 inches wide and 3 inches high
+        title      : string, optional
+                     title of figure
+                     default is no title
         save_fig   : str, optional
                      path to save figure if desired.
         alpha      : float, optional
@@ -661,7 +687,10 @@ class Community:
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
         ax[1].axis('off')
-        f.tight_layout()
+        if title:
+            f.suptitle(title)
+        else:
+            f.tight_layout()
         if save_fig:
             f.savefig(save_fig, dpi=dpi, bbox_inches='tight')
         return ax
