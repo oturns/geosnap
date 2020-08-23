@@ -355,6 +355,7 @@ class Community:
                       ctxmap=ctx.providers.Stamen.TonerLite,
                       save_fig=None,
                       figsize=(12, 3),
+                      alpha=.5,
                       dpi=500,
                       time_var='year',
                       id_var='geoid',
@@ -376,6 +377,9 @@ class Community:
         figsize    : tuple, optional
                      an order tuple where x is width and y is height
                      default is 12 inches wide and 3 inches high
+        alpha      : float, optional
+                     how transparent the plotted objects are
+                     Default is 0.5
         dpi        : int, optional
                      dpi of the saved image if save_fig=True
                     default is 500
@@ -409,14 +413,14 @@ class Community:
             ax[0].hist(self.models[model_name].silhouettes['silhouettes'])
             self.gdf.join(
                 self.models[model_name].silhouettes, on=[id_var, time_var]).plot(
-                'silhouettes', ax=ax[1], alpha=.5, legend=True, **kwargs)
+                'silhouettes', ax=ax[1], alpha=alpha, legend=True, **kwargs)
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
         else:
             ax[0].hist(self.models[model_name][year].silhouettes['silhouettes'])
             self.gdf[self.gdf.year == year].join(
                 self.models[model_name][year].silhouettes, on=[id_var, time_var]).plot(
-                'silhouettes', ax=ax[1], alpha=.5, legend=True, **kwargs)
+                'silhouettes', ax=ax[1], alpha=alpha, legend=True, **kwargs)
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
         ax[1].axis('off')
@@ -431,6 +435,7 @@ class Community:
                      ctxmap=ctx.providers.Stamen.TonerLite,
                      save_fig=None,
                      figsize=(12, 3),
+                     alpha=.5,
                      dpi=500,
                      time_var='year',
                      id_var='geoid',
@@ -451,6 +456,9 @@ class Community:
         figsize    : tuple, optional
                      an order tuple where x is width and y is height
                      default is 12 inches wide and 3 inches high
+        alpha      : float, optional
+                     how transparent the plotted objects are
+                     Default is 0.5
         dpi        : int, optional
                      dpi of the saved image if save_fig=True
                      default is 500
@@ -483,7 +491,7 @@ class Community:
             temp_df = temp_df[['nearest_label', 'geometry', model_name]]
             temp_df.set_index(model_name, inplace=True)
             self.gdf.plot(model_name, ax=ax[0], alpha=.5, legend=True, categorical=True)
-            temp_df.plot('nearest_label', ax=ax[1], legend=True, categorical=True, alpha=.5, **kwargs)
+            temp_df.plot('nearest_label', ax=ax[1], legend=True, categorical=True, alpha=alpha, **kwargs)
             if ctxmap:
                 ctx.add_basemap(ax[0], source=ctxmap)
                 ctx.add_basemap(ax[1], source=ctxmap)
@@ -491,9 +499,9 @@ class Community:
             temp_df = self.gdf.join(self.models[model_name][year].nearest_labels, on=[id_var, time_var])
             temp_df = temp_df[['nearest_label', time_var, 'geometry', model_name]]
             temp_df.set_index(model_name, inplace=True)
-            self.gdf[self.gdf.year == year].plot(model_name, ax=ax[0], alpha=.5, legend=True, categorical=True)
+            self.gdf[self.gdf.year == year].plot(model_name, ax=ax[0], alpha=alpha, legend=True, categorical=True)
             temp_df[temp_df.year == year].plot('nearest_label', ax=ax[1],
-                                                 alpha=.5, legend=True, categorical=True, **kwargs)
+                                                 alpha=alpha, legend=True, categorical=True, **kwargs)
             if ctxmap:
                 ctx.add_basemap(ax[0], source=ctxmap)
                 ctx.add_basemap(ax[1], source=ctxmap)
@@ -510,6 +518,7 @@ class Community:
                      ctxmap=ctx.providers.Stamen.TonerLite,
                      save_fig=None,
                      figsize=(12, 3),
+                     alpha=.5,
                      dpi=500,
                      time_var='year',
                      id_var='geoid',
@@ -530,6 +539,9 @@ class Community:
         figsize    : tuple, optional
                      an order tuple where x is width and y is height
                      default is 12 inches wide and 3 inches high
+        alpha      : float, optional
+                     how transparent the plotted objects are
+                     Default is 0.5
         dpi        : int, optional
                      dpi of the saved image if save_fig=True
                      default is 500
@@ -559,14 +571,14 @@ class Community:
             ax[0].hist(self.models[model_name].path_silhouettes['path_silhouettes'])
             self.gdf.join(
                 self.models[model_name][year].path_silhouettes, on=[id_var, time_var]).plot(
-                'path_silhouettes', ax=ax[1], alpha=.5, legend=True, **kwargs)
+                'path_silhouettes', ax=ax[1], alpha=alpha, legend=True, **kwargs)
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
         else:
             ax[0].hist(self.models[model_name][year].path_silhouettes['path_silhouettes'])
             self.gdf[self.gdf.year == year].join(
                 self.models[model_name][year].path_silhouettes, on=[id_var, time_var]).plot(
-                'path_silhouettes', ax=ax[1], alpha=.5, legend=True, **kwargs)
+                'path_silhouettes', ax=ax[1], alpha=alpha, legend=True, **kwargs)
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
         ax[1].axis('off')
@@ -581,6 +593,7 @@ class Community:
                          ctxmap=ctx.providers.Stamen.TonerLite,
                          save_fig=None,
                          figsize=(12, 3),
+                         alpha=.5,
                          dpi=500,
                          time_var='year',
                          id_var='geoid',
@@ -596,8 +609,14 @@ class Community:
         ctxmap     : contextily map provider, optional
                      contextily basemap. Set to False for no basemap.
                      Default is ctx.providers.Stamen.TonerLite
+        figsize    : tuple, optional
+                     an order tuple where x is width and y is height
+                     default is 12 inches wide and 3 inches high
         save_fig   : str, optional
                      path to save figure if desired.
+        alpha      : float, optional
+                     how transparent the plotted objects are
+                     Default is 0.5
         dpi        : int, optional
                      dpi of the saved image if save_fig=True
                      default is 500
@@ -630,7 +649,7 @@ class Community:
                 self.models[model_name].boundary_silhouettes['boundary_silhouettes'][self.models[model_name].boundary_silhouettes['boundary_silhouettes'] != 0])
             self.gdf.join(
                 self.models[model_name][year].boundary_silhouettes, on=[id_var, time_var]).plot(
-                'boundary_silhouettes', ax=ax[1], alpha=.5, legend=True, **kwargs)
+                'boundary_silhouettes', ax=ax[1], alpha=alpha, legend=True, **kwargs)
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
         else:
@@ -638,7 +657,7 @@ class Community:
                 self.models[model_name][year].boundary_silhouettes['boundary_silhouettes'][self.models[model_name][year].boundary_silhouettes['boundary_silhouettes'] != 0])
             self.gdf[self.gdf.year == year].join(
                 self.models[model_name][year].boundary_silhouettes, on=[id_var, time_var]).plot(
-                'boundary_silhouettes', ax=ax[1], alpha=.5, legend=True, **kwargs)
+                'boundary_silhouettes', ax=ax[1], alpha=alpha, legend=True, **kwargs)
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
         ax[1].axis('off')
