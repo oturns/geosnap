@@ -356,6 +356,7 @@ class Community:
                       save_fig=None,
                       figsize=(12, 3),
                       alpha=.5,
+                      cmap='bwr',
                       title='',
                       dpi=500,
                       time_var='year',
@@ -381,6 +382,9 @@ class Community:
         alpha      : float, optional
                      how transparent the plotted objects are
                      Default is 0.5
+        cmap       : string, optional
+                     cmap to be plotted
+                     default is 'bwr'
         title      : string, optional
                      title of figure
                      default is no title
@@ -417,14 +421,14 @@ class Community:
             ax[0].hist(self.models[model_name].silhouettes['silhouettes'])
             self.gdf.join(
                 self.models[model_name].silhouettes, on=[id_var, time_var]).plot(
-                'silhouettes', ax=ax[1], alpha=alpha, legend=True, **kwargs)
+                'silhouettes', ax=ax[1], alpha=alpha, legend=True, vmin=-1, vmax=1, cmap=cmap, **kwargs)
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
         else:
             ax[0].hist(self.models[model_name][year].silhouettes['silhouettes'])
             self.gdf[self.gdf.year == year].join(
                 self.models[model_name][year].silhouettes, on=[id_var, time_var]).plot(
-                'silhouettes', ax=ax[1], alpha=alpha, legend=True, **kwargs)
+                'silhouettes', ax=ax[1], alpha=alpha, legend=True, vmin=-1, vmax=1, cmap=cmap, **kwargs)
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
         ax[1].axis('off')
@@ -535,6 +539,7 @@ class Community:
                      figsize=(12, 3),
                      title='',
                      alpha=.5,
+                     cmap='bwr',
                      dpi=500,
                      time_var='year',
                      id_var='geoid',
@@ -561,6 +566,9 @@ class Community:
         alpha      : float, optional
                      how transparent the plotted objects are
                      Default is 0.5
+        cmap       : string, optional
+                     cmap to be plotted
+                     default is 'bwr'
         dpi        : int, optional
                      dpi of the saved image if save_fig=True
                      default is 500
@@ -590,14 +598,14 @@ class Community:
             ax[0].hist(self.models[model_name].path_silhouettes['path_silhouettes'])
             self.gdf.join(
                 self.models[model_name][year].path_silhouettes, on=[id_var, time_var]).plot(
-                'path_silhouettes', ax=ax[1], alpha=alpha, legend=True, **kwargs)
+                'path_silhouettes', ax=ax[1], alpha=alpha, legend=True, vmin=-1, vmax=1, cmap=cmap, **kwargs)
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
         else:
             ax[0].hist(self.models[model_name][year].path_silhouettes['path_silhouettes'])
             self.gdf[self.gdf.year == year].join(
                 self.models[model_name][year].path_silhouettes, on=[id_var, time_var]).plot(
-                'path_silhouettes', ax=ax[1], alpha=alpha, legend=True, **kwargs)
+                'path_silhouettes', ax=ax[1], alpha=alpha, legend=True, vmin=-1, vmax=1, cmap=cmap, **kwargs)
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
         ax[1].axis('off')
@@ -617,6 +625,7 @@ class Community:
                          figsize=(12, 3),
                          title='',
                          alpha=.5,
+                         cmap='bwr',
                          dpi=500,
                          time_var='year',
                          id_var='geoid',
@@ -643,6 +652,9 @@ class Community:
         alpha      : float, optional
                      how transparent the plotted objects are
                      Default is 0.5
+        cmap       : string, optional
+                     cmap to be plotted
+                     default is 'bwr'
         dpi        : int, optional
                      dpi of the saved image if save_fig=True
                      default is 500
@@ -675,7 +687,7 @@ class Community:
                 self.models[model_name].boundary_silhouettes['boundary_silhouettes'][self.models[model_name].boundary_silhouettes['boundary_silhouettes'] != 0])
             self.gdf.join(
                 self.models[model_name][year].boundary_silhouettes, on=[id_var, time_var]).plot(
-                'boundary_silhouettes', ax=ax[1], alpha=alpha, legend=True, **kwargs)
+                'boundary_silhouettes', ax=ax[1], legend=True, alpha=alpha, vmin=-1, vmax=1, cmap=cmap, **kwargs)
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
         else:
@@ -683,7 +695,7 @@ class Community:
                 self.models[model_name][year].boundary_silhouettes['boundary_silhouettes'][self.models[model_name][year].boundary_silhouettes['boundary_silhouettes'] != 0])
             self.gdf[self.gdf.year == year].join(
                 self.models[model_name][year].boundary_silhouettes, on=[id_var, time_var]).plot(
-                'boundary_silhouettes', ax=ax[1], alpha=alpha, legend=True, **kwargs)
+                'boundary_silhouettes', ax=ax[1], legend=True, alpha=alpha, vmin=-1, vmax=1, cmap=cmap, **kwargs)
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
         ax[1].axis('off')
