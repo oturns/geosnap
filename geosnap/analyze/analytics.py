@@ -1,8 +1,9 @@
 """Tools for the spatial analysis of neighborhood change."""
-
+import esda
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import silhouette_samples
 
 from libpysal.weights import attach_islands
 from libpysal.weights.contiguity import Queen, Rook
@@ -33,16 +34,31 @@ class ModelResults:
         data used to compute model
     columns: list-like
         columns used in model
-    W: libpysal.weights.W 
+    W: libpysal.weights.W
         libpysal spatial weights matrix used in model
     labels: array-like
         labels of each column
     instance: instance of model class used to generate neighborhood labels.
-        fitted model instance, e.g sklearn.cluster.AgglomerativeClustering object 
+        fitted model instance, e.g sklearn.cluster.AgglomerativeClustering object
         or other model class used to estimate class labels
+    nearest_labels: dataframe
+        container for dataframe of nearest_labels
+    silhouettes: dataframe
+        container for dataframe of silhouette scores
+    path_silhouettes: dataframe
+        container for dataframe of path_silhouette scores
+    boundary_silhouettes: dataframe
+        container for dataframe of boundary_silhouette scores
+    model_type: string
+        says whether the model is spatial or aspatial (contains a W object)
 
     """
-    def __init__(self, X, columns, labels,instance,W,):
+
+    def __init__(self, X,
+                 columns,
+                 labels,
+                 instance,
+                 W):
         """Initialize a new ModelResults instance.
 
         Parameters
@@ -57,27 +73,104 @@ class ModelResults:
             labels of each column
         instance: AgglomerativeCluserting object, or other model specific object type
             how many clusters model was computed with
-
+        nearest_labels: dataframe
+            container for dataframe of nearest_labels
+        silhouettes: dataframe
+            container for dataframe of silhouette scores
+        path_silhouettes: dataframe
+            container for dataframe of path_silhouette scores
+        boundary_silhouettes: dataframe
+            container for dataframe of boundary_silhouette scores
+        model_type: string
+            says whether the model is spatial or aspatial (contains a W object)
         """
         self.columns = columns
         self.X = X
         self.W = W
         self.instance = instance
         self.labels = labels
+        self.nearest_labels = None
+        self.silhouettes = None
+        self.path_silhouettes = None
+        self.boundary_silhouettes = None
+        if self.W is None:
+            self.model_type = 'aspatial'
+        else:
+            self.model_type = 'spatial'
+
+    # Standalone funcs to calc these if you don't want to graph them
+    def sil_scores(self, **kwargs):
+        """
+        A function that calculates silhouette scores for the current model.
+        Allows passing of custom parameters if desired.
+        Returns
+        -------
+        silhouette scores stored in a dataframe accessible from `comm.models.['model_name'].silhouettes`
+        """
+        self.silhouettes = pd.DataFrame()
+        self.silhouettes['silhouettes'] = silhouette_samples(self.X.values, self.labels, **kwargs)
+        self.silhouettes.index = self.X.index
+        return self.silhouettes
+
+    def nearest_label(self, **kwargs):
+        """
+        A function that calculates nearest_labels for the current model.
+        Allows passing of custom parameters if desired.
+        Returns
+        -------
+        nearest_labels stored in a dataframe accessible from:
+        `comm.models.['model_name'].nearest_labels`
+        """
+        self.nearest_labels = pd.DataFrame()
+        self.nearest_labels['nearest_label'] = esda.nearest_label(self.X.values, self.labels, **kwargs)
+        self.nearest_labels.index = self.X.index
+        return self.nearest_labels
+
+    def boundary_sil(self, **kwargs):
+        """
+        A function that calculates boundary silhouette scores for the current model.
+        Allows passing of custom parameters if desired.
+        Returns
+        -------
+        boundary silhouette scores stored in a dataframe accessible from:
+        `comm.models.['model_name'].boundary_silhouettes`
+        """
+        assert self.model_type is 'spatial', 'Model is aspatial (lacks a W object), but has been passed to a spatial diagnostic.' \
+                                             ' Try aspatial diagnostics like nearest_label() or sil_scores()'
+        self.boundary_silhouettes = pd.DataFrame()
+        self.boundary_silhouettes['boundary_silhouettes'] = esda.boundary_silhouette(self.X.values, self.labels, self.W, **kwargs)
+        self.boundary_silhouettes.index = self.X.index
+        return self.boundary_silhouettes
+
+    def path_sil(self, **kwargs):
+        """
+        A function that calculates path silhouette scores for the current model.
+        Allows passing of custom parameters if desired.
+        Returns
+        -------
+        path silhouette scores stored in a dataframe accessible from:
+        `comm.models.['model_name'].path_silhouettes`
+        """
+        assert self.model_type is 'spatial', 'Model is aspatial(lacks a W object), but has been passed to a spatial diagnostic.' \
+                                             ' Try aspatial diagnostics like nearest_label() or sil_scores()'
+        self.path_silhouettes = pd.DataFrame()
+        self.path_silhouettes['path_silhouettes'] = esda.path_silhouette(self.X.values, self.labels, self.W, **kwargs)
+        self.path_silhouettes.index = self.X.index
+        return self.path_silhouettes
 
 
 def cluster(
-    gdf,
-    n_clusters=6,
-    method=None,
-    best_model=False,
-    columns=None,
-    verbose=False,
-    time_var="year",
-    id_var="geoid",
-    scaler='std',
-    pooling="fixed",
-    **kwargs,
+        gdf,
+        n_clusters=6,
+        method=None,
+        best_model=False,
+        columns=None,
+        verbose=False,
+        time_var="year",
+        id_var="geoid",
+        scaler='std',
+        pooling="fixed",
+        **kwargs,
 ):
     """Create a geodemographic typology by running a cluster analysis on the study area's neighborhood attributes.
 
@@ -192,7 +285,7 @@ def cluster(
         gdf = gdf.join(clusters, how="left")
         gdf = gdf.reset_index()
         results = ModelResults(
-            X=data.values, columns=columns, labels=model.labels_, instance=model, W=None
+            X=data.set_index([id_var, time_var]), columns=columns, labels=model.labels_, instance=model, W=None
         )
         return gdf, results, model_name
 
@@ -202,7 +295,6 @@ def cluster(
         data = data.reset_index()
 
         for time in times:
-
             df = data[data[time_var] == time]
 
             model = specification[method](
@@ -220,7 +312,7 @@ def cluster(
             clusters.set_index([time_var, id_var], inplace=True)
             gdf.update(clusters)
             results = ModelResults(
-                X=df[columns].values,
+                X=df.set_index([id_var, time_var]),
                 columns=columns,
                 labels=model.labels_,
                 instance=model,
@@ -234,18 +326,18 @@ def cluster(
 
 
 def cluster_spatial(
-    gdf,
-    n_clusters=6,
-    spatial_weights="rook",
-    method=None,
-    columns=None,
-    threshold_variable="count",
-    threshold=10,
-    time_var="year",
-    id_var="geoid",
-    scaler="std",
-    weights_kwargs=None,
-    **kwargs,
+        gdf,
+        n_clusters=6,
+        spatial_weights="rook",
+        method=None,
+        columns=None,
+        threshold_variable="count",
+        threshold=10,
+        time_var="year",
+        id_var="geoid",
+        scaler="std",
+        weights_kwargs=None,
+        **kwargs,
 ):
     """Create a *spatial* geodemographic typology by running a cluster
     analysis on the metro area's neighborhood attributes and including a
@@ -386,7 +478,7 @@ def cluster_spatial(
         clusters.set_index([time_var, id_var], inplace=True)
         gdf.update(clusters)
         results = ModelResults(
-            X=df[columns].values,
+            X=df.set_index([id_var, time_var]).drop('geometry', axis=1),
             columns=columns,
             labels=model.labels_,
             instance=model,
