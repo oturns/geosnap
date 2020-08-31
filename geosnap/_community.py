@@ -414,6 +414,7 @@ class Community:
         # Checking both arrays at the same time would be more efficient, but
         # comparing NumPy arrays with `and` is not allowed, and many solutions that try to compare numpy arrays
         # directly require error handling, so check if objects contain numpy arrays separately.
+        df = self.gdf.copy()
         if not year:
             if self.models[model_name].silhouettes is None:
                 self.models[model_name].sil_scores()
@@ -422,10 +423,11 @@ class Community:
                 self.models[model_name][year].sil_scores()
         f, ax = plt.subplots(1, 2, figsize=figsize)
         if ctxmap:  # need to convert crs to mercator before graphing
-            self.gdf = self.gdf.to_crs(epsg=3857)
+            if df.crs!=3857:
+                df = df.to_crs(epsg=3857)
         if not year:
             ax[0].hist(self.models[model_name].silhouettes["silhouettes"])
-            self.gdf.join(
+            df.join(
                 self.models[model_name].silhouettes, on=[id_var, time_var]
             ).plot(
                 "silhouettes",
@@ -441,7 +443,7 @@ class Community:
                 ctx.add_basemap(ax[1], source=ctxmap)
         else:
             ax[0].hist(self.models[model_name][year].silhouettes["silhouettes"])
-            self.gdf[self.gdf.year == year].join(
+            sdf[df.year == year].join(
                 self.models[model_name][year].silhouettes, on=[id_var, time_var]
             ).plot(
                 "silhouettes",
@@ -465,7 +467,7 @@ class Community:
             f.savefig(save_fig, dpi=dpi, bbox_inches="tight")
         return ax
 
-    def plot_nearest(
+    def plot_next_best_label(
         self,
         model_name=None,
         year=None,
@@ -518,23 +520,30 @@ class Community:
         and an array made up of the the model labels and nearest labels that was used to graph the values
 
         """
+        df = self.gdf.copy()
+        if isinstance(self.models[model_name], dict) and not year:
+            raise('This model has unique results for each time period; You must supply a value for `year`')
+
         # If the user has already calculated, respect already calculated values
         if not year:
             if self.models[model_name].nearest_labels is None:
-                self.models[model_name].nearest_label()
+                self.models[model_name].nearest_label().astype(int)
         else:
             if self.models[model_name][year].nearest_labels is None:
-                self.models[model_name][year].nearest_label()
+                self.models[model_name][year].nearest_label().astype(int)
         f, ax = plt.subplots(1, 2, figsize=figsize)
-        if ctxmap:  # need to convert crs to mercator before graphing
-            self.gdf = self.gdf.to_crs(epsg=3857)
+        if ctxmap:
+            if df.crs==3857:
+                pass
+            else:  # need to convert crs to mercator before graphing
+                df = df.to_crs(epsg=3857)
         if not year:
-            temp_df = self.gdf.join(
+            temp_df = df.join(
                 self.models[model_name].nearest_labels, on=[id_var, time_var]
             )
             temp_df = temp_df[["nearest_label", "geometry", model_name]]
             temp_df.set_index(model_name, inplace=True)
-            self.gdf.plot(
+            df.plot(
                 model_name, ax=ax[0], alpha=0.5, legend=True, categorical=True
             )
             temp_df.plot(
@@ -549,12 +558,12 @@ class Community:
                 ctx.add_basemap(ax[0], source=ctxmap)
                 ctx.add_basemap(ax[1], source=ctxmap)
         else:
-            temp_df = self.gdf.join(
+            temp_df = operate.join(
                 self.models[model_name][year].nearest_labels, on=[id_var, time_var]
             )
             temp_df = temp_df[["nearest_label", time_var, "geometry", model_name]]
             temp_df.set_index(model_name, inplace=True)
-            self.gdf[self.gdf.year == year].plot(
+            operate[operate.year == year].plot(
                 model_name, ax=ax[0], alpha=alpha, legend=True, categorical=True
             )
             temp_df[temp_df.year == year].plot(
@@ -817,6 +826,9 @@ class Community:
         years=[],
         scheme="quantiles",
         k=5,
+        cmap='Blues',
+        legend=True,
+        categorical=False,
         save_fig=None,
         dpi=500,
         legend_kwds="default",
@@ -845,6 +857,10 @@ class Community:
                        number of bins to graph. k may be ignored
                        or unnecessary for some schemes, like headtailbreaks, maxp, and maximum_breaks
                        Default is 5.
+        legend       : bool, optional
+                       whether to display a legend on the plot
+        categorical  : bool, optional
+                       whether the data should be plotted as categorical as opposed to continuous
         save_fig     : str, optional
                        path to save figure if desired.
         dpi          : int, optional
@@ -868,28 +884,42 @@ class Community:
         # proplot needs to be used as a function-level import,
         # as it influences all figures when imported at the top of the file
         import proplot as plot
-
+        df = self.gdf
+        if categorical and not cmap:
+            cmap='Accent'
         if legend_kwds == "default":
             legend_kwds = {"ncols": 1, "loc": "b"}
         if ctxmap:  # need to convert crs to mercator before graphing
-            self.gdf = self.gdf.to_crs(epsg=3857)
+            if df.crs!=3857:
+                df = df.to_crs(epsg=3857)
         if not years:
             if nrows is None and ncols is None:
-                f, axs = plot.subplots(ncols=len(self.gdf.year.unique()))
+                f, axs = plot.subplots(ncols=len(df.year.unique()))
             else:
                 f, axs = plot.subplots(ncols=ncols, nrows=nrows)
             for i, year in enumerate(
-                sorted(self.gdf.year.unique())
+                sorted(df.year.unique())
             ):  # sort to prevent graphing out of order
-                self.gdf[self.gdf.year == year].plot(
+                if categorical:
+                    df[df.year == year].plot(
                     column=column,
                     ax=axs[i],
-                    scheme=scheme,
-                    k=k,
-                    **kwargs,
-                    legend=True,
+                    categorical=True,
+                    cmap=cmap,
+                    legend=legend,
                     legend_kwds=legend_kwds,
                 )
+                else:
+                    df[df.year == year].plot(
+                        column=column,
+                        ax=axs[i],
+                        scheme=scheme,
+                        k=k,
+                        cmap=cmap,
+                        **kwargs,
+                        legend=legend,
+                        legend_kwds=legend_kwds,
+                    )
                 if ctxmap:  # need set basemap of each graph
                     ctx.add_basemap(axs[i], source=ctxmap)
                 axs[i].format(title=year)
@@ -901,15 +931,26 @@ class Community:
             for i, year in enumerate(
                 years
             ):  # display in whatever order list is passed in
-                self.gdf[self.gdf.year == year].plot(
+                if categorical:
+                    df[df.year == year].plot(
                     column=column,
                     ax=axs[i],
-                    scheme=scheme,
-                    k=k,
-                    **kwargs,
-                    legend=True,
+                    categorical=True,
+                    cmap=cmap,
+                    legend=legend,
                     legend_kwds=legend_kwds,
                 )
+                else:
+                    df[df.year == year].plot(
+                        column=column,
+                        ax=axs[i],
+                        scheme=scheme,
+                        k=k,
+                        cmap=cmap,
+                        **kwargs,
+                        legend=legend,
+                        legend_kwds=legend_kwds,
+                    )
                 if ctxmap:  # need set basemap of each graph
                     ctx.add_basemap(axs[i], source=ctxmap)
                 axs[i].format(title=year)
