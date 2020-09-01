@@ -1,8 +1,11 @@
 """A Community is a thin wrapper around a long-form time-series geodataframe."""
+import tempfile
+from pathlib import PurePath
 from warnings import warn
 
 import contextily as ctx
 import geopandas as gpd
+import mapclassify.classifiers as classifiers
 import matplotlib.pyplot as plt
 import pandas as pd
 import scikitplot as skplt
@@ -14,8 +17,7 @@ from .analyze import sequence as _sequence
 from .analyze import transition as _transition
 from .harmonize import harmonize as _harmonize
 from .io import _fips_filter, _fipstable, _from_db, get_lehd
-
-import mapclassify.classifiers as classifiers
+from .util import gif_from_path as _gif_from_path
 
 schemes = {}
 for classifier in classifiers.CLASSIFIERS:
@@ -840,7 +842,7 @@ class Community:
         figsize=None,
         ncols=None,
         nrows=None,
-        ctxmap=ctx.providers.OpenStreetMap.Mapnik,
+        ctxmap=ctx.providers.Stamen.TonerLite,
         **kwargs,
     ):
         """Plot an attribute from a Community arranged as a timeseries.
@@ -892,7 +894,7 @@ class Community:
                        the desired size of the matplotlib figure
         ctxmap       : contextily map provider, optional
                        contextily basemap. Set to False for no basemap.
-                       Default is OpenStreetMap.Mapnik
+                       Default is Stamen.TonerLite
         """
         # proplot needs to be used as a function-level import,
         # as it influences all figures when imported at the top of the file
@@ -1001,6 +1003,128 @@ class Community:
         if save_fig:
             f.savefig(save_fig, dpi=dpi, bbox_inches="tight")
         return axs
+
+    def animate_timeseries(
+        self,
+        column,
+        title="",
+        time_col="year",
+        time_periods=None,
+        scheme="quantiles",
+        k=5,
+        cmap="Blues",
+        legend=True,
+        alpha=0.6,
+        categorical=False,
+        dpi=500,
+        fps=1,
+        interval=500,
+        repeat_delay=1000,
+        title_fontsize=40,
+        subtitle_fontsize=38,
+        figsize=(20, 20),
+        filename=None,
+        ctxmap=ctx.providers.Stamen.TonerLite,
+    ):
+        """Create an animated gif from a Community timeseries
+
+        Parameters
+        ----------
+        column       : str
+                       column to be graphed in a time series
+        title        : str, optional
+                       desired title of figure
+        time_col     : str, required
+                        column on the Community.gdf that stores time periods
+        time_periods:  list, optional
+                        subset of time periods to include in the animation. If none, then all times will be used
+        scheme       : string, optional
+                       matplotlib scheme to be used
+                       default is 'quantiles'
+        k            : int, optional
+                       number of bins to graph. k may be ignored
+                       or unnecessary for some schemes, like headtailbreaks, maxp, and maximum_breaks
+                       Default is 5.
+        legend       : bool, optional
+                       whether to display a legend on the plot
+        categorical  : bool, optional
+                       whether the data should be plotted as categorical as opposed to continuous
+        alpha:       : float, optional
+                       transparency parameter passed to matplotlib
+        dpi          : int, optional
+                       dpi of the saved image if save_fig=True
+                       default is 500
+        legend_kwds  : dictionary, optional
+                       parameters for the legend
+                       Default is 1 column on the bottom of the graph.
+        ncols        : int, optional
+                       number of columns in the figure
+                       if passing ncols, nrows must also be passed
+                       default is None
+        nrows        : int, optional
+                       number of rows in the figure
+                       if passing nrows, ncols must also be passed
+                       default is None
+        figsize      : tuple, optional
+                       the desired size of the matplotlib figure
+        ctxmap       : contextily map provider, optional
+                       contextily basemap. Set to False for no basemap.
+        figsize      : tuple, optional
+                        output figure size passed to matplotlib.pyplot
+        fps          : float, optional
+                        frames per second
+        interval     : int, optional
+                        interval between frames in miliseconds, default 500
+        repeat_delay : int, optional
+                        time before animation repeats in miliseconds, default 1000
+        filename     : str, required
+                        output file name
+        """
+        gdf = self.gdf.copy()
+        if not gdf.crs == 3857:
+            gdf = gdf.to_crs(3857)
+        if not time_periods:
+            time_periods = gdf[time_col].unique()
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            for i, time in enumerate(time_periods):
+                fig, ax = plt.subplots(figsize=figsize)
+                outpath = PurePath(tmpdirname, f"file_{i}.png")
+                if categorical:
+                    gdf[gdf[time_col] == time].plot(
+                        column,
+                        categorical=True,
+                        ax=ax,
+                        alpha=alpha,
+                        legend=legend,
+                        cmap=cmap,
+                    )
+                else:
+                    classifier = schemes[scheme](gdf[column].dropna().values, k=k)
+                    gdf[gdf[time_col] == time].plot(
+                        column,
+                        scheme="user_defined",
+                        classification_kwds={"bins": classifier.bins},
+                        k=k,
+                        ax=ax,
+                        alpha=alpha,
+                        legend=legend,
+                        cmap=cmap,
+                    )
+                ctx.add_basemap(ax=ax, source=ctxmap)
+                ax.axis("off")
+                ax.set_title(f"{time}", fontsize=subtitle_fontsize)
+                fig.suptitle(f"{title}", fontsize=title_fontsize)
+
+                plt.tight_layout()
+                plt.savefig(outpath, dpi=dpi)
+
+                _gif_from_path(
+                    tmpdirname,
+                    interval=interval,
+                    repeat_delay=repeat_delay,
+                    filename=filename,
+                    dpi=dpi,
+                )
 
     def transition(
         self, cluster_col, time_var="year", id_var="geoid", w_type=None, permutations=0
