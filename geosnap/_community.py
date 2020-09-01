@@ -827,7 +827,7 @@ class Community:
         self,
         column,
         title="",
-        years=[],
+        years=None,
         scheme="quantiles",
         k=5,
         pooled=True,
@@ -837,6 +837,7 @@ class Community:
         save_fig=None,
         dpi=500,
         legend_kwds="default",
+        figsize=None,
         ncols=None,
         nrows=None,
         ctxmap=ctx.providers.OpenStreetMap.Mapnik,
@@ -887,6 +888,8 @@ class Community:
                        number of rows in the figure
                        if passing nrows, ncols must also be passed
                        default is None
+        figsize      : tuple, optional
+                       the desired size of the matplotlib figure
         ctxmap       : contextily map provider, optional
                        contextily basemap. Set to False for no basemap.
                        Default is OpenStreetMap.Mapnik
@@ -906,12 +909,12 @@ class Community:
         if (
             pooled
         ):  # if pooling the classifier, create one from scratch and pass to user defined
-            classifier = schemes[scheme](self.gdf[column].values, k=k)
+            classifier = schemes[scheme](self.gdf[column].dropna().values, k=k)
         if not years:
             if nrows is None and ncols is None:
-                f, axs = plot.subplots(ncols=len(df.year.unique()))
+                f, axs = plot.subplots(ncols=len(df.year.unique()), figsize=figsize)
             else:
-                f, axs = plot.subplots(ncols=ncols, nrows=nrows)
+                f, axs = plot.subplots(ncols=ncols, nrows=nrows, figsize=figsize)
             for i, year in enumerate(
                 sorted(df.year.unique())
             ):  # sort to prevent graphing out of order
@@ -923,6 +926,12 @@ class Community:
                         cmap=cmap,
                         legend=legend,
                         legend_kwds=legend_kwds,
+                        missing_kwds={
+                            "color": "lightgrey",
+                            "edgecolor": "red",
+                            "hatch": "///",
+                            "label": "Missing values",
+                        },
                     )
                 else:
                     if pooled:
