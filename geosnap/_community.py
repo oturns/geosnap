@@ -1054,17 +1054,6 @@ class Community:
         dpi          : int, optional
                        dpi of the saved image if save_fig=True
                        default is 500
-        legend_kwds  : dictionary, optional
-                       parameters for the legend
-                       Default is 1 column on the bottom of the graph.
-        ncols        : int, optional
-                       number of columns in the figure
-                       if passing ncols, nrows must also be passed
-                       default is None
-        nrows        : int, optional
-                       number of rows in the figure
-                       if passing nrows, ncols must also be passed
-                       default is None
         figsize      : tuple, optional
                        the desired size of the matplotlib figure
         ctxmap       : contextily map provider, optional
