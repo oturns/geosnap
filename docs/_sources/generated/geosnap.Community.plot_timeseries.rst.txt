@@ -1,0 +1,6 @@
+﻿geosnap.Community.plot\_timeseries
+==================================
+
+.. currentmodule:: geosnap
+
+.. automethod:: Community.plot_timeseries

@@ -1,0 +1,26 @@
+﻿geosnap.analyze.ModelResults
+============================
+
+.. currentmodule:: geosnap.analyze
+
+.. autoclass:: ModelResults
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ModelResults.__init__
+      ~ModelResults.boundary_sil
+      ~ModelResults.nearest_label
+      ~ModelResults.path_sil
+      ~ModelResults.sil_scores
+   
+   
+
+   
+   
+   

@@ -1,4 +1,4 @@
-geosnap.visualize.explore
+﻿geosnap.visualize.explore
 =========================
 
 .. currentmodule:: geosnap.visualize

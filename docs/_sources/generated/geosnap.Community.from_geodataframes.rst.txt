@@ -1,4 +1,4 @@
-geosnap.Community.from\_geodataframes
+﻿geosnap.Community.from\_geodataframes
 =====================================
 
 .. currentmodule:: geosnap

@@ -1,4 +1,4 @@
-geosnap.Community.from\_lodes
+﻿geosnap.Community.from\_lodes
 =============================
 
 .. currentmodule:: geosnap

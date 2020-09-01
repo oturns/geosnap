@@ -1,4 +1,4 @@
-geosnap.datasets.counties
+﻿geosnap.datasets.counties
 =========================
 
 .. currentmodule:: geosnap

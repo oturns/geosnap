@@ -1,4 +1,4 @@
-geosnap.analyze.analytics.ward
+﻿geosnap.analyze.analytics.ward
 ==============================
 
 .. currentmodule:: geosnap.analyze.analytics

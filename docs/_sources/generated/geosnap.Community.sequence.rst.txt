@@ -1,4 +1,4 @@
-geosnap.Community.sequence
+﻿geosnap.Community.sequence
 ==========================
 
 .. currentmodule:: geosnap

@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>geosnap.analyze.analytics &#8212; geosnap v0.3.2 Manual</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>geosnap.analyze.analytics &#8212; geosnap v0.4.0 Manual</title>
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/pysal-styles.css" />
@@ -19,9 +20,9 @@
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../../_static/js/jquery-1.12.4.min.js "></script>
 <script type="text/javascript" src="../../../_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-3.4.1/js/bootstrap.min.js "></script>
 <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js "></script>
 
   </head><body>
@@ -37,7 +38,7 @@
         </button>
         <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/geosnap.svg"></span>
           geosnap</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.3.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.4.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -121,12 +122,11 @@
       
   <h1>Source code for geosnap.analyze.analytics</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Tools for the spatial analysis of neighborhood change.&quot;&quot;&quot;</span>
-
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
-
+<span class="kn">import</span> <span class="nn">esda</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">silhouette_samples</span>
 
 <span class="kn">from</span> <span class="nn">libpysal.weights</span> <span class="kn">import</span> <span class="n">attach_islands</span>
 <span class="kn">from</span> <span class="nn">libpysal.weights.contiguity</span> <span class="kn">import</span> <span class="n">Queen</span><span class="p">,</span> <span class="n">Rook</span>
@@ -147,23 +147,153 @@
     <span class="n">ward_spatial</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">ModelResults</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span>
-    <span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="s2">&quot;columns&quot;</span><span class="p">,</span> <span class="s2">&quot;labels&quot;</span><span class="p">,</span> <span class="s2">&quot;instance&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">],</span> <span class="n">rename</span><span class="o">=</span><span class="kc">False</span>
-<span class="p">)</span>
+
+<div class="viewcode-block" id="ModelResults"><a class="viewcode-back" href="../../../generated/geosnap.analyze.ModelResults.html#geosnap.analyze.ModelResults">[docs]</a><span class="k">class</span> <span class="nc">ModelResults</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Stores data about cluster and cluster_spatial models.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X: array-like</span>
+<span class="sd">        data used to compute model</span>
+<span class="sd">    columns: list-like</span>
+<span class="sd">        columns used in model</span>
+<span class="sd">    W: libpysal.weights.W</span>
+<span class="sd">        libpysal spatial weights matrix used in model</span>
+<span class="sd">    labels: array-like</span>
+<span class="sd">        labels of each column</span>
+<span class="sd">    instance: instance of model class used to generate neighborhood labels.</span>
+<span class="sd">        fitted model instance, e.g sklearn.cluster.AgglomerativeClustering object</span>
+<span class="sd">        or other model class used to estimate class labels</span>
+<span class="sd">    nearest_labels: dataframe</span>
+<span class="sd">        container for dataframe of nearest_labels</span>
+<span class="sd">    silhouettes: dataframe</span>
+<span class="sd">        container for dataframe of silhouette scores</span>
+<span class="sd">    path_silhouettes: dataframe</span>
+<span class="sd">        container for dataframe of path_silhouette scores</span>
+<span class="sd">    boundary_silhouettes: dataframe</span>
+<span class="sd">        container for dataframe of boundary_silhouette scores</span>
+<span class="sd">    model_type: string</span>
+<span class="sd">        says whether the model is spatial or aspatial (contains a W object)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ModelResults.__init__"><a class="viewcode-back" href="../../../generated/geosnap.analyze.ModelResults.html#geosnap.analyze.ModelResults.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span>
+                 <span class="n">columns</span><span class="p">,</span>
+                 <span class="n">labels</span><span class="p">,</span>
+                 <span class="n">instance</span><span class="p">,</span>
+                 <span class="n">W</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize a new ModelResults instance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X: array-like</span>
+<span class="sd">            data of the cluster</span>
+<span class="sd">        columns: list-like</span>
+<span class="sd">            columns used to compute model</span>
+<span class="sd">        W: libpysal.weights.W</span>
+<span class="sd">            libpysal spatial weights matrix used in model</span>
+<span class="sd">        labels: array-like</span>
+<span class="sd">            labels of each column</span>
+<span class="sd">        instance: AgglomerativeCluserting object, or other model specific object type</span>
+<span class="sd">            how many clusters model was computed with</span>
+<span class="sd">        nearest_labels: dataframe</span>
+<span class="sd">            container for dataframe of nearest_labels</span>
+<span class="sd">        silhouettes: dataframe</span>
+<span class="sd">            container for dataframe of silhouette scores</span>
+<span class="sd">        path_silhouettes: dataframe</span>
+<span class="sd">            container for dataframe of path_silhouette scores</span>
+<span class="sd">        boundary_silhouettes: dataframe</span>
+<span class="sd">            container for dataframe of boundary_silhouette scores</span>
+<span class="sd">        model_type: string</span>
+<span class="sd">            says whether the model is spatial or aspatial (contains a W object)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">X</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">W</span> <span class="o">=</span> <span class="n">W</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span> <span class="o">=</span> <span class="n">instance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nearest_labels</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">silhouettes</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path_silhouettes</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">boundary_silhouettes</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">=</span> <span class="s1">&#39;aspatial&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">=</span> <span class="s1">&#39;spatial&#39;</span></div>
+
+    <span class="c1"># Standalone funcs to calc these if you don&#39;t want to graph them</span>
+    <span class="k">def</span> <span class="nf">sil_scores</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A function that calculates silhouette scores for the current model.</span>
+<span class="sd">        Allows passing of custom parameters if desired.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        silhouette scores stored in a dataframe accessible from `comm.models.[&#39;model_name&#39;].silhouettes`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">silhouettes</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">silhouettes</span><span class="p">[</span><span class="s1">&#39;silhouettes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">silhouette_samples</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">silhouettes</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">index</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">silhouettes</span>
+
+    <span class="k">def</span> <span class="nf">nearest_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A function that calculates nearest_labels for the current model.</span>
+<span class="sd">        Allows passing of custom parameters if desired.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        nearest_labels stored in a dataframe accessible from:</span>
+<span class="sd">        `comm.models.[&#39;model_name&#39;].nearest_labels`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nearest_labels</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nearest_labels</span><span class="p">[</span><span class="s1">&#39;nearest_label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">nearest_label</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nearest_labels</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">index</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nearest_labels</span>
+
+    <span class="k">def</span> <span class="nf">boundary_sil</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A function that calculates boundary silhouette scores for the current model.</span>
+<span class="sd">        Allows passing of custom parameters if desired.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        boundary silhouette scores stored in a dataframe accessible from:</span>
+<span class="sd">        `comm.models.[&#39;model_name&#39;].boundary_silhouettes`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="ow">is</span> <span class="s1">&#39;spatial&#39;</span><span class="p">,</span> <span class="s1">&#39;Model is aspatial (lacks a W object), but has been passed to a spatial diagnostic.&#39;</span> \
+                                             <span class="s1">&#39; Try aspatial diagnostics like nearest_label() or sil_scores()&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">boundary_silhouettes</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">boundary_silhouettes</span><span class="p">[</span><span class="s1">&#39;boundary_silhouettes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">boundary_silhouette</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">boundary_silhouettes</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">index</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundary_silhouettes</span>
+
+    <span class="k">def</span> <span class="nf">path_sil</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A function that calculates path silhouette scores for the current model.</span>
+<span class="sd">        Allows passing of custom parameters if desired.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        path silhouette scores stored in a dataframe accessible from:</span>
+<span class="sd">        `comm.models.[&#39;model_name&#39;].path_silhouettes`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="ow">is</span> <span class="s1">&#39;spatial&#39;</span><span class="p">,</span> <span class="s1">&#39;Model is aspatial(lacks a W object), but has been passed to a spatial diagnostic.&#39;</span> \
+                                             <span class="s1">&#39; Try aspatial diagnostics like nearest_label() or sil_scores()&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path_silhouettes</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path_silhouettes</span><span class="p">[</span><span class="s1">&#39;path_silhouettes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">path_silhouette</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path_silhouettes</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">index</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">path_silhouettes</span></div>
 
 
 <div class="viewcode-block" id="cluster"><a class="viewcode-back" href="../../../generated/geosnap.analyze.cluster.html#geosnap.analyze.cluster">[docs]</a><span class="k">def</span> <span class="nf">cluster</span><span class="p">(</span>
-    <span class="n">gdf</span><span class="p">,</span>
-    <span class="n">n_clusters</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
-    <span class="n">method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">best_model</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">time_var</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span>
-    <span class="n">id_var</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span>
-    <span class="n">scaler</span><span class="o">=</span><span class="s1">&#39;std&#39;</span><span class="p">,</span>
-    <span class="n">pooling</span><span class="o">=</span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="n">gdf</span><span class="p">,</span>
+        <span class="n">n_clusters</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+        <span class="n">method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">best_model</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">time_var</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span>
+        <span class="n">id_var</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span>
+        <span class="n">scaler</span><span class="o">=</span><span class="s1">&#39;std&#39;</span><span class="p">,</span>
+        <span class="n">pooling</span><span class="o">=</span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create a geodemographic typology by running a cluster analysis on the study area&#39;s neighborhood attributes.</span>
 
@@ -278,7 +408,7 @@
         <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
         <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
         <span class="n">results</span> <span class="o">=</span> <span class="n">ModelResults</span><span class="p">(</span>
-            <span class="n">X</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">labels_</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">W</span><span class="o">=</span><span class="kc">None</span>
+            <span class="n">X</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">id_var</span><span class="p">,</span> <span class="n">time_var</span><span class="p">]),</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">labels_</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">W</span><span class="o">=</span><span class="kc">None</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">gdf</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">model_name</span>
 
@@ -288,7 +418,6 @@
         <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="n">time</span> <span class="ow">in</span> <span class="n">times</span><span class="p">:</span>
-
             <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="n">time_var</span><span class="p">]</span> <span class="o">==</span> <span class="n">time</span><span class="p">]</span>
 
             <span class="n">model</span> <span class="o">=</span> <span class="n">specification</span><span class="p">[</span><span class="n">method</span><span class="p">](</span>
@@ -306,7 +435,7 @@
             <span class="n">clusters</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">time_var</span><span class="p">,</span> <span class="n">id_var</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">gdf</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
             <span class="n">results</span> <span class="o">=</span> <span class="n">ModelResults</span><span class="p">(</span>
-                <span class="n">X</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="n">X</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">id_var</span><span class="p">,</span> <span class="n">time_var</span><span class="p">]),</span>
                 <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
                 <span class="n">labels</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">labels_</span><span class="p">,</span>
                 <span class="n">instance</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
@@ -320,18 +449,18 @@
 
 
 <div class="viewcode-block" id="cluster_spatial"><a class="viewcode-back" href="../../../generated/geosnap.analyze.cluster_spatial.html#geosnap.analyze.cluster_spatial">[docs]</a><span class="k">def</span> <span class="nf">cluster_spatial</span><span class="p">(</span>
-    <span class="n">gdf</span><span class="p">,</span>
-    <span class="n">n_clusters</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
-    <span class="n">spatial_weights</span><span class="o">=</span><span class="s2">&quot;rook&quot;</span><span class="p">,</span>
-    <span class="n">method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">threshold_variable</span><span class="o">=</span><span class="s2">&quot;count&quot;</span><span class="p">,</span>
-    <span class="n">threshold</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-    <span class="n">time_var</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span>
-    <span class="n">id_var</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span>
-    <span class="n">scaler</span><span class="o">=</span><span class="s2">&quot;std&quot;</span><span class="p">,</span>
-    <span class="n">weights_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="n">gdf</span><span class="p">,</span>
+        <span class="n">n_clusters</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+        <span class="n">spatial_weights</span><span class="o">=</span><span class="s2">&quot;rook&quot;</span><span class="p">,</span>
+        <span class="n">method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">threshold_variable</span><span class="o">=</span><span class="s2">&quot;count&quot;</span><span class="p">,</span>
+        <span class="n">threshold</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">time_var</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span>
+        <span class="n">id_var</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span>
+        <span class="n">scaler</span><span class="o">=</span><span class="s2">&quot;std&quot;</span><span class="p">,</span>
+        <span class="n">weights_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create a *spatial* geodemographic typology by running a cluster</span>
 <span class="sd">    analysis on the metro area&#39;s neighborhood attributes and including a</span>
@@ -472,7 +601,7 @@
         <span class="n">clusters</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">time_var</span><span class="p">,</span> <span class="n">id_var</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">gdf</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
         <span class="n">results</span> <span class="o">=</span> <span class="n">ModelResults</span><span class="p">(</span>
-            <span class="n">X</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+            <span class="n">X</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">id_var</span><span class="p">,</span> <span class="n">time_var</span><span class="p">])</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;geometry&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
             <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
             <span class="n">labels</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">labels_</span><span class="p">,</span>
             <span class="n">instance</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
@@ -500,7 +629,7 @@
     </p>
     <p>
         &copy; Copyright 2020, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
     </p>
   </div>
 </footer>

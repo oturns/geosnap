@@ -1,0 +1,6 @@
+﻿geosnap.Community.plot\_boundary\_silhouette
+============================================
+
+.. currentmodule:: geosnap
+
+.. automethod:: Community.plot_boundary_silhouette

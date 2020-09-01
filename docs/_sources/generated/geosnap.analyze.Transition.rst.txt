@@ -1,4 +1,4 @@
-geosnap.analyze.transition
+﻿geosnap.analyze.transition
 ==========================
 
 .. currentmodule:: geosnap.analyze

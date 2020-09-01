@@ -1,4 +1,4 @@
-geosnap.analyze.analytics.gaussian\_mixture
+﻿geosnap.analyze.analytics.gaussian\_mixture
 ===========================================
 
 .. currentmodule:: geosnap.analyze.analytics
