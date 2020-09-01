@@ -862,6 +862,11 @@ class Community:
                        number of bins to graph. k may be ignored
                        or unnecessary for some schemes, like headtailbreaks, maxp, and maximum_breaks
                        Default is 5.
+        pooled       : bool, optional
+                       whether the classification should be pooled across time periods or unique to each.
+                       E.g. with a 'quantile' scheme, pooled=True indicates that quantiles should be identified
+                       on the entire time series, whereas pooled=False indicates that they should be calculated
+                       independently for each time period
         legend       : bool, optional
                        whether to display a legend on the plot
         categorical  : bool, optional
