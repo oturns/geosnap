@@ -44,11 +44,10 @@ class Community:
     harmonized : bool
         Whether neighborhood boundaries have been harmonized into
         consistent units over time
-    models : dict
+    models : dict of geosnap.analyze.ModelResults
         Dictionary of model instances that have been fitted on the community.
-        The model name is the key and the value is a named tuple that stores the input matrix,
-        the columns used to fit the model, the cluster labels, and the spatial weights matrix
-        if necessary. For cluster models, the model name will match a column on the Community.gdf.
+        The model name is the key and the value is an instance of geosnap.analyze.ModelResults.
+        For cluster models, the model name will match a column on the Community.gdf.
 
     """
 
@@ -72,15 +71,15 @@ class Community:
         self.models = _Map()
 
     def harmonize(
-            self,
-            target_year=None,
-            weights_method="area",
-            extensive_variables=None,
-            intensive_variables=None,
-            allocate_total=True,
-            raster=None,
-            codes="developed",
-            force_crs_match=True,
+        self,
+        target_year=None,
+        weights_method="area",
+        extensive_variables=None,
+        intensive_variables=None,
+        allocate_total=True,
+        raster=None,
+        codes="developed",
+        force_crs_match=True,
     ):
         """Standardize inconsistent boundaries into time-static ones.
 
@@ -189,15 +188,15 @@ class Community:
         return Community(gdf, harmonized=True)
 
     def cluster(
-            self,
-            n_clusters=6,
-            method=None,
-            best_model=False,
-            columns=None,
-            verbose=False,
-            scaler="std",
-            pooling="fixed",
-            **kwargs,
+        self,
+        n_clusters=6,
+        method=None,
+        best_model=False,
+        columns=None,
+        verbose=False,
+        scaler="std",
+        pooling="fixed",
+        **kwargs,
     ):
         """Create a geodemographic typology by running a cluster analysis on the study area's neighborhood attributes.
 
@@ -252,18 +251,18 @@ class Community:
         return comm
 
     def cluster_spatial(
-            self,
-            n_clusters=6,
-            spatial_weights="rook",
-            method=None,
-            best_model=False,
-            columns=None,
-            threshold_variable="count",
-            threshold=10,
-            return_model=False,
-            scaler=None,
-            weights_kwargs=None,
-            **kwargs,
+        self,
+        n_clusters=6,
+        spatial_weights="rook",
+        method=None,
+        best_model=False,
+        columns=None,
+        threshold_variable="count",
+        threshold=10,
+        return_model=False,
+        scaler=None,
+        weights_kwargs=None,
+        **kwargs,
     ):
         """Create a *spatial* geodemographic typology by running a cluster analysis on the metro area's neighborhood attributes and including a contiguity constraint.
 
@@ -324,7 +323,7 @@ class Community:
         comm.models[model_name] = model
         return comm
 
-    def silplot(self, model_name=None, year=None, **kwargs):
+    def plot_silhouette(self, model_name=None, year=None, **kwargs):
         """ Returns a silhouette plot of the model that is passed to it.
 
         Parameters
@@ -341,26 +340,34 @@ class Community:
 
         """
         if not year:
-            fig = skplt.metrics.plot_silhouette(self.models[model_name].X.values, self.models[model_name].labels,
-                                                **kwargs)
+            fig = skplt.metrics.plot_silhouette(
+                self.models[model_name].X.values,
+                self.models[model_name].labels,
+                **kwargs,
+            )
         else:
-            fig = skplt.metrics.plot_silhouette(self.models[model_name][year].X.values, self.models[model_name][year].labels,
-                                                **kwargs)
+            fig = skplt.metrics.plot_silhouette(
+                self.models[model_name][year].X.values,
+                self.models[model_name][year].labels,
+                **kwargs,
+            )
         return fig
 
-    def plot_silscore(self,
-                      model_name=None,
-                      year=None,
-                      ctxmap=ctx.providers.Stamen.TonerLite,
-                      save_fig=None,
-                      figsize=(12, 3),
-                      alpha=.5,
-                      cmap='bwr',
-                      title='',
-                      dpi=500,
-                      time_var='year',
-                      id_var='geoid',
-                      **kwargs):
+    def plot_silhouette_map(
+        self,
+        model_name=None,
+        year=None,
+        ctxmap=ctx.providers.Stamen.TonerLite,
+        save_fig=None,
+        figsize=(12, 3),
+        alpha=0.5,
+        cmap="bwr",
+        title="",
+        dpi=500,
+        time_var="year",
+        id_var="geoid",
+        **kwargs,
+    ):
         """ Returns a plot of the silhouette scores of the model that is passed to it
             by creating a table join of the models silhouettes object and community gdf
 
@@ -407,6 +414,7 @@ class Community:
         # Checking both arrays at the same time would be more efficient, but
         # comparing NumPy arrays with `and` is not allowed, and many solutions that try to compare numpy arrays
         # directly require error handling, so check if objects contain numpy arrays separately.
+        df = self.gdf.copy()
         if not year:
             if self.models[model_name].silhouettes is None:
                 self.models[model_name].sil_scores()
@@ -415,43 +423,64 @@ class Community:
                 self.models[model_name][year].sil_scores()
         f, ax = plt.subplots(1, 2, figsize=figsize)
         if ctxmap:  # need to convert crs to mercator before graphing
-            self.gdf = self.gdf.to_crs(epsg=3857)
+            if df.crs!=3857:
+                df = df.to_crs(epsg=3857)
         if not year:
-            ax[0].hist(self.models[model_name].silhouettes['silhouettes'])
-            self.gdf.join(
-                self.models[model_name].silhouettes, on=[id_var, time_var]).plot(
-                'silhouettes', ax=ax[1], alpha=alpha, legend=True, vmin=-1, vmax=1, cmap=cmap, **kwargs)
+            ax[0].hist(self.models[model_name].silhouettes["silhouettes"])
+            df.join(
+                self.models[model_name].silhouettes, on=[id_var, time_var]
+            ).plot(
+                "silhouettes",
+                ax=ax[1],
+                alpha=alpha,
+                legend=True,
+                vmin=-1,
+                vmax=1,
+                cmap=cmap,
+                **kwargs,
+            )
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
         else:
-            ax[0].hist(self.models[model_name][year].silhouettes['silhouettes'])
-            self.gdf[self.gdf.year == year].join(
-                self.models[model_name][year].silhouettes, on=[id_var, time_var]).plot(
-                'silhouettes', ax=ax[1], alpha=alpha, legend=True, vmin=-1, vmax=1, cmap=cmap, **kwargs)
+            ax[0].hist(self.models[model_name][year].silhouettes["silhouettes"])
+            sdf[df.year == year].join(
+                self.models[model_name][year].silhouettes, on=[id_var, time_var]
+            ).plot(
+                "silhouettes",
+                ax=ax[1],
+                alpha=alpha,
+                legend=True,
+                vmin=-1,
+                vmax=1,
+                cmap=cmap,
+                **kwargs,
+            )
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
-        ax[1].axis('off')
+        ax[1].axis("off")
         #  using both tight_layout() and passing title makes plots and title overlap, so only use one
         if title:
             f.suptitle(title)
         else:
             f.tight_layout()
         if save_fig:
-            f.savefig(save_fig, dpi=dpi, bbox_inches='tight')
+            f.savefig(save_fig, dpi=dpi, bbox_inches="tight")
         return ax
 
-    def plot_nearest(self,
-                     model_name=None,
-                     year=None,
-                     ctxmap=ctx.providers.Stamen.TonerLite,
-                     save_fig=None,
-                     figsize=(12, 3),
-                     title='',
-                     alpha=.5,
-                     dpi=500,
-                     time_var='year',
-                     id_var='geoid',
-                     **kwargs):
+    def plot_next_best_label(
+        self,
+        model_name=None,
+        year=None,
+        ctxmap=ctx.providers.Stamen.TonerLite,
+        save_fig=None,
+        figsize=(12, 3),
+        title="",
+        alpha=0.5,
+        dpi=500,
+        time_var="year",
+        id_var="geoid",
+        **kwargs,
+    ):
         """ Returns a plot of the nearest_labels of the model that is passed to it.
 
         Parameters
@@ -491,58 +520,88 @@ class Community:
         and an array made up of the the model labels and nearest labels that was used to graph the values
 
         """
+        df = self.gdf.copy()
+        if isinstance(self.models[model_name], dict) and not year:
+            raise('This model has unique results for each time period; You must supply a value for `year`')
+
         # If the user has already calculated, respect already calculated values
         if not year:
             if self.models[model_name].nearest_labels is None:
-                self.models[model_name].nearest_label()
+                self.models[model_name].nearest_label().astype(int)
         else:
             if self.models[model_name][year].nearest_labels is None:
-                self.models[model_name][year].nearest_label()
+                self.models[model_name][year].nearest_label().astype(int)
         f, ax = plt.subplots(1, 2, figsize=figsize)
-        if ctxmap:  # need to convert crs to mercator before graphing
-            self.gdf = self.gdf.to_crs(epsg=3857)
+        if ctxmap:
+            if df.crs==3857:
+                pass
+            else:  # need to convert crs to mercator before graphing
+                df = df.to_crs(epsg=3857)
         if not year:
-            temp_df = self.gdf.join(self.models[model_name].nearest_labels, on=[id_var, time_var])
-            temp_df = temp_df[['nearest_label', 'geometry', model_name]]
+            temp_df = df.join(
+                self.models[model_name].nearest_labels, on=[id_var, time_var]
+            )
+            temp_df = temp_df[["nearest_label", "geometry", model_name]]
             temp_df.set_index(model_name, inplace=True)
-            self.gdf.plot(model_name, ax=ax[0], alpha=.5, legend=True, categorical=True)
-            temp_df.plot('nearest_label', ax=ax[1], legend=True, categorical=True, alpha=alpha, **kwargs)
+            df.plot(
+                model_name, ax=ax[0], alpha=0.5, legend=True, categorical=True
+            )
+            temp_df.plot(
+                "nearest_label",
+                ax=ax[1],
+                legend=True,
+                categorical=True,
+                alpha=alpha,
+                **kwargs,
+            )
             if ctxmap:
                 ctx.add_basemap(ax[0], source=ctxmap)
                 ctx.add_basemap(ax[1], source=ctxmap)
         else:
-            temp_df = self.gdf.join(self.models[model_name][year].nearest_labels, on=[id_var, time_var])
-            temp_df = temp_df[['nearest_label', time_var, 'geometry', model_name]]
+            temp_df = df.join(
+                self.models[model_name][year].nearest_labels, on=[id_var, time_var]
+            )
+            temp_df = temp_df[["nearest_label", time_var, "geometry", model_name]]
             temp_df.set_index(model_name, inplace=True)
-            self.gdf[self.gdf.year == year].plot(model_name, ax=ax[0], alpha=alpha, legend=True, categorical=True)
-            temp_df[temp_df.year == year].plot('nearest_label', ax=ax[1],
-                                                 alpha=alpha, legend=True, categorical=True, **kwargs)
+            df[df.year == year].plot(
+                model_name, ax=ax[0], alpha=alpha, legend=True, categorical=True
+            )
+            temp_df[temp_df.year == year].plot(
+                "nearest_label",
+                ax=ax[1],
+                alpha=alpha,
+                legend=True,
+                categorical=True,
+                **kwargs,
+            )
             if ctxmap:
                 ctx.add_basemap(ax[0], source=ctxmap)
                 ctx.add_basemap(ax[1], source=ctxmap)
-        ax[0].axis('off')
-        ax[1].axis('off')
+        ax[0].axis("off")
+        ax[1].axis("off")
         if title:
             f.suptitle(title)
         else:
             f.tight_layout()
         if save_fig:
-            f.savefig(save_fig, dpi=dpi, bbox_inches='tight')
+            f.savefig(save_fig, dpi=dpi, bbox_inches="tight")
         return ax
 
-    def plot_pathsil(self,
-                     model_name=None,
-                     year=None,
-                     ctxmap=ctx.providers.Stamen.TonerLite,
-                     save_fig=None,
-                     figsize=(12, 3),
-                     title='',
-                     alpha=.5,
-                     cmap='bwr',
-                     dpi=500,
-                     time_var='year',
-                     id_var='geoid',
-                     **kwargs):
+    def plot_path_silhouette(
+        self,
+        model_name=None,
+        year=None,
+        ctxmap=ctx.providers.Stamen.TonerLite,
+        save_fig=None,
+        figsize=(12, 3),
+        title="",
+        alpha=0.5,
+        cmap="bwr",
+        dpi=500,
+        time_var="year",
+        id_var="geoid",
+        **kwargs,
+    ):
         """ Returns a plot of the path_silhouettes of the model that is passed to it.
 
         Parameters
@@ -594,41 +653,63 @@ class Community:
         if ctxmap:  # need to convert crs to mercator before graphing
             self.gdf = self.gdf.to_crs(epsg=3857)
         if not year:
-            ax[0].hist(self.models[model_name].path_silhouettes['path_silhouettes'])
+            ax[0].hist(self.models[model_name].path_silhouettes["path_silhouettes"])
             self.gdf.join(
-                self.models[model_name][year].path_silhouettes, on=[id_var, time_var]).plot(
-                'path_silhouettes', ax=ax[1], alpha=alpha, legend=True, vmin=-1, vmax=1, cmap=cmap, **kwargs)
+                self.models[model_name][year].path_silhouettes, on=[id_var, time_var]
+            ).plot(
+                "path_silhouettes",
+                ax=ax[1],
+                alpha=alpha,
+                legend=True,
+                vmin=-1,
+                vmax=1,
+                cmap=cmap,
+                **kwargs,
+            )
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
         else:
-            ax[0].hist(self.models[model_name][year].path_silhouettes['path_silhouettes'])
+            ax[0].hist(
+                self.models[model_name][year].path_silhouettes["path_silhouettes"]
+            )
             self.gdf[self.gdf.year == year].join(
-                self.models[model_name][year].path_silhouettes, on=[id_var, time_var]).plot(
-                'path_silhouettes', ax=ax[1], alpha=alpha, legend=True, vmin=-1, vmax=1, cmap=cmap, **kwargs)
+                self.models[model_name][year].path_silhouettes, on=[id_var, time_var]
+            ).plot(
+                "path_silhouettes",
+                ax=ax[1],
+                alpha=alpha,
+                legend=True,
+                vmin=-1,
+                vmax=1,
+                cmap=cmap,
+                **kwargs,
+            )
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
-        ax[1].axis('off')
+        ax[1].axis("off")
         if title:
             f.suptitle(title)
         else:
             f.tight_layout()
         if save_fig:
-            f.savefig(save_fig, dpi=dpi, bbox_inches='tight')
+            f.savefig(save_fig, dpi=dpi, bbox_inches="tight")
         return ax
 
-    def plot_boundarysil(self,
-                         model_name=None,
-                         year=None,
-                         ctxmap=ctx.providers.Stamen.TonerLite,
-                         save_fig=None,
-                         figsize=(12, 3),
-                         title='',
-                         alpha=.5,
-                         cmap='bwr',
-                         dpi=500,
-                         time_var='year',
-                         id_var='geoid',
-                         **kwargs):
+    def plot_boundary_silhouette(
+        self,
+        model_name=None,
+        year=None,
+        ctxmap=ctx.providers.Stamen.TonerLite,
+        save_fig=None,
+        figsize=(12, 3),
+        title="",
+        alpha=0.5,
+        cmap="bwr",
+        dpi=500,
+        time_var="year",
+        id_var="geoid",
+        **kwargs,
+    ):
         """ Returns a plot of the boundary_silhouettes of the model that is passed to it.
 
         Parameters
@@ -683,42 +764,84 @@ class Community:
         # To make visualization of boundary_silhouettes informative we need to remove the graphing of zero values
         if not year:
             ax[0].hist(
-                self.models[model_name].boundary_silhouettes['boundary_silhouettes'][self.models[model_name].boundary_silhouettes['boundary_silhouettes'] != 0])
+                self.models[model_name].boundary_silhouettes["boundary_silhouettes"][
+                    self.models[model_name].boundary_silhouettes["boundary_silhouettes"]
+                    != 0
+                ]
+            )
             self.gdf.join(
-                self.models[model_name][year].boundary_silhouettes, on=[id_var, time_var]).plot(
-                'boundary_silhouettes', ax=ax[1], legend=True, alpha=alpha, vmin=-1, vmax=1, cmap=cmap, **kwargs)
+                self.models[model_name][year].boundary_silhouettes,
+                on=[id_var, time_var],
+            ).plot(
+                "boundary_silhouettes",
+                ax=ax[1],
+                legend=True,
+                alpha=alpha,
+                vmin=-1,
+                vmax=1,
+                cmap=cmap,
+                **kwargs,
+            )
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
         else:
             ax[0].hist(
-                self.models[model_name][year].boundary_silhouettes['boundary_silhouettes'][self.models[model_name][year].boundary_silhouettes['boundary_silhouettes'] != 0])
+                self.models[model_name][year].boundary_silhouettes[
+                    "boundary_silhouettes"
+                ][
+                    self.models[model_name][year].boundary_silhouettes[
+                        "boundary_silhouettes"
+                    ]
+                    != 0
+                ]
+            )
             self.gdf[self.gdf.year == year].join(
-                self.models[model_name][year].boundary_silhouettes, on=[id_var, time_var]).plot(
-                'boundary_silhouettes', ax=ax[1], legend=True, alpha=alpha, vmin=-1, vmax=1, cmap=cmap, **kwargs)
+                self.models[model_name][year].boundary_silhouettes,
+                on=[id_var, time_var],
+            ).plot(
+                "boundary_silhouettes",
+                ax=ax[1],
+                legend=True,
+                alpha=alpha,
+                vmin=-1,
+                vmax=1,
+                cmap=cmap,
+                **kwargs,
+            )
             if ctxmap:
                 ctx.add_basemap(ax[1], source=ctxmap)
-        ax[1].axis('off')
+        ax[1].axis("off")
         if title:
             f.suptitle(title)
         else:
             f.tight_layout()
         if save_fig:
-            f.savefig(save_fig, dpi=dpi, bbox_inches='tight')
+            f.savefig(save_fig, dpi=dpi, bbox_inches="tight")
         return ax
 
-    def tsplot(self, column, title='',
-               years=[], scheme='quantiles',
-               k=5, save_fig=None, dpi=500,
-               legend_kwds='default',
-               ncols=None,
-               nrows=None,
-               ctxmap=ctx.providers.OpenStreetMap.Mapnik,
-               **kwargs):
-        """
-        Function for plotting timeseries data from community objects.
+    def plot_timeseries(
+        self,
+        column,
+        title="",
+        years=[],
+        scheme="quantiles",
+        k=5,
+        cmap='Blues',
+        legend=True,
+        categorical=False,
+        save_fig=None,
+        dpi=500,
+        legend_kwds="default",
+        ncols=None,
+        nrows=None,
+        ctxmap=ctx.providers.OpenStreetMap.Mapnik,
+        **kwargs,
+    ):
+        """Plot an attribute from a Community arranged as a timeseries.
+        
         Parameters
         ----------
-        community    : community object
+        Community    : Community object
                        community object
         column       : str
                        column to be graphed in a time series
@@ -734,6 +857,10 @@ class Community:
                        number of bins to graph. k may be ignored
                        or unnecessary for some schemes, like headtailbreaks, maxp, and maximum_breaks
                        Default is 5.
+        legend       : bool, optional
+                       whether to display a legend on the plot
+        categorical  : bool, optional
+                       whether the data should be plotted as categorical as opposed to continuous
         save_fig     : str, optional
                        path to save figure if desired.
         dpi          : int, optional
@@ -757,19 +884,42 @@ class Community:
         # proplot needs to be used as a function-level import,
         # as it influences all figures when imported at the top of the file
         import proplot as plot
-
-        if legend_kwds == 'default':
-            legend_kwds = {'ncols': 1, "loc": "b"}
+        df = self.gdf
+        if categorical and not cmap:
+            cmap='Accent'
+        if legend_kwds == "default":
+            legend_kwds = {"ncols": 1, "loc": "b"}
         if ctxmap:  # need to convert crs to mercator before graphing
-            self.gdf = self.gdf.to_crs(epsg=3857)
+            if df.crs!=3857:
+                df = df.to_crs(epsg=3857)
         if not years:
             if nrows is None and ncols is None:
-                f, axs = plot.subplots(ncols=len(self.gdf.year.unique()))
+                f, axs = plot.subplots(ncols=len(df.year.unique()))
             else:
                 f, axs = plot.subplots(ncols=ncols, nrows=nrows)
-            for i, year in enumerate(sorted(self.gdf.year.unique())):  # sort to prevent graphing out of order
-                self.gdf[self.gdf.year == year].plot(column=column, ax=axs[i], scheme=scheme, k=k, **kwargs,
-                                                     legend=True, legend_kwds=legend_kwds)
+            for i, year in enumerate(
+                sorted(df.year.unique())
+            ):  # sort to prevent graphing out of order
+                if categorical:
+                    df[df.year == year].plot(
+                    column=column,
+                    ax=axs[i],
+                    categorical=True,
+                    cmap=cmap,
+                    legend=legend,
+                    legend_kwds=legend_kwds,
+                )
+                else:
+                    df[df.year == year].plot(
+                        column=column,
+                        ax=axs[i],
+                        scheme=scheme,
+                        k=k,
+                        cmap=cmap,
+                        **kwargs,
+                        legend=legend,
+                        legend_kwds=legend_kwds,
+                    )
                 if ctxmap:  # need set basemap of each graph
                     ctx.add_basemap(axs[i], source=ctxmap)
                 axs[i].format(title=year)
@@ -778,9 +928,29 @@ class Community:
                 f, axs = plot.subplots(ncols=len(years))
             else:
                 f, axs = plot.subplots(ncols=ncols, nrows=nrows)
-            for i, year in enumerate(years):  # display in whatever order list is passed in
-                self.gdf[self.gdf.year == year].plot(column=column, ax=axs[i], scheme=scheme, k=k, **kwargs,
-                                                     legend=True, legend_kwds=legend_kwds)
+            for i, year in enumerate(
+                years
+            ):  # display in whatever order list is passed in
+                if categorical:
+                    df[df.year == year].plot(
+                    column=column,
+                    ax=axs[i],
+                    categorical=True,
+                    cmap=cmap,
+                    legend=legend,
+                    legend_kwds=legend_kwds,
+                )
+                else:
+                    df[df.year == year].plot(
+                        column=column,
+                        ax=axs[i],
+                        scheme=scheme,
+                        k=k,
+                        cmap=cmap,
+                        **kwargs,
+                        legend=legend,
+                        legend_kwds=legend_kwds,
+                    )
                 if ctxmap:  # need set basemap of each graph
                     ctx.add_basemap(axs[i], source=ctxmap)
                 axs[i].format(title=year)
@@ -789,14 +959,14 @@ class Community:
             axs.format(suptitle=column)
         else:
             axs.format(suptitle=title)
-        axs.axis('off')
+        axs.axis("off")
 
         if save_fig:
-            f.savefig(save_fig, dpi=dpi, bbox_inches='tight')
+            f.savefig(save_fig, dpi=dpi, bbox_inches="tight")
         return axs
 
     def transition(
-            self, cluster_col, time_var="year", id_var="geoid", w_type=None, permutations=0
+        self, cluster_col, time_var="year", id_var="geoid", w_type=None, permutations=0
     ):
         """
         (Spatial) Markov approach to transitional dynamics of neighborhoods.
@@ -843,14 +1013,14 @@ class Community:
         return mar
 
     def sequence(
-            self,
-            cluster_col,
-            seq_clusters=5,
-            subs_mat=None,
-            dist_type=None,
-            indel=None,
-            time_var="year",
-            id_var="geoid",
+        self,
+        cluster_col,
+        seq_clusters=5,
+        subs_mat=None,
+        dist_type=None,
+        indel=None,
+        time_var="year",
+        id_var="geoid",
     ):
         """
         Pairwise sequence analysis to evaluate the distance/dissimilarity
@@ -921,13 +1091,13 @@ class Community:
 
     @classmethod
     def from_ltdb(
-            cls,
-            state_fips=None,
-            county_fips=None,
-            msa_fips=None,
-            fips=None,
-            boundary=None,
-            years="all",
+        cls,
+        state_fips=None,
+        county_fips=None,
+        msa_fips=None,
+        fips=None,
+        boundary=None,
+        years="all",
     ):
         """Create a new Community from LTDB data.
 
@@ -999,13 +1169,13 @@ class Community:
 
     @classmethod
     def from_ncdb(
-            cls,
-            state_fips=None,
-            county_fips=None,
-            msa_fips=None,
-            fips=None,
-            boundary=None,
-            years="all",
+        cls,
+        state_fips=None,
+        county_fips=None,
+        msa_fips=None,
+        fips=None,
+        boundary=None,
+        years="all",
     ):
         """Create a new Community from NCDB data.
 
@@ -1076,13 +1246,13 @@ class Community:
 
     @classmethod
     def from_census(
-            cls,
-            state_fips=None,
-            county_fips=None,
-            msa_fips=None,
-            fips=None,
-            boundary=None,
-            years="all",
+        cls,
+        state_fips=None,
+        county_fips=None,
+        msa_fips=None,
+        fips=None,
+        boundary=None,
+        years="all",
     ):
         """Create a new Community from original vintage US Census data.
 
@@ -1132,7 +1302,7 @@ class Community:
         if msa_fips:
             msa_states += datasets.msa_definitions()[
                 datasets.msa_definitions()["CBSA Code"] == msa_fips
-                ]["stcofips"].tolist()
+            ]["stcofips"].tolist()
         msa_states = [i[:2] for i in msa_states]
 
         # build a list of states in the dataset
@@ -1185,14 +1355,14 @@ class Community:
 
     @classmethod
     def from_lodes(
-            cls,
-            state_fips=None,
-            county_fips=None,
-            msa_fips=None,
-            fips=None,
-            boundary=None,
-            years=2015,
-            dataset="wac",
+        cls,
+        state_fips=None,
+        county_fips=None,
+        msa_fips=None,
+        fips=None,
+        boundary=None,
+        years=2015,
+        dataset="wac",
     ):
         """Create a new Community from Census LEHD/LODES data.
 
@@ -1245,7 +1415,7 @@ class Community:
         if msa_fips:
             msa_counties = datasets.msa_definitions()[
                 datasets.msa_definitions()["CBSA Code"] == msa_fips
-                ]["stcofips"].tolist()
+            ]["stcofips"].tolist()
 
         else:
             msa_counties = None
@@ -1278,7 +1448,9 @@ class Community:
                         "Unable to determine whether boundary CRS is WGS84 "
                         "if this produces unexpected results, try reprojecting"
                     )
-                gdf00 = gdf00[gdf00.representative_point().intersects(boundary.unary_union)]
+                gdf00 = gdf00[
+                    gdf00.representative_point().intersects(boundary.unary_union)
+                ]
 
         gdf = datasets.blocks_2010(states=states, fips=(tuple(allfips)))
         gdf = gdf.drop(columns=["year"])
@@ -1300,8 +1472,8 @@ class Community:
         # grab state abbreviations
         names = (
             _fipstable[_fipstable["FIPS Code"].isin(states)]["State Abbreviation"]
-                .str.lower()
-                .tolist()
+            .str.lower()
+            .tolist()
         )
         if isinstance(names, str):
             names = [names]

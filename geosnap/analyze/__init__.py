@@ -1,4 +1,4 @@
-from .analytics import cluster, cluster_spatial
+from .analytics import cluster, cluster_spatial, ModelResults
 from .dynamics import sequence, transition
 from .incs import linc
 

@@ -96,9 +96,29 @@ Community Analytics
    Community.sequence
    Community.transition
 
+Community Visualization
+'''''''''''''''''''''''''
+.. currentmodule:: geosnap
+
+.. autosummary::
+   :toctree: generated/
+
+   Community.plot_boundary_silhouette
+   Community.plot_next_best_label
+   Community.plot_silhouette
+   Community.plot_silhouette_map
+   Community.plot_path_silhouette
+   Community.plot_timeseries
+
    
 Analyze Module
 ----------------
+.. currentmodule:: geosnap
+
+.. autosummary::
+   :toctree: generated/
+   
+   analyze.ModelResults
 
 Neighborhood Clustering Methods
 '''''''''''''''''''''''''''''''''''''''''''''
