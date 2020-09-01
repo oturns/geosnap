@@ -1,4 +1,4 @@
-geosnap.Community
+﻿geosnap.Community
 =================
 
 .. currentmodule:: geosnap
@@ -22,6 +22,12 @@ geosnap.Community
       ~Community.from_ltdb
       ~Community.from_ncdb
       ~Community.harmonize
+      ~Community.plot_boundary_silhouette
+      ~Community.plot_next_best_label
+      ~Community.plot_path_silhouette
+      ~Community.plot_silhouette
+      ~Community.plot_silhouette_map
+      ~Community.plot_timeseries
       ~Community.sequence
       ~Community.transition
    

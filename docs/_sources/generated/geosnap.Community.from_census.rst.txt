@@ -1,4 +1,4 @@
-geosnap.Community.from\_census
+﻿geosnap.Community.from\_census
 ==============================
 
 .. currentmodule:: geosnap

@@ -1,4 +1,4 @@
-geosnap.Community.from\_ltdb
+﻿geosnap.Community.from\_ltdb
 ============================
 
 .. currentmodule:: geosnap

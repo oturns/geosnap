@@ -1,4 +1,4 @@
-geosnap.Community.harmonize
+﻿geosnap.Community.harmonize
 ===========================
 
 .. currentmodule:: geosnap

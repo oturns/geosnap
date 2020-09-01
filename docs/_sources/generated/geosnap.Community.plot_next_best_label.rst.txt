@@ -1,0 +1,6 @@
+﻿geosnap.Community.plot\_next\_best\_label
+=========================================
+
+.. currentmodule:: geosnap
+
+.. automethod:: Community.plot_next_best_label

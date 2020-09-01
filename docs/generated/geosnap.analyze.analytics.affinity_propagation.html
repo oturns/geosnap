@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>geosnap.analyze.analytics.affinity_propagation &#8212; geosnap v0.3.2 Manual</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>geosnap.analyze.analytics.affinity_propagation &#8212; geosnap v0.4.0 Manual</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/pysal-styles.css" />
@@ -21,9 +22,9 @@
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-1.12.4.min.js "></script>
 <script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.4.1/js/bootstrap.min.js "></script>
 <script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
 
   </head><body>
@@ -39,7 +40,7 @@
         </button>
         <a class="navbar-brand" href="../index.html"><span><img src="../_static/geosnap.svg"></span>
           geosnap</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.3.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.4.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -126,16 +127,16 @@
       
   <div class="section" id="geosnap-analyze-analytics-affinity-propagation">
 <h1>geosnap.analyze.analytics.affinity_propagation<a class="headerlink" href="#geosnap-analyze-analytics-affinity-propagation" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
+<dl class="py function">
 <dt id="geosnap.analyze.analytics.affinity_propagation">
-<code class="sig-prename descclassname">geosnap.analyze.analytics.</code><code class="sig-name descname">affinity_propagation</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">damping=0.8</em>, <em class="sig-param">preference=-1000</em>, <em class="sig-param">max_iter=500</em>, <em class="sig-param">convergence_iter=15</em>, <em class="sig-param">copy=True</em>, <em class="sig-param">affinity='euclidean'</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/analyze/cluster.html#affinity_propagation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.analyze.analytics.affinity_propagation" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">geosnap.analyze.analytics.</code><code class="sig-name descname">affinity_propagation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">damping</span><span class="o">=</span><span class="default_value">0.8</span></em>, <em class="sig-param"><span class="n">preference</span><span class="o">=</span><span class="default_value">- 1000</span></em>, <em class="sig-param"><span class="n">max_iter</span><span class="o">=</span><span class="default_value">500</span></em>, <em class="sig-param"><span class="n">convergence_iter</span><span class="o">=</span><span class="default_value">15</span></em>, <em class="sig-param"><span class="n">copy</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">affinity</span><span class="o">=</span><span class="default_value">'euclidean'</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/analyze/cluster.html#affinity_propagation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.analyze.analytics.affinity_propagation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clustering with Affinity Propagation.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>X</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array-like" title="(in NumPy v1.18)"><span>array_like</span></a></span></dt><dd><p>n x k attribute data</p>
+<dt><strong>X</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array-like" title="(in NumPy v1.19)"><span>array_like</span></a></span></dt><dd><p>n x k attribute data</p>
 </dd>
-<dt><strong>preference</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array-like" title="(in NumPy v1.18)"><span>array_like</span></a>, shape (n_samples,) or <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, optional, default: <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a></span></dt><dd><p>The preference parameter passed to scikit-learn’s affinity propagation
+<dt><strong>preference</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/glossary.html#term-array-like" title="(in NumPy v1.19)"><span>array_like</span></a>, shape (n_samples,) or <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, optional, default: <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">None</span></code></a></span></dt><dd><p>The preference parameter passed to scikit-learn’s affinity propagation
 algorithm</p>
 </dd>
 <dt><strong>damping</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">float</span></code></a>, optional, default: 0.8</span></dt><dd><p>The damping parameter passed to scikit-learn’s affinity propagation
@@ -175,7 +176,7 @@ algorithm</p>
     </p>
     <p>
         &copy; Copyright 2020, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
     </p>
   </div>
 </footer>

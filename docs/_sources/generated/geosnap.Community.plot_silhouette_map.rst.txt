@@ -1,0 +1,6 @@
+﻿geosnap.Community.plot\_silhouette\_map
+=======================================
+
+.. currentmodule:: geosnap
+
+.. automethod:: Community.plot_silhouette_map

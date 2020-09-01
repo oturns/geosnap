@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>geosnap.visualize.indexplot_seq &#8212; geosnap v0.3.2 Manual</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>geosnap.visualize.indexplot_seq &#8212; geosnap v0.4.0 Manual</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/pysal-styles.css" />
@@ -21,9 +22,9 @@
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-1.12.4.min.js "></script>
 <script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.4.1/js/bootstrap.min.js "></script>
 <script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
 
   </head><body>
@@ -39,7 +40,7 @@
         </button>
         <a class="navbar-brand" href="../index.html"><span><img src="../_static/geosnap.svg"></span>
           geosnap</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.3.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.4.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -126,9 +127,9 @@
       
   <div class="section" id="geosnap-visualize-indexplot-seq">
 <h1>geosnap.visualize.indexplot_seq<a class="headerlink" href="#geosnap-visualize-indexplot-seq" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
+<dl class="py function">
 <dt id="geosnap.visualize.indexplot_seq">
-<code class="sig-prename descclassname">geosnap.visualize.</code><code class="sig-name descname">indexplot_seq</code><span class="sig-paren">(</span><em class="sig-param">df_traj, clustering, years=['1970', '1980', '1990', '2000', '2010'], k=None, ncols=3, palette='Set1', save_fig=False, fig_suffix='LA'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/visualize/seq.html#indexplot_seq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.visualize.indexplot_seq" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">geosnap.visualize.</code><code class="sig-name descname">indexplot_seq</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df_traj</span></em>, <em class="sig-param"><span class="n">clustering</span></em>, <em class="sig-param"><span class="n">years</span><span class="o">=</span><span class="default_value">['1970', '1980', '1990', '2000', '2010']</span></em>, <em class="sig-param"><span class="n">k</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ncols</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">palette</span><span class="o">=</span><span class="default_value">'Set1'</span></em>, <em class="sig-param"><span class="n">save_fig</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dpi</span><span class="o">=</span><span class="default_value">500</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/visualize/seq.html#indexplot_seq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.visualize.indexplot_seq" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function for index plot of neighborhood sequences within each cluster.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -150,9 +151,9 @@ Default is None.</p>
 If a sequence, input colors are used but possibly
 cycled and desaturated. Default is “Set1”.</p>
 </dd>
-<dt><strong>save_fig</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bltin-boolean-values" title="(in Python v3.8)"><span class="xref std std-ref">bool</span></a>, optional</span></dt><dd><p>whether to save figure. Default is False.</p>
+<dt><strong>save_fig</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>path to save figure if desired</p>
 </dd>
-<dt><strong>fig_suffix</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>suffix of the saved figure name. Default is “LA”.</p>
+<dt><strong>dpi</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>the dpi of the saved figure. Deafult is 500</p>
 </dd>
 </dl>
 </dd>
@@ -194,7 +195,7 @@ cycled and desaturated. Default is “Set1”.</p>
     </p>
     <p>
         &copy; Copyright 2020, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
     </p>
   </div>
 </footer>

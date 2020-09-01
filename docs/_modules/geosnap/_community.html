@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>geosnap._community &#8212; geosnap v0.3.2 Manual</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>geosnap._community &#8212; geosnap v0.4.0 Manual</title>
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/pysal-styles.css" />
@@ -19,9 +20,9 @@
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-1.12.4.min.js "></script>
 <script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.4.1/js/bootstrap.min.js "></script>
 <script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
 
   </head><body>
@@ -37,7 +38,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html"><span><img src="../../_static/geosnap.svg"></span>
           geosnap</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.3.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.4.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -123,8 +124,11 @@
 <span></span><span class="sd">&quot;&quot;&quot;A Community is a thin wrapper around a long-form time-series geodataframe.&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
 
+<span class="kn">import</span> <span class="nn">contextily</span> <span class="k">as</span> <span class="nn">ctx</span>
 <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">scikitplot</span> <span class="k">as</span> <span class="nn">skplt</span>
 
 <span class="kn">from</span> <span class="nn">._data</span> <span class="kn">import</span> <span class="n">_Map</span><span class="p">,</span> <span class="n">datasets</span>
 <span class="kn">from</span> <span class="nn">.analyze</span> <span class="kn">import</span> <span class="n">cluster</span> <span class="k">as</span> <span class="n">_cluster</span>
@@ -163,11 +167,10 @@
 <span class="sd">    harmonized : bool</span>
 <span class="sd">        Whether neighborhood boundaries have been harmonized into</span>
 <span class="sd">        consistent units over time</span>
-<span class="sd">    models : dict</span>
+<span class="sd">    models : dict of geosnap.analyze.ModelResults</span>
 <span class="sd">        Dictionary of model instances that have been fitted on the community.</span>
-<span class="sd">        The model name is the key and the value is a named tuple that stores the input matrix,</span>
-<span class="sd">        the columns used to fit the model, the cluster labels, and the spatial weights matrix</span>
-<span class="sd">        if necessary. For cluster models, the model name will match a column on the Community.gdf.</span>
+<span class="sd">        The model name is the key and the value is an instance of geosnap.analyze.ModelResults.</span>
+<span class="sd">        For cluster models, the model name will match a column on the Community.gdf.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -442,6 +445,648 @@
         <span class="p">)</span>  <span class="c1"># keep any existing models in the input Community</span>
         <span class="n">comm</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span>
         <span class="k">return</span> <span class="n">comm</span></div>
+
+<div class="viewcode-block" id="Community.plot_silhouette"><a class="viewcode-back" href="../../generated/geosnap.Community.plot_silhouette.html#geosnap.Community.plot_silhouette">[docs]</a>    <span class="k">def</span> <span class="nf">plot_silhouette</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">year</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns a silhouette plot of the model that is passed to it.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        model_name : str , required</span>
+<span class="sd">                     model to be silhouette plotted</span>
+<span class="sd">        year       : int, optional</span>
+<span class="sd">                     year to be plotted if model created with pooling==&#39;unique&#39;</span>
+<span class="sd">        kwargs     : **kwargs, optional</span>
+<span class="sd">                     pass through to plot_silhouette()</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        silhouette plot of given model.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">year</span><span class="p">:</span>
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">skplt</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">plot_silhouette</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span><span class="o">.</span><span class="n">labels</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">skplt</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">plot_silhouette</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">labels</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span></div>
+
+<div class="viewcode-block" id="Community.plot_silhouette_map"><a class="viewcode-back" href="../../generated/geosnap.Community.plot_silhouette_map.html#geosnap.Community.plot_silhouette_map">[docs]</a>    <span class="k">def</span> <span class="nf">plot_silhouette_map</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">model_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">year</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">ctxmap</span><span class="o">=</span><span class="n">ctx</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">TonerLite</span><span class="p">,</span>
+        <span class="n">save_fig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;bwr&quot;</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+        <span class="n">time_var</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span>
+        <span class="n">id_var</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns a plot of the silhouette scores of the model that is passed to it</span>
+<span class="sd">            by creating a table join of the models silhouettes object and community gdf</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        model_name : str , required</span>
+<span class="sd">                     model to be plotted</span>
+<span class="sd">        year       : int, optional</span>
+<span class="sd">                     year to be plotted if model created with pooling==&#39;unique&#39;</span>
+<span class="sd">        ctxmap     : contextily map provider, optional</span>
+<span class="sd">                     contextily basemap. Set to False for no basemap.</span>
+<span class="sd">                     Default is ctx.providers.Stamen.TonerLite</span>
+<span class="sd">        save_fig   : str, optional</span>
+<span class="sd">                     path to save figure if desired.</span>
+<span class="sd">        figsize    : tuple, optional</span>
+<span class="sd">                     an order tuple where x is width and y is height</span>
+<span class="sd">                     default is 12 inches wide and 3 inches high</span>
+<span class="sd">        alpha      : float, optional</span>
+<span class="sd">                     how transparent the plotted objects are</span>
+<span class="sd">                     Default is 0.5</span>
+<span class="sd">        cmap       : string, optional</span>
+<span class="sd">                     cmap to be plotted</span>
+<span class="sd">                     default is &#39;bwr&#39;</span>
+<span class="sd">        title      : string, optional</span>
+<span class="sd">                     title of figure</span>
+<span class="sd">                     default is no title</span>
+<span class="sd">        dpi        : int, optional</span>
+<span class="sd">                     dpi of the saved image if save_fig=True</span>
+<span class="sd">                    default is 500</span>
+<span class="sd">        time_var   : string, optional</span>
+<span class="sd">                     the column in the community gdf that identifies time period</span>
+<span class="sd">                     default is &#39;year&#39; from US census data</span>
+<span class="sd">        id_var     : string, optional</span>
+<span class="sd">                     column in gdf that identifies geographic units</span>
+<span class="sd">                     default is &#39;geoid&#39; from US census data</span>
+<span class="sd">        kwargs     : **kwargs, optional</span>
+<span class="sd">                     pass through to matplotlib pyplot</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        silhouette scores mapped onto community geography</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check for and use previously calculated values for graphs</span>
+        <span class="c1"># Checking both arrays at the same time would be more efficient, but</span>
+        <span class="c1"># comparing NumPy arrays with `and` is not allowed, and many solutions that try to compare numpy arrays</span>
+        <span class="c1"># directly require error handling, so check if objects contain numpy arrays separately.</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">year</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span><span class="o">.</span><span class="n">silhouettes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span><span class="o">.</span><span class="n">sil_scores</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">silhouettes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">sil_scores</span><span class="p">()</span>
+        <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ctxmap</span><span class="p">:</span>  <span class="c1"># need to convert crs to mercator before graphing</span>
+            <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">crs</span><span class="o">!=</span><span class="mi">3857</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3857</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">year</span><span class="p">:</span>
+            <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span><span class="o">.</span><span class="n">silhouettes</span><span class="p">[</span><span class="s2">&quot;silhouettes&quot;</span><span class="p">])</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span><span class="o">.</span><span class="n">silhouettes</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="n">id_var</span><span class="p">,</span> <span class="n">time_var</span><span class="p">]</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                <span class="s2">&quot;silhouettes&quot;</span><span class="p">,</span>
+                <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+                <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">vmin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">ctxmap</span><span class="p">:</span>
+                <span class="n">ctx</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">source</span><span class="o">=</span><span class="n">ctxmap</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">silhouettes</span><span class="p">[</span><span class="s2">&quot;silhouettes&quot;</span><span class="p">])</span>
+            <span class="n">sdf</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">year</span> <span class="o">==</span> <span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">silhouettes</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="n">id_var</span><span class="p">,</span> <span class="n">time_var</span><span class="p">]</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                <span class="s2">&quot;silhouettes&quot;</span><span class="p">,</span>
+                <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+                <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">vmin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">ctxmap</span><span class="p">:</span>
+                <span class="n">ctx</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">source</span><span class="o">=</span><span class="n">ctxmap</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+        <span class="c1">#  using both tight_layout() and passing title makes plots and title overlap, so only use one</span>
+        <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">save_fig</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_fig</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ax</span></div>
+
+<div class="viewcode-block" id="Community.plot_next_best_label"><a class="viewcode-back" href="../../generated/geosnap.Community.plot_next_best_label.html#geosnap.Community.plot_next_best_label">[docs]</a>    <span class="k">def</span> <span class="nf">plot_next_best_label</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">model_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">year</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">ctxmap</span><span class="o">=</span><span class="n">ctx</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">TonerLite</span><span class="p">,</span>
+        <span class="n">save_fig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+        <span class="n">time_var</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span>
+        <span class="n">id_var</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns a plot of the nearest_labels of the model that is passed to it.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        model_name : str , required</span>
+<span class="sd">                     model to be plotted</span>
+<span class="sd">        year       : int, optional</span>
+<span class="sd">                     year to be plotted if model created with pooling==&#39;unique&#39;</span>
+<span class="sd">        ctxmap     : contextily map provider, optional</span>
+<span class="sd">                     contextily basemap. Set to False for no basemap.</span>
+<span class="sd">                     Default is ctx.providers.Stamen.TonerLite</span>
+<span class="sd">        save_fig   : str, optional</span>
+<span class="sd">                     path to save figure if desired.</span>
+<span class="sd">        figsize    : tuple, optional</span>
+<span class="sd">                     an order tuple where x is width and y is height</span>
+<span class="sd">                     default is 12 inches wide and 3 inches high</span>
+<span class="sd">        title      : string, optional</span>
+<span class="sd">                     title of figure</span>
+<span class="sd">                     default is no title</span>
+<span class="sd">        alpha      : float, optional</span>
+<span class="sd">                     how transparent the plotted objects are</span>
+<span class="sd">                     Default is 0.5</span>
+<span class="sd">        dpi        : int, optional</span>
+<span class="sd">                     dpi of the saved image if save_fig=True</span>
+<span class="sd">                     default is 500</span>
+<span class="sd">        time_var   : string, optional</span>
+<span class="sd">                     the column in the community gdf that identifies time period</span>
+<span class="sd">                     default is &#39;year&#39; from US census data</span>
+<span class="sd">        id_var     : string, optional</span>
+<span class="sd">                     column in gdf that identifies geographic units</span>
+<span class="sd">                     default is &#39;geoid&#39; from US census data</span>
+<span class="sd">        kwargs     : **kwargs, optional</span>
+<span class="sd">                     pass through to matplotlib pyplot</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        nearest_labels scores of the passed model plotted onto community geography</span>
+<span class="sd">        and an array made up of the the model labels and nearest labels that was used to graph the values</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">year</span><span class="p">:</span>
+            <span class="k">raise</span><span class="p">(</span><span class="s1">&#39;This model has unique results for each time period; You must supply a value for `year`&#39;</span><span class="p">)</span>
+
+        <span class="c1"># If the user has already calculated, respect already calculated values</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">year</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span><span class="o">.</span><span class="n">nearest_labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span><span class="o">.</span><span class="n">nearest_label</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">nearest_labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">nearest_label</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ctxmap</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">crs</span><span class="o">==</span><span class="mi">3857</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># need to convert crs to mercator before graphing</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3857</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">year</span><span class="p">:</span>
+            <span class="n">temp_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span><span class="o">.</span><span class="n">nearest_labels</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="n">id_var</span><span class="p">,</span> <span class="n">time_var</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">temp_df</span> <span class="o">=</span> <span class="n">temp_df</span><span class="p">[[</span><span class="s2">&quot;nearest_label&quot;</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="n">model_name</span><span class="p">]]</span>
+            <span class="n">temp_df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                <span class="n">model_name</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="n">temp_df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                <span class="s2">&quot;nearest_label&quot;</span><span class="p">,</span>
+                <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">ctxmap</span><span class="p">:</span>
+                <span class="n">ctx</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">source</span><span class="o">=</span><span class="n">ctxmap</span><span class="p">)</span>
+                <span class="n">ctx</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">source</span><span class="o">=</span><span class="n">ctxmap</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">temp_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">nearest_labels</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="n">id_var</span><span class="p">,</span> <span class="n">time_var</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">temp_df</span> <span class="o">=</span> <span class="n">temp_df</span><span class="p">[[</span><span class="s2">&quot;nearest_label&quot;</span><span class="p">,</span> <span class="n">time_var</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="n">model_name</span><span class="p">]]</span>
+            <span class="n">temp_df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">year</span> <span class="o">==</span> <span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                <span class="n">model_name</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="n">temp_df</span><span class="p">[</span><span class="n">temp_df</span><span class="o">.</span><span class="n">year</span> <span class="o">==</span> <span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                <span class="s2">&quot;nearest_label&quot;</span><span class="p">,</span>
+                <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+                <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">ctxmap</span><span class="p">:</span>
+                <span class="n">ctx</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">source</span><span class="o">=</span><span class="n">ctxmap</span><span class="p">)</span>
+                <span class="n">ctx</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">source</span><span class="o">=</span><span class="n">ctxmap</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">save_fig</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_fig</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ax</span></div>
+
+<div class="viewcode-block" id="Community.plot_path_silhouette"><a class="viewcode-back" href="../../generated/geosnap.Community.plot_path_silhouette.html#geosnap.Community.plot_path_silhouette">[docs]</a>    <span class="k">def</span> <span class="nf">plot_path_silhouette</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">model_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">year</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">ctxmap</span><span class="o">=</span><span class="n">ctx</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">TonerLite</span><span class="p">,</span>
+        <span class="n">save_fig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;bwr&quot;</span><span class="p">,</span>
+        <span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+        <span class="n">time_var</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span>
+        <span class="n">id_var</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns a plot of the path_silhouettes of the model that is passed to it.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        model_name : str , required</span>
+<span class="sd">                     model to be plotted</span>
+<span class="sd">        year       : int, optional</span>
+<span class="sd">                     year to be plotted if model created with pooling==&#39;unique&#39;</span>
+<span class="sd">        ctxmap     : contextily map provider, optional</span>
+<span class="sd">                     contextily basemap. Set to False for no basemap.</span>
+<span class="sd">                     Default is ctx.providers.Stamen.TonerLite</span>
+<span class="sd">        save_fig   : str, optional</span>
+<span class="sd">                     path to save figure if desired.</span>
+<span class="sd">        figsize    : tuple, optional</span>
+<span class="sd">                     an order tuple where x is width and y is height</span>
+<span class="sd">                     default is 12 inches wide and 3 inches high</span>
+<span class="sd">        title      : string, optional</span>
+<span class="sd">                     title of figure</span>
+<span class="sd">                     default is no title</span>
+<span class="sd">        alpha      : float, optional</span>
+<span class="sd">                     how transparent the plotted objects are</span>
+<span class="sd">                     Default is 0.5</span>
+<span class="sd">        cmap       : string, optional</span>
+<span class="sd">                     cmap to be plotted</span>
+<span class="sd">                     default is &#39;bwr&#39;</span>
+<span class="sd">        dpi        : int, optional</span>
+<span class="sd">                     dpi of the saved image if save_fig=True</span>
+<span class="sd">                     default is 500</span>
+<span class="sd">        time_var   : string, optional</span>
+<span class="sd">                     the column in the community gdf that identifies time period</span>
+<span class="sd">                     default is &#39;year&#39; from US census data</span>
+<span class="sd">        id_var     : string, optional</span>
+<span class="sd">                     column in gdf that identifies geographic units</span>
+<span class="sd">                     default is &#39;geoid&#39; from US census data</span>
+<span class="sd">        kwargs     : **kwargs, optional</span>
+<span class="sd">                     pass through to matplotlib pyplot</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        path_silhouette scores of the passed model plotted onto community geography</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">year</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span><span class="o">.</span><span class="n">path_silhouettes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span><span class="o">.</span><span class="n">path_sil</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">path_silhouettes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">path_sil</span><span class="p">()</span>
+        <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ctxmap</span><span class="p">:</span>  <span class="c1"># need to convert crs to mercator before graphing</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3857</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">year</span><span class="p">:</span>
+            <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span><span class="o">.</span><span class="n">path_silhouettes</span><span class="p">[</span><span class="s2">&quot;path_silhouettes&quot;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">path_silhouettes</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="n">id_var</span><span class="p">,</span> <span class="n">time_var</span><span class="p">]</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                <span class="s2">&quot;path_silhouettes&quot;</span><span class="p">,</span>
+                <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+                <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">vmin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">ctxmap</span><span class="p">:</span>
+                <span class="n">ctx</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">source</span><span class="o">=</span><span class="n">ctxmap</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">path_silhouettes</span><span class="p">[</span><span class="s2">&quot;path_silhouettes&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">year</span> <span class="o">==</span> <span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">path_silhouettes</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="n">id_var</span><span class="p">,</span> <span class="n">time_var</span><span class="p">]</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                <span class="s2">&quot;path_silhouettes&quot;</span><span class="p">,</span>
+                <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+                <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">vmin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">ctxmap</span><span class="p">:</span>
+                <span class="n">ctx</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">source</span><span class="o">=</span><span class="n">ctxmap</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">save_fig</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_fig</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ax</span></div>
+
+<div class="viewcode-block" id="Community.plot_boundary_silhouette"><a class="viewcode-back" href="../../generated/geosnap.Community.plot_boundary_silhouette.html#geosnap.Community.plot_boundary_silhouette">[docs]</a>    <span class="k">def</span> <span class="nf">plot_boundary_silhouette</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">model_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">year</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">ctxmap</span><span class="o">=</span><span class="n">ctx</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">TonerLite</span><span class="p">,</span>
+        <span class="n">save_fig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;bwr&quot;</span><span class="p">,</span>
+        <span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+        <span class="n">time_var</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span>
+        <span class="n">id_var</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns a plot of the boundary_silhouettes of the model that is passed to it.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        model_name : str , required</span>
+<span class="sd">                     model to be silhouette plotted</span>
+<span class="sd">        year       : int, optional</span>
+<span class="sd">                     year to be plotted if model created with pooling==&#39;unique&#39;</span>
+<span class="sd">        ctxmap     : contextily map provider, optional</span>
+<span class="sd">                     contextily basemap. Set to False for no basemap.</span>
+<span class="sd">                     Default is ctx.providers.Stamen.TonerLite</span>
+<span class="sd">        figsize    : tuple, optional</span>
+<span class="sd">                     an order tuple where x is width and y is height</span>
+<span class="sd">                     default is 12 inches wide and 3 inches high</span>
+<span class="sd">        title      : string, optional</span>
+<span class="sd">                     title of figure</span>
+<span class="sd">                     default is no title</span>
+<span class="sd">        save_fig   : str, optional</span>
+<span class="sd">                     path to save figure if desired.</span>
+<span class="sd">        alpha      : float, optional</span>
+<span class="sd">                     how transparent the plotted objects are</span>
+<span class="sd">                     Default is 0.5</span>
+<span class="sd">        cmap       : string, optional</span>
+<span class="sd">                     cmap to be plotted</span>
+<span class="sd">                     default is &#39;bwr&#39;</span>
+<span class="sd">        dpi        : int, optional</span>
+<span class="sd">                     dpi of the saved image if save_fig=True</span>
+<span class="sd">                     default is 500</span>
+<span class="sd">        time_var   : string, optional</span>
+<span class="sd">                     the column in the community gdf that identifies time period</span>
+<span class="sd">                     default is &#39;year&#39; from US census data</span>
+<span class="sd">        id_var     : string, optional</span>
+<span class="sd">                     column in gdf that identifies geographic units</span>
+<span class="sd">                     default is &#39;geoid&#39; from US census data</span>
+<span class="sd">        kwargs     : **kwargs, optional</span>
+<span class="sd">                     pass through to matplotlib pyplot</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        boundary_silhouette scores of the passed model plotted onto community geography</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># If the user has already calculated , respect already calculated values</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">year</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span><span class="o">.</span><span class="n">boundary_silhouettes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span><span class="o">.</span><span class="n">boundary_sil</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">boundary_silhouettes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">boundary_sil</span><span class="p">()</span>
+        <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ctxmap</span><span class="p">:</span>  <span class="c1"># need to convert crs to mercator before graphing</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3857</span><span class="p">)</span>
+        <span class="c1"># To make visualization of boundary_silhouettes informative we need to remove the graphing of zero values</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">year</span><span class="p">:</span>
+            <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span><span class="o">.</span><span class="n">boundary_silhouettes</span><span class="p">[</span><span class="s2">&quot;boundary_silhouettes&quot;</span><span class="p">][</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span><span class="o">.</span><span class="n">boundary_silhouettes</span><span class="p">[</span><span class="s2">&quot;boundary_silhouettes&quot;</span><span class="p">]</span>
+                    <span class="o">!=</span> <span class="mi">0</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">boundary_silhouettes</span><span class="p">,</span>
+                <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="n">id_var</span><span class="p">,</span> <span class="n">time_var</span><span class="p">],</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                <span class="s2">&quot;boundary_silhouettes&quot;</span><span class="p">,</span>
+                <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+                <span class="n">vmin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">ctxmap</span><span class="p">:</span>
+                <span class="n">ctx</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">source</span><span class="o">=</span><span class="n">ctxmap</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">boundary_silhouettes</span><span class="p">[</span>
+                    <span class="s2">&quot;boundary_silhouettes&quot;</span>
+                <span class="p">][</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">boundary_silhouettes</span><span class="p">[</span>
+                        <span class="s2">&quot;boundary_silhouettes&quot;</span>
+                    <span class="p">]</span>
+                    <span class="o">!=</span> <span class="mi">0</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">year</span> <span class="o">==</span> <span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">boundary_silhouettes</span><span class="p">,</span>
+                <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="n">id_var</span><span class="p">,</span> <span class="n">time_var</span><span class="p">],</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                <span class="s2">&quot;boundary_silhouettes&quot;</span><span class="p">,</span>
+                <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+                <span class="n">vmin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">ctxmap</span><span class="p">:</span>
+                <span class="n">ctx</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">source</span><span class="o">=</span><span class="n">ctxmap</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">save_fig</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_fig</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ax</span></div>
+
+<div class="viewcode-block" id="Community.plot_timeseries"><a class="viewcode-back" href="../../generated/geosnap.Community.plot_timeseries.html#geosnap.Community.plot_timeseries">[docs]</a>    <span class="k">def</span> <span class="nf">plot_timeseries</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">column</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">years</span><span class="o">=</span><span class="p">[],</span>
+        <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span>
+        <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Blues&#39;</span><span class="p">,</span>
+        <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">categorical</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">save_fig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+        <span class="n">legend_kwds</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+        <span class="n">ncols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">nrows</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">ctxmap</span><span class="o">=</span><span class="n">ctx</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">OpenStreetMap</span><span class="o">.</span><span class="n">Mapnik</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plot an attribute from a Community arranged as a timeseries.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        Community    : Community object</span>
+<span class="sd">                       community object</span>
+<span class="sd">        column       : str</span>
+<span class="sd">                       column to be graphed in a time series</span>
+<span class="sd">        title        : str, optional</span>
+<span class="sd">                       desired title of figure</span>
+<span class="sd">        years        : list, optional</span>
+<span class="sd">                       years to be graphed</span>
+<span class="sd">                       default is every year in dataframe.</span>
+<span class="sd">        scheme       : string,optional</span>
+<span class="sd">                       matplotlib scheme to be used</span>
+<span class="sd">                       default is &#39;quantiles&#39;</span>
+<span class="sd">        k            : int, optional</span>
+<span class="sd">                       number of bins to graph. k may be ignored</span>
+<span class="sd">                       or unnecessary for some schemes, like headtailbreaks, maxp, and maximum_breaks</span>
+<span class="sd">                       Default is 5.</span>
+<span class="sd">        legend       : bool, optional</span>
+<span class="sd">                       whether to display a legend on the plot</span>
+<span class="sd">        categorical  : bool, optional</span>
+<span class="sd">                       whether the data should be plotted as categorical as opposed to continuous</span>
+<span class="sd">        save_fig     : str, optional</span>
+<span class="sd">                       path to save figure if desired.</span>
+<span class="sd">        dpi          : int, optional</span>
+<span class="sd">                       dpi of the saved image if save_fig=True</span>
+<span class="sd">                       default is 500</span>
+<span class="sd">        legend_kwds  : dictionary, optional</span>
+<span class="sd">                       parameters for the legend</span>
+<span class="sd">                       Default is 1 column on the bottom of the graph.</span>
+<span class="sd">        ncols        : int, optional</span>
+<span class="sd">                       number of columns in the figure</span>
+<span class="sd">                       if passing ncols, nrows must also be passed</span>
+<span class="sd">                       default is None</span>
+<span class="sd">        nrows        : int, optional</span>
+<span class="sd">                       number of rows in the figure</span>
+<span class="sd">                       if passing nrows, ncols must also be passed</span>
+<span class="sd">                       default is None</span>
+<span class="sd">        ctxmap       : contextily map provider, optional</span>
+<span class="sd">                       contextily basemap. Set to False for no basemap.</span>
+<span class="sd">                       Default is OpenStreetMap.Mapnik</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># proplot needs to be used as a function-level import,</span>
+        <span class="c1"># as it influences all figures when imported at the top of the file</span>
+        <span class="kn">import</span> <span class="nn">proplot</span> <span class="k">as</span> <span class="nn">plot</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span>
+        <span class="k">if</span> <span class="n">categorical</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">cmap</span><span class="p">:</span>
+            <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Accent&#39;</span>
+        <span class="k">if</span> <span class="n">legend_kwds</span> <span class="o">==</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span>
+            <span class="n">legend_kwds</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ncols&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;loc&quot;</span><span class="p">:</span> <span class="s2">&quot;b&quot;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">ctxmap</span><span class="p">:</span>  <span class="c1"># need to convert crs to mercator before graphing</span>
+            <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">crs</span><span class="o">!=</span><span class="mi">3857</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3857</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">years</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">nrows</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ncols</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">unique</span><span class="p">()))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="n">ncols</span><span class="p">,</span> <span class="n">nrows</span><span class="o">=</span><span class="n">nrows</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">year</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+                <span class="nb">sorted</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+            <span class="p">):</span>  <span class="c1"># sort to prevent graphing out of order</span>
+                <span class="k">if</span> <span class="n">categorical</span><span class="p">:</span>
+                    <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">year</span> <span class="o">==</span> <span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                    <span class="n">column</span><span class="o">=</span><span class="n">column</span><span class="p">,</span>
+                    <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                    <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+                    <span class="n">legend</span><span class="o">=</span><span class="n">legend</span><span class="p">,</span>
+                    <span class="n">legend_kwds</span><span class="o">=</span><span class="n">legend_kwds</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">year</span> <span class="o">==</span> <span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                        <span class="n">column</span><span class="o">=</span><span class="n">column</span><span class="p">,</span>
+                        <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                        <span class="n">scheme</span><span class="o">=</span><span class="n">scheme</span><span class="p">,</span>
+                        <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span>
+                        <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+                        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+                        <span class="n">legend</span><span class="o">=</span><span class="n">legend</span><span class="p">,</span>
+                        <span class="n">legend_kwds</span><span class="o">=</span><span class="n">legend_kwds</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">if</span> <span class="n">ctxmap</span><span class="p">:</span>  <span class="c1"># need set basemap of each graph</span>
+                    <span class="n">ctx</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">source</span><span class="o">=</span><span class="n">ctxmap</span><span class="p">)</span>
+                <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">year</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">nrows</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ncols</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">years</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="n">ncols</span><span class="p">,</span> <span class="n">nrows</span><span class="o">=</span><span class="n">nrows</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">year</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+                <span class="n">years</span>
+            <span class="p">):</span>  <span class="c1"># display in whatever order list is passed in</span>
+                <span class="k">if</span> <span class="n">categorical</span><span class="p">:</span>
+                    <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">year</span> <span class="o">==</span> <span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                    <span class="n">column</span><span class="o">=</span><span class="n">column</span><span class="p">,</span>
+                    <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                    <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+                    <span class="n">legend</span><span class="o">=</span><span class="n">legend</span><span class="p">,</span>
+                    <span class="n">legend_kwds</span><span class="o">=</span><span class="n">legend_kwds</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">year</span> <span class="o">==</span> <span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                        <span class="n">column</span><span class="o">=</span><span class="n">column</span><span class="p">,</span>
+                        <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                        <span class="n">scheme</span><span class="o">=</span><span class="n">scheme</span><span class="p">,</span>
+                        <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span>
+                        <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+                        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+                        <span class="n">legend</span><span class="o">=</span><span class="n">legend</span><span class="p">,</span>
+                        <span class="n">legend_kwds</span><span class="o">=</span><span class="n">legend_kwds</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">if</span> <span class="n">ctxmap</span><span class="p">:</span>  <span class="c1"># need set basemap of each graph</span>
+                    <span class="n">ctx</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">source</span><span class="o">=</span><span class="n">ctxmap</span><span class="p">)</span>
+                <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">year</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">title</span><span class="p">:</span>  <span class="c1"># only use title when passed</span>
+            <span class="n">axs</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">suptitle</span><span class="o">=</span><span class="n">column</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">axs</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">suptitle</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+        <span class="n">axs</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">save_fig</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_fig</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">axs</span></div>
 
 <div class="viewcode-block" id="Community.transition"><a class="viewcode-back" href="../../generated/geosnap.Community.transition.html#geosnap.Community.transition">[docs]</a>    <span class="k">def</span> <span class="nf">transition</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">cluster_col</span><span class="p">,</span> <span class="n">time_var</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span> <span class="n">id_var</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span> <span class="n">w_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">permutations</span><span class="o">=</span><span class="mi">0</span>
@@ -926,7 +1571,9 @@
                         <span class="s2">&quot;Unable to determine whether boundary CRS is WGS84 &quot;</span>
                         <span class="s2">&quot;if this produces unexpected results, try reprojecting&quot;</span>
                     <span class="p">)</span>
-                <span class="n">gdf00</span> <span class="o">=</span> <span class="n">gdf00</span><span class="p">[</span><span class="n">gdf00</span><span class="o">.</span><span class="n">representative_point</span><span class="p">()</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">boundary</span><span class="o">.</span><span class="n">unary_union</span><span class="p">)]</span>
+                <span class="n">gdf00</span> <span class="o">=</span> <span class="n">gdf00</span><span class="p">[</span>
+                    <span class="n">gdf00</span><span class="o">.</span><span class="n">representative_point</span><span class="p">()</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">boundary</span><span class="o">.</span><span class="n">unary_union</span><span class="p">)</span>
+                <span class="p">]</span>
 
         <span class="n">gdf</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">blocks_2010</span><span class="p">(</span><span class="n">states</span><span class="o">=</span><span class="n">states</span><span class="p">,</span> <span class="n">fips</span><span class="o">=</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">allfips</span><span class="p">)))</span>
         <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">])</span>
@@ -967,7 +1614,7 @@
                     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span> <span class="s2">&quot;year&quot;</span><span class="p">])</span>
                     <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                    <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;{name.upper()} </span><span class="si">{year}</span><span class="s2"> not found!&quot;</span><span class="p">)</span>
+                    <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2"> not found!&quot;</span><span class="p">)</span>
                     <span class="k">pass</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="o">~</span><span class="n">out</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">duplicated</span><span class="p">(</span><span class="n">keep</span><span class="o">=</span><span class="s2">&quot;first&quot;</span><span class="p">)]</span>
@@ -1011,7 +1658,7 @@
     </p>
     <p>
         &copy; Copyright 2020, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
     </p>
   </div>
 </footer>
