@@ -449,7 +449,7 @@ class Community:
                 ctx.add_basemap(ax[1], source=ctxmap)
         else:
             ax[0].hist(self.models[model_name][year].silhouettes["silhouettes"])
-            sdf[df.year == year].join(
+            df[df.year == year].join(
                 self.models[model_name][year].silhouettes, on=[id_var, time_var]
             ).plot(
                 "silhouettes",
