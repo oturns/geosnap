@@ -558,12 +558,12 @@ class Community:
                 ctx.add_basemap(ax[0], source=ctxmap)
                 ctx.add_basemap(ax[1], source=ctxmap)
         else:
-            temp_df = operate.join(
+            temp_df = df.join(
                 self.models[model_name][year].nearest_labels, on=[id_var, time_var]
             )
             temp_df = temp_df[["nearest_label", time_var, "geometry", model_name]]
             temp_df.set_index(model_name, inplace=True)
-            operate[operate.year == year].plot(
+            df[df.year == year].plot(
                 model_name, ax=ax[0], alpha=alpha, legend=True, categorical=True
             )
             temp_df[temp_df.year == year].plot(
