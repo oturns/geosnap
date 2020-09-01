@@ -1118,12 +1118,12 @@ class Community:
                 plt.tight_layout()
                 plt.savefig(outpath, dpi=dpi)
 
-                _gif_from_path(
-                    tmpdirname,
-                    interval=interval,
-                    repeat_delay=repeat_delay,
-                    filename=filename,
-                    dpi=dpi,
+            _gif_from_path(
+                tmpdirname,
+                interval=interval,
+                repeat_delay=repeat_delay,
+                filename=filename,
+                dpi=dpi,
                 )
 
     def transition(
