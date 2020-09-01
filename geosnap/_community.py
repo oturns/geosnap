@@ -15,6 +15,12 @@ from .analyze import transition as _transition
 from .harmonize import harmonize as _harmonize
 from .io import _fips_filter, _fipstable, _from_db, get_lehd
 
+import mapclassify.classifiers as classifiers
+
+schemes = {}
+for classifier in classifiers.CLASSIFIERS:
+    schemes[classifier.lower()] = getattr(classifiers, classifier)
+
 
 class Community:
     """Spatial and tabular data for a collection of "neighborhoods" over time.
@@ -423,13 +429,11 @@ class Community:
                 self.models[model_name][year].sil_scores()
         f, ax = plt.subplots(1, 2, figsize=figsize)
         if ctxmap:  # need to convert crs to mercator before graphing
-            if df.crs!=3857:
+            if df.crs != 3857:
                 df = df.to_crs(epsg=3857)
         if not year:
             ax[0].hist(self.models[model_name].silhouettes["silhouettes"])
-            df.join(
-                self.models[model_name].silhouettes, on=[id_var, time_var]
-            ).plot(
+            df.join(self.models[model_name].silhouettes, on=[id_var, time_var]).plot(
                 "silhouettes",
                 ax=ax[1],
                 alpha=alpha,
@@ -522,7 +526,9 @@ class Community:
         """
         df = self.gdf.copy()
         if isinstance(self.models[model_name], dict) and not year:
-            raise('This model has unique results for each time period; You must supply a value for `year`')
+            raise (
+                "This model has unique results for each time period; You must supply a value for `year`"
+            )
 
         # If the user has already calculated, respect already calculated values
         if not year:
@@ -533,7 +539,7 @@ class Community:
                 self.models[model_name][year].nearest_label().astype(int)
         f, ax = plt.subplots(1, 2, figsize=figsize)
         if ctxmap:
-            if df.crs==3857:
+            if df.crs == 3857:
                 pass
             else:  # need to convert crs to mercator before graphing
                 df = df.to_crs(epsg=3857)
@@ -543,9 +549,7 @@ class Community:
             )
             temp_df = temp_df[["nearest_label", "geometry", model_name]]
             temp_df.set_index(model_name, inplace=True)
-            df.plot(
-                model_name, ax=ax[0], alpha=0.5, legend=True, categorical=True
-            )
+            df.plot(model_name, ax=ax[0], alpha=0.5, legend=True, categorical=True)
             temp_df.plot(
                 "nearest_label",
                 ax=ax[1],
@@ -826,7 +830,8 @@ class Community:
         years=[],
         scheme="quantiles",
         k=5,
-        cmap='Blues',
+        pooled=True,
+        cmap="Blues",
         legend=True,
         categorical=False,
         save_fig=None,
@@ -857,6 +862,11 @@ class Community:
                        number of bins to graph. k may be ignored
                        or unnecessary for some schemes, like headtailbreaks, maxp, and maximum_breaks
                        Default is 5.
+        pooled       : bool, optional
+                       whether the classification should be pooled across time periods or unique to each.
+                       E.g. with a 'quantile' scheme, pooled=True indicates that quantiles should be identified
+                       on the entire time series, whereas pooled=False indicates that they should be calculated
+                       independently for each time period
         legend       : bool, optional
                        whether to display a legend on the plot
         categorical  : bool, optional
@@ -884,14 +894,19 @@ class Community:
         # proplot needs to be used as a function-level import,
         # as it influences all figures when imported at the top of the file
         import proplot as plot
+
         df = self.gdf
         if categorical and not cmap:
-            cmap='Accent'
+            cmap = "Accent"
         if legend_kwds == "default":
             legend_kwds = {"ncols": 1, "loc": "b"}
         if ctxmap:  # need to convert crs to mercator before graphing
-            if df.crs!=3857:
+            if df.crs != 3857:
                 df = df.to_crs(epsg=3857)
+        if (
+            pooled
+        ):  # if pooling the classifier, create one from scratch and pass to user defined
+            classifier = schemes[scheme](self.gdf[column].values, k=k)
         if not years:
             if nrows is None and ncols is None:
                 f, axs = plot.subplots(ncols=len(df.year.unique()))
@@ -902,24 +917,37 @@ class Community:
             ):  # sort to prevent graphing out of order
                 if categorical:
                     df[df.year == year].plot(
-                    column=column,
-                    ax=axs[i],
-                    categorical=True,
-                    cmap=cmap,
-                    legend=legend,
-                    legend_kwds=legend_kwds,
-                )
-                else:
-                    df[df.year == year].plot(
                         column=column,
                         ax=axs[i],
-                        scheme=scheme,
-                        k=k,
+                        categorical=True,
                         cmap=cmap,
-                        **kwargs,
                         legend=legend,
                         legend_kwds=legend_kwds,
                     )
+                else:
+                    if pooled:
+                        df[df.year == year].plot(
+                            column=column,
+                            ax=axs[i],
+                            scheme="user_defined",
+                            classification_kwds={"bins": classifier.bins},
+                            k=k,
+                            cmap=cmap,
+                            **kwargs,
+                            legend=legend,
+                            legend_kwds=legend_kwds,
+                        )
+                    else:
+                        df[df.year == year].plot(
+                            column=column,
+                            ax=axs[i],
+                            scheme=scheme,
+                            k=k,
+                            cmap=cmap,
+                            **kwargs,
+                            legend=legend,
+                            legend_kwds=legend_kwds,
+                        )
                 if ctxmap:  # need set basemap of each graph
                     ctx.add_basemap(axs[i], source=ctxmap)
                 axs[i].format(title=year)
@@ -933,13 +961,13 @@ class Community:
             ):  # display in whatever order list is passed in
                 if categorical:
                     df[df.year == year].plot(
-                    column=column,
-                    ax=axs[i],
-                    categorical=True,
-                    cmap=cmap,
-                    legend=legend,
-                    legend_kwds=legend_kwds,
-                )
+                        column=column,
+                        ax=axs[i],
+                        categorical=True,
+                        cmap=cmap,
+                        legend=legend,
+                        legend_kwds=legend_kwds,
+                    )
                 else:
                     df[df.year == year].plot(
                         column=column,
