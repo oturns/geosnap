@@ -1,4 +1,4 @@
-﻿geosnap.datasets.blocks\_2010
+geosnap.datasets.blocks\_2010
 =============================
 
 .. currentmodule:: geosnap

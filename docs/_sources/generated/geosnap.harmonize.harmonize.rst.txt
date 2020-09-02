@@ -1,4 +1,4 @@
-﻿geosnap.harmonize.harmonize
+geosnap.harmonize.harmonize
 ===========================
 
 .. currentmodule:: geosnap.harmonize

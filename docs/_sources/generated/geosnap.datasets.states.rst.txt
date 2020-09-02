@@ -1,4 +1,4 @@
-﻿geosnap.datasets.states
+geosnap.datasets.states
 =======================
 
 .. currentmodule:: geosnap

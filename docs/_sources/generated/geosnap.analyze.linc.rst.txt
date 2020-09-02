@@ -1,4 +1,4 @@
-﻿geosnap.analyze.linc
+geosnap.analyze.linc
 ====================
 
 .. currentmodule:: geosnap.analyze

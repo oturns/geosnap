@@ -1,4 +1,4 @@
-﻿geosnap.analyze.analytics.kmeans
+geosnap.analyze.analytics.kmeans
 ================================
 
 .. currentmodule:: geosnap.analyze.analytics

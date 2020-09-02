@@ -1,0 +1,6 @@
+geosnap.util.fetch\_acs
+=======================
+
+.. currentmodule:: geosnap.util
+
+.. autofunction:: fetch_acs

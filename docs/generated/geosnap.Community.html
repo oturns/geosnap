@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>geosnap.Community &#8212; geosnap v0.4.0 Manual</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -74,6 +73,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../api.html#analyze-module">Analyze Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#harmonize-module">Harmonize Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#visualize-module">Visualize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#util-module">Util Module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
@@ -127,9 +127,9 @@
       
   <div class="section" id="geosnap-community">
 <h1>geosnap.Community<a class="headerlink" href="#geosnap-community" title="Permalink to this headline">¶</a></h1>
-<dl class="py class">
+<dl class="class">
 <dt id="geosnap.Community">
-<em class="property">class </em><code class="sig-prename descclassname">geosnap.</code><code class="sig-name descname">Community</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gdf</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">harmonized</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/_community.html#Community"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.Community" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">geosnap.</code><code class="sig-name descname">Community</code><span class="sig-paren">(</span><em class="sig-param">gdf=None</em>, <em class="sig-param">harmonized=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/_community.html#Community"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.Community" title="Permalink to this definition">¶</a></dt>
 <dd><p>Spatial and tabular data for a collection of “neighborhoods” over time.</p>
 <blockquote>
 <div><p>A community is a collection of “neighborhoods” represented by spatial
@@ -165,9 +165,9 @@ For cluster models, the model name will match a column on the Community.gdf.</p>
 </dl>
 </dd>
 </dl>
-<dl class="py method">
+<dl class="method">
 <dt id="geosnap.Community.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gdf</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">harmonized</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/_community.html#Community.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.Community.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">gdf=None</em>, <em class="sig-param">harmonized=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/_community.html#Community.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.Community.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize a new Community.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -195,52 +195,55 @@ consistent units over time</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#geosnap.Community.__init__" title="geosnap.Community.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([gdf, harmonized])</p></td>
 <td><p>Initialize a new Community.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="geosnap.Community.cluster.html#geosnap.Community.cluster" title="geosnap.Community.cluster"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cluster</span></code></a>([n_clusters, method, best_model, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="geosnap.Community.animate_timeseries.html#geosnap.Community.animate_timeseries" title="geosnap.Community.animate_timeseries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">animate_timeseries</span></code></a>(column[, title, …])</p></td>
+<td><p>Create an animated gif from a Community timeseries</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="geosnap.Community.cluster.html#geosnap.Community.cluster" title="geosnap.Community.cluster"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cluster</span></code></a>([n_clusters, method, best_model, …])</p></td>
 <td><p>Create a geodemographic typology by running a cluster analysis on the study area’s neighborhood attributes.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="geosnap.Community.cluster_spatial.html#geosnap.Community.cluster_spatial" title="geosnap.Community.cluster_spatial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cluster_spatial</span></code></a>([n_clusters, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="geosnap.Community.cluster_spatial.html#geosnap.Community.cluster_spatial" title="geosnap.Community.cluster_spatial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cluster_spatial</span></code></a>([n_clusters, …])</p></td>
 <td><p>Create a <em>spatial</em> geodemographic typology by running a cluster analysis on the metro area’s neighborhood attributes and including a contiguity constraint.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="geosnap.Community.from_census.html#geosnap.Community.from_census" title="geosnap.Community.from_census"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_census</span></code></a>([state_fips, county_fips, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="geosnap.Community.from_census.html#geosnap.Community.from_census" title="geosnap.Community.from_census"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_census</span></code></a>([state_fips, county_fips, …])</p></td>
 <td><p>Create a new Community from original vintage US Census data.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="geosnap.Community.from_geodataframes.html#geosnap.Community.from_geodataframes" title="geosnap.Community.from_geodataframes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_geodataframes</span></code></a>([gdfs])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="geosnap.Community.from_geodataframes.html#geosnap.Community.from_geodataframes" title="geosnap.Community.from_geodataframes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_geodataframes</span></code></a>([gdfs])</p></td>
 <td><p>Create a new Community from a list of geodataframes.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="geosnap.Community.from_lodes.html#geosnap.Community.from_lodes" title="geosnap.Community.from_lodes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_lodes</span></code></a>([state_fips, county_fips, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="geosnap.Community.from_lodes.html#geosnap.Community.from_lodes" title="geosnap.Community.from_lodes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_lodes</span></code></a>([state_fips, county_fips, …])</p></td>
 <td><p>Create a new Community from Census LEHD/LODES data.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="geosnap.Community.from_ltdb.html#geosnap.Community.from_ltdb" title="geosnap.Community.from_ltdb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_ltdb</span></code></a>([state_fips, county_fips, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="geosnap.Community.from_ltdb.html#geosnap.Community.from_ltdb" title="geosnap.Community.from_ltdb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_ltdb</span></code></a>([state_fips, county_fips, …])</p></td>
 <td><p>Create a new Community from LTDB data.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="geosnap.Community.from_ncdb.html#geosnap.Community.from_ncdb" title="geosnap.Community.from_ncdb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_ncdb</span></code></a>([state_fips, county_fips, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="geosnap.Community.from_ncdb.html#geosnap.Community.from_ncdb" title="geosnap.Community.from_ncdb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_ncdb</span></code></a>([state_fips, county_fips, …])</p></td>
 <td><p>Create a new Community from NCDB data.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="geosnap.Community.harmonize.html#geosnap.Community.harmonize" title="geosnap.Community.harmonize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">harmonize</span></code></a>([target_year, weights_method, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="geosnap.Community.harmonize.html#geosnap.Community.harmonize" title="geosnap.Community.harmonize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">harmonize</span></code></a>([target_year, weights_method, …])</p></td>
 <td><p>Standardize inconsistent boundaries into time-static ones.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="geosnap.Community.plot_boundary_silhouette.html#geosnap.Community.plot_boundary_silhouette" title="geosnap.Community.plot_boundary_silhouette"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_boundary_silhouette</span></code></a>([model_name, year, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="geosnap.Community.plot_boundary_silhouette.html#geosnap.Community.plot_boundary_silhouette" title="geosnap.Community.plot_boundary_silhouette"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_boundary_silhouette</span></code></a>([model_name, year, …])</p></td>
 <td><p>Returns a plot of the boundary_silhouettes of the model that is passed to it.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="geosnap.Community.plot_next_best_label.html#geosnap.Community.plot_next_best_label" title="geosnap.Community.plot_next_best_label"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_next_best_label</span></code></a>([model_name, year, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="geosnap.Community.plot_next_best_label.html#geosnap.Community.plot_next_best_label" title="geosnap.Community.plot_next_best_label"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_next_best_label</span></code></a>([model_name, year, …])</p></td>
 <td><p>Returns a plot of the nearest_labels of the model that is passed to it.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="geosnap.Community.plot_path_silhouette.html#geosnap.Community.plot_path_silhouette" title="geosnap.Community.plot_path_silhouette"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_path_silhouette</span></code></a>([model_name, year, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="geosnap.Community.plot_path_silhouette.html#geosnap.Community.plot_path_silhouette" title="geosnap.Community.plot_path_silhouette"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_path_silhouette</span></code></a>([model_name, year, …])</p></td>
 <td><p>Returns a plot of the path_silhouettes of the model that is passed to it.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="geosnap.Community.plot_silhouette.html#geosnap.Community.plot_silhouette" title="geosnap.Community.plot_silhouette"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_silhouette</span></code></a>([model_name, year])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="geosnap.Community.plot_silhouette.html#geosnap.Community.plot_silhouette" title="geosnap.Community.plot_silhouette"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_silhouette</span></code></a>([model_name, year])</p></td>
 <td><p>Returns a silhouette plot of the model that is passed to it.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="geosnap.Community.plot_silhouette_map.html#geosnap.Community.plot_silhouette_map" title="geosnap.Community.plot_silhouette_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_silhouette_map</span></code></a>([model_name, year, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="geosnap.Community.plot_silhouette_map.html#geosnap.Community.plot_silhouette_map" title="geosnap.Community.plot_silhouette_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_silhouette_map</span></code></a>([model_name, year, …])</p></td>
 <td><p>Returns a plot of the silhouette scores of the model that is passed to it</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="geosnap.Community.plot_timeseries.html#geosnap.Community.plot_timeseries" title="geosnap.Community.plot_timeseries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_timeseries</span></code></a>(column[, title, years, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="geosnap.Community.plot_timeseries.html#geosnap.Community.plot_timeseries" title="geosnap.Community.plot_timeseries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_timeseries</span></code></a>(column[, title, years, …])</p></td>
 <td><p>Plot an attribute from a Community arranged as a timeseries.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="geosnap.Community.sequence.html#geosnap.Community.sequence" title="geosnap.Community.sequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sequence</span></code></a>(cluster_col[, seq_clusters, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="geosnap.Community.sequence.html#geosnap.Community.sequence" title="geosnap.Community.sequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sequence</span></code></a>(cluster_col[, seq_clusters, …])</p></td>
 <td><p>Pairwise sequence analysis to evaluate the distance/dissimilarity between every two neighborhood sequences.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="geosnap.Community.transition.html#geosnap.Community.transition" title="geosnap.Community.transition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transition</span></code></a>(cluster_col[, time_var, id_var, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="geosnap.Community.transition.html#geosnap.Community.transition" title="geosnap.Community.transition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transition</span></code></a>(cluster_col[, time_var, id_var, …])</p></td>
 <td><p>(Spatial) Markov approach to transitional dynamics of neighborhoods.</p></td>
 </tr>
 </tbody>
@@ -269,7 +272,7 @@ consistent units over time</p>
     </p>
     <p>
         &copy; Copyright 2020, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
     </p>
   </div>
 </footer>

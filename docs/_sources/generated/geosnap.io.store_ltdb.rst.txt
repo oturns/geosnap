@@ -1,4 +1,4 @@
-﻿geosnap.io.store\_ltdb
+geosnap.io.store\_ltdb
 ======================
 
 .. currentmodule:: geosnap.io

@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>geosnap._community &#8212; geosnap v0.4.0 Manual</title>
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -72,6 +71,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#analyze-module">Analyze Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#harmonize-module">Harmonize Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#visualize-module">Visualize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#util-module">Util Module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../references.html">References</a></li>
@@ -122,10 +122,13 @@
       
   <h1>Source code for geosnap._community</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;A Community is a thin wrapper around a long-form time-series geodataframe.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">PurePath</span>
 <span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
 
 <span class="kn">import</span> <span class="nn">contextily</span> <span class="k">as</span> <span class="nn">ctx</span>
 <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="kn">import</span> <span class="nn">mapclassify.classifiers</span> <span class="k">as</span> <span class="nn">classifiers</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">scikitplot</span> <span class="k">as</span> <span class="nn">skplt</span>
@@ -137,6 +140,11 @@
 <span class="kn">from</span> <span class="nn">.analyze</span> <span class="kn">import</span> <span class="n">transition</span> <span class="k">as</span> <span class="n">_transition</span>
 <span class="kn">from</span> <span class="nn">.harmonize</span> <span class="kn">import</span> <span class="n">harmonize</span> <span class="k">as</span> <span class="n">_harmonize</span>
 <span class="kn">from</span> <span class="nn">.io</span> <span class="kn">import</span> <span class="n">_fips_filter</span><span class="p">,</span> <span class="n">_fipstable</span><span class="p">,</span> <span class="n">_from_db</span><span class="p">,</span> <span class="n">get_lehd</span>
+<span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">gif_from_path</span> <span class="k">as</span> <span class="n">_gif_from_path</span>
+
+<span class="n">schemes</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">classifier</span> <span class="ow">in</span> <span class="n">classifiers</span><span class="o">.</span><span class="n">CLASSIFIERS</span><span class="p">:</span>
+    <span class="n">schemes</span><span class="p">[</span><span class="n">classifier</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">classifiers</span><span class="p">,</span> <span class="n">classifier</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="Community"><a class="viewcode-back" href="../../generated/geosnap.Community.html#geosnap.Community">[docs]</a><span class="k">class</span> <span class="nc">Community</span><span class="p">:</span>
@@ -546,13 +554,11 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">sil_scores</span><span class="p">()</span>
         <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ctxmap</span><span class="p">:</span>  <span class="c1"># need to convert crs to mercator before graphing</span>
-            <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">crs</span><span class="o">!=</span><span class="mi">3857</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">crs</span> <span class="o">!=</span> <span class="mi">3857</span><span class="p">:</span>
                 <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3857</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">year</span><span class="p">:</span>
             <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span><span class="o">.</span><span class="n">silhouettes</span><span class="p">[</span><span class="s2">&quot;silhouettes&quot;</span><span class="p">])</span>
-            <span class="n">df</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span><span class="o">.</span><span class="n">silhouettes</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="n">id_var</span><span class="p">,</span> <span class="n">time_var</span><span class="p">]</span>
-            <span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span><span class="o">.</span><span class="n">silhouettes</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="n">id_var</span><span class="p">,</span> <span class="n">time_var</span><span class="p">])</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
                 <span class="s2">&quot;silhouettes&quot;</span><span class="p">,</span>
                 <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                 <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
@@ -566,7 +572,7 @@
                 <span class="n">ctx</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">source</span><span class="o">=</span><span class="n">ctxmap</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">silhouettes</span><span class="p">[</span><span class="s2">&quot;silhouettes&quot;</span><span class="p">])</span>
-            <span class="n">sdf</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">year</span> <span class="o">==</span> <span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">year</span> <span class="o">==</span> <span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">silhouettes</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="n">id_var</span><span class="p">,</span> <span class="n">time_var</span><span class="p">]</span>
             <span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
                 <span class="s2">&quot;silhouettes&quot;</span><span class="p">,</span>
@@ -645,7 +651,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">year</span><span class="p">:</span>
-            <span class="k">raise</span><span class="p">(</span><span class="s1">&#39;This model has unique results for each time period; You must supply a value for `year`&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="p">(</span>
+                <span class="s2">&quot;This model has unique results for each time period; You must supply a value for `year`&quot;</span>
+            <span class="p">)</span>
 
         <span class="c1"># If the user has already calculated, respect already calculated values</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">year</span><span class="p">:</span>
@@ -656,7 +664,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">][</span><span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">nearest_label</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
         <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ctxmap</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">crs</span><span class="o">==</span><span class="mi">3857</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">crs</span> <span class="o">==</span> <span class="mi">3857</span><span class="p">:</span>
                 <span class="k">pass</span>
             <span class="k">else</span><span class="p">:</span>  <span class="c1"># need to convert crs to mercator before graphing</span>
                 <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3857</span><span class="p">)</span>
@@ -666,9 +674,7 @@
             <span class="p">)</span>
             <span class="n">temp_df</span> <span class="o">=</span> <span class="n">temp_df</span><span class="p">[[</span><span class="s2">&quot;nearest_label&quot;</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="n">model_name</span><span class="p">]]</span>
             <span class="n">temp_df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-                <span class="n">model_name</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span>
-            <span class="p">)</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">temp_df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
                 <span class="s2">&quot;nearest_label&quot;</span><span class="p">,</span>
                 <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
@@ -946,18 +952,20 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">column</span><span class="p">,</span>
         <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="n">years</span><span class="o">=</span><span class="p">[],</span>
+        <span class="n">years</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span>
         <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-        <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Blues&#39;</span><span class="p">,</span>
+        <span class="n">pooled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Blues&quot;</span><span class="p">,</span>
         <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">categorical</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">save_fig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
         <span class="n">legend_kwds</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+        <span class="n">figsize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">ncols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">nrows</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">ctxmap</span><span class="o">=</span><span class="n">ctx</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">OpenStreetMap</span><span class="o">.</span><span class="n">Mapnik</span><span class="p">,</span>
+        <span class="n">ctxmap</span><span class="o">=</span><span class="n">ctx</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">TonerLite</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Plot an attribute from a Community arranged as a timeseries.</span>
@@ -980,6 +988,11 @@
 <span class="sd">                       number of bins to graph. k may be ignored</span>
 <span class="sd">                       or unnecessary for some schemes, like headtailbreaks, maxp, and maximum_breaks</span>
 <span class="sd">                       Default is 5.</span>
+<span class="sd">        pooled       : bool, optional</span>
+<span class="sd">                       whether the classification should be pooled across time periods or unique to each.</span>
+<span class="sd">                       E.g. with a &#39;quantile&#39; scheme, pooled=True indicates that quantiles should be identified</span>
+<span class="sd">                       on the entire time series, whereas pooled=False indicates that they should be calculated</span>
+<span class="sd">                       independently for each time period</span>
 <span class="sd">        legend       : bool, optional</span>
 <span class="sd">                       whether to display a legend on the plot</span>
 <span class="sd">        categorical  : bool, optional</span>
@@ -1000,49 +1013,75 @@
 <span class="sd">                       number of rows in the figure</span>
 <span class="sd">                       if passing nrows, ncols must also be passed</span>
 <span class="sd">                       default is None</span>
+<span class="sd">        figsize      : tuple, optional</span>
+<span class="sd">                       the desired size of the matplotlib figure</span>
 <span class="sd">        ctxmap       : contextily map provider, optional</span>
 <span class="sd">                       contextily basemap. Set to False for no basemap.</span>
-<span class="sd">                       Default is OpenStreetMap.Mapnik</span>
+<span class="sd">                       Default is Stamen.TonerLite</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># proplot needs to be used as a function-level import,</span>
         <span class="c1"># as it influences all figures when imported at the top of the file</span>
         <span class="kn">import</span> <span class="nn">proplot</span> <span class="k">as</span> <span class="nn">plot</span>
+
         <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span>
         <span class="k">if</span> <span class="n">categorical</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">cmap</span><span class="p">:</span>
-            <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Accent&#39;</span>
+            <span class="n">cmap</span> <span class="o">=</span> <span class="s2">&quot;Accent&quot;</span>
         <span class="k">if</span> <span class="n">legend_kwds</span> <span class="o">==</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span>
             <span class="n">legend_kwds</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ncols&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;loc&quot;</span><span class="p">:</span> <span class="s2">&quot;b&quot;</span><span class="p">}</span>
         <span class="k">if</span> <span class="n">ctxmap</span><span class="p">:</span>  <span class="c1"># need to convert crs to mercator before graphing</span>
-            <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">crs</span><span class="o">!=</span><span class="mi">3857</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">crs</span> <span class="o">!=</span> <span class="mi">3857</span><span class="p">:</span>
                 <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3857</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">pooled</span>
+        <span class="p">):</span>  <span class="c1"># if pooling the classifier, create one from scratch and pass to user defined</span>
+            <span class="n">classifier</span> <span class="o">=</span> <span class="n">schemes</span><span class="p">[</span><span class="n">scheme</span><span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">years</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">nrows</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ncols</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">unique</span><span class="p">()))</span>
+                <span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">unique</span><span class="p">()),</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="n">ncols</span><span class="p">,</span> <span class="n">nrows</span><span class="o">=</span><span class="n">nrows</span><span class="p">)</span>
+                <span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="n">ncols</span><span class="p">,</span> <span class="n">nrows</span><span class="o">=</span><span class="n">nrows</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">year</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
                 <span class="nb">sorted</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
             <span class="p">):</span>  <span class="c1"># sort to prevent graphing out of order</span>
                 <span class="k">if</span> <span class="n">categorical</span><span class="p">:</span>
                     <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">year</span> <span class="o">==</span> <span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-                    <span class="n">column</span><span class="o">=</span><span class="n">column</span><span class="p">,</span>
-                    <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
-                    <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                    <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
-                    <span class="n">legend</span><span class="o">=</span><span class="n">legend</span><span class="p">,</span>
-                    <span class="n">legend_kwds</span><span class="o">=</span><span class="n">legend_kwds</span><span class="p">,</span>
-                <span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">year</span> <span class="o">==</span> <span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
                         <span class="n">column</span><span class="o">=</span><span class="n">column</span><span class="p">,</span>
                         <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
-                        <span class="n">scheme</span><span class="o">=</span><span class="n">scheme</span><span class="p">,</span>
-                        <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span>
+                        <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                         <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
-                        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
                         <span class="n">legend</span><span class="o">=</span><span class="n">legend</span><span class="p">,</span>
                         <span class="n">legend_kwds</span><span class="o">=</span><span class="n">legend_kwds</span><span class="p">,</span>
+                        <span class="n">missing_kwds</span><span class="o">=</span><span class="p">{</span>
+                            <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;lightgrey&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;edgecolor&quot;</span><span class="p">:</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;hatch&quot;</span><span class="p">:</span> <span class="s2">&quot;///&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Missing values&quot;</span><span class="p">,</span>
+                        <span class="p">},</span>
                     <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">pooled</span><span class="p">:</span>
+                        <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">year</span> <span class="o">==</span> <span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                            <span class="n">column</span><span class="o">=</span><span class="n">column</span><span class="p">,</span>
+                            <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                            <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;user_defined&quot;</span><span class="p">,</span>
+                            <span class="n">classification_kwds</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;bins&quot;</span><span class="p">:</span> <span class="n">classifier</span><span class="o">.</span><span class="n">bins</span><span class="p">},</span>
+                            <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span>
+                            <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+                            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+                            <span class="n">legend</span><span class="o">=</span><span class="n">legend</span><span class="p">,</span>
+                            <span class="n">legend_kwds</span><span class="o">=</span><span class="n">legend_kwds</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">year</span> <span class="o">==</span> <span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                            <span class="n">column</span><span class="o">=</span><span class="n">column</span><span class="p">,</span>
+                            <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                            <span class="n">scheme</span><span class="o">=</span><span class="n">scheme</span><span class="p">,</span>
+                            <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span>
+                            <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+                            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+                            <span class="n">legend</span><span class="o">=</span><span class="n">legend</span><span class="p">,</span>
+                            <span class="n">legend_kwds</span><span class="o">=</span><span class="n">legend_kwds</span><span class="p">,</span>
+                        <span class="p">)</span>
                 <span class="k">if</span> <span class="n">ctxmap</span><span class="p">:</span>  <span class="c1"># need set basemap of each graph</span>
                     <span class="n">ctx</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">source</span><span class="o">=</span><span class="n">ctxmap</span><span class="p">)</span>
                 <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">year</span><span class="p">)</span>
@@ -1056,13 +1095,13 @@
             <span class="p">):</span>  <span class="c1"># display in whatever order list is passed in</span>
                 <span class="k">if</span> <span class="n">categorical</span><span class="p">:</span>
                     <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">year</span> <span class="o">==</span> <span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-                    <span class="n">column</span><span class="o">=</span><span class="n">column</span><span class="p">,</span>
-                    <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
-                    <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                    <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
-                    <span class="n">legend</span><span class="o">=</span><span class="n">legend</span><span class="p">,</span>
-                    <span class="n">legend_kwds</span><span class="o">=</span><span class="n">legend_kwds</span><span class="p">,</span>
-                <span class="p">)</span>
+                        <span class="n">column</span><span class="o">=</span><span class="n">column</span><span class="p">,</span>
+                        <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                        <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+                        <span class="n">legend</span><span class="o">=</span><span class="n">legend</span><span class="p">,</span>
+                        <span class="n">legend_kwds</span><span class="o">=</span><span class="n">legend_kwds</span><span class="p">,</span>
+                    <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">year</span> <span class="o">==</span> <span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
                         <span class="n">column</span><span class="o">=</span><span class="n">column</span><span class="p">,</span>
@@ -1087,6 +1126,117 @@
         <span class="k">if</span> <span class="n">save_fig</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_fig</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">axs</span></div>
+
+<div class="viewcode-block" id="Community.animate_timeseries"><a class="viewcode-back" href="../../generated/geosnap.Community.animate_timeseries.html#geosnap.Community.animate_timeseries">[docs]</a>    <span class="k">def</span> <span class="nf">animate_timeseries</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">column</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">time_col</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span>
+        <span class="n">time_periods</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span>
+        <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Blues&quot;</span><span class="p">,</span>
+        <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>
+        <span class="n">categorical</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+        <span class="n">fps</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">interval</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+        <span class="n">repeat_delay</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+        <span class="n">title_fontsize</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
+        <span class="n">subtitle_fontsize</span><span class="o">=</span><span class="mi">38</span><span class="p">,</span>
+        <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span>
+        <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">ctxmap</span><span class="o">=</span><span class="n">ctx</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">TonerLite</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create an animated gif from a Community timeseries</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        column       : str</span>
+<span class="sd">                       column to be graphed in a time series</span>
+<span class="sd">        title        : str, optional</span>
+<span class="sd">                       desired title of figure</span>
+<span class="sd">        time_col     : str, required</span>
+<span class="sd">                        column on the Community.gdf that stores time periods</span>
+<span class="sd">        time_periods:  list, optional</span>
+<span class="sd">                        subset of time periods to include in the animation. If none, then all times will be used</span>
+<span class="sd">        scheme       : string, optional</span>
+<span class="sd">                       matplotlib scheme to be used</span>
+<span class="sd">                       default is &#39;quantiles&#39;</span>
+<span class="sd">        k            : int, optional</span>
+<span class="sd">                       number of bins to graph. k may be ignored</span>
+<span class="sd">                       or unnecessary for some schemes, like headtailbreaks, maxp, and maximum_breaks</span>
+<span class="sd">                       Default is 5.</span>
+<span class="sd">        legend       : bool, optional</span>
+<span class="sd">                       whether to display a legend on the plot</span>
+<span class="sd">        categorical  : bool, optional</span>
+<span class="sd">                       whether the data should be plotted as categorical as opposed to continuous</span>
+<span class="sd">        alpha:       : float, optional</span>
+<span class="sd">                       transparency parameter passed to matplotlib</span>
+<span class="sd">        dpi          : int, optional</span>
+<span class="sd">                       dpi of the saved image if save_fig=True</span>
+<span class="sd">                       default is 500</span>
+<span class="sd">        figsize      : tuple, optional</span>
+<span class="sd">                       the desired size of the matplotlib figure</span>
+<span class="sd">        ctxmap       : contextily map provider, optional</span>
+<span class="sd">                       contextily basemap. Set to False for no basemap.</span>
+<span class="sd">        figsize      : tuple, optional</span>
+<span class="sd">                        output figure size passed to matplotlib.pyplot</span>
+<span class="sd">        fps          : float, optional</span>
+<span class="sd">                        frames per second</span>
+<span class="sd">        interval     : int, optional</span>
+<span class="sd">                        interval between frames in miliseconds, default 500</span>
+<span class="sd">        repeat_delay : int, optional</span>
+<span class="sd">                        time before animation repeats in miliseconds, default 1000</span>
+<span class="sd">        filename     : str, required</span>
+<span class="sd">                        output file name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">gdf</span><span class="o">.</span><span class="n">crs</span> <span class="o">==</span> <span class="mi">3857</span><span class="p">:</span>
+            <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="mi">3857</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">time_periods</span><span class="p">:</span>
+            <span class="n">time_periods</span> <span class="o">=</span> <span class="n">gdf</span><span class="p">[</span><span class="n">time_col</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdirname</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">time</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">time_periods</span><span class="p">):</span>
+                <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+                <span class="n">outpath</span> <span class="o">=</span> <span class="n">PurePath</span><span class="p">(</span><span class="n">tmpdirname</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;file_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">categorical</span><span class="p">:</span>
+                    <span class="n">gdf</span><span class="p">[</span><span class="n">gdf</span><span class="p">[</span><span class="n">time_col</span><span class="p">]</span> <span class="o">==</span> <span class="n">time</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                        <span class="n">column</span><span class="p">,</span>
+                        <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+                        <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+                        <span class="n">legend</span><span class="o">=</span><span class="n">legend</span><span class="p">,</span>
+                        <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">classifier</span> <span class="o">=</span> <span class="n">schemes</span><span class="p">[</span><span class="n">scheme</span><span class="p">](</span><span class="n">gdf</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+                    <span class="n">gdf</span><span class="p">[</span><span class="n">gdf</span><span class="p">[</span><span class="n">time_col</span><span class="p">]</span> <span class="o">==</span> <span class="n">time</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                        <span class="n">column</span><span class="p">,</span>
+                        <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;user_defined&quot;</span><span class="p">,</span>
+                        <span class="n">classification_kwds</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;bins&quot;</span><span class="p">:</span> <span class="n">classifier</span><span class="o">.</span><span class="n">bins</span><span class="p">},</span>
+                        <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span>
+                        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+                        <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+                        <span class="n">legend</span><span class="o">=</span><span class="n">legend</span><span class="p">,</span>
+                        <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="n">ctx</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">ctxmap</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">time</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">subtitle_fontsize</span><span class="p">)</span>
+                <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">title_fontsize</span><span class="p">)</span>
+
+                <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">outpath</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
+
+            <span class="n">_gif_from_path</span><span class="p">(</span>
+                <span class="n">tmpdirname</span><span class="p">,</span>
+                <span class="n">interval</span><span class="o">=</span><span class="n">interval</span><span class="p">,</span>
+                <span class="n">repeat_delay</span><span class="o">=</span><span class="n">repeat_delay</span><span class="p">,</span>
+                <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span>
+                <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span>
+                <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Community.transition"><a class="viewcode-back" href="../../generated/geosnap.Community.transition.html#geosnap.Community.transition">[docs]</a>    <span class="k">def</span> <span class="nf">transition</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">cluster_col</span><span class="p">,</span> <span class="n">time_var</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span> <span class="n">id_var</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span> <span class="n">w_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">permutations</span><span class="o">=</span><span class="mi">0</span>
@@ -1658,7 +1808,7 @@
     </p>
     <p>
         &copy; Copyright 2020, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
     </p>
   </div>
 </footer>

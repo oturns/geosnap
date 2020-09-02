@@ -1,4 +1,4 @@
-﻿geosnap.Community.transition
+geosnap.Community.transition
 ============================
 
 .. currentmodule:: geosnap

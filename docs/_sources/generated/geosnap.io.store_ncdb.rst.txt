@@ -1,4 +1,4 @@
-﻿geosnap.io.store\_ncdb
+geosnap.io.store\_ncdb
 ======================
 
 .. currentmodule:: geosnap.io

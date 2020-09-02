@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>geosnap.Community.plot_timeseries &#8212; geosnap v0.4.0 Manual</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -74,6 +73,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../api.html#analyze-module">Analyze Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#harmonize-module">Harmonize Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#visualize-module">Visualize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#util-module">Util Module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
@@ -127,9 +127,9 @@
       
   <div class="section" id="geosnap-community-plot-timeseries">
 <h1>geosnap.Community.plot_timeseries<a class="headerlink" href="#geosnap-community-plot-timeseries" title="Permalink to this headline">¶</a></h1>
-<dl class="py method">
+<dl class="method">
 <dt id="geosnap.Community.plot_timeseries">
-<code class="sig-prename descclassname">Community.</code><code class="sig-name descname">plot_timeseries</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">column</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">years</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">scheme</span><span class="o">=</span><span class="default_value">'quantiles'</span></em>, <em class="sig-param"><span class="n">k</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">cmap</span><span class="o">=</span><span class="default_value">'Blues'</span></em>, <em class="sig-param"><span class="n">legend</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">categorical</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">save_fig</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dpi</span><span class="o">=</span><span class="default_value">500</span></em>, <em class="sig-param"><span class="n">legend_kwds</span><span class="o">=</span><span class="default_value">'default'</span></em>, <em class="sig-param"><span class="n">ncols</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nrows</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ctxmap</span><span class="o">=</span><span class="default_value">{'attribution': '(C) OpenStreetMap contributors', 'max_zoom': 19, 'name': 'OpenStreetMap.Mapnik', 'url': 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'}</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/_community.html#Community.plot_timeseries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.Community.plot_timeseries" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">Community.</code><code class="sig-name descname">plot_timeseries</code><span class="sig-paren">(</span><em class="sig-param">column</em>, <em class="sig-param">title=''</em>, <em class="sig-param">years=None</em>, <em class="sig-param">scheme='quantiles'</em>, <em class="sig-param">k=5</em>, <em class="sig-param">pooled=True</em>, <em class="sig-param">cmap='Blues'</em>, <em class="sig-param">legend=True</em>, <em class="sig-param">categorical=False</em>, <em class="sig-param">save_fig=None</em>, <em class="sig-param">dpi=500</em>, <em class="sig-param">legend_kwds='default'</em>, <em class="sig-param">figsize=None</em>, <em class="sig-param">ncols=None</em>, <em class="sig-param">nrows=None</em>, <em class="sig-param">ctxmap={'attribution': 'Map tiles by Stamen Design</em>, <em class="sig-param">CC BY 3.0 -- Map data (C) OpenStreetMap contributors'</em>, <em class="sig-param">'ext': 'png'</em>, <em class="sig-param">'max_zoom': 20</em>, <em class="sig-param">'min_zoom': 0</em>, <em class="sig-param">'name': 'Stamen.TonerLite'</em>, <em class="sig-param">'subdomains': 'abcd'</em>, <em class="sig-param">'url': 'https://stamen-tiles-{s}.a.ssl.fastly.net/{variant}/{z}/{x}/{y}{r}.{ext}'</em>, <em class="sig-param">'variant': 'toner-lite'}</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/_community.html#Community.plot_timeseries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.Community.plot_timeseries" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot an attribute from a Community arranged as a timeseries.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -149,6 +149,11 @@ default is ‘quantiles’</p>
 <dt><strong>k</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">int</span></code></a>, optional</span></dt><dd><p>number of bins to graph. k may be ignored
 or unnecessary for some schemes, like headtailbreaks, maxp, and maximum_breaks
 Default is 5.</p>
+</dd>
+<dt><strong>pooled</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bltin-boolean-values" title="(in Python v3.8)"><span class="xref std std-ref">bool</span></a>, optional</span></dt><dd><p>whether the classification should be pooled across time periods or unique to each.
+E.g. with a ‘quantile’ scheme, pooled=True indicates that quantiles should be identified
+on the entire time series, whereas pooled=False indicates that they should be calculated
+independently for each time period</p>
 </dd>
 <dt><strong>legend</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bltin-boolean-values" title="(in Python v3.8)"><span class="xref std std-ref">bool</span></a>, optional</span></dt><dd><p>whether to display a legend on the plot</p>
 </dd>
@@ -170,8 +175,10 @@ default is None</p>
 if passing nrows, ncols must also be passed
 default is None</p>
 </dd>
+<dt><strong>figsize</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">tuple</span></code></a>, optional</span></dt><dd><p>the desired size of the matplotlib figure</p>
+</dd>
 <dt><strong>ctxmap</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">contextily</span></code> <a class="reference external" href="https://docs.python.org/3/library/functions.html#map" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">map</span></code></a> <code class="xref py py-obj docutils literal notranslate"><span class="pre">provider</span></code>, optional</span></dt><dd><p>contextily basemap. Set to False for no basemap.
-Default is OpenStreetMap.Mapnik</p>
+Default is Stamen.TonerLite</p>
 </dd>
 </dl>
 </dd>
@@ -200,7 +207,7 @@ Default is OpenStreetMap.Mapnik</p>
     </p>
     <p>
         &copy; Copyright 2020, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
     </p>
   </div>
 </footer>

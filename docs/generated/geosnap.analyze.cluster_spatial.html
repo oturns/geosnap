@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>geosnap.analyze.cluster_spatial &#8212; geosnap v0.4.0 Manual</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -74,6 +73,7 @@
 <li class="toctree-l2 current"><a class="reference internal" href="../api.html#analyze-module">Analyze Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#harmonize-module">Harmonize Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#visualize-module">Visualize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#util-module">Util Module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
@@ -127,9 +127,9 @@
       
   <div class="section" id="geosnap-analyze-cluster-spatial">
 <h1>geosnap.analyze.cluster_spatial<a class="headerlink" href="#geosnap-analyze-cluster-spatial" title="Permalink to this headline">¶</a></h1>
-<dl class="py function">
+<dl class="function">
 <dt id="geosnap.analyze.cluster_spatial">
-<code class="sig-prename descclassname">geosnap.analyze.</code><code class="sig-name descname">cluster_spatial</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gdf</span></em>, <em class="sig-param"><span class="n">n_clusters</span><span class="o">=</span><span class="default_value">6</span></em>, <em class="sig-param"><span class="n">spatial_weights</span><span class="o">=</span><span class="default_value">'rook'</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">columns</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">threshold_variable</span><span class="o">=</span><span class="default_value">'count'</span></em>, <em class="sig-param"><span class="n">threshold</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">time_var</span><span class="o">=</span><span class="default_value">'year'</span></em>, <em class="sig-param"><span class="n">id_var</span><span class="o">=</span><span class="default_value">'geoid'</span></em>, <em class="sig-param"><span class="n">scaler</span><span class="o">=</span><span class="default_value">'std'</span></em>, <em class="sig-param"><span class="n">weights_kwargs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/analyze/analytics.html#cluster_spatial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.analyze.cluster_spatial" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">geosnap.analyze.</code><code class="sig-name descname">cluster_spatial</code><span class="sig-paren">(</span><em class="sig-param">gdf</em>, <em class="sig-param">n_clusters=6</em>, <em class="sig-param">spatial_weights='rook'</em>, <em class="sig-param">method=None</em>, <em class="sig-param">columns=None</em>, <em class="sig-param">threshold_variable='count'</em>, <em class="sig-param">threshold=10</em>, <em class="sig-param">time_var='year'</em>, <em class="sig-param">id_var='geoid'</em>, <em class="sig-param">scaler='std'</em>, <em class="sig-param">weights_kwargs=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/analyze/analytics.html#cluster_spatial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.analyze.cluster_spatial" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a <em>spatial</em> geodemographic typology by running a cluster
 analysis on the metro area’s neighborhood attributes and including a
 contiguity constraint.</p>
@@ -208,7 +208,7 @@ and spatial weights matrix</p>
     </p>
     <p>
         &copy; Copyright 2020, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
     </p>
   </div>
 </footer>
