@@ -1,4 +1,4 @@
-﻿geosnap.Community.plot\_silhouette\_map
+geosnap.Community.plot\_silhouette\_map
 =======================================
 
 .. currentmodule:: geosnap

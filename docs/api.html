@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>API reference &#8212; geosnap v0.4.0 Manual</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -74,6 +73,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#analyze-module">Analyze Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#harmonize-module">Harmonize Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#visualize-module">Visualize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#util-module">Util Module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
@@ -121,6 +121,7 @@
 </li>
 <li><a class="reference internal" href="#harmonize-module">Harmonize Module</a></li>
 <li><a class="reference internal" href="#visualize-module">Visualize Module</a></li>
+<li><a class="reference internal" href="#util-module">Util Module</a></li>
 </ul>
 </li>
 </ul>
@@ -315,22 +316,25 @@ then using analytical methods upon the community</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.Community.plot_boundary_silhouette.html#geosnap.Community.plot_boundary_silhouette" title="geosnap.Community.plot_boundary_silhouette"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.plot_boundary_silhouette</span></code></a>([…])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.Community.animate_timeseries.html#geosnap.Community.animate_timeseries" title="geosnap.Community.animate_timeseries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.animate_timeseries</span></code></a>(column[, …])</p></td>
+<td><p>Create an animated gif from a Community timeseries</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.Community.plot_boundary_silhouette.html#geosnap.Community.plot_boundary_silhouette" title="geosnap.Community.plot_boundary_silhouette"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.plot_boundary_silhouette</span></code></a>([…])</p></td>
 <td><p>Returns a plot of the boundary_silhouettes of the model that is passed to it.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.Community.plot_next_best_label.html#geosnap.Community.plot_next_best_label" title="geosnap.Community.plot_next_best_label"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.plot_next_best_label</span></code></a>([model_name, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.Community.plot_next_best_label.html#geosnap.Community.plot_next_best_label" title="geosnap.Community.plot_next_best_label"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.plot_next_best_label</span></code></a>([model_name, …])</p></td>
 <td><p>Returns a plot of the nearest_labels of the model that is passed to it.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.Community.plot_silhouette.html#geosnap.Community.plot_silhouette" title="geosnap.Community.plot_silhouette"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.plot_silhouette</span></code></a>([model_name, year])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.Community.plot_silhouette.html#geosnap.Community.plot_silhouette" title="geosnap.Community.plot_silhouette"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.plot_silhouette</span></code></a>([model_name, year])</p></td>
 <td><p>Returns a silhouette plot of the model that is passed to it.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.Community.plot_silhouette_map.html#geosnap.Community.plot_silhouette_map" title="geosnap.Community.plot_silhouette_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.plot_silhouette_map</span></code></a>([model_name, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.Community.plot_silhouette_map.html#geosnap.Community.plot_silhouette_map" title="geosnap.Community.plot_silhouette_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.plot_silhouette_map</span></code></a>([model_name, …])</p></td>
 <td><p>Returns a plot of the silhouette scores of the model that is passed to it</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.Community.plot_path_silhouette.html#geosnap.Community.plot_path_silhouette" title="geosnap.Community.plot_path_silhouette"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.plot_path_silhouette</span></code></a>([model_name, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.Community.plot_path_silhouette.html#geosnap.Community.plot_path_silhouette" title="geosnap.Community.plot_path_silhouette"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.plot_path_silhouette</span></code></a>([model_name, …])</p></td>
 <td><p>Returns a plot of the path_silhouettes of the model that is passed to it.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.Community.plot_timeseries.html#geosnap.Community.plot_timeseries" title="geosnap.Community.plot_timeseries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.plot_timeseries</span></code></a>(column[, title, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.Community.plot_timeseries.html#geosnap.Community.plot_timeseries" title="geosnap.Community.plot_timeseries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Community.plot_timeseries</span></code></a>(column[, title, …])</p></td>
 <td><p>Plot an attribute from a Community arranged as a timeseries.</p></td>
 </tr>
 </tbody>
@@ -480,6 +484,26 @@ then using analytical methods upon the community</p>
 </tbody>
 </table>
 </div>
+<div class="section" id="util-module">
+<span id="util-api"></span><h2>Util Module<a class="headerlink" href="#util-module" title="Permalink to this headline">¶</a></h2>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.util.gif_from_path.html#geosnap.util.gif_from_path" title="geosnap.util.gif_from_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">util.gif_from_path</span></code></a>([path, figsize, fps, …])</p></td>
+<td><p>Create an animated gif from a director of image files</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/geosnap.util.fetch_acs.html#geosnap.util.fetch_acs" title="geosnap.util.fetch_acs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">util.fetch_acs</span></code></a>([state, level, year, …])</p></td>
+<td><p>Collect the variables defined in <cite>geosnap.datasets.codebook</cite> from the Census API.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/geosnap.util.process_acs.html#geosnap.util.process_acs" title="geosnap.util.process_acs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">util.process_acs</span></code></a>(df)</p></td>
+<td><p>Calculate variables from the geosnap codebook</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 
 
@@ -502,7 +526,7 @@ then using analytical methods upon the community</p>
     </p>
     <p>
         &copy; Copyright 2020, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
     </p>
   </div>
 </footer>

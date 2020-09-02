@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>geosnap.analyze.analytics.spectral &#8212; geosnap v0.4.0 Manual</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -74,6 +73,7 @@
 <li class="toctree-l2 current"><a class="reference internal" href="../api.html#analyze-module">Analyze Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#harmonize-module">Harmonize Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#visualize-module">Visualize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#util-module">Util Module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
@@ -127,9 +127,9 @@
       
   <div class="section" id="geosnap-analyze-analytics-spectral">
 <h1>geosnap.analyze.analytics.spectral<a class="headerlink" href="#geosnap-analyze-analytics-spectral" title="Permalink to this headline">¶</a></h1>
-<dl class="py function">
+<dl class="function">
 <dt id="geosnap.analyze.analytics.spectral">
-<code class="sig-prename descclassname">geosnap.analyze.analytics.</code><code class="sig-name descname">spectral</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">n_clusters</span></em>, <em class="sig-param"><span class="n">eigen_solver</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">random_state</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">n_init</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">gamma</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">affinity</span><span class="o">=</span><span class="default_value">'rbf'</span></em>, <em class="sig-param"><span class="n">n_neighbors</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">eigen_tol</span><span class="o">=</span><span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">assign_labels</span><span class="o">=</span><span class="default_value">'kmeans'</span></em>, <em class="sig-param"><span class="n">degree</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">coef0</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">kernel_params</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">n_jobs</span><span class="o">=</span><span class="default_value">- 1</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/analyze/cluster.html#spectral"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.analyze.analytics.spectral" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">geosnap.analyze.analytics.</code><code class="sig-name descname">spectral</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">n_clusters</em>, <em class="sig-param">eigen_solver=None</em>, <em class="sig-param">random_state=None</em>, <em class="sig-param">n_init=10</em>, <em class="sig-param">gamma=1.0</em>, <em class="sig-param">affinity='rbf'</em>, <em class="sig-param">n_neighbors=10</em>, <em class="sig-param">eigen_tol=0.0</em>, <em class="sig-param">assign_labels='kmeans'</em>, <em class="sig-param">degree=3</em>, <em class="sig-param">coef0=1</em>, <em class="sig-param">kernel_params=None</em>, <em class="sig-param">n_jobs=-1</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/analyze/cluster.html#spectral"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.analyze.analytics.spectral" title="Permalink to this definition">¶</a></dt>
 <dd><p>Spectral Clustering.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -202,7 +202,7 @@ method. Ignored for affinity=’rbf’.</p>
     </p>
     <p>
         &copy; Copyright 2020, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
     </p>
   </div>
 </footer>

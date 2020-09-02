@@ -1,4 +1,4 @@
-﻿geosnap.analyze.analytics.spenc
+geosnap.analyze.analytics.spenc
 ===============================
 
 .. currentmodule:: geosnap.analyze.analytics

@@ -1,4 +1,4 @@
-﻿geosnap.Community.from\_ncdb
+geosnap.Community.from\_ncdb
 ============================
 
 .. currentmodule:: geosnap

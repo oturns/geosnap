@@ -1,4 +1,4 @@
-﻿geosnap.io.get\_lehd
+geosnap.io.get\_lehd
 ====================
 
 .. currentmodule:: geosnap.io

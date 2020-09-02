@@ -1,4 +1,4 @@
-﻿geosnap.analyze.analytics.hdbscan
+geosnap.analyze.analytics.hdbscan
 =================================
 
 .. currentmodule:: geosnap.analyze.analytics

@@ -1,4 +1,4 @@
-﻿geosnap.analyze.analytics.max\_p
+geosnap.analyze.analytics.max\_p
 ================================
 
 .. currentmodule:: geosnap.analyze.analytics

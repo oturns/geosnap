@@ -103,6 +103,7 @@ Community Visualization
 .. autosummary::
    :toctree: generated/
 
+   Community.animate_timeseries
    Community.plot_boundary_silhouette
    Community.plot_next_best_label
    Community.plot_silhouette
@@ -204,3 +205,14 @@ Visualize Module
 
    visualize.indexplot_seq
    visualize.explore
+
+.. _util_api:
+
+Util Module
+--------------
+.. autosummary::
+   :toctree: generated/
+
+   util.gif_from_path
+   util.fetch_acs
+   util.process_acs

@@ -1,4 +1,4 @@
-﻿geosnap.analyze.analytics.affinity\_propagation
+geosnap.analyze.analytics.affinity\_propagation
 ===============================================
 
 .. currentmodule:: geosnap.analyze.analytics

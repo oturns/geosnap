@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>geosnap.Community.cluster_spatial &#8212; geosnap v0.4.0 Manual</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -74,6 +73,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../api.html#analyze-module">Analyze Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#harmonize-module">Harmonize Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#visualize-module">Visualize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#util-module">Util Module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
@@ -127,9 +127,9 @@
       
   <div class="section" id="geosnap-community-cluster-spatial">
 <h1>geosnap.Community.cluster_spatial<a class="headerlink" href="#geosnap-community-cluster-spatial" title="Permalink to this headline">¶</a></h1>
-<dl class="py method">
+<dl class="method">
 <dt id="geosnap.Community.cluster_spatial">
-<code class="sig-prename descclassname">Community.</code><code class="sig-name descname">cluster_spatial</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_clusters</span><span class="o">=</span><span class="default_value">6</span></em>, <em class="sig-param"><span class="n">spatial_weights</span><span class="o">=</span><span class="default_value">'rook'</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">best_model</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">columns</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">threshold_variable</span><span class="o">=</span><span class="default_value">'count'</span></em>, <em class="sig-param"><span class="n">threshold</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">return_model</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">scaler</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">weights_kwargs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/_community.html#Community.cluster_spatial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.Community.cluster_spatial" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">Community.</code><code class="sig-name descname">cluster_spatial</code><span class="sig-paren">(</span><em class="sig-param">n_clusters=6</em>, <em class="sig-param">spatial_weights='rook'</em>, <em class="sig-param">method=None</em>, <em class="sig-param">best_model=False</em>, <em class="sig-param">columns=None</em>, <em class="sig-param">threshold_variable='count'</em>, <em class="sig-param">threshold=10</em>, <em class="sig-param">return_model=False</em>, <em class="sig-param">scaler=None</em>, <em class="sig-param">weights_kwargs=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/_community.html#Community.cluster_spatial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.Community.cluster_spatial" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a <em>spatial</em> geodemographic typology by running a cluster analysis on the metro area’s neighborhood attributes and including a contiguity constraint.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -190,7 +190,7 @@ as a new column. If the cluster is already present, the name will be incremented
     </p>
     <p>
         &copy; Copyright 2020, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
     </p>
   </div>
 </footer>

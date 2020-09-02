@@ -1,4 +1,4 @@
-﻿geosnap.datasets.ncdb
+geosnap.datasets.ncdb
 =====================
 
 .. currentmodule:: geosnap

@@ -1,4 +1,4 @@
-﻿geosnap.datasets.codebook
+geosnap.datasets.codebook
 =========================
 
 .. currentmodule:: geosnap

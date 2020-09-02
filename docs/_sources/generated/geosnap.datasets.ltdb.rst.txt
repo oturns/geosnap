@@ -1,4 +1,4 @@
-﻿geosnap.datasets.ltdb
+geosnap.datasets.ltdb
 =====================
 
 .. currentmodule:: geosnap

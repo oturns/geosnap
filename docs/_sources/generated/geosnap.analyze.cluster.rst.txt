@@ -1,4 +1,4 @@
-﻿geosnap.analyze.cluster
+geosnap.analyze.cluster
 =======================
 
 .. currentmodule:: geosnap.analyze

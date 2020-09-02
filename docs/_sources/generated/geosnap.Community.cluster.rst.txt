@@ -1,4 +1,4 @@
-﻿geosnap.Community.cluster
+geosnap.Community.cluster
 =========================
 
 .. currentmodule:: geosnap

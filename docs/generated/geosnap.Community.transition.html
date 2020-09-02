@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>geosnap.Community.transition &#8212; geosnap v0.4.0 Manual</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +15,7 @@
     <link rel="shortcut icon" href="../_static/geosnap.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="geosnap.Community.plot_boundary_silhouette" href="geosnap.Community.plot_boundary_silhouette.html" />
+    <link rel="next" title="geosnap.Community.animate_timeseries" href="geosnap.Community.animate_timeseries.html" />
     <link rel="prev" title="geosnap.Community.sequence" href="geosnap.Community.sequence.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -74,6 +73,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../api.html#analyze-module">Analyze Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#harmonize-module">Harmonize Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#visualize-module">Visualize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#util-module">Util Module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
@@ -127,9 +127,9 @@
       
   <div class="section" id="geosnap-community-transition">
 <h1>geosnap.Community.transition<a class="headerlink" href="#geosnap-community-transition" title="Permalink to this headline">¶</a></h1>
-<dl class="py method">
+<dl class="method">
 <dt id="geosnap.Community.transition">
-<code class="sig-prename descclassname">Community.</code><code class="sig-name descname">transition</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cluster_col</span></em>, <em class="sig-param"><span class="n">time_var</span><span class="o">=</span><span class="default_value">'year'</span></em>, <em class="sig-param"><span class="n">id_var</span><span class="o">=</span><span class="default_value">'geoid'</span></em>, <em class="sig-param"><span class="n">w_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">permutations</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/_community.html#Community.transition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.Community.transition" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">Community.</code><code class="sig-name descname">transition</code><span class="sig-paren">(</span><em class="sig-param">cluster_col</em>, <em class="sig-param">time_var='year'</em>, <em class="sig-param">id_var='geoid'</em>, <em class="sig-param">w_type=None</em>, <em class="sig-param">permutations=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/_community.html#Community.transition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.Community.transition" title="Permalink to this definition">¶</a></dt>
 <dd><p>(Spatial) Markov approach to transitional dynamics of neighborhoods.</p>
 <p>The transitional dynamics approach should be adopted after
 neighborhood segmentation since the column name of neighborhood
@@ -187,7 +187,7 @@ if w_type is given, return a Spatial_Markov instance</p>
     </p>
     <p>
         &copy; Copyright 2020, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
     </p>
   </div>
 </footer>

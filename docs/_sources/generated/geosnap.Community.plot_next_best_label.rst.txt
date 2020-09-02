@@ -1,4 +1,4 @@
-﻿geosnap.Community.plot\_next\_best\_label
+geosnap.Community.plot\_next\_best\_label
 =========================================
 
 .. currentmodule:: geosnap

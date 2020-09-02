@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>geosnap.Community.plot_silhouette_map &#8212; geosnap v0.4.0 Manual</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -74,6 +73,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../api.html#analyze-module">Analyze Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#harmonize-module">Harmonize Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#visualize-module">Visualize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#util-module">Util Module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
@@ -127,9 +127,9 @@
       
   <div class="section" id="geosnap-community-plot-silhouette-map">
 <h1>geosnap.Community.plot_silhouette_map<a class="headerlink" href="#geosnap-community-plot-silhouette-map" title="Permalink to this headline">¶</a></h1>
-<dl class="py method">
+<dl class="method">
 <dt id="geosnap.Community.plot_silhouette_map">
-<code class="sig-prename descclassname">Community.</code><code class="sig-name descname">plot_silhouette_map</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">year</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ctxmap</span><span class="o">=</span><span class="default_value">{'attribution': 'Map tiles by Stamen Design, CC BY 3.0 -- Map data (C) OpenStreetMap contributors', 'ext': 'png', 'max_zoom': 20, 'min_zoom': 0, 'name': 'Stamen.TonerLite', 'subdomains': 'abcd', 'url': 'https://stamen-tiles-{s}.a.ssl.fastly.net/{variant}/{z}/{x}/{y}{r}.{ext}', 'variant': 'toner-lite'}</span></em>, <em class="sig-param"><span class="n">save_fig</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="o">=</span><span class="default_value">12, 3</span></em>, <em class="sig-param"><span class="n">alpha</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em class="sig-param"><span class="n">cmap</span><span class="o">=</span><span class="default_value">'bwr'</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">dpi</span><span class="o">=</span><span class="default_value">500</span></em>, <em class="sig-param"><span class="n">time_var</span><span class="o">=</span><span class="default_value">'year'</span></em>, <em class="sig-param"><span class="n">id_var</span><span class="o">=</span><span class="default_value">'geoid'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/_community.html#Community.plot_silhouette_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.Community.plot_silhouette_map" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">Community.</code><code class="sig-name descname">plot_silhouette_map</code><span class="sig-paren">(</span><em class="sig-param">model_name=None</em>, <em class="sig-param">year=None</em>, <em class="sig-param">ctxmap={'attribution': 'Map tiles by Stamen Design</em>, <em class="sig-param">CC BY 3.0 -- Map data (C) OpenStreetMap contributors'</em>, <em class="sig-param">'ext': 'png'</em>, <em class="sig-param">'max_zoom': 20</em>, <em class="sig-param">'min_zoom': 0</em>, <em class="sig-param">'name': 'Stamen.TonerLite'</em>, <em class="sig-param">'subdomains': 'abcd'</em>, <em class="sig-param">'url': 'https://stamen-tiles-{s}.a.ssl.fastly.net/{variant}/{z}/{x}/{y}{r}.{ext}'</em>, <em class="sig-param">'variant': 'toner-lite'}</em>, <em class="sig-param">save_fig=None</em>, <em class="sig-param">figsize=(12</em>, <em class="sig-param">3)</em>, <em class="sig-param">alpha=0.5</em>, <em class="sig-param">cmap='bwr'</em>, <em class="sig-param">title=''</em>, <em class="sig-param">dpi=500</em>, <em class="sig-param">time_var='year'</em>, <em class="sig-param">id_var='geoid'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/_community.html#Community.plot_silhouette_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.Community.plot_silhouette_map" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>Returns a plot of the silhouette scores of the model that is passed to it</dt><dd><p>by creating a table join of the models silhouettes object and community gdf</p>
 </dd>
@@ -201,7 +201,7 @@ default is ‘geoid’ from US census data</p>
     </p>
     <p>
         &copy; Copyright 2020, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
     </p>
   </div>
 </footer>

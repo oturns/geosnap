@@ -1,4 +1,4 @@
-﻿geosnap.datasets.msa\_definitions
+geosnap.datasets.msa\_definitions
 =================================
 
 .. currentmodule:: geosnap

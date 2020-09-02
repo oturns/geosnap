@@ -1,4 +1,4 @@
-﻿geosnap.analyze.analytics.spectral
+geosnap.analyze.analytics.spectral
 ==================================
 
 .. currentmodule:: geosnap.analyze.analytics

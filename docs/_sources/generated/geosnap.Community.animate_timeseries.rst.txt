@@ -1,0 +1,6 @@
+geosnap.Community.animate\_timeseries
+=====================================
+
+.. currentmodule:: geosnap
+
+.. automethod:: Community.animate_timeseries
