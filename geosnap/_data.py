@@ -398,7 +398,7 @@ class DataStore:
                     pd.read_parquet(self.administrative["msas.parquet"].get_cached_path()).sort_values(by="name")
                 )
             except:
-                return _convert_gdf(self.tracts_cartographic["tracts_2010_500k.parquet"]())
+                return _convert_gdf(self.administrative["msas.parquet"]())
         try:
             return pd.read_parquet(self.administrative["msas.parquet"].get_cached_path()).sort_values(by="name")
         except:
