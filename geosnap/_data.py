@@ -394,9 +394,9 @@ class DataStore:
         if convert:
             try:
                 
-            return _convert_gdf(
-                pd.read_parquet(self.administrative["msas.parquet"].get_cached_path()).sort_values(by="name")
-            )
+                return _convert_gdf(
+                    pd.read_parquet(self.administrative["msas.parquet"].get_cached_path()).sort_values(by="name")
+                )
             except:
                 return _convert_gdf(self.tracts_cartographic["tracts_2010_500k.parquet"]())
         try:
