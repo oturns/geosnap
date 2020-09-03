@@ -536,14 +536,13 @@ def predict_labels(
     ), "You must provide the name of a cluster model present on the Community gdf"
 
     gdf = comm.gdf.copy()
+    gdf = gdf.dropna(subset=[model_name]).reset_index()
+    w = Ws[w_type].from_dataframe(gdf, **w_options)
     t = comm.transition(model_name, w_type=w_type)
 
     if time_steps == 1:
 
         gdf = gdf[gdf[time_col] == base_year]
-        gdf = gdf.dropna(subset=[model_name]).reset_index()
-
-        w = Ws[w_type].from_dataframe(gdf, **w_options)
         lags = lag_categorical(w, gdf[model_name].values)
         lags = lags.astype(int)
 
@@ -574,26 +573,27 @@ def predict_labels(
         gdf = gdf[gdf[time_col] == base_year]
         gdf = gdf[[index_col, model_name, time_col, "geometry"]]
         current_time = base_year + increment
+        gdf = gdf.dropna(subset=[model_name]).reset_index()
+        w = Ws[w_type].from_dataframe(gdf, **w_options)
         predictions.append(gdf)
+        
         for step in range(time_steps):
-            gdf = predictions[step - 1].copy()
-            gdf = gdf.dropna(subset=[model_name]).reset_index()
-
-            w = Ws[w_type].from_dataframe(gdf, **w_options)
+            # use the last known set of labels  to get the spatial context for each geog unit
+            gdf = predictions[step - 1].copy() 
             lags = lag_categorical(w, gdf[model_name].values)
             lags = lags.astype(int)
-
             labels = {}
             for i, cluster in gdf[model_name].astype(int).iteritems():
+                #  use labels and spatial context to get the transition probabilities for each unit
                 probs = np.nan_to_num(t.P)[lags[i]][cluster]
                 probs /= (
                     probs.sum()
                 )  # correct for tolerance, see https://stackoverflow.com/questions/25985120/numpy-1-9-0-valueerror-probabilities-do-not-sum-to-1
                 try:
+                    #  draw from the conditional probabilities for each unit
                     # in case obs have a modal neighbor never before seen in the model
                     # (so all transition probs are 0)
                     # fall back to the aspatial transition matrix
-
                     labels[i] = np.random.choice(t.classes, p=probs)
                 except:
                     labels[i] = np.random.choice(t.classes, p=t.p[cluster])

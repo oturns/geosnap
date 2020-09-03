@@ -19,6 +19,7 @@ from .analyze import predict_labels as _predict_labels
 from .harmonize import harmonize as _harmonize
 from .io import _fips_filter, _fipstable, _from_db, get_lehd
 from .util import gif_from_path as _gif_from_path
+from .visualize import plot_transitions as _plot_transitions
 
 schemes = {}
 for classifier in classifiers.CLASSIFIERS:
@@ -331,6 +332,35 @@ class Community:
         )  # keep any existing models in the input Community
         comm.models[model_name] = model
         return comm
+
+    def plot_transitions(
+        self,
+        cluster_col=None,
+        w_type="queen",
+        w_options=None,
+        figsize=(13, 12),
+        n_rows=3,
+        n_cols=3,
+        suptitle=None,
+        savefig=None,
+        dpi=300
+        **kwargs
+    ):
+
+        ax = _plot_transitions(
+            self,
+            cluster_col=cluster_col,
+            w_type=w_type,
+            w_options=w_options,
+            figsize=figsize,
+            n_rows=n_rows,
+            n_cols=n_cols,
+            suptitle=suptitle,
+            savefig=savefig,
+            dpi=dpi
+            **kwargs
+        )
+        return ax
 
     def plot_silhouette(self, model_name=None, year=None, **kwargs):
         """ Returns a silhouette plot of the model that is passed to it.
@@ -905,7 +935,7 @@ class Community:
         if categorical and not cmap:
             cmap = "Accent"
         elif not cmap:
-            cmap='Blues'
+            cmap = "Blues"
         if legend_kwds == "default":
             legend_kwds = {"ncols": 1, "loc": "b"}
         if ctxmap:  # need to convert crs to mercator before graphing
@@ -1076,7 +1106,7 @@ class Community:
         if categorical and not cmap:
             cmap = "Accent"
         elif not cmap:
-            cmap='Blues'
+            cmap = "Blues"
         if not gdf.crs == 3857:
             gdf = gdf.to_crs(3857)
         if not time_periods:
@@ -1246,7 +1276,6 @@ class Community:
         gdf_new = Community(gdf_temp)
         return gdf_new, df_wide, seq_dis_mat
 
-
     def simulate(
         self,
         model_name=None,
@@ -1257,7 +1286,7 @@ class Community:
         new_colname="predicted",
         increment=10,
         time_steps=1,
-        time_col='year'
+        time_col="year",
     ):
         if not w_options:
             w_options = {}
@@ -1272,7 +1301,7 @@ class Community:
                 index_col=index_col,
                 increment=increment,
                 time_steps=time_steps,
-                time_col=time_col
+                time_col=time_col,
             )
             return gdf
         else:
@@ -1286,7 +1315,7 @@ class Community:
                 index_col=index_col,
                 increment=increment,
                 time_steps=time_steps,
-                time_col=time_col
+                time_col=time_col,
             )
             gdfs = pd.concat(gdfs)
             gdfs = gdfs.dropna(subset=[model_name])
