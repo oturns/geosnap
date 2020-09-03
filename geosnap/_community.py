@@ -19,7 +19,8 @@ from .analyze import predict_labels as _predict_labels
 from .harmonize import harmonize as _harmonize
 from .io import _fips_filter, _fipstable, _from_db, get_lehd
 from .util import gif_from_path as _gif_from_path
-from .visualize import plot_transitions as _plot_transitions
+from .visualize import plot_transition_matrix as _plot_transitions
+from .visualize import plot_transition_graphs as _plot_transition_graphs
 
 schemes = {}
 for classifier in classifiers.CLASSIFIERS:
@@ -333,7 +334,7 @@ class Community:
         comm.models[model_name] = model
         return comm
 
-    def plot_transitions(
+    def plot_transition_matrix(
         self,
         cluster_col=None,
         w_type="queen",
@@ -344,9 +345,40 @@ class Community:
         suptitle=None,
         savefig=None,
         dpi=300,
-        **kwargs
+        **kwargs,
     ):
+        """Plot global and spatially-conditioned transition matrices as heatmaps
 
+        Parameters
+        ----------
+        community : geosnap.Community 
+            a geosnap Community instance
+        cluster_col : str
+            column on the Community.gdf containing neighborhood type labels
+        w_type : str {'queen', 'rook'}
+            which type of libpysal spatial weights objects to encode connectivity
+        w_options : dict
+            additional options passed to a libpysal weights constructor (e.g. `k` for a KNN weights matrix)
+        figsize : tuple, optional
+            size of the resulting figure (13, 12)
+        n_rows : int, optional
+            rows in the plot; n_rows * n_cols must be >= the number of neighborhood types
+        n_cols : int, optional
+            columns in the plot; n_rows * n_cols must be >= the number of neighborhood types
+        suptitle : str, optional
+            title of the figure
+        title_kwds : dict, optional
+            additional keyword options for formatting the title
+        savefig : str, optional
+            location the plot will be saved
+        dpi : int, optional
+            dpi of the resulting image, default is 300
+
+        Returns
+        -------
+        matplotlib Axes 
+            the axes on which the plots are drawn
+        """    
         ax = _plot_transitions(
             self,
             cluster_col=cluster_col,
@@ -357,10 +389,49 @@ class Community:
             n_cols=n_cols,
             suptitle=suptitle,
             savefig=savefig,
-            dpi=dpi
-            **kwargs
+            dpi=dpi,
+            ** kwargs,
         )
         return ax
+
+    def plot_transition_graphs(
+        self,
+        cluster_col,
+        w_type,
+        layout="dot",
+        args="-n -Groot=0 -Goverlap=false -Gmindist=3.5 -Gsize=30,30!",
+        output_dir=None,
+    ):
+        """Plot a network graph representation of global and spatially-conditioned transition matrices.
+
+        Parameters
+        ----------
+        community : geosnap.Community 
+            a geosnap Community instance
+        cluster_col : str
+            column on the Community.gdf containing neighborhood type labels
+        output_dir : str
+            the location that output images will be placed
+        w_type : str {'queen', 'rook'}
+            which type of libpysal spatial weights objects to encode connectivity
+        layout : str, 'dot'
+            graphviz layout for plotting
+        args : str, optional
+            additional arguments passed to graphviz.
+            default is  "-n -Groot=0 -Goverlap=false -Gnodesep=0.01 -Gfont_size=1 -Gmindist=3.5 -Gsize=30,30!"
+
+        Returns
+        ------
+        None
+        """  
+        _plot_transition_graphs(
+            self,
+            cluster_col=cluster_col,
+            w_type=w_type,
+            layout=layout,
+            args=args,
+            output_dir=output_dir,
+        )
 
     def plot_silhouette(self, model_name=None, year=None, **kwargs):
         """ Returns a silhouette plot of the model that is passed to it.
