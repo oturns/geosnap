@@ -116,9 +116,10 @@ class DataStore:
         """Instantiate a new DataStore object."""
 
         try: # if any of these aren't found, stream them insteead
+            #from quilt3.data.census import administrative, tracts_cartographic
             administrative = quilt3.Package.browse("census/administrative")
             tracts_cartographic = quilt3.Package.browse("census/tracts_cartographic")
-        except FileNotFoundError:
+        except ImportError:
             warn(
                 "Unable to locate local census data. Streaming instead.\n"
                 "If you plan to use census data repeatedly you can store it locally "
@@ -181,8 +182,9 @@ class DataStore:
 
         """
         try:
-            blocks_2000 = quilt3.Package.browse("census/blocks_2000") # if any of these aren't found, stream them instead
-        except FileNotFoundError:
+            from quilt3.data.census import blocks_2000
+            #blocks_2000 = quilt3.Package.browse("census/blocks_2000") # if any of these aren't found, stream them instead
+        except ImportError:
             warn(
                 "Unable to locate local census 2000 block data. Streaming instead.\n"
                 "If you plan to use census data repeatedly you can store it locally "
@@ -289,7 +291,7 @@ class DataStore:
             stored as well-known binary on the 'wkb' column.
 
         """
-        t = self.tracts_cartographic["tracts_1990_500k.parquet"]()
+        t = pd.read_parquet(self.tracts_cartographic["tracts_1990_500k.parquet"].get_cached_path())
         if states:
             t = t[t.geoid.str[:2].isin(states)]
         t["year"] = 1990
@@ -315,7 +317,11 @@ class DataStore:
             stored as well-known binary on the 'wkb' column.
 
         """
-        t = self.tracts_cartographic["tracts_2000_500k.parquet"]()
+        try:
+            t = pd.read_parquet(self.tracts_cartographic["tracts_2000_500k.parquet"].get_cached_path())
+        except:
+            print('streaming remote data. Use `geosnap.io.store_census() to store the data locally for better performance')
+            t = self.tracts_cartographic["tracts_2000_500k.parquet"]()
         if states:
             t = t[t.geoid.str[:2].isin(states)]
         t["year"] = 2000
@@ -341,7 +347,7 @@ class DataStore:
             stored as well-known binary on the 'wkb' column.
 
         """
-        t = self.tracts_cartographic["tracts_2010_500k.parquet"]()
+        t = pd.read_parquet(self.tracts_cartographic["tracts_2010_500k.parquet"].get_cached_path())
         if states:
             t = t[t.geoid.str[:2].isin(states)]
         t["year"] = 2010
@@ -370,9 +376,9 @@ class DataStore:
         """
         if convert:
             return _convert_gdf(
-                self.administrative["msas.parquet"]().sort_values(by="name")
+                pd.read_parquet(self.administrative["msas.parquet"].get_cached_path()).sort_values(by="name")
             )
-        return self.administrative["msas.parquet"]().sort_values(by="name")
+        return pd.read_parquet(self.administrative["msas.parquet"].get_cached_path()).sort_values(by="name")
 
     def states(self, convert=True):
         """States.
@@ -408,7 +414,7 @@ class DataStore:
             stored as well-known binary on the 'wkb' column.
 
         """
-        return _convert_gdf(self.administrative["counties.parquet"]())
+        return _convert_gdf(pd.read_parquet(self.administrative["counties.parquet"].get_cached_path()))
 
     def msa_definitions(self):
         """2010 Metropolitan Statistical Area definitions.
@@ -422,7 +428,7 @@ class DataStore:
             dataframe that stores state/county --> MSA crosswalk definitions.
 
         """
-        return self.administrative["msa_definitions.parquet"]()
+        return pd.read_parquet(self.administrative["msa_definitions.parquet"].get_cached_path())
 
     def ltdb(self):
         """Longitudinal Tract Database (LTDB).

@@ -15,6 +15,7 @@ from .analyze import cluster as _cluster
 from .analyze import cluster_spatial as _cluster_spatial
 from .analyze import sequence as _sequence
 from .analyze import transition as _transition
+from .analyze import predict_labels as _predict_labels
 from .harmonize import harmonize as _harmonize
 from .io import _fips_filter, _fipstable, _from_db, get_lehd
 from .util import gif_from_path as _gif_from_path
@@ -833,7 +834,7 @@ class Community:
         scheme="quantiles",
         k=5,
         pooled=True,
-        cmap="Blues",
+        cmap=None,
         legend=True,
         categorical=False,
         save_fig=None,
@@ -903,6 +904,8 @@ class Community:
         df = self.gdf
         if categorical and not cmap:
             cmap = "Accent"
+        elif not cmap:
+            cmap='Blues'
         if legend_kwds == "default":
             legend_kwds = {"ncols": 1, "loc": "b"}
         if ctxmap:  # need to convert crs to mercator before graphing
@@ -1012,7 +1015,7 @@ class Community:
         time_periods=None,
         scheme="quantiles",
         k=5,
-        cmap="Blues",
+        cmap=None,
         legend=True,
         alpha=0.6,
         categorical=False,
@@ -1070,6 +1073,10 @@ class Community:
                         output file name
         """
         gdf = self.gdf.copy()
+        if categorical and not cmap:
+            cmap = "Accent"
+        elif not cmap:
+            cmap='Blues'
         if not gdf.crs == 3857:
             gdf = gdf.to_crs(3857)
         if not time_periods:
@@ -1113,7 +1120,7 @@ class Community:
                 repeat_delay=repeat_delay,
                 filename=filename,
                 dpi=dpi,
-                )
+            )
 
     def transition(
         self, cluster_col, time_var="year", id_var="geoid", w_type=None, permutations=0
@@ -1238,6 +1245,56 @@ class Community:
         )
         gdf_new = Community(gdf_temp)
         return gdf_new, df_wide, seq_dis_mat
+
+
+    def simulate(
+        self,
+        model_name=None,
+        index_col="geoid",
+        w_type="queen",
+        w_options=None,
+        base_year=2010,
+        new_colname="predicted",
+        increment=10,
+        time_steps=1,
+        time_col='year'
+    ):
+        if not w_options:
+            w_options = {}
+        if time_steps == 1:
+            gdf = _predict_labels(
+                self,
+                model_name=model_name,
+                w_type=w_type,
+                w_options=w_options,
+                base_year=base_year,
+                new_colname=new_colname,
+                index_col=index_col,
+                increment=increment,
+                time_steps=time_steps,
+                time_col=time_col
+            )
+            return gdf
+        else:
+            gdfs = _predict_labels(
+                self,
+                model_name=model_name,
+                w_type=w_type,
+                w_options=w_options,
+                base_year=base_year,
+                new_colname=new_colname,
+                index_col=index_col,
+                increment=increment,
+                time_steps=time_steps,
+                time_col=time_col
+            )
+            gdfs = pd.concat(gdfs)
+            gdfs = gdfs.dropna(subset=[model_name])
+            gdfs[model_name] = gdfs[model_name].astype(int)
+            return Community.from_geodataframes(gdfs=[gdfs])
+
+    ###### Constructor Methods ######
+    #################################
 
     @classmethod
     def from_ltdb(

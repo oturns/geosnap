@@ -37,6 +37,7 @@ def gif_from_path(
         image dpi passed to matplotlib writer
     """
     imgs = os.listdir(path)
+    imgs.sort()
 
     fig, ax = plt.subplots(figsize=figsize)
     ax.axis("off")

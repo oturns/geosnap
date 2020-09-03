@@ -32,7 +32,7 @@ except FileNotFoundError:
     storage = quilt3.Package()
 
 
-def store_census(dest=None):
+def store_census():
     """Save census data to the local quilt package storage.
 
     Returns
@@ -43,11 +43,11 @@ def store_census(dest=None):
         is 3.05 GB.
 
     """
-    quilt3.Package.install("census/tracts_cartographic", "s3://spatial-ucr", dest=dest)
-    quilt3.Package.install("census/administrative", "s3://spatial-ucr", dest=dest)
+    quilt3.Package.install("census/tracts_cartographic", "s3://spatial-ucr")
+    quilt3.Package.install("census/administrative", "s3://spatial-ucr")
 
 
-def store_blocks_2000(dest=None):
+def store_blocks_2000():
     """Save census 2000 census block data to the local quilt package storage.
 
     Returns
@@ -57,10 +57,10 @@ def store_blocks_2000(dest=None):
         in place of streaming data for all census queries.
 
     """
-    quilt3.Package.install("census/blocks_2000", "s3://spatial-ucr", dest=dest)
+    quilt3.Package.install("census/blocks_2000", "s3://spatial-ucr")
 
 
-def store_blocks_2010(dest=None):
+def store_blocks_2010():
     """Save census 2010 census block data to the local quilt package storage.
 
     Returns
@@ -70,7 +70,7 @@ def store_blocks_2010(dest=None):
         in place of streaming data for all census queries.
 
     """
-    quilt3.Package.install("census/blocks_2010", "s3://spatial-ucr", dest=dest)
+    quilt3.Package.install("census/blocks_2010", "s3://spatial-ucr")
 
 
 def store_ltdb(sample, fullcount):
