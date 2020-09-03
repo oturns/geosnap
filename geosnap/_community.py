@@ -343,7 +343,7 @@ class Community:
         n_cols=3,
         suptitle=None,
         savefig=None,
-        dpi=300
+        dpi=300,
         **kwargs
     ):
 
