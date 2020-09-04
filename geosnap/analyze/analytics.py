@@ -2,12 +2,14 @@
 import esda
 import numpy as np
 import pandas as pd
+import geopandas as gpd
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import silhouette_samples
 
 from libpysal.weights import attach_islands
-from libpysal.weights.contiguity import Queen, Rook
-from libpysal.weights.distance import KNN
+from libpysal.weights.contiguity import Queen, Rook, Voronoi
+from libpysal.weights.distance import KNN, DistanceBand
+from libpysal.weights import lag_categorical
 
 from .._data import _Map
 from .cluster import (
@@ -23,6 +25,14 @@ from .cluster import (
     ward,
     ward_spatial,
 )
+
+Ws = {
+    "queen": Queen,
+    "rook": Rook,
+    "voronoi": Voronoi,
+    "knn": KNN,
+    "distanceband": DistanceBand,
+}
 
 
 class ModelResults:
@@ -54,11 +64,7 @@ class ModelResults:
 
     """
 
-    def __init__(self, X,
-                 columns,
-                 labels,
-                 instance,
-                 W):
+    def __init__(self, X, columns, labels, instance, W):
         """Initialize a new ModelResults instance.
 
         Parameters
@@ -94,9 +100,9 @@ class ModelResults:
         self.path_silhouettes = None
         self.boundary_silhouettes = None
         if self.W is None:
-            self.model_type = 'aspatial'
+            self.model_type = "aspatial"
         else:
-            self.model_type = 'spatial'
+            self.model_type = "spatial"
 
     # Standalone funcs to calc these if you don't want to graph them
     def sil_scores(self, **kwargs):
@@ -108,7 +114,9 @@ class ModelResults:
         silhouette scores stored in a dataframe accessible from `comm.models.['model_name'].silhouettes`
         """
         self.silhouettes = pd.DataFrame()
-        self.silhouettes['silhouettes'] = silhouette_samples(self.X.values, self.labels, **kwargs)
+        self.silhouettes["silhouettes"] = silhouette_samples(
+            self.X.values, self.labels, **kwargs
+        )
         self.silhouettes.index = self.X.index
         return self.silhouettes
 
@@ -122,7 +130,9 @@ class ModelResults:
         `comm.models.['model_name'].nearest_labels`
         """
         self.nearest_labels = pd.DataFrame()
-        self.nearest_labels['nearest_label'] = esda.nearest_label(self.X.values, self.labels, **kwargs)
+        self.nearest_labels["nearest_label"] = esda.nearest_label(
+            self.X.values, self.labels, **kwargs
+        )
         self.nearest_labels.index = self.X.index
         return self.nearest_labels
 
@@ -135,10 +145,14 @@ class ModelResults:
         boundary silhouette scores stored in a dataframe accessible from:
         `comm.models.['model_name'].boundary_silhouettes`
         """
-        assert self.model_type is 'spatial', 'Model is aspatial (lacks a W object), but has been passed to a spatial diagnostic.' \
-                                             ' Try aspatial diagnostics like nearest_label() or sil_scores()'
+        assert self.model_type is "spatial", (
+            "Model is aspatial (lacks a W object), but has been passed to a spatial diagnostic."
+            " Try aspatial diagnostics like nearest_label() or sil_scores()"
+        )
         self.boundary_silhouettes = pd.DataFrame()
-        self.boundary_silhouettes['boundary_silhouettes'] = esda.boundary_silhouette(self.X.values, self.labels, self.W, **kwargs)
+        self.boundary_silhouettes["boundary_silhouettes"] = esda.boundary_silhouette(
+            self.X.values, self.labels, self.W, **kwargs
+        )
         self.boundary_silhouettes.index = self.X.index
         return self.boundary_silhouettes
 
@@ -151,26 +165,30 @@ class ModelResults:
         path silhouette scores stored in a dataframe accessible from:
         `comm.models.['model_name'].path_silhouettes`
         """
-        assert self.model_type is 'spatial', 'Model is aspatial(lacks a W object), but has been passed to a spatial diagnostic.' \
-                                             ' Try aspatial diagnostics like nearest_label() or sil_scores()'
+        assert self.model_type is "spatial", (
+            "Model is aspatial(lacks a W object), but has been passed to a spatial diagnostic."
+            " Try aspatial diagnostics like nearest_label() or sil_scores()"
+        )
         self.path_silhouettes = pd.DataFrame()
-        self.path_silhouettes['path_silhouettes'] = esda.path_silhouette(self.X.values, self.labels, self.W, **kwargs)
+        self.path_silhouettes["path_silhouettes"] = esda.path_silhouette(
+            self.X.values, self.labels, self.W, **kwargs
+        )
         self.path_silhouettes.index = self.X.index
         return self.path_silhouettes
 
 
 def cluster(
-        gdf,
-        n_clusters=6,
-        method=None,
-        best_model=False,
-        columns=None,
-        verbose=False,
-        time_var="year",
-        id_var="geoid",
-        scaler='std',
-        pooling="fixed",
-        **kwargs,
+    gdf,
+    n_clusters=6,
+    method=None,
+    best_model=False,
+    columns=None,
+    verbose=False,
+    time_var="year",
+    id_var="geoid",
+    scaler="std",
+    pooling="fixed",
+    **kwargs,
 ):
     """Create a geodemographic typology by running a cluster analysis on the study area's neighborhood attributes.
 
@@ -281,15 +299,19 @@ def cluster(
             {model_name: labels, time_var: data[time_var], id_var: data[id_var]}
         )
         clusters.set_index([time_var, id_var], inplace=True)
-        clusters = clusters[~clusters.index.duplicated(keep='first')]
+        clusters = clusters[~clusters.index.duplicated(keep="first")]
         gdf = gdf.join(clusters, how="left")
         gdf = gdf.reset_index()
         results = ModelResults(
-            X=data.set_index([id_var, time_var]), columns=columns, labels=model.labels_, instance=model, W=None
+            X=data.set_index([id_var, time_var]),
+            columns=columns,
+            labels=model.labels_,
+            instance=model,
+            W=None,
         )
         return gdf, results, model_name
 
-    elif pooling == 'unique':
+    elif pooling == "unique":
         models = _Map()
         gdf[model_name] = np.nan
         data = data.reset_index()
@@ -316,7 +338,7 @@ def cluster(
                 columns=columns,
                 labels=model.labels_,
                 instance=model,
-                W=None
+                W=None,
             )
             models[time] = results
 
@@ -326,18 +348,18 @@ def cluster(
 
 
 def cluster_spatial(
-        gdf,
-        n_clusters=6,
-        spatial_weights="rook",
-        method=None,
-        columns=None,
-        threshold_variable="count",
-        threshold=10,
-        time_var="year",
-        id_var="geoid",
-        scaler="std",
-        weights_kwargs=None,
-        **kwargs,
+    gdf,
+    n_clusters=6,
+    spatial_weights="rook",
+    method=None,
+    columns=None,
+    threshold_variable="count",
+    threshold=10,
+    time_var="year",
+    id_var="geoid",
+    scaler="std",
+    weights_kwargs=None,
+    **kwargs,
 ):
     """Create a *spatial* geodemographic typology by running a cluster
     analysis on the metro area's neighborhood attributes and including a
@@ -478,7 +500,7 @@ def cluster_spatial(
         clusters.set_index([time_var, id_var], inplace=True)
         gdf.update(clusters)
         results = ModelResults(
-            X=df.set_index([id_var, time_var]).drop('geometry', axis=1),
+            X=df.set_index([id_var, time_var]).drop("geometry", axis=1),
             columns=columns,
             labels=model.labels_,
             instance=model,
@@ -489,3 +511,97 @@ def cluster_spatial(
     gdf = gdf.reset_index()
 
     return gdf, models, model_name
+
+
+def predict_labels(
+    comm,
+    index_col,
+    time_col,
+    model_name,
+    w_type,
+    w_options,
+    base_year,
+    new_colname,
+    time_steps=1,
+    increment=None,
+):
+    if not new_colname:
+        new_colname = "predicted"
+
+    assert (
+        comm.harmonized
+    ), "Predictions based on transition models require harmonized data"
+    assert (
+        model_name
+    ), "You must provide the name of a cluster model present on the Community gdf"
+
+    gdf = comm.gdf.copy()
+    gdf = gdf.dropna(subset=[model_name]).reset_index()
+    w = Ws[w_type].from_dataframe(gdf, **w_options)
+    t = comm.transition(model_name, w_type=w_type)
+
+    if time_steps == 1:
+
+        gdf = gdf[gdf[time_col] == base_year]
+        lags = lag_categorical(w, gdf[model_name].values)
+        lags = lags.astype(int)
+
+        labels = {}
+        for i, cluster in gdf[model_name].astype(int).iteritems():
+            probs = np.nan_to_num(t.P)[lags[i]][cluster]
+            probs /= (
+                probs.sum()
+            )  # correct for tolerance, see https://stackoverflow.com/questions/25985120/numpy-1-9-0-valueerror-probabilities-do-not-sum-to-1
+            try:
+                # in case obs have a modal neighbor never before seen in the model
+                # (so all transition probs are 0)
+                # fall back to the aspatial transition matrix
+
+                labels[i] = np.random.choice(t.classes, p=probs)
+            except:
+                labels[i] = np.random.choice(t.classes, p=t.p[cluster])
+        labels = pd.Series(labels, name=new_colname)
+        out = gdf[[index_col, "geometry"]]
+        predicted = pd.concat([labels, out], axis=1)
+        return gpd.GeoDataFrame(predicted)
+
+    else:
+        assert (
+            increment
+        ), "You must set the `increment` argument to simulate multiple time steps"
+        predictions = []
+        gdf = gdf[gdf[time_col] == base_year]
+        gdf = gdf[[index_col, model_name, time_col, "geometry"]]
+        current_time = base_year + increment
+        gdf = gdf.dropna(subset=[model_name]).reset_index()
+        w = Ws[w_type].from_dataframe(gdf, **w_options)
+        predictions.append(gdf)
+        
+        for step in range(time_steps):
+            # use the last known set of labels  to get the spatial context for each geog unit
+            gdf = predictions[step - 1].copy() 
+            lags = lag_categorical(w, gdf[model_name].values)
+            lags = lags.astype(int)
+            labels = {}
+            for i, cluster in gdf[model_name].astype(int).iteritems():
+                #  use labels and spatial context to get the transition probabilities for each unit
+                probs = np.nan_to_num(t.P)[lags[i]][cluster]
+                probs /= (
+                    probs.sum()
+                )  # correct for tolerance, see https://stackoverflow.com/questions/25985120/numpy-1-9-0-valueerror-probabilities-do-not-sum-to-1
+                try:
+                    #  draw from the conditional probabilities for each unit
+                    # in case obs have a modal neighbor never before seen in the model
+                    # (so all transition probs are 0)
+                    # fall back to the aspatial transition matrix
+                    labels[i] = np.random.choice(t.classes, p=probs)
+                except:
+                    labels[i] = np.random.choice(t.classes, p=t.p[cluster])
+            labels = pd.Series(labels, name=model_name)
+            out = gdf[[index_col, "geometry"]]
+            out[time_col] = current_time
+            predicted = pd.concat([labels, out], axis=1)
+            predictions.append(gpd.GeoDataFrame(predicted).dropna(subset=[model_name]))
+            current_time += increment
+        return predictions
+

@@ -15,9 +15,12 @@ from .analyze import cluster as _cluster
 from .analyze import cluster_spatial as _cluster_spatial
 from .analyze import sequence as _sequence
 from .analyze import transition as _transition
+from .analyze import predict_labels as _predict_labels
 from .harmonize import harmonize as _harmonize
 from .io import _fips_filter, _fipstable, _from_db, get_lehd
 from .util import gif_from_path as _gif_from_path
+from .visualize import plot_transition_matrix as _plot_transitions
+from .visualize import plot_transition_graphs as _plot_transition_graphs
 
 schemes = {}
 for classifier in classifiers.CLASSIFIERS:
@@ -330,6 +333,105 @@ class Community:
         )  # keep any existing models in the input Community
         comm.models[model_name] = model
         return comm
+
+    def plot_transition_matrix(
+        self,
+        cluster_col=None,
+        w_type="queen",
+        w_options=None,
+        figsize=(13, 12),
+        n_rows=3,
+        n_cols=3,
+        suptitle=None,
+        savefig=None,
+        dpi=300,
+        **kwargs,
+    ):
+        """Plot global and spatially-conditioned transition matrices as heatmaps
+
+        Parameters
+        ----------
+        community : geosnap.Community 
+            a geosnap Community instance
+        cluster_col : str
+            column on the Community.gdf containing neighborhood type labels
+        w_type : str {'queen', 'rook'}
+            which type of libpysal spatial weights objects to encode connectivity
+        w_options : dict
+            additional options passed to a libpysal weights constructor (e.g. `k` for a KNN weights matrix)
+        figsize : tuple, optional
+            size of the resulting figure (13, 12)
+        n_rows : int, optional
+            rows in the plot; n_rows * n_cols must be >= the number of neighborhood types
+        n_cols : int, optional
+            columns in the plot; n_rows * n_cols must be >= the number of neighborhood types
+        suptitle : str, optional
+            title of the figure
+        title_kwds : dict, optional
+            additional keyword options for formatting the title
+        savefig : str, optional
+            location the plot will be saved
+        dpi : int, optional
+            dpi of the resulting image, default is 300
+
+        Returns
+        -------
+        matplotlib Axes 
+            the axes on which the plots are drawn
+        """
+        ax = _plot_transitions(
+            self,
+            cluster_col=cluster_col,
+            w_type=w_type,
+            w_options=w_options,
+            figsize=figsize,
+            n_rows=n_rows,
+            n_cols=n_cols,
+            suptitle=suptitle,
+            savefig=savefig,
+            dpi=dpi,
+            **kwargs,
+        )
+        return ax
+
+    def plot_transition_graphs(
+        self,
+        cluster_col,
+        w_type,
+        layout="dot",
+        args="-n -Groot=0 -Goverlap=false -Gmindist=3.5 -Gsize=30,30!",
+        output_dir=None,
+    ):
+        """Plot a network graph representation of global and spatially-conditioned transition matrices.
+
+        Parameters
+        ----------
+        community : geosnap.Community 
+            a geosnap Community instance
+        cluster_col : str
+            column on the Community.gdf containing neighborhood type labels
+        output_dir : str
+            the location that output images will be placed
+        w_type : str {'queen', 'rook'}
+            which type of libpysal spatial weights objects to encode connectivity
+        layout : str, 'dot'
+            graphviz layout for plotting
+        args : str, optional
+            additional arguments passed to graphviz.
+            default is  "-n -Groot=0 -Goverlap=false -Gnodesep=0.01 -Gfont_size=1 -Gmindist=3.5 -Gsize=30,30!"
+
+        Returns
+        ------
+        None
+        """
+        _plot_transition_graphs(
+            self,
+            cluster_col=cluster_col,
+            w_type=w_type,
+            layout=layout,
+            args=args,
+            output_dir=output_dir,
+        )
 
     def plot_silhouette(self, model_name=None, year=None, **kwargs):
         """ Returns a silhouette plot of the model that is passed to it.
@@ -833,11 +935,11 @@ class Community:
         scheme="quantiles",
         k=5,
         pooled=True,
-        cmap="Blues",
+        cmap=None,
         legend=True,
         categorical=False,
         save_fig=None,
-        dpi=500,
+        dpi=200,
         legend_kwds="default",
         figsize=None,
         ncols=None,
@@ -900,9 +1002,14 @@ class Community:
         # as it influences all figures when imported at the top of the file
         import proplot as plot
 
+        if categorical:  # there's no pooled classification for categorical
+            pooled = False
+
         df = self.gdf
         if categorical and not cmap:
             cmap = "Accent"
+        elif not cmap:
+            cmap = "Blues"
         if legend_kwds == "default":
             legend_kwds = {"ncols": 1, "loc": "b"}
         if ctxmap:  # need to convert crs to mercator before graphing
@@ -1012,11 +1119,11 @@ class Community:
         time_periods=None,
         scheme="quantiles",
         k=5,
-        cmap="Blues",
+        cmap=None,
         legend=True,
         alpha=0.6,
         categorical=False,
-        dpi=500,
+        dpi=200,
         fps=1,
         interval=500,
         repeat_delay=1000,
@@ -1070,6 +1177,10 @@ class Community:
                         output file name
         """
         gdf = self.gdf.copy()
+        if categorical and not cmap:
+            cmap = "Accent"
+        elif not cmap:
+            cmap = "Blues"
         if not gdf.crs == 3857:
             gdf = gdf.to_crs(3857)
         if not time_periods:
@@ -1113,7 +1224,7 @@ class Community:
                 repeat_delay=repeat_delay,
                 filename=filename,
                 dpi=dpi,
-                )
+            )
 
     def transition(
         self, cluster_col, time_var="year", id_var="geoid", w_type=None, permutations=0
@@ -1238,6 +1349,86 @@ class Community:
         )
         gdf_new = Community(gdf_temp)
         return gdf_new, df_wide, seq_dis_mat
+
+    def simulate(
+        self,
+        model_name=None,
+        index_col="geoid",
+        w_type="queen",
+        w_options=None,
+        base_year=2010,
+        new_colname="predicted",
+        increment=10,
+        time_steps=1,
+        time_col="year",
+    ):
+        """Simulate community dynamics using spatial Markov transition rules.
+
+        Parameters
+        ----------
+        model_name : [type], optional
+            [description], by default None
+        index_col : str, optional
+            column on the community gdf that denotes the unique index of geographic units
+            for U.S. census data this is "geoid" (which is the default)
+        w_type : str {'queen', 'rook'}
+            which type of libpysal spatial weights objects to encode connectivity
+        w_options : dict
+            additional options passed to a libpysal weights constructor (e.g. `k` for a KNN weights matrix)
+        base_year : int, optional
+            time period to begin the simulation. Typically this is the last time period for which
+            labels have been estimated by a cluster model.
+        new_colname : str, optional
+            name of new column holding predicted neighorhood labels. Default is "predicted"
+        increment : int, optional
+            number of units in each time step (e.g. for a model based on decennial census data, this is 10)
+        time_steps : int, optional
+            number of time periods to simulate
+        time_col : str, optional
+            column on the community gdf that denotes the time index. For builtin data, this is "year"
+
+        Returns
+        -------
+        geosnap.Community if time_steps > 1, else geopandas.GeoDataFrame
+            If simulating multiple timesteps, the return is a new Community instance with simulated label values as its gdf.
+            If simulating a single time step, the return is a single geodataframe
+        """
+        if not w_options:
+            w_options = {}
+        if time_steps == 1:
+            gdf = _predict_labels(
+                self,
+                model_name=model_name,
+                w_type=w_type,
+                w_options=w_options,
+                base_year=base_year,
+                new_colname=new_colname,
+                index_col=index_col,
+                increment=increment,
+                time_steps=time_steps,
+                time_col=time_col,
+            )
+            return gdf
+        else:
+            gdfs = _predict_labels(
+                self,
+                model_name=model_name,
+                w_type=w_type,
+                w_options=w_options,
+                base_year=base_year,
+                new_colname=new_colname,
+                index_col=index_col,
+                increment=increment,
+                time_steps=time_steps,
+                time_col=time_col,
+            )
+            gdfs = pd.concat(gdfs)
+            gdfs = gdfs.dropna(subset=[model_name])
+            gdfs[model_name] = gdfs[model_name].astype(int)
+            return Community.from_geodataframes(gdfs=[gdfs])
+
+    ###### Constructor Methods ######
+    #################################
 
     @classmethod
     def from_ltdb(
