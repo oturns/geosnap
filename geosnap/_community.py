@@ -939,7 +939,7 @@ class Community:
         legend=True,
         categorical=False,
         save_fig=None,
-        dpi=500,
+        dpi=200,
         legend_kwds="default",
         figsize=None,
         ncols=None,
@@ -1001,6 +1001,9 @@ class Community:
         # proplot needs to be used as a function-level import,
         # as it influences all figures when imported at the top of the file
         import proplot as plot
+
+        if categorical:  # there's no pooled classification for categorical
+            pooled = False
 
         df = self.gdf
         if categorical and not cmap:
@@ -1120,7 +1123,7 @@ class Community:
         legend=True,
         alpha=0.6,
         categorical=False,
-        dpi=500,
+        dpi=200,
         fps=1,
         interval=500,
         repeat_delay=1000,
