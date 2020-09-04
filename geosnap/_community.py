@@ -378,7 +378,7 @@ class Community:
         -------
         matplotlib Axes 
             the axes on which the plots are drawn
-        """    
+        """
         ax = _plot_transitions(
             self,
             cluster_col=cluster_col,
@@ -390,7 +390,7 @@ class Community:
             suptitle=suptitle,
             savefig=savefig,
             dpi=dpi,
-            ** kwargs,
+            **kwargs,
         )
         return ax
 
@@ -423,7 +423,7 @@ class Community:
         Returns
         ------
         None
-        """  
+        """
         _plot_transition_graphs(
             self,
             cluster_col=cluster_col,
@@ -1359,6 +1359,37 @@ class Community:
         time_steps=1,
         time_col="year",
     ):
+        """Simulate community dynamics using spatial Markov transition rules.
+
+        Parameters
+        ----------
+        model_name : [type], optional
+            [description], by default None
+        index_col : str, optional
+            column on the community gdf that denotes the unique index of geographic units
+            for U.S. census data this is "geoid" (which is the default)
+        w_type : str {'queen', 'rook'}
+            which type of libpysal spatial weights objects to encode connectivity
+        w_options : dict
+            additional options passed to a libpysal weights constructor (e.g. `k` for a KNN weights matrix)
+        base_year : int, optional
+            time period to begin the simulation. Typically this is the last time period for which
+            labels have been estimated by a cluster model.
+        new_colname : str, optional
+            name of new column holding predicted neighorhood labels. Default is "predicted"
+        increment : int, optional
+            number of units in each time step (e.g. for a model based on decennial census data, this is 10)
+        time_steps : int, optional
+            number of time periods to simulate
+        time_col : str, optional
+            column on the community gdf that denotes the time index. For builtin data, this is "year"
+
+        Returns
+        -------
+        geosnap.Community if time_steps > 1, else geopandas.GeoDataFrame
+            If simulating multiple timesteps, the return is a new Community instance with simulated label values as its gdf.
+            If simulating a single time step, the return is a single geodataframe
+        """
         if not w_options:
             w_options = {}
         if time_steps == 1:
