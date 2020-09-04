@@ -80,6 +80,8 @@ def plot_transition_matrix(
         **kwargs,
     )
     axs[0].set_title("Global", fontsize=14)
+    axs[0].tick_params(axis='x', which='minor', bottom=False)
+    axs[0].tick_params(axis='y', which='minor', left=False)
 
     for i in range(len(sm.P)):
 
@@ -98,6 +100,9 @@ def plot_transition_matrix(
         )
 
         axs[i + 1].set_title(lags_all[i], fontsize=14)
+        axs[i+1].tick_params(axis='x', which='minor', bottom=False)
+        axs[i+1].tick_params(axis='y', which='minor', left=False)
+
 
     # pop off any unused axes
     for i in range(len(axs)):
@@ -108,7 +113,7 @@ def plot_transition_matrix(
         plt.suptitle(suptitle, **title_kwds)
     plt.tight_layout()
     plt.subplots_adjust(top=0.89)
-    plt.minorticks_off()
+    #plt.minorticks_off()
 
     if savefig:
         plt.savefig(savefig, dpi=dpi)
