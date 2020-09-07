@@ -114,8 +114,7 @@ class DataStore:
 
     def __init__(self):
         """Instantiate a new DataStore object."""
-
-        try: # if any of these aren't found, stream them insteead
+        try:  # if any of these aren't found, stream them insteead
             from quilt3.data.census import administrative, tracts_cartographic
             #administrative = quilt3.Package.browse("census/administrative")
             #tracts_cartographic = quilt3.Package.browse("census/tracts_cartographic")
@@ -393,7 +392,7 @@ class DataStore:
         """
         if convert:
             try:
-                
+
                 return _convert_gdf(
                     pd.read_parquet(self.administrative["msas.parquet"].get_cached_path()).sort_values(by="name")
                 )
@@ -448,7 +447,6 @@ class DataStore:
             return _convert_gdf(pd.read_parquet(self.administrative["counties.parquet"].get_cached_path()))
         except:
             return _convert_gdf(self.administrative["counties.parquet"]())
-
 
     def msa_definitions(self):
         """2010 Metropolitan Statistical Area definitions.

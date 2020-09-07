@@ -4,10 +4,7 @@ import pandas
 import sys
 import geopandas as gpd
 from tqdm.auto import tqdm
-import os
 
-from cenpy import products
-from cenpy import set_sitekey
 from pathlib import Path
 
 
@@ -52,6 +49,7 @@ def fetch_acs(
     >>> dc = fetch_acs('District of Columbia', year=2015)
 
     """
+    from cenpy import products
     from .._data import datasets
 
     states = datasets.states()

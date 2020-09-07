@@ -3,16 +3,15 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from matplotlib.pyplot import savefig
 import os
 import networkx as nx
 
 
 def plot_transition_matrix(
     community,
-    cluster_col,
-    w_type,
-    w_options,
+    cluster_col=None,
+    w_type="queen",
+    w_options=None,
     figsize=(13, 12),
     n_rows=3,
     n_cols=3,
@@ -22,11 +21,11 @@ def plot_transition_matrix(
     dpi=300,
     **kwargs,
 ):
-    """Plot global and spatially-conditioned transition matrices as heatmaps
+    """Plot global and spatially-conditioned transition matrices as heatmaps.
 
     Parameters
     ----------
-    community : geosnap.Community 
+    community : geosnap.Community
         a geosnap Community instance
     cluster_col : str
         column on the Community.gdf containing neighborhood type labels
@@ -51,9 +50,9 @@ def plot_transition_matrix(
 
     Returns
     -------
-    matplotlib Axes 
+    matplotlib Axes
         the axes on which the plots are drawn
-    """    
+    """
     if not n_rows and not n_cols:
         n_cols = len(community.gdf[cluster_col].unique()) + 1
         n_rows = 1
@@ -61,11 +60,15 @@ def plot_transition_matrix(
         title_kwds = {
             "fontsize": 20,
         }
+
     sm = community.transition(cluster_col=cluster_col, w_type=w_type)
-    fig, axs = plt.subplots(n_rows, n_cols, figsize=figsize)
+
+    _, axs = plt.subplots(n_rows, n_cols, figsize=figsize)
+    axs = axs.flatten()
+
     ls = sm.classes
     lags_all = ["Modal Neighbor - " + str(l) for l in ls]
-    axs = axs.flatten()
+
     sns.heatmap(
         sm.p,
         annot=True,
@@ -80,14 +83,14 @@ def plot_transition_matrix(
         **kwargs,
     )
     axs[0].set_title("Global", fontsize=14)
-    axs[0].tick_params(axis='x', which='minor', bottom=False)
-    axs[0].tick_params(axis='y', which='minor', left=False)
+    axs[0].tick_params(axis="x", which="minor", bottom=False)
+    axs[0].tick_params(axis="y", which="minor", left=False)
 
     for i in range(len(sm.P)):
 
         # Loop over data dimensions and create text annotations.
         p_temp = sm.P[i]
-        im = sns.heatmap(
+        sns.heatmap(
             p_temp,
             annot=True,
             linewidths=0.5,
@@ -100,9 +103,8 @@ def plot_transition_matrix(
         )
 
         axs[i + 1].set_title(lags_all[i], fontsize=14)
-        axs[i+1].tick_params(axis='x', which='minor', bottom=False)
-        axs[i+1].tick_params(axis='y', which='minor', left=False)
-
+        axs[i + 1].tick_params(axis="x", which="minor", bottom=False)
+        axs[i + 1].tick_params(axis="y", which="minor", left=False)
 
     # pop off any unused axes
     for i in range(len(axs)):
@@ -113,7 +115,6 @@ def plot_transition_matrix(
         plt.suptitle(suptitle, **title_kwds)
     plt.tight_layout()
     plt.subplots_adjust(top=0.89)
-    #plt.minorticks_off()
 
     if savefig:
         plt.savefig(savefig, dpi=dpi)
@@ -123,17 +124,17 @@ def plot_transition_matrix(
 
 def plot_transition_graphs(
     community,
-    cluster_col,
-    output_dir,
-    w_type,
-    layout='dot',
+    cluster_col=None,
+    output_dir=".",
+    w_type="queen",
+    layout="dot",
     args="-n -Groot=0 -Goverlap=false -Gnodesep=0.01 -Gfont_size=1 -Gmindist=3.5 -Gsize=30,30!",
 ):
-    """Plot a network graph representation of global and spatially-conditioned transition matrices
+    """Plot a network graph representation of global and spatially-conditioned transition matrices.
 
     Parameters
     ----------
-    community : geosnap.Community 
+    community : geosnap.Community
         a geosnap Community instance
     cluster_col : str
         column on the Community.gdf containing neighborhood type labels
@@ -150,16 +151,15 @@ def plot_transition_graphs(
     Returns
     ------
     None
-    """    
+    """
     try:
         import pygraphviz
     except ImportError:
-        raise ImportError('You must have pygraphviz installed to use graph plotting')
+        raise ImportError("You must have pygraphviz installed to use graph plotting")
     sm = community.transition(cluster_col=cluster_col, w_type=w_type)
 
     # plot the global transition matrix
     p = sm.p
-    fig, ax = plt.subplots()
     graph = np.round(p, 2)
 
     dt = [("weight", float)]
@@ -173,11 +173,9 @@ def plot_transition_graphs(
     A.layout(layout, args=args)  # use either circo or dot layout
     A.draw(os.path.join(output_dir, f"{cluster_col}_transitions_global.png"))
 
-
     # then plot each of the spatially-conditioned matrices
     for i, p in enumerate(sm.P):
 
-        fig, ax = plt.subplots()
         graph = np.round(p, 2)
 
         dt = [("weight", float)]
