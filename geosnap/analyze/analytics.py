@@ -543,12 +543,12 @@ def predict_labels(
 
     gdf = comm.gdf.copy()
     gdf = gdf.dropna(subset=[model_name]).reset_index()
-    w = Ws[w_type].from_dataframe(gdf, **w_options)
     t = comm.transition(model_name, w_type=w_type)
 
     if time_steps == 1:
 
-        gdf = gdf[gdf[time_col] == base_year]
+        gdf = gdf[gdf[time_col] == base_year].reset_index()
+        w = Ws[w_type].from_dataframe(gdf, **w_options)
         lags = lag_categorical(w, gdf[model_name].values)
         lags = lags.astype(int)
 
