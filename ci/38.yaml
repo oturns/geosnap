@@ -36,3 +36,4 @@ dependencies:
   - proplot
   - contextily
   - scikit-plot
+  - pygraphviz
