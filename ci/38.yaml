@@ -1,6 +1,7 @@
 name: test
 channels:
   - conda-forge
+  - alubbock   # pygraphviz builds for windows
 dependencies:
   - python=3.8
   - pandas
