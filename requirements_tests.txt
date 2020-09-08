@@ -11,3 +11,4 @@ hdbscan
 twine
 jupyter
 descartes
+pygraphviz

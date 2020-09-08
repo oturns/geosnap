@@ -20,3 +20,4 @@ snap/tests/.ipynb_checkpoints/
 **/.vscode
 **/build/
 **/dist/
+geosnap/tests/images
