@@ -524,11 +524,13 @@ def predict_labels(
     new_colname=None,
     time_steps=1,
     increment=None,
+    seed=None
 ):
+    np.random.seed(seed)
     if not new_colname:
         new_colname = "predicted"
     if not w_options:
-        w_options - {}
+        w_options = {}
 
     assert (
         comm.harmonized

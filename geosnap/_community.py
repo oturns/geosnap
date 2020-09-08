@@ -8,6 +8,7 @@ import geopandas as gpd
 import mapclassify.classifiers as classifiers
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 import scikitplot as skplt
 
 from ._data import _Map, datasets
@@ -1357,6 +1358,7 @@ class Community:
         increment=10,
         time_steps=3,
         time_col="year",
+        seed=None,
     ):
         """Simulate community dynamics using spatial Markov transition rules.
 
@@ -1382,6 +1384,8 @@ class Community:
             number of time periods to simulate
         time_col : str, optional
             column on the community gdf that denotes the time index. For builtin data, this is "year"
+        seed: int, optional\
+            seed passed to numpy random number generator
 
         Returns
         -------
@@ -1389,6 +1393,7 @@ class Community:
             If simulating multiple timesteps, the return is a new Community instance with simulated label values as its gdf.
             If simulating a single time step, the return is a single geodataframe
         """
+        np.random.seed(seed)
         if time_steps == 1:
             gdf = _predict_labels(
                 self,
@@ -1401,6 +1406,7 @@ class Community:
                 increment=increment,
                 time_steps=time_steps,
                 time_col=time_col,
+                seed=seed
             )
             return gdf
         else:
@@ -1415,6 +1421,7 @@ class Community:
                 increment=increment,
                 time_steps=time_steps,
                 time_col=time_col,
+                seed=seed
             )
             gdfs = pd.concat(gdfs)
             gdfs = gdfs.dropna(subset=[model_name])
