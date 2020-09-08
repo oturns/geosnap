@@ -26,6 +26,8 @@ from .cluster import (
     ward_spatial,
 )
 
+np.seterr(divide='ignore', invalid='ignore')
+
 Ws = {
     "queen": Queen,
     "rook": Rook,
