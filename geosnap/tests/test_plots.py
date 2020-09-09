@@ -3,6 +3,8 @@ import proplot
 import numpy
 import os
 import shutil
+import pytest
+
 
 try:
     import pygraphviz
