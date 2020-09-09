@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>geosnap._data &#8212; geosnap v0.4.0 Manual</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>geosnap._data &#8212; geosnap v0.5.0 Manual</title>
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/pysal-styles.css" />
@@ -37,7 +38,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html"><span><img src="../../_static/geosnap.svg"></span>
           geosnap</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.4.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.5.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -237,11 +238,11 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Instantiate a new DataStore object.&quot;&quot;&quot;</span>
-
-        <span class="k">try</span><span class="p">:</span> <span class="c1"># if any of these aren&#39;t found, stream them insteead</span>
-            <span class="n">administrative</span> <span class="o">=</span> <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">browse</span><span class="p">(</span><span class="s2">&quot;census/administrative&quot;</span><span class="p">)</span>
-            <span class="n">tracts_cartographic</span> <span class="o">=</span> <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">browse</span><span class="p">(</span><span class="s2">&quot;census/tracts_cartographic&quot;</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>  <span class="c1"># if any of these aren&#39;t found, stream them insteead</span>
+            <span class="kn">from</span> <span class="nn">quilt3.data.census</span> <span class="kn">import</span> <span class="n">administrative</span><span class="p">,</span> <span class="n">tracts_cartographic</span>
+            <span class="c1">#administrative = quilt3.Package.browse(&quot;census/administrative&quot;)</span>
+            <span class="c1">#tracts_cartographic = quilt3.Package.browse(&quot;census/tracts_cartographic&quot;)</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
             <span class="n">warn</span><span class="p">(</span>
                 <span class="s2">&quot;Unable to locate local census data. Streaming instead.</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="s2">&quot;If you plan to use census data repeatedly you can store it locally &quot;</span>
@@ -304,8 +305,9 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">blocks_2000</span> <span class="o">=</span> <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">browse</span><span class="p">(</span><span class="s2">&quot;census/blocks_2000&quot;</span><span class="p">)</span> <span class="c1"># if any of these aren&#39;t found, stream them instead</span>
-        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">quilt3.data.census</span> <span class="kn">import</span> <span class="n">blocks_2000</span>
+            <span class="c1">#blocks_2000 = quilt3.Package.browse(&quot;census/blocks_2000&quot;) # if any of these aren&#39;t found, stream them instead</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
             <span class="n">warn</span><span class="p">(</span>
                 <span class="s2">&quot;Unable to locate local census 2000 block data. Streaming instead.</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="s2">&quot;If you plan to use census data repeatedly you can store it locally &quot;</span>
@@ -330,7 +332,10 @@
             <span class="n">states</span> <span class="o">=</span> <span class="p">[</span><span class="n">states</span><span class="p">]</span>
         <span class="n">blks</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">states</span><span class="p">:</span>
-            <span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">=</span> <span class="n">blocks_2000</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">state</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">]()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">blocks_2000</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">state</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_cached_path</span><span class="p">())</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">=</span> <span class="n">blocks_2000</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">state</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">]()</span>
             <span class="k">if</span> <span class="n">fips</span><span class="p">:</span>
                 <span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">=</span> <span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">][</span><span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">][</span><span class="s2">&quot;geoid&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">fips</span><span class="p">)]</span>
             <span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">][</span><span class="s2">&quot;year&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2000</span>
@@ -359,8 +364,9 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">blocks_2010</span> <span class="o">=</span> <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">browse</span><span class="p">(</span><span class="s2">&quot;census/blocks_2010&quot;</span><span class="p">)</span>  <span class="c1"># if any of these aren&#39;t found, stream them instead</span>
-        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">quilt3.data.census</span> <span class="kn">import</span> <span class="n">blocks_2010</span>
+            <span class="c1">#blocks_2010 = quilt3.Package.browse(&quot;census/blocks_2010&quot;)  # if any of these aren&#39;t found, stream them instead</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
             <span class="n">warn</span><span class="p">(</span>
                 <span class="s2">&quot;Unable to locate local census 2010 block data. Streaming instead.</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="s2">&quot;If you plan to use census data repeatedly you can store it locally &quot;</span>
@@ -384,7 +390,10 @@
             <span class="n">states</span> <span class="o">=</span> <span class="p">[</span><span class="n">states</span><span class="p">]</span>
         <span class="n">blks</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">states</span><span class="p">:</span>
-            <span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">=</span> <span class="n">blocks_2010</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">state</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">]()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">blocks_2010</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">state</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_cached_path</span><span class="p">())</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">=</span> <span class="n">blocks_2010</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">state</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">]()</span>
             <span class="k">if</span> <span class="n">fips</span><span class="p">:</span>
                 <span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="o">=</span> <span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">][</span><span class="n">blks</span><span class="p">[</span><span class="n">state</span><span class="p">][</span><span class="s2">&quot;geoid&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">fips</span><span class="p">)]</span>
 
@@ -412,7 +421,12 @@
 <span class="sd">            stored as well-known binary on the &#39;wkb&#39; column.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tracts_cartographic</span><span class="p">[</span><span class="s2">&quot;tracts_1990_500k.parquet&quot;</span><span class="p">]()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tracts_cartographic</span><span class="p">[</span><span class="s2">&quot;tracts_1990_500k.parquet&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_cached_path</span><span class="p">())</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">warn</span><span class="p">(</span><span class="s1">&#39;streaming remote data. Use `geosnap.io.store_census() to store the data locally for better performance&#39;</span><span class="p">)</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tracts_cartographic</span><span class="p">[</span><span class="s2">&quot;tracts_1990_500k.parquet&quot;</span><span class="p">]()</span>
+
         <span class="k">if</span> <span class="n">states</span><span class="p">:</span>
             <span class="n">t</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">geoid</span><span class="o">.</span><span class="n">str</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">states</span><span class="p">)]</span>
         <span class="n">t</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1990</span>
@@ -438,7 +452,11 @@
 <span class="sd">            stored as well-known binary on the &#39;wkb&#39; column.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tracts_cartographic</span><span class="p">[</span><span class="s2">&quot;tracts_2000_500k.parquet&quot;</span><span class="p">]()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tracts_cartographic</span><span class="p">[</span><span class="s2">&quot;tracts_2000_500k.parquet&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_cached_path</span><span class="p">())</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">warn</span><span class="p">(</span><span class="s1">&#39;streaming remote data. Use `geosnap.io.store_census() to store the data locally for better performance&#39;</span><span class="p">)</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tracts_cartographic</span><span class="p">[</span><span class="s2">&quot;tracts_2000_500k.parquet&quot;</span><span class="p">]()</span>
         <span class="k">if</span> <span class="n">states</span><span class="p">:</span>
             <span class="n">t</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">geoid</span><span class="o">.</span><span class="n">str</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">states</span><span class="p">)]</span>
         <span class="n">t</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2000</span>
@@ -464,7 +482,12 @@
 <span class="sd">            stored as well-known binary on the &#39;wkb&#39; column.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tracts_cartographic</span><span class="p">[</span><span class="s2">&quot;tracts_2010_500k.parquet&quot;</span><span class="p">]()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tracts_cartographic</span><span class="p">[</span><span class="s2">&quot;tracts_2010_500k.parquet&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_cached_path</span><span class="p">())</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">warn</span><span class="p">(</span><span class="s1">&#39;streaming remote data. Use `geosnap.io.store_census() to store the data locally for better performance&#39;</span><span class="p">)</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tracts_cartographic</span><span class="p">[</span><span class="s2">&quot;tracts_2010_500k.parquet&quot;</span><span class="p">]()</span>
+
         <span class="k">if</span> <span class="n">states</span><span class="p">:</span>
             <span class="n">t</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">geoid</span><span class="o">.</span><span class="n">str</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">states</span><span class="p">)]</span>
         <span class="n">t</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2010</span>
@@ -492,10 +515,17 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">convert</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">_convert_gdf</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">administrative</span><span class="p">[</span><span class="s2">&quot;msas.parquet&quot;</span><span class="p">]()</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
-            <span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">administrative</span><span class="p">[</span><span class="s2">&quot;msas.parquet&quot;</span><span class="p">]()</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+
+                <span class="k">return</span> <span class="n">_convert_gdf</span><span class="p">(</span>
+                    <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">administrative</span><span class="p">[</span><span class="s2">&quot;msas.parquet&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_cached_path</span><span class="p">())</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">_convert_gdf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">administrative</span><span class="p">[</span><span class="s2">&quot;msas.parquet&quot;</span><span class="p">]())</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">administrative</span><span class="p">[</span><span class="s2">&quot;msas.parquet&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_cached_path</span><span class="p">())</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">administrative</span><span class="p">[</span><span class="s2">&quot;msas.parquet&quot;</span><span class="p">]()</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">states</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">convert</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;States.</span>
@@ -513,8 +543,14 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">convert</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">_convert_gdf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">administrative</span><span class="p">[</span><span class="s2">&quot;states.parquet&quot;</span><span class="p">]())</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">administrative</span><span class="p">[</span><span class="s2">&quot;states.parquet&quot;</span><span class="p">]()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">_convert_gdf</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">administrative</span><span class="p">[</span><span class="s2">&quot;states.parquet&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_cached_path</span><span class="p">()))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">_convert_gdf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">administrative</span><span class="p">[</span><span class="s2">&quot;states.parquet&quot;</span><span class="p">]())</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">administrative</span><span class="p">[</span><span class="s2">&quot;states.parquet&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_cached_path</span><span class="p">())</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">administrative</span><span class="p">[</span><span class="s2">&quot;states.parquet&quot;</span><span class="p">]()</span>
 
     <span class="k">def</span> <span class="nf">counties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Nationwide counties as drawn in 2010.</span>
@@ -531,7 +567,10 @@
 <span class="sd">            stored as well-known binary on the &#39;wkb&#39; column.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_convert_gdf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">administrative</span><span class="p">[</span><span class="s2">&quot;counties.parquet&quot;</span><span class="p">]())</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">_convert_gdf</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">administrative</span><span class="p">[</span><span class="s2">&quot;counties.parquet&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_cached_path</span><span class="p">()))</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">_convert_gdf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">administrative</span><span class="p">[</span><span class="s2">&quot;counties.parquet&quot;</span><span class="p">]())</span>
 
     <span class="k">def</span> <span class="nf">msa_definitions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;2010 Metropolitan Statistical Area definitions.</span>
@@ -545,7 +584,10 @@
 <span class="sd">            dataframe that stores state/county --&gt; MSA crosswalk definitions.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">administrative</span><span class="p">[</span><span class="s2">&quot;msa_definitions.parquet&quot;</span><span class="p">]()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">administrative</span><span class="p">[</span><span class="s2">&quot;msa_definitions.parquet&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_cached_path</span><span class="p">())</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">administrative</span><span class="p">[</span><span class="s2">&quot;msa_definitions.parquet&quot;</span><span class="p">]()</span>
 
     <span class="k">def</span> <span class="nf">ltdb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Longitudinal Tract Database (LTDB).</span>
@@ -613,7 +655,7 @@
     </p>
     <p>
         &copy; Copyright 2020, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
     </p>
   </div>
 </footer>

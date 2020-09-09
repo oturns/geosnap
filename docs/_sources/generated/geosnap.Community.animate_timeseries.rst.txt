@@ -1,4 +1,4 @@
-geosnap.Community.animate\_timeseries
+﻿geosnap.Community.animate\_timeseries
 =====================================
 
 .. currentmodule:: geosnap

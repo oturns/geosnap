@@ -1,4 +1,4 @@
-geosnap.io.store\_blocks\_2010
+﻿geosnap.io.store\_blocks\_2010
 ==============================
 
 .. currentmodule:: geosnap.io

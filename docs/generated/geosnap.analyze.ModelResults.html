@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>geosnap.analyze.ModelResults &#8212; geosnap v0.4.0 Manual</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>geosnap.analyze.ModelResults &#8212; geosnap v0.5.0 Manual</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/pysal-styles.css" />
@@ -16,7 +17,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="geosnap.analyze.cluster" href="geosnap.analyze.cluster.html" />
-    <link rel="prev" title="geosnap.Community.plot_timeseries" href="geosnap.Community.plot_timeseries.html" />
+    <link rel="prev" title="geosnap.Community.plot_transition_graphs" href="geosnap.Community.plot_transition_graphs.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -39,7 +40,7 @@
         </button>
         <a class="navbar-brand" href="../index.html"><span><img src="../_static/geosnap.svg"></span>
           geosnap</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.4.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.5.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -127,9 +128,9 @@
       
   <div class="section" id="geosnap-analyze-modelresults">
 <h1>geosnap.analyze.ModelResults<a class="headerlink" href="#geosnap-analyze-modelresults" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="geosnap.analyze.ModelResults">
-<em class="property">class </em><code class="sig-prename descclassname">geosnap.analyze.</code><code class="sig-name descname">ModelResults</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">columns</em>, <em class="sig-param">labels</em>, <em class="sig-param">instance</em>, <em class="sig-param">W</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/analyze/analytics.html#ModelResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.analyze.ModelResults" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">geosnap.analyze.</code><code class="sig-name descname">ModelResults</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">columns</span></em>, <em class="sig-param"><span class="n">labels</span></em>, <em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">W</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/analyze/analytics.html#ModelResults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.analyze.ModelResults" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stores data about cluster and cluster_spatial models.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Attributes</dt>
@@ -158,9 +159,9 @@ or other model class used to estimate class labels</p>
 </dl>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="geosnap.analyze.ModelResults.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">columns</em>, <em class="sig-param">labels</em>, <em class="sig-param">instance</em>, <em class="sig-param">W</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/analyze/analytics.html#ModelResults.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.analyze.ModelResults.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">columns</span></em>, <em class="sig-param"><span class="n">labels</span></em>, <em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">W</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/analyze/analytics.html#ModelResults.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.analyze.ModelResults.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize a new ModelResults instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -201,16 +202,16 @@ or other model class used to estimate class labels</p>
 <td><p>Initialize a new ModelResults instance.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">boundary_sil</span></code>(**kwargs)</p></td>
-<td><p>A function that calculates boundary silhouette scores for the current model.</p></td>
+<td><p>Calculate boundary silhouette scores for the current model.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">nearest_label</span></code>(**kwargs)</p></td>
-<td><p>A function that calculates nearest_labels for the current model.</p></td>
+<td><p>Calculate nearest_labels for the current model.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">path_sil</span></code>(**kwargs)</p></td>
-<td><p>A function that calculates path silhouette scores for the current model.</p></td>
+<td><p>Calculate path silhouette scores for the current model.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sil_scores</span></code>(**kwargs)</p></td>
-<td><p>A function that calculates silhouette scores for the current model.</p></td>
+<td><p>Calculate silhouette scores for the current model.</p></td>
 </tr>
 </tbody>
 </table>
@@ -238,7 +239,7 @@ or other model class used to estimate class labels</p>
     </p>
     <p>
         &copy; Copyright 2020, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
     </p>
   </div>
 </footer>

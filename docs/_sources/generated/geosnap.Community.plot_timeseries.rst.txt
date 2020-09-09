@@ -1,4 +1,4 @@
-geosnap.Community.plot\_timeseries
+﻿geosnap.Community.plot\_timeseries
 ==================================
 
 .. currentmodule:: geosnap

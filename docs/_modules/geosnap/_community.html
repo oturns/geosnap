@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>geosnap._community &#8212; geosnap v0.4.0 Manual</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>geosnap._community &#8212; geosnap v0.5.0 Manual</title>
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/pysal-styles.css" />
@@ -37,7 +38,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html"><span><img src="../../_static/geosnap.svg"></span>
           geosnap</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.4.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.5.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -131,6 +132,7 @@
 <span class="kn">import</span> <span class="nn">mapclassify.classifiers</span> <span class="k">as</span> <span class="nn">classifiers</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scikitplot</span> <span class="k">as</span> <span class="nn">skplt</span>
 
 <span class="kn">from</span> <span class="nn">._data</span> <span class="kn">import</span> <span class="n">_Map</span><span class="p">,</span> <span class="n">datasets</span>
@@ -138,9 +140,12 @@
 <span class="kn">from</span> <span class="nn">.analyze</span> <span class="kn">import</span> <span class="n">cluster_spatial</span> <span class="k">as</span> <span class="n">_cluster_spatial</span>
 <span class="kn">from</span> <span class="nn">.analyze</span> <span class="kn">import</span> <span class="n">sequence</span> <span class="k">as</span> <span class="n">_sequence</span>
 <span class="kn">from</span> <span class="nn">.analyze</span> <span class="kn">import</span> <span class="n">transition</span> <span class="k">as</span> <span class="n">_transition</span>
+<span class="kn">from</span> <span class="nn">.analyze</span> <span class="kn">import</span> <span class="n">predict_labels</span> <span class="k">as</span> <span class="n">_predict_labels</span>
 <span class="kn">from</span> <span class="nn">.harmonize</span> <span class="kn">import</span> <span class="n">harmonize</span> <span class="k">as</span> <span class="n">_harmonize</span>
 <span class="kn">from</span> <span class="nn">.io</span> <span class="kn">import</span> <span class="n">_fips_filter</span><span class="p">,</span> <span class="n">_fipstable</span><span class="p">,</span> <span class="n">_from_db</span><span class="p">,</span> <span class="n">get_lehd</span>
 <span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">gif_from_path</span> <span class="k">as</span> <span class="n">_gif_from_path</span>
+<span class="kn">from</span> <span class="nn">.visualize</span> <span class="kn">import</span> <span class="n">plot_transition_matrix</span> <span class="k">as</span> <span class="n">_plot_transitions</span>
+<span class="kn">from</span> <span class="nn">.visualize</span> <span class="kn">import</span> <span class="n">plot_transition_graphs</span> <span class="k">as</span> <span class="n">_plot_transition_graphs</span>
 
 <span class="n">schemes</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="k">for</span> <span class="n">classifier</span> <span class="ow">in</span> <span class="n">classifiers</span><span class="o">.</span><span class="n">CLASSIFIERS</span><span class="p">:</span>
@@ -454,8 +459,108 @@
         <span class="n">comm</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span>
         <span class="k">return</span> <span class="n">comm</span></div>
 
+<div class="viewcode-block" id="Community.plot_transition_matrix"><a class="viewcode-back" href="../../generated/geosnap.Community.plot_transition_matrix.html#geosnap.Community.plot_transition_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">plot_transition_matrix</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">cluster_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">w_type</span><span class="o">=</span><span class="s2">&quot;queen&quot;</span><span class="p">,</span>
+        <span class="n">w_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span>
+        <span class="n">n_rows</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">n_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">suptitle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">savefig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plot global and spatially-conditioned transition matrices as heatmaps</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cluster_col : str</span>
+<span class="sd">            column on the Community.gdf containing neighborhood type labels</span>
+<span class="sd">        w_type : str {&#39;queen&#39;, &#39;rook&#39;}</span>
+<span class="sd">            which type of libpysal spatial weights objects to encode connectivity</span>
+<span class="sd">        w_options : dict</span>
+<span class="sd">            additional options passed to a libpysal weights constructor (e.g. `k` for a KNN weights matrix)</span>
+<span class="sd">        figsize : tuple, optional</span>
+<span class="sd">            size of the resulting figure (13, 12)</span>
+<span class="sd">        n_rows : int, optional</span>
+<span class="sd">            rows in the plot; n_rows * n_cols must be &gt;= the number of neighborhood types</span>
+<span class="sd">        n_cols : int, optional</span>
+<span class="sd">            columns in the plot; n_rows * n_cols must be &gt;= the number of neighborhood types</span>
+<span class="sd">        suptitle : str, optional</span>
+<span class="sd">            title of the figure</span>
+<span class="sd">        title_kwds : dict, optional</span>
+<span class="sd">            additional keyword options for formatting the title</span>
+<span class="sd">        savefig : str, optional</span>
+<span class="sd">            location the plot will be saved</span>
+<span class="sd">        dpi : int, optional</span>
+<span class="sd">            dpi of the resulting image, default is 300</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        matplotlib Axes</span>
+<span class="sd">            the axes on which the plots are drawn</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">_plot_transitions</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">cluster_col</span><span class="o">=</span><span class="n">cluster_col</span><span class="p">,</span>
+            <span class="n">w_type</span><span class="o">=</span><span class="n">w_type</span><span class="p">,</span>
+            <span class="n">w_options</span><span class="o">=</span><span class="n">w_options</span><span class="p">,</span>
+            <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span>
+            <span class="n">n_rows</span><span class="o">=</span><span class="n">n_rows</span><span class="p">,</span>
+            <span class="n">n_cols</span><span class="o">=</span><span class="n">n_cols</span><span class="p">,</span>
+            <span class="n">suptitle</span><span class="o">=</span><span class="n">suptitle</span><span class="p">,</span>
+            <span class="n">savefig</span><span class="o">=</span><span class="n">savefig</span><span class="p">,</span>
+            <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">ax</span></div>
+
+<div class="viewcode-block" id="Community.plot_transition_graphs"><a class="viewcode-back" href="../../generated/geosnap.Community.plot_transition_graphs.html#geosnap.Community.plot_transition_graphs">[docs]</a>    <span class="k">def</span> <span class="nf">plot_transition_graphs</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">cluster_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">w_type</span><span class="o">=</span><span class="s1">&#39;queen&#39;</span><span class="p">,</span>
+        <span class="n">layout</span><span class="o">=</span><span class="s2">&quot;dot&quot;</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">=</span><span class="s2">&quot;-n -Groot=0 -Goverlap=false -Gmindist=3.5 -Gsize=30,30!&quot;</span><span class="p">,</span>
+        <span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plot a network graph representation of global and spatially-conditioned transition matrices.</span>
+
+<span class="sd">        This function requires pygraphviz to be installed. For linux and macos, it can be installed with</span>
+<span class="sd">        `conda install -c conda-forge pygraphviz`. At the time of this writing there is no pygraphviz build</span>
+<span class="sd">        available for Windows from mainstream conda channels, but it can be installed with</span>
+<span class="sd">        `conda install -c alubbock pygraphviz`</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cluster_col : str</span>
+<span class="sd">            column on the Community.gdf containing neighborhood type labels</span>
+<span class="sd">        output_dir : str</span>
+<span class="sd">            the location that output images will be placed</span>
+<span class="sd">        w_type : str {&#39;queen&#39;, &#39;rook&#39;}</span>
+<span class="sd">            which type of libpysal spatial weights objects to encode connectivity</span>
+<span class="sd">        layout : str, &#39;dot&#39;</span>
+<span class="sd">            graphviz layout for plotting</span>
+<span class="sd">        args : str, optional</span>
+<span class="sd">            additional arguments passed to graphviz.</span>
+<span class="sd">            default is  &quot;-n -Groot=0 -Goverlap=false -Gnodesep=0.01 -Gfont_size=1 -Gmindist=3.5 -Gsize=30,30!&quot;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_plot_transition_graphs</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">cluster_col</span><span class="o">=</span><span class="n">cluster_col</span><span class="p">,</span>
+            <span class="n">w_type</span><span class="o">=</span><span class="n">w_type</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span>
+            <span class="n">output_dir</span><span class="o">=</span><span class="n">output_dir</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
 <div class="viewcode-block" id="Community.plot_silhouette"><a class="viewcode-back" href="../../generated/geosnap.Community.plot_silhouette.html#geosnap.Community.plot_silhouette">[docs]</a>    <span class="k">def</span> <span class="nf">plot_silhouette</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">year</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Returns a silhouette plot of the model that is passed to it.</span>
+        <span class="sd">&quot;&quot;&quot;Make silhouette plot of the Community model.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -499,8 +604,7 @@
         <span class="n">id_var</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Returns a plot of the silhouette scores of the model that is passed to it</span>
-<span class="sd">            by creating a table join of the models silhouettes object and community gdf</span>
+        <span class="sd">&quot;&quot;&quot;Plot of the silhouette scores of a Community model.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -610,7 +714,7 @@
         <span class="n">id_var</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Returns a plot of the nearest_labels of the model that is passed to it.</span>
+        <span class="sd">&quot;&quot;&quot;Plot the nearest_labels of the community model.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -651,7 +755,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">model_name</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">year</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="p">(</span>
+            <span class="k">raise</span> <span class="n">InputError</span><span class="p">(</span>
                 <span class="s2">&quot;This model has unique results for each time period; You must supply a value for `year`&quot;</span>
             <span class="p">)</span>
 
@@ -731,7 +835,7 @@
         <span class="n">id_var</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Returns a plot of the path_silhouettes of the model that is passed to it.</span>
+        <span class="sd">&quot;&quot;&quot;Plot the path_silhouettes of Commmunity model.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -839,7 +943,7 @@
         <span class="n">id_var</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Returns a plot of the boundary_silhouettes of the model that is passed to it.</span>
+        <span class="sd">&quot;&quot;&quot;Plot boundary_silhouettes of the Commiunity model.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -956,11 +1060,11 @@
         <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span>
         <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
         <span class="n">pooled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Blues&quot;</span><span class="p">,</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">categorical</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">save_fig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+        <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
         <span class="n">legend_kwds</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
         <span class="n">figsize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">ncols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -969,7 +1073,7 @@
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Plot an attribute from a Community arranged as a timeseries.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        Community    : Community object</span>
@@ -1023,9 +1127,14 @@
         <span class="c1"># as it influences all figures when imported at the top of the file</span>
         <span class="kn">import</span> <span class="nn">proplot</span> <span class="k">as</span> <span class="nn">plot</span>
 
+        <span class="k">if</span> <span class="n">categorical</span><span class="p">:</span>  <span class="c1"># there&#39;s no pooled classification for categorical</span>
+            <span class="n">pooled</span> <span class="o">=</span> <span class="kc">False</span>
+
         <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span>
         <span class="k">if</span> <span class="n">categorical</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">cmap</span><span class="p">:</span>
             <span class="n">cmap</span> <span class="o">=</span> <span class="s2">&quot;Accent&quot;</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">cmap</span><span class="p">:</span>
+            <span class="n">cmap</span> <span class="o">=</span> <span class="s2">&quot;Blues&quot;</span>
         <span class="k">if</span> <span class="n">legend_kwds</span> <span class="o">==</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span>
             <span class="n">legend_kwds</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ncols&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;loc&quot;</span><span class="p">:</span> <span class="s2">&quot;b&quot;</span><span class="p">}</span>
         <span class="k">if</span> <span class="n">ctxmap</span><span class="p">:</span>  <span class="c1"># need to convert crs to mercator before graphing</span>
@@ -1129,38 +1238,40 @@
 
 <div class="viewcode-block" id="Community.animate_timeseries"><a class="viewcode-back" href="../../generated/geosnap.Community.animate_timeseries.html#geosnap.Community.animate_timeseries">[docs]</a>    <span class="k">def</span> <span class="nf">animate_timeseries</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">column</span><span class="p">,</span>
+        <span class="n">column</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
         <span class="n">time_col</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span>
         <span class="n">time_periods</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span>
         <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-        <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Blues&quot;</span><span class="p">,</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>
         <span class="n">categorical</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
-        <span class="n">fps</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+        <span class="n">fps</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
         <span class="n">interval</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
         <span class="n">repeat_delay</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
         <span class="n">title_fontsize</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
         <span class="n">subtitle_fontsize</span><span class="o">=</span><span class="mi">38</span><span class="p">,</span>
         <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span>
-        <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">ctxmap</span><span class="o">=</span><span class="n">ctx</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">TonerLite</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Create an animated gif from a Community timeseries</span>
+        <span class="sd">&quot;&quot;&quot;Create an animated gif from a Community timeseries.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        column       : str</span>
 <span class="sd">                       column to be graphed in a time series</span>
+<span class="sd">        filename     : str, required</span>
+<span class="sd">                        output file name</span>
 <span class="sd">        title        : str, optional</span>
 <span class="sd">                       desired title of figure</span>
 <span class="sd">        time_col     : str, required</span>
 <span class="sd">                        column on the Community.gdf that stores time periods</span>
 <span class="sd">        time_periods:  list, optional</span>
-<span class="sd">                        subset of time periods to include in the animation. If none, then all times will be used</span>
+<span class="sd">                        subset of time periods to include in the animation. If None, then all times will be used</span>
 <span class="sd">        scheme       : string, optional</span>
 <span class="sd">                       matplotlib scheme to be used</span>
 <span class="sd">                       default is &#39;quantiles&#39;</span>
@@ -1184,15 +1295,17 @@
 <span class="sd">        figsize      : tuple, optional</span>
 <span class="sd">                        output figure size passed to matplotlib.pyplot</span>
 <span class="sd">        fps          : float, optional</span>
-<span class="sd">                        frames per second</span>
+<span class="sd">                       frames per second, used to speed up or slow down animation</span>
 <span class="sd">        interval     : int, optional</span>
-<span class="sd">                        interval between frames in miliseconds, default 500</span>
+<span class="sd">                       interval between frames in miliseconds, default 500</span>
 <span class="sd">        repeat_delay : int, optional</span>
 <span class="sd">                        time before animation repeats in miliseconds, default 1000</span>
-<span class="sd">        filename     : str, required</span>
-<span class="sd">                        output file name</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">gdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">categorical</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">cmap</span><span class="p">:</span>
+            <span class="n">cmap</span> <span class="o">=</span> <span class="s2">&quot;Accent&quot;</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">cmap</span><span class="p">:</span>
+            <span class="n">cmap</span> <span class="o">=</span> <span class="s2">&quot;Blues&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">gdf</span><span class="o">.</span><span class="n">crs</span> <span class="o">==</span> <span class="mi">3857</span><span class="p">:</span>
             <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="mi">3857</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">time_periods</span><span class="p">:</span>
@@ -1235,8 +1348,9 @@
                 <span class="n">interval</span><span class="o">=</span><span class="n">interval</span><span class="p">,</span>
                 <span class="n">repeat_delay</span><span class="o">=</span><span class="n">repeat_delay</span><span class="p">,</span>
                 <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span>
+                <span class="n">fps</span><span class="o">=</span><span class="n">fps</span><span class="p">,</span>
                 <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span>
-                <span class="p">)</span></div>
+            <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Community.transition"><a class="viewcode-back" href="../../generated/geosnap.Community.transition.html#geosnap.Community.transition">[docs]</a>    <span class="k">def</span> <span class="nf">transition</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">cluster_col</span><span class="p">,</span> <span class="n">time_var</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span> <span class="n">id_var</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span> <span class="n">w_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">permutations</span><span class="o">=</span><span class="mi">0</span>
@@ -1361,6 +1475,90 @@
         <span class="p">)</span>
         <span class="n">gdf_new</span> <span class="o">=</span> <span class="n">Community</span><span class="p">(</span><span class="n">gdf_temp</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">gdf_new</span><span class="p">,</span> <span class="n">df_wide</span><span class="p">,</span> <span class="n">seq_dis_mat</span></div>
+
+<div class="viewcode-block" id="Community.simulate"><a class="viewcode-back" href="../../generated/geosnap.Community.simulate.html#geosnap.Community.simulate">[docs]</a>    <span class="k">def</span> <span class="nf">simulate</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">model_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">index_col</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span>
+        <span class="n">w_type</span><span class="o">=</span><span class="s2">&quot;queen&quot;</span><span class="p">,</span>
+        <span class="n">w_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">base_year</span><span class="o">=</span><span class="mi">2010</span><span class="p">,</span>
+        <span class="n">new_colname</span><span class="o">=</span><span class="s2">&quot;predicted&quot;</span><span class="p">,</span>
+        <span class="n">increment</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">time_steps</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">time_col</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span>
+        <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Simulate community dynamics using spatial Markov transition rules.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        model_name : [type], optional</span>
+<span class="sd">            [description], by default None</span>
+<span class="sd">        index_col : str, optional</span>
+<span class="sd">            column on the community gdf that denotes the unique index of geographic units</span>
+<span class="sd">            for U.S. census data this is &quot;geoid&quot; (which is the default)</span>
+<span class="sd">        w_type : str {&#39;queen&#39;, &#39;rook&#39;}</span>
+<span class="sd">            which type of libpysal spatial weights objects to encode connectivity</span>
+<span class="sd">        w_options : dict</span>
+<span class="sd">            additional options passed to a libpysal weights constructor (e.g. `k` for a KNN weights matrix)</span>
+<span class="sd">        base_year : int, optional</span>
+<span class="sd">            time period to begin the simulation. Typically this is the last time period for which</span>
+<span class="sd">            labels have been estimated by a cluster model.</span>
+<span class="sd">        new_colname : str, optional</span>
+<span class="sd">            name of new column holding predicted neighorhood labels. Default is &quot;predicted&quot;</span>
+<span class="sd">        increment : int, optional</span>
+<span class="sd">            number of units in each time step (e.g. for a model based on decennial census data, this is 10)</span>
+<span class="sd">        time_steps : int, optional</span>
+<span class="sd">            number of time periods to simulate</span>
+<span class="sd">        time_col : str, optional</span>
+<span class="sd">            column on the community gdf that denotes the time index. For builtin data, this is &quot;year&quot;</span>
+<span class="sd">        seed: int, optional\</span>
+<span class="sd">            seed passed to numpy random number generator</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        geosnap.Community if time_steps &gt; 1, else geopandas.GeoDataFrame</span>
+<span class="sd">            If simulating multiple timesteps, the return is a new Community instance with simulated label values as its gdf.</span>
+<span class="sd">            If simulating a single time step, the return is a single geodataframe</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">time_steps</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">gdf</span> <span class="o">=</span> <span class="n">_predict_labels</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span>
+                <span class="n">model_name</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
+                <span class="n">w_type</span><span class="o">=</span><span class="n">w_type</span><span class="p">,</span>
+                <span class="n">w_options</span><span class="o">=</span><span class="n">w_options</span><span class="p">,</span>
+                <span class="n">base_year</span><span class="o">=</span><span class="n">base_year</span><span class="p">,</span>
+                <span class="n">new_colname</span><span class="o">=</span><span class="n">new_colname</span><span class="p">,</span>
+                <span class="n">index_col</span><span class="o">=</span><span class="n">index_col</span><span class="p">,</span>
+                <span class="n">increment</span><span class="o">=</span><span class="n">increment</span><span class="p">,</span>
+                <span class="n">time_steps</span><span class="o">=</span><span class="n">time_steps</span><span class="p">,</span>
+                <span class="n">time_col</span><span class="o">=</span><span class="n">time_col</span><span class="p">,</span>
+                <span class="n">seed</span><span class="o">=</span><span class="n">seed</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">gdf</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">gdfs</span> <span class="o">=</span> <span class="n">_predict_labels</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span>
+                <span class="n">model_name</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
+                <span class="n">w_type</span><span class="o">=</span><span class="n">w_type</span><span class="p">,</span>
+                <span class="n">w_options</span><span class="o">=</span><span class="n">w_options</span><span class="p">,</span>
+                <span class="n">base_year</span><span class="o">=</span><span class="n">base_year</span><span class="p">,</span>
+                <span class="n">new_colname</span><span class="o">=</span><span class="n">new_colname</span><span class="p">,</span>
+                <span class="n">index_col</span><span class="o">=</span><span class="n">index_col</span><span class="p">,</span>
+                <span class="n">increment</span><span class="o">=</span><span class="n">increment</span><span class="p">,</span>
+                <span class="n">time_steps</span><span class="o">=</span><span class="n">time_steps</span><span class="p">,</span>
+                <span class="n">time_col</span><span class="o">=</span><span class="n">time_col</span><span class="p">,</span>
+                <span class="n">seed</span><span class="o">=</span><span class="n">seed</span>
+            <span class="p">)</span>
+            <span class="n">gdfs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">gdfs</span><span class="p">)</span>
+            <span class="n">gdfs</span> <span class="o">=</span> <span class="n">gdfs</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="n">model_name</span><span class="p">])</span>
+            <span class="n">gdfs</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">gdfs</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Community</span><span class="o">.</span><span class="n">from_geodataframes</span><span class="p">(</span><span class="n">gdfs</span><span class="o">=</span><span class="p">[</span><span class="n">gdfs</span><span class="p">])</span></div>
+
+    <span class="c1">###### Constructor Methods ######</span>
+    <span class="c1">#################################</span>
 
 <div class="viewcode-block" id="Community.from_ltdb"><a class="viewcode-back" href="../../generated/geosnap.Community.from_ltdb.html#geosnap.Community.from_ltdb">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_ltdb</span><span class="p">(</span>
@@ -1808,7 +2006,7 @@
     </p>
     <p>
         &copy; Copyright 2020, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
     </p>
   </div>
 </footer>

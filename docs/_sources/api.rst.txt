@@ -94,6 +94,7 @@ Community Analytics
    Community.cluster_spatial
    Community.harmonize
    Community.sequence
+   Community.simulate
    Community.transition
 
 Community Visualization
@@ -110,6 +111,8 @@ Community Visualization
    Community.plot_silhouette_map
    Community.plot_path_silhouette
    Community.plot_timeseries
+   Community.plot_transition_matrix
+   Community.plot_transition_graphs
 
    
 Analyze Module

@@ -1,4 +1,4 @@
-geosnap.analyze.ModelResults
+﻿geosnap.analyze.ModelResults
 ============================
 
 .. currentmodule:: geosnap.analyze

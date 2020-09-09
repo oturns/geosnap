@@ -1,4 +1,4 @@
-geosnap.Community
+﻿geosnap.Community
 =================
 
 .. currentmodule:: geosnap
@@ -29,7 +29,10 @@ geosnap.Community
       ~Community.plot_silhouette
       ~Community.plot_silhouette_map
       ~Community.plot_timeseries
+      ~Community.plot_transition_graphs
+      ~Community.plot_transition_matrix
       ~Community.sequence
+      ~Community.simulate
       ~Community.transition
    
    
