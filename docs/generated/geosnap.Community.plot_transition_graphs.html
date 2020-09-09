@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>geosnap.datasets &#8212; geosnap v0.5.0 Manual</title>
+    <title>geosnap.Community.plot_transition_graphs &#8212; geosnap v0.5.0 Manual</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/pysal-styles.css" />
@@ -16,8 +16,8 @@
     <link rel="shortcut icon" href="../_static/geosnap.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="geosnap.datasets.blocks_2000" href="geosnap.datasets.blocks_2000.html" />
-    <link rel="prev" title="geosnap.io.get_lehd" href="geosnap.io.get_lehd.html" />
+    <link rel="next" title="geosnap.analyze.ModelResults" href="geosnap.analyze.ModelResults.html" />
+    <link rel="prev" title="geosnap.Community.plot_transition_matrix" href="geosnap.Community.plot_transition_matrix.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -69,8 +69,8 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="../api.html#io-module">IO Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api.html#the-community-class">The Community Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#io-module">IO Module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#the-community-class">The Community Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#analyze-module">Analyze Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#harmonize-module">Harmonize Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#visualize-module">Visualize Module</a></li>
@@ -96,7 +96,7 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">geosnap.datasets</a></li>
+<li><a class="reference internal" href="#">geosnap.Community.plot_transition_graphs</a></li>
 </ul>
 </ul>
 </li>
@@ -126,15 +126,36 @@
   <div class="row">
     <div class="body col-md-12 content" role="main">
       
-  <div class="section" id="geosnap-datasets">
-<h1>geosnap.datasets<a class="headerlink" href="#geosnap-datasets" title="Permalink to this headline">¶</a></h1>
-<dl class="py data">
-<dt id="geosnap.datasets">
-<code class="sig-prename descclassname">geosnap.</code><code class="sig-name descname">datasets</code><em class="property"> = &lt;geosnap._data.DataStore object&gt;</em><a class="headerlink" href="#geosnap.datasets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Storage for geosnap data. Currently supports US Census data.</p>
-<p>Unless otherwise noted, data are collected from the U.S. Census Bureau’s TIGER/LINE Files
-<a class="reference external" href="https://www.census.gov/cgi-bin/geo/shapefiles/index.php?year=2018">https://www.census.gov/cgi-bin/geo/shapefiles/index.php?year=2018</a> and converted to
-parquet files.</p>
+  <div class="section" id="geosnap-community-plot-transition-graphs">
+<h1>geosnap.Community.plot_transition_graphs<a class="headerlink" href="#geosnap-community-plot-transition-graphs" title="Permalink to this headline">¶</a></h1>
+<dl class="py method">
+<dt id="geosnap.Community.plot_transition_graphs">
+<code class="sig-prename descclassname">Community.</code><code class="sig-name descname">plot_transition_graphs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cluster_col</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">w_type</span><span class="o">=</span><span class="default_value">'queen'</span></em>, <em class="sig-param"><span class="n">layout</span><span class="o">=</span><span class="default_value">'dot'</span></em>, <em class="sig-param"><span class="n">args</span><span class="o">=</span><span class="default_value">'-n -Groot=0 -Goverlap=false -Gmindist=3.5 -Gsize=30,30!'</span></em>, <em class="sig-param"><span class="n">output_dir</span><span class="o">=</span><span class="default_value">'.'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/_community.html#Community.plot_transition_graphs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#geosnap.Community.plot_transition_graphs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot a network graph representation of global and spatially-conditioned transition matrices.</p>
+<p>This function requires pygraphviz to be installed. For linux and macos, it can be installed with
+<cite>conda install -c conda-forge pygraphviz</cite>. At the time of this writing there is no pygraphviz build
+available for Windows from mainstream conda channels, but it can be installed with
+<cite>conda install -c alubbock pygraphviz</cite></p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>cluster_col</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>column on the Community.gdf containing neighborhood type labels</p>
+</dd>
+<dt><strong>output_dir</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a></span></dt><dd><p>the location that output images will be placed</p>
+</dd>
+<dt><strong>w_type</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a> {‘queen’, ‘rook’}</span></dt><dd><p>which type of libpysal spatial weights objects to encode connectivity</p>
+</dd>
+<dt><strong>layout</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, ‘dot’</span></dt><dd><p>graphviz layout for plotting</p>
+</dd>
+<dt><strong>args</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="docutils literal notranslate"><span class="pre">str</span></code></a>, optional</span></dt><dd><p>additional arguments passed to graphviz.
+default is  “-n -Groot=0 -Goverlap=false -Gnodesep=0.01 -Gfont_size=1 -Gmindist=3.5 -Gsize=30,30!”</p>
+</dd>
+<dt><strong>Returns</strong></dt><dd></dd>
+<dt><strong>——</strong></dt><dd></dd>
+<dt><strong>None</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -152,7 +173,7 @@ parquet files.</p>
         <br/>
         
 <div id="sourcelink">
-  <a href="../_sources/generated/geosnap.datasets.rst.txt"
+  <a href="../_sources/generated/geosnap.Community.plot_transition_graphs.rst.txt"
      rel="nofollow">Source</a>
 </div>
       

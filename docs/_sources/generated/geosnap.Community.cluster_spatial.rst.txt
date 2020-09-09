@@ -1,4 +1,4 @@
-geosnap.Community.cluster\_spatial
+﻿geosnap.Community.cluster\_spatial
 ==================================
 
 .. currentmodule:: geosnap

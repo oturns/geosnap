@@ -1,4 +1,4 @@
-geosnap.util.fetch\_acs
+﻿geosnap.util.fetch\_acs
 =======================
 
 .. currentmodule:: geosnap.util

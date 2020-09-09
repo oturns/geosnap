@@ -1,0 +1,6 @@
+﻿geosnap.Community.simulate
+==========================
+
+.. currentmodule:: geosnap
+
+.. automethod:: Community.simulate

@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>geosnap.io.storage &#8212; geosnap v0.4.0 Manual</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>geosnap.io.storage &#8212; geosnap v0.5.0 Manual</title>
     <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/pysal-styles.css" />
@@ -37,7 +38,7 @@
         </button>
         <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/geosnap.svg"></span>
           geosnap</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.4.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.5.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -155,7 +156,7 @@
     <span class="n">storage</span> <span class="o">=</span> <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="store_census"><a class="viewcode-back" href="../../../generated/geosnap.io.store_census.html#geosnap.io.store_census">[docs]</a><span class="k">def</span> <span class="nf">store_census</span><span class="p">(</span><span class="n">dest</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="store_census"><a class="viewcode-back" href="../../../generated/geosnap.io.store_census.html#geosnap.io.store_census">[docs]</a><span class="k">def</span> <span class="nf">store_census</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Save census data to the local quilt package storage.</span>
 
 <span class="sd">    Returns</span>
@@ -166,11 +167,11 @@
 <span class="sd">        is 3.05 GB.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="s2">&quot;census/tracts_cartographic&quot;</span><span class="p">,</span> <span class="s2">&quot;s3://spatial-ucr&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">dest</span><span class="p">)</span>
-    <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="s2">&quot;census/administrative&quot;</span><span class="p">,</span> <span class="s2">&quot;s3://spatial-ucr&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">dest</span><span class="p">)</span></div>
+    <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="s2">&quot;census/tracts_cartographic&quot;</span><span class="p">,</span> <span class="s2">&quot;s3://spatial-ucr&quot;</span><span class="p">)</span>
+    <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="s2">&quot;census/administrative&quot;</span><span class="p">,</span> <span class="s2">&quot;s3://spatial-ucr&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="store_blocks_2000"><a class="viewcode-back" href="../../../generated/geosnap.io.store_blocks_2000.html#geosnap.io.store_blocks_2000">[docs]</a><span class="k">def</span> <span class="nf">store_blocks_2000</span><span class="p">(</span><span class="n">dest</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="store_blocks_2000"><a class="viewcode-back" href="../../../generated/geosnap.io.store_blocks_2000.html#geosnap.io.store_blocks_2000">[docs]</a><span class="k">def</span> <span class="nf">store_blocks_2000</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Save census 2000 census block data to the local quilt package storage.</span>
 
 <span class="sd">    Returns</span>
@@ -180,10 +181,10 @@
 <span class="sd">        in place of streaming data for all census queries.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="s2">&quot;census/blocks_2000&quot;</span><span class="p">,</span> <span class="s2">&quot;s3://spatial-ucr&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">dest</span><span class="p">)</span></div>
+    <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="s2">&quot;census/blocks_2000&quot;</span><span class="p">,</span> <span class="s2">&quot;s3://spatial-ucr&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="store_blocks_2010"><a class="viewcode-back" href="../../../generated/geosnap.io.store_blocks_2010.html#geosnap.io.store_blocks_2010">[docs]</a><span class="k">def</span> <span class="nf">store_blocks_2010</span><span class="p">(</span><span class="n">dest</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="store_blocks_2010"><a class="viewcode-back" href="../../../generated/geosnap.io.store_blocks_2010.html#geosnap.io.store_blocks_2010">[docs]</a><span class="k">def</span> <span class="nf">store_blocks_2010</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Save census 2010 census block data to the local quilt package storage.</span>
 
 <span class="sd">    Returns</span>
@@ -193,7 +194,7 @@
 <span class="sd">        in place of streaming data for all census queries.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="s2">&quot;census/blocks_2010&quot;</span><span class="p">,</span> <span class="s2">&quot;s3://spatial-ucr&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">dest</span><span class="p">)</span></div>
+    <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="s2">&quot;census/blocks_2010&quot;</span><span class="p">,</span> <span class="s2">&quot;s3://spatial-ucr&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="store_ltdb"><a class="viewcode-back" href="../../../generated/geosnap.io.store_ltdb.html#geosnap.io.store_ltdb">[docs]</a><span class="k">def</span> <span class="nf">store_ltdb</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">fullcount</span><span class="p">):</span>
@@ -511,7 +512,7 @@
     </p>
     <p>
         &copy; Copyright 2020, geosnap developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.2.1.<br/>
     </p>
   </div>
 </footer>

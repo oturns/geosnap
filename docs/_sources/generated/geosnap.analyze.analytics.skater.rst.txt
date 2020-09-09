@@ -1,4 +1,4 @@
-geosnap.analyze.analytics.skater
+﻿geosnap.analyze.analytics.skater
 ================================
 
 .. currentmodule:: geosnap.analyze.analytics

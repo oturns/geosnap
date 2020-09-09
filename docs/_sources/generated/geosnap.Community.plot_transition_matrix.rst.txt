@@ -1,0 +1,6 @@
+﻿geosnap.Community.plot\_transition\_matrix
+==========================================
+
+.. currentmodule:: geosnap
+
+.. automethod:: Community.plot_transition_matrix

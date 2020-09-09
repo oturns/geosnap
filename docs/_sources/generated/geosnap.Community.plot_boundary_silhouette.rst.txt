@@ -1,4 +1,4 @@
-geosnap.Community.plot\_boundary\_silhouette
+﻿geosnap.Community.plot\_boundary\_silhouette
 ============================================
 
 .. currentmodule:: geosnap

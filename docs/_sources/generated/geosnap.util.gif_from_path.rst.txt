@@ -1,4 +1,4 @@
-geosnap.util.gif\_from\_path
+﻿geosnap.util.gif\_from\_path
 ============================
 
 .. currentmodule:: geosnap.util

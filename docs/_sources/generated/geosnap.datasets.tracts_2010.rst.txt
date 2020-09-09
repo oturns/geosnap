@@ -1,4 +1,4 @@
-geosnap.datasets.tracts\_2010
+﻿geosnap.datasets.tracts\_2010
 =============================
 
 .. currentmodule:: geosnap

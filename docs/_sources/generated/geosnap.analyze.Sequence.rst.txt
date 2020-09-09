@@ -1,4 +1,4 @@
-geosnap.analyze.sequence
+﻿geosnap.analyze.sequence
 ========================
 
 .. currentmodule:: geosnap.analyze
