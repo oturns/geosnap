@@ -23,36 +23,36 @@ def plot_transition_matrix(
 ):
     """Plot global and spatially-conditioned transition matrices as heatmaps.
 
-    Parameters
-    ----------
-    community : geosnap.Community
-        a geosnap Community instance
-    cluster_col : str
-        column on the Community.gdf containing neighborhood type labels
-    w_type : str {'queen', 'rook'}
-        which type of libpysal spatial weights objects to encode connectivity
-    w_options : dict
-        additional options passed to a libpysal weights constructor (e.g. `k` for a KNN weights matrix)
-    figsize : tuple, optional
-        size of the resulting figure (13, 12)
-    n_rows : int, optional
-        rows in the plot; n_rows * n_cols must be >= the number of neighborhood types
-    n_cols : int, optional
-        columns in the plot; n_rows * n_cols must be >= the number of neighborhood types
-    suptitle : str, optional
-        title of the figure
-    title_kwds : dict, optional
-        additional keyword options for formatting the title
-    savefig : str, optional
-        location the plot will be saved
-    dpi : int, optional
-        dpi of the resulting image, default is 300
-
-    Returns
-    -------
-    matplotlib Axes
-        the axes on which the plots are drawn
-    """
+     Parameters
+     ----------
+     community : geosnap.Community
+         a geosnap Community instance
+     cluster_col : str
+         column on the Community.gdf containing neighborhood type labels
+     w_type : str {'queen', 'rook'}
+         which type of libpysal spatial weights objects to encode connectivity
+     w_options : dict
+         additional options passed to a libpysal weights constructor (e.g. `k` for a KNN weights matrix)
+     figsize : tuple, optional
+         size of the resulting figure (13, 12)
+     n_rows : int, optional
+         rows in the plot; n_rows * n_cols must be >= the number of neighborhood types
+     n_cols : int, optional
+         columns in the plot; n_rows * n_cols must be >= the number of neighborhood types
+     suptitle : str, optional
+         title of the figure
+     title_kwds : dict, optional
+         additional keyword options for formatting the title
+     savefig : str, optional
+         location the plot will be saved
+     dpi : int, optional
+         dpi of the resulting image, default is 300
+ 
+     Returns
+     -------
+     matplotlib Axes
+         the axes on which the plots are drawn
+     """
     if not n_rows and not n_cols:
         n_cols = len(community.gdf[cluster_col].unique()) + 1
         n_rows = 1
@@ -132,6 +132,11 @@ def plot_transition_graphs(
 ):
     """Plot a network graph representation of global and spatially-conditioned transition matrices.
 
+       This function requires pygraphviz to be installed. For linux and macos, it can be installed with
+       `conda install -c conda-forge pygraphviz`. At the time of this writing there is no pygraphviz build
+       available for Windows from mainstream conda channels, but it can be installed with
+       `conda install -c alubbock pygraphviz`
+
     Parameters
     ----------
     community : geosnap.Community
@@ -145,7 +150,7 @@ def plot_transition_graphs(
     layout : str, 'dot'
         graphviz layout for plotting
     args : str, optional
-         additional arguments passed to graphviz.
+        additional arguments passed to graphviz.
         default is  "-n -Groot=0 -Goverlap=false -Gnodesep=0.01 -Gfont_size=1 -Gmindist=3.5 -Gsize=30,30!"
 
     Returns

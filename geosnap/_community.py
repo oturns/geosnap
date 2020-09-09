@@ -403,6 +403,11 @@ class Community:
     ):
         """Plot a network graph representation of global and spatially-conditioned transition matrices.
 
+        This function requires pygraphviz to be installed. For linux and macos, it can be installed with
+        `conda install -c conda-forge pygraphviz`. At the time of this writing there is no pygraphviz build
+        available for Windows from mainstream conda channels, but it can be installed with
+        `conda install -c alubbock pygraphviz`
+
         Parameters
         ----------
         cluster_col : str
