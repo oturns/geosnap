@@ -40,6 +40,8 @@ def test_graphs():
     assert len(os.listdir('geosnap/tests/images')) == 7
 
 def test_animation():
+    if not os.path.exists('geosnap/tests/images'):
+            os.mkdir('geosnap/tests/images')
     reno.animate_timeseries(column='kmeans', categorical=True, filename='geosnap/tests/images/animation.gif')
     assert 'animation.gif' in os.listdir('geosnap/tests/images')
 
