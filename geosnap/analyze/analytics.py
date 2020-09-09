@@ -26,6 +26,8 @@ from .cluster import (
     ward_spatial,
 )
 
+np.seterr(divide='ignore', invalid='ignore')
+
 Ws = {
     "queen": Queen,
     "rook": Rook,
@@ -107,8 +109,8 @@ class ModelResults:
     # Standalone funcs to calc these if you don't want to graph them
     def sil_scores(self, **kwargs):
         """
-        A function that calculates silhouette scores for the current model.
-        Allows passing of custom parameters if desired.
+        Calculate silhouette scores for the current model.
+
         Returns
         -------
         silhouette scores stored in a dataframe accessible from `comm.models.['model_name'].silhouettes`
@@ -122,8 +124,8 @@ class ModelResults:
 
     def nearest_label(self, **kwargs):
         """
-        A function that calculates nearest_labels for the current model.
-        Allows passing of custom parameters if desired.
+        Calculate nearest_labels for the current model.
+
         Returns
         -------
         nearest_labels stored in a dataframe accessible from:
@@ -138,14 +140,14 @@ class ModelResults:
 
     def boundary_sil(self, **kwargs):
         """
-        A function that calculates boundary silhouette scores for the current model.
-        Allows passing of custom parameters if desired.
+        Calculate boundary silhouette scores for the current model.
+
         Returns
         -------
         boundary silhouette scores stored in a dataframe accessible from:
         `comm.models.['model_name'].boundary_silhouettes`
         """
-        assert self.model_type is "spatial", (
+        assert self.model_type == "spatial", (
             "Model is aspatial (lacks a W object), but has been passed to a spatial diagnostic."
             " Try aspatial diagnostics like nearest_label() or sil_scores()"
         )
@@ -158,14 +160,14 @@ class ModelResults:
 
     def path_sil(self, **kwargs):
         """
-        A function that calculates path silhouette scores for the current model.
-        Allows passing of custom parameters if desired.
+        Calculate path silhouette scores for the current model.
+
         Returns
         -------
         path silhouette scores stored in a dataframe accessible from:
         `comm.models.['model_name'].path_silhouettes`
         """
-        assert self.model_type is "spatial", (
+        assert self.model_type == "spatial", (
             "Model is aspatial(lacks a W object), but has been passed to a spatial diagnostic."
             " Try aspatial diagnostics like nearest_label() or sil_scores()"
         )
@@ -515,34 +517,40 @@ def cluster_spatial(
 
 def predict_labels(
     comm,
-    index_col,
-    time_col,
-    model_name,
-    w_type,
-    w_options,
-    base_year,
-    new_colname,
+    index_col='geoid',
+    time_col='year',
+    model_name=None,
+    w_type='queen',
+    w_options=None,
+    base_year=None,
+    new_colname=None,
     time_steps=1,
     increment=None,
+    seed=None
 ):
+    np.random.seed(seed)
     if not new_colname:
         new_colname = "predicted"
+    if not w_options:
+        w_options = {}
 
     assert (
         comm.harmonized
     ), "Predictions based on transition models require harmonized data"
     assert (
-        model_name
+        model_name and model_name in comm.gdf.columns
     ), "You must provide the name of a cluster model present on the Community gdf"
+
+    assert base_year, "Missing `base_year`. You must provide an initial time point with labels to begin simulation"
 
     gdf = comm.gdf.copy()
     gdf = gdf.dropna(subset=[model_name]).reset_index()
-    w = Ws[w_type].from_dataframe(gdf, **w_options)
     t = comm.transition(model_name, w_type=w_type)
 
     if time_steps == 1:
 
-        gdf = gdf[gdf[time_col] == base_year]
+        gdf = gdf[gdf[time_col] == base_year].reset_index()
+        w = Ws[w_type].from_dataframe(gdf, **w_options)
         lags = lag_categorical(w, gdf[model_name].values)
         lags = lags.astype(int)
 
@@ -576,10 +584,10 @@ def predict_labels(
         gdf = gdf.dropna(subset=[model_name]).reset_index()
         w = Ws[w_type].from_dataframe(gdf, **w_options)
         predictions.append(gdf)
-        
+
         for step in range(time_steps):
             # use the last known set of labels  to get the spatial context for each geog unit
-            gdf = predictions[step - 1].copy() 
+            gdf = predictions[step - 1].copy()
             lags = lag_categorical(w, gdf[model_name].values)
             lags = lags.astype(int)
             labels = {}
@@ -604,4 +612,3 @@ def predict_labels(
             predictions.append(gpd.GeoDataFrame(predicted).dropna(subset=[model_name]))
             current_time += increment
         return predictions
-

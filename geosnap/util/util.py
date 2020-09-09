@@ -17,7 +17,7 @@ def gif_from_path(
     dpi=400,
 ):
     """
-    Create an animated gif from a director of image files
+    Create an animated gif from a director of image files.
 
     Parameters
     ----------
@@ -36,6 +36,7 @@ def gif_from_path(
     dpi : int, optional
         image dpi passed to matplotlib writer
     """
+    assert filename, "You must provide an output filename ending in .gif"
     imgs = os.listdir(path)
     imgs.sort()
 
@@ -56,4 +57,3 @@ def gif_from_path(
 
     plt.tight_layout()
     ani.save(filename, writer=writer, dpi=dpi)
-    

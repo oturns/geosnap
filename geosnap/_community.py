@@ -8,6 +8,7 @@ import geopandas as gpd
 import mapclassify.classifiers as classifiers
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 import scikitplot as skplt
 
 from ._data import _Map, datasets
@@ -351,8 +352,6 @@ class Community:
 
         Parameters
         ----------
-        community : geosnap.Community 
-            a geosnap Community instance
         cluster_col : str
             column on the Community.gdf containing neighborhood type labels
         w_type : str {'queen', 'rook'}
@@ -376,7 +375,7 @@ class Community:
 
         Returns
         -------
-        matplotlib Axes 
+        matplotlib Axes
             the axes on which the plots are drawn
         """
         ax = _plot_transitions(
@@ -396,18 +395,21 @@ class Community:
 
     def plot_transition_graphs(
         self,
-        cluster_col,
-        w_type,
+        cluster_col=None,
+        w_type='queen',
         layout="dot",
         args="-n -Groot=0 -Goverlap=false -Gmindist=3.5 -Gsize=30,30!",
-        output_dir=None,
+        output_dir=".",
     ):
         """Plot a network graph representation of global and spatially-conditioned transition matrices.
 
+        This function requires pygraphviz to be installed. For linux and macos, it can be installed with
+        `conda install -c conda-forge pygraphviz`. At the time of this writing there is no pygraphviz build
+        available for Windows from mainstream conda channels, but it can be installed with
+        `conda install -c alubbock pygraphviz`
+
         Parameters
         ----------
-        community : geosnap.Community 
-            a geosnap Community instance
         cluster_col : str
             column on the Community.gdf containing neighborhood type labels
         output_dir : str
@@ -434,7 +436,7 @@ class Community:
         )
 
     def plot_silhouette(self, model_name=None, year=None, **kwargs):
-        """ Returns a silhouette plot of the model that is passed to it.
+        """Make silhouette plot of the Community model.
 
         Parameters
         ----------
@@ -478,8 +480,7 @@ class Community:
         id_var="geoid",
         **kwargs,
     ):
-        """ Returns a plot of the silhouette scores of the model that is passed to it
-            by creating a table join of the models silhouettes object and community gdf
+        """Plot of the silhouette scores of a Community model.
 
         Parameters
         ----------
@@ -589,7 +590,7 @@ class Community:
         id_var="geoid",
         **kwargs,
     ):
-        """ Returns a plot of the nearest_labels of the model that is passed to it.
+        """Plot the nearest_labels of the community model.
 
         Parameters
         ----------
@@ -630,7 +631,7 @@ class Community:
         """
         df = self.gdf.copy()
         if isinstance(self.models[model_name], dict) and not year:
-            raise (
+            raise InputError(
                 "This model has unique results for each time period; You must supply a value for `year`"
             )
 
@@ -710,7 +711,7 @@ class Community:
         id_var="geoid",
         **kwargs,
     ):
-        """ Returns a plot of the path_silhouettes of the model that is passed to it.
+        """Plot the path_silhouettes of Commmunity model.
 
         Parameters
         ----------
@@ -818,7 +819,7 @@ class Community:
         id_var="geoid",
         **kwargs,
     ):
-        """ Returns a plot of the boundary_silhouettes of the model that is passed to it.
+        """Plot boundary_silhouettes of the Commiunity model.
 
         Parameters
         ----------
@@ -948,7 +949,7 @@ class Community:
         **kwargs,
     ):
         """Plot an attribute from a Community arranged as a timeseries.
-        
+
         Parameters
         ----------
         Community    : Community object
@@ -1113,7 +1114,8 @@ class Community:
 
     def animate_timeseries(
         self,
-        column,
+        column=None,
+        filename=None,
         title="",
         time_col="year",
         time_periods=None,
@@ -1124,27 +1126,28 @@ class Community:
         alpha=0.6,
         categorical=False,
         dpi=200,
-        fps=1,
+        fps=0.5,
         interval=500,
         repeat_delay=1000,
         title_fontsize=40,
         subtitle_fontsize=38,
         figsize=(20, 20),
-        filename=None,
         ctxmap=ctx.providers.Stamen.TonerLite,
     ):
-        """Create an animated gif from a Community timeseries
+        """Create an animated gif from a Community timeseries.
 
         Parameters
         ----------
         column       : str
                        column to be graphed in a time series
+        filename     : str, required
+                        output file name
         title        : str, optional
                        desired title of figure
         time_col     : str, required
                         column on the Community.gdf that stores time periods
         time_periods:  list, optional
-                        subset of time periods to include in the animation. If none, then all times will be used
+                        subset of time periods to include in the animation. If None, then all times will be used
         scheme       : string, optional
                        matplotlib scheme to be used
                        default is 'quantiles'
@@ -1168,13 +1171,11 @@ class Community:
         figsize      : tuple, optional
                         output figure size passed to matplotlib.pyplot
         fps          : float, optional
-                        frames per second
+                       frames per second, used to speed up or slow down animation
         interval     : int, optional
-                        interval between frames in miliseconds, default 500
+                       interval between frames in miliseconds, default 500
         repeat_delay : int, optional
                         time before animation repeats in miliseconds, default 1000
-        filename     : str, required
-                        output file name
         """
         gdf = self.gdf.copy()
         if categorical and not cmap:
@@ -1223,6 +1224,7 @@ class Community:
                 interval=interval,
                 repeat_delay=repeat_delay,
                 filename=filename,
+                fps=fps,
                 dpi=dpi,
             )
 
@@ -1359,8 +1361,9 @@ class Community:
         base_year=2010,
         new_colname="predicted",
         increment=10,
-        time_steps=1,
+        time_steps=3,
         time_col="year",
+        seed=None,
     ):
         """Simulate community dynamics using spatial Markov transition rules.
 
@@ -1386,6 +1389,8 @@ class Community:
             number of time periods to simulate
         time_col : str, optional
             column on the community gdf that denotes the time index. For builtin data, this is "year"
+        seed: int, optional\
+            seed passed to numpy random number generator
 
         Returns
         -------
@@ -1393,8 +1398,7 @@ class Community:
             If simulating multiple timesteps, the return is a new Community instance with simulated label values as its gdf.
             If simulating a single time step, the return is a single geodataframe
         """
-        if not w_options:
-            w_options = {}
+        np.random.seed(seed)
         if time_steps == 1:
             gdf = _predict_labels(
                 self,
@@ -1407,6 +1411,7 @@ class Community:
                 increment=increment,
                 time_steps=time_steps,
                 time_col=time_col,
+                seed=seed
             )
             return gdf
         else:
@@ -1421,6 +1426,7 @@ class Community:
                 increment=increment,
                 time_steps=time_steps,
                 time_col=time_col,
+                seed=seed
             )
             gdfs = pd.concat(gdfs)
             gdfs = gdfs.dropna(subset=[model_name])
