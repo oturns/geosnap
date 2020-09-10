@@ -98,7 +98,7 @@ def _convert_gdf(df):
         df = df.drop(columns=["wkb"])
 
     df = gpd.GeoDataFrame(df)
-    df.crs = {"init": "epsg:4326"}
+    df.crs = 4326
 
     return df
 
