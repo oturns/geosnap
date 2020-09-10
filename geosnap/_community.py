@@ -18,7 +18,7 @@ from .analyze import sequence as _sequence
 from .analyze import transition as _transition
 from .analyze import predict_labels as _predict_labels
 from .harmonize import harmonize as _harmonize
-from .io import _fips_filter, _fipstable, _from_db, get_lehd
+from .io import _fips_filter, _fipstable, _from_db, get_lehd, adjust_inflation
 from .util import gif_from_path as _gif_from_path
 from .visualize import plot_transition_matrix as _plot_transitions
 from .visualize import plot_transition_graphs as _plot_transition_graphs
@@ -396,7 +396,7 @@ class Community:
     def plot_transition_graphs(
         self,
         cluster_col=None,
-        w_type='queen',
+        w_type="queen",
         layout="dot",
         args="-n -Groot=0 -Goverlap=false -Gmindist=3.5 -Gsize=30,30!",
         output_dir=".",
@@ -1411,7 +1411,7 @@ class Community:
                 increment=increment,
                 time_steps=time_steps,
                 time_col=time_col,
-                seed=seed
+                seed=seed,
             )
             return gdf
         else:
@@ -1426,7 +1426,7 @@ class Community:
                 increment=increment,
                 time_steps=time_steps,
                 time_col=time_col,
-                seed=seed
+                seed=seed,
             )
             gdfs = pd.concat(gdfs)
             gdfs = gdfs.dropna(subset=[model_name])
@@ -1600,6 +1600,8 @@ class Community:
         fips=None,
         boundary=None,
         years="all",
+        constant_dollars=True,
+        currency_year=2015,
     ):
         """Create a new Community from original vintage US Census data.
 
@@ -1633,6 +1635,12 @@ class Community:
         years : list of ints, required
             list of years to include in the study data
             (the default is [1990, 2000, 2010]).
+        constant_dollars : bool, optional
+            whether to standardize currency columns to constant dollars. If true,
+            each year will be expressed in dollars set by the `currency_year` parameter
+        currency_year : int, optional
+            If adjusting for inflation, this parameter sets the year in which dollar values will
+            be expressed
 
         Returns
         -------
@@ -1697,6 +1705,23 @@ class Community:
                 fips=fips,
                 data=tracts,
             )
+        
+        # adjust for inflation if necessary
+        if constant_dollars:
+            newtracts = []
+            inflate_cols = [
+                "median_home_value",
+                "median_contract_rent",
+                "per_capita_income",
+                "median_household_income",
+            ]
+
+            for year in years:
+                df = gdf[gdf.year == year]
+                df = adjust_inflation(df, inflate_cols, year, currency_year)
+                newtracts.append(df)
+            gdf = pd.concat(newtracts)
+            
 
         return cls(gdf=gdf, harmonized=False)
 
