@@ -5,7 +5,7 @@ import pandas as pd
 from tobler.area_weighted import area_interpolate
 from tobler.dasymetric import masked_area_interpolate
 from tobler.util.util import _check_presence_of_crs
-
+from tqdm.auto import tqdm
 
 def harmonize(
     raw_community,
@@ -105,6 +105,7 @@ def harmonize(
         w_{i,j} = a_{i,j} / \sum_k a_{k,j}
 
     """
+    assert target_year, ('target_year is a required parameter')
     if extensive_variables is None and intensive_variables is None:
         raise ValueError(
             "You must pass a set of extensive and/or intensive variables to interpolate"
@@ -117,55 +118,62 @@ def harmonize(
 
     _check_presence_of_crs(raw_community)
     dfs = raw_community.copy()
-    times = dfs[time_col].unique()
+    times = dfs[time_col].unique().tolist()
+    times.remove(target_year)
 
     target_df = dfs[dfs[time_col] == target_year].reset_index()
 
     interpolated_dfs = {}
     interpolated_dfs[target_year] = target_df.copy()
 
-    for i in times:
-        source_df = dfs[dfs[time_col] == i]
+    with tqdm(total=len(times)) as pbar:
 
-        if weights_method == "area":
+        for i in times:
+            pbar.set_description(f'Interpolating {i}')
+            source_df = dfs[dfs[time_col] == i]
 
-            # In area_interpolate, the resulting variable has same lenght as target_df
-            interpolation = area_interpolate(
-                source_df,
-                target_df.copy(),
-                extensive_variables=extensive_variables,
-                intensive_variables=intensive_variables,
-                allocate_total=allocate_total,
-            )
+            if weights_method == "area":
 
-        elif weights_method == "dasymetric":
-            try:
                 # In area_interpolate, the resulting variable has same lenght as target_df
-                interpolation = masked_area_interpolate(
+                interpolation = area_interpolate(
                     source_df,
                     target_df.copy(),
                     extensive_variables=extensive_variables,
                     intensive_variables=intensive_variables,
                     allocate_total=allocate_total,
-                    raster=raster,
                 )
-            except IOError:
-                raise IOError(
-                    "Unable to locate raster. If using the `dasymetric` or model-based methods. You"
-                    "must provide a raster file and indicate which pixel values contain developed land"
-                )
-        else:
-            raise ValueError('weights_method must of one of ["area", "dasymetric"]')
 
-        profiles = []
-        profile = interpolation[all_vars]
-        profiles.append(profile)
+            elif weights_method == "dasymetric":
+                try:
+                    # In area_interpolate, the resulting variable has same lenght as target_df
+                    interpolation = masked_area_interpolate(
+                        source_df,
+                        target_df.copy(),
+                        extensive_variables=extensive_variables,
+                        intensive_variables=intensive_variables,
+                        allocate_total=allocate_total,
+                        codes=codes,
+                        raster=raster,
+                    )
+                except IOError:
+                    raise IOError(
+                        "Unable to locate raster. If using the `dasymetric` or model-based methods. You"
+                        "must provide a raster file and indicate which pixel values contain developed land"
+                    )
+            else:
+                raise ValueError('weights_method must of one of ["area", "dasymetric"]')
 
-        profile["geometry"] = target_df["geometry"]
-        profile[index] = target_df[index]
-        profile[time_col] = i
+            profiles = []
+            profile = interpolation[all_vars]
+            profiles.append(profile)
 
-        interpolated_dfs[i] = profile
+            profile["geometry"] = target_df["geometry"]
+            profile[index] = target_df[index]
+            profile[time_col] = i
+
+            interpolated_dfs[i] = profile
+            pbar.update(1)
+        pbar.set_description("Complete")
 
     harmonized_df = gpd.GeoDataFrame(
         pd.concat(list(interpolated_dfs.values()), sort=True)
