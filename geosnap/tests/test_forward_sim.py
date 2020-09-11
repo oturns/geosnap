@@ -9,9 +9,9 @@ reno = reno.cluster(columns=columns, method='kmeans', n_clusters=3)
 
 def test_single_simulation():
     simulated = reno.simulate(model_name='kmeans', base_year=2010, time_steps=1)
-    assert simulated.shape == (113, 3)
+    assert simulated.shape == (107, 3)
 
 def test_multi_simulation():
     simulated = reno.simulate(model_name='kmeans', base_year=2010)
-    assert simulated.gdf.shape == (452, 5)
+    assert simulated.gdf.shape == (428, 4)
 

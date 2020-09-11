@@ -544,12 +544,12 @@ def predict_labels(
     assert base_year, "Missing `base_year`. You must provide an initial time point with labels to begin simulation"
 
     gdf = comm.gdf.copy()
-    gdf = gdf.dropna(subset=[model_name]).reset_index()
+    gdf = gdf.dropna(subset=[model_name]).reset_index(drop=True)
     t = comm.transition(model_name, w_type=w_type)
 
     if time_steps == 1:
 
-        gdf = gdf[gdf[time_col] == base_year].reset_index()
+        gdf = gdf[gdf[time_col] == base_year].reset_index(drop=True)
         w = Ws[w_type].from_dataframe(gdf, **w_options)
         lags = lag_categorical(w, gdf[model_name].values)
         lags = lags.astype(int)
@@ -581,7 +581,7 @@ def predict_labels(
         gdf = gdf[gdf[time_col] == base_year]
         gdf = gdf[[index_col, model_name, time_col, "geometry"]]
         current_time = base_year + increment
-        gdf = gdf.dropna(subset=[model_name]).reset_index()
+        gdf = gdf.dropna(subset=[model_name]).reset_index(drop=True)
         w = Ws[w_type].from_dataframe(gdf, **w_options)
         predictions.append(gdf)
 

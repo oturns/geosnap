@@ -60,7 +60,6 @@ def kmeans(
     verbose=0,
     random_state=None,
     copy_x=True,
-    n_jobs=None,
     algorithm="auto",
     precompute_distances="auto",
     **kwargs,
@@ -101,7 +100,6 @@ def kmeans(
             verbose=0,
             random_state=random_state,
             copy_x=copy_x,
-            n_jobs=n_jobs,
             algorithm=algorithm,
         )
 
