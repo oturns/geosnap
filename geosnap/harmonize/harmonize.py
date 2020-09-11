@@ -126,10 +126,9 @@ def harmonize(
     interpolated_dfs = {}
     interpolated_dfs[target_year] = target_df.copy()
 
-    with tqdm(total=len(times)) as pbar:
-
+    with tqdm(total=len(times), desc=f'Converting {len(times)} time periods') as pbar:
         for i in times:
-            pbar.set_description(f'Interpolating {i}')
+            pbar.write(f"Harmonizing {i}")
             source_df = dfs[dfs[time_col] == i]
 
             if weights_method == "area":
@@ -174,6 +173,8 @@ def harmonize(
             interpolated_dfs[i] = profile
             pbar.update(1)
         pbar.set_description("Complete")
+        pbar.close()
+
 
     harmonized_df = gpd.GeoDataFrame(
         pd.concat(list(interpolated_dfs.values()), sort=True)
