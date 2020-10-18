@@ -335,6 +335,116 @@ class Community:
         comm.models[model_name] = model
         return comm
 
+    def best_cluster(
+        self,
+        columns,
+        cluster_methods=None,
+        n_clusters=6,
+        year=None
+    ):
+        """Determines the best fit cluster model by running all available cluster models, averaging
+           the silhouette scores of each, and then returning the best model, and a dictionary containing all of the values.
+
+        Parameters
+        ----------
+        columns : array-like, required
+            subset of columns on which to apply the clustering
+        cluster_methods: list, optional
+            list of cluster methods to have mean silhouettes calculated for
+            default is all clusterers
+        n_clusters : int, required
+            the number of clusters to model. The default is 6).
+        year : int, optional
+            if seeking the best fit clusterer for a specific year of the data
+            default is None
+
+        Returns
+        -------
+        cluster_methods : dict
+            a dictionary containing the cluster models and the mean of their silhouette scores
+            
+        """
+        if cluster_methods:
+            cluster_methods = dict.from_keys(cluster_methods) 
+        else:
+            cluster_methods={
+                'kmeans' : None,
+                'ward': None,
+                'affinity_propagation': None,
+                'spectral': None,
+                'gaussian_mixture': None,
+               #'hdbscan': None
+                }
+        comm = self
+        for methods in cluster_methods.keys():
+            comm = comm.cluster(n_clusters=n_clusters, method=methods, columns=columns)
+            try:
+                if year:
+                    means_dict = {methods : list(comm.models.values())[-1].sil_scores().filter(like=str(year),axis=0).values.mean()}
+                else:
+                    means_dict = {methods : list(comm.models.values())[-1].sil_scores().values.mean()}
+            except ValueError:
+                warn(f'Silhouettes could not be calculated for {methods} with given parameters, probably because it only has one cluster label.')
+                continue
+            cluster_methods.update(means_dict)
+
+        # Remove values that could not be calculated with given parameters
+        cluster_methods = {k: v for k, v in cluster_methods.items() if v is not None}
+        return cluster_methods,max(cluster_methods, key=cluster_methods.get)
+
+    def best_cluster_spatial(
+        self,
+        columns,
+        cluster_methods=None,
+        n_clusters=6,
+        year=None
+    ):
+        """Determines the best fit cluster model by running all available cluster models, averaging
+           the silhouette scores of each, and then returning the best model, and a dictionary containing all of the values.
+
+        Parameters
+        ----------
+        columns : array-like, required
+            subset of columns on which to apply the clustering
+        cluster_methods: list, optional
+            list of cluster methods to have mean silhouettes calculated for
+            default is all clusterers
+        n_clusters : int, optional
+            the number of clusters to model. The default is 6.
+        year : int, required
+            year of the model to be calculated
+            default is None
+
+        Returns
+        -------
+        cluster_methods : dict
+            a dictionary containing the cluster models and the mean of their silhouette scores
+        """
+
+        if cluster_methods:
+            cluster_methods = dict.from_keys(cluster_methods)
+        else:
+            cluster_methods={
+                'ward_spatial': None,
+                # 'spenc': None,
+                'skater': None,
+                'azp': None,
+                'max_p': None
+                }
+        comm = self
+        for methods in cluster_methods.keys():
+            comm = comm.cluster_spatial(n_clusters=n_clusters, method=methods, columns=columns)
+            try:
+                means_dict = {methods : list(comm.models.values())[-1][year].sil_scores().values.mean()}
+            except ValueError:
+                warn(f'Silhouettes could not be calculated for {methods} with given parameters, probably because it only has one cluster label.')
+                continue
+            cluster_methods.update(means_dict)
+
+        # Remove values that could not be calculated with given parameters
+        cluster_methods = {k: v for k, v in cluster_methods.items() if v is not None}
+        return cluster_methods,max(cluster_methods, key=cluster_methods.get)
+
     def plot_transition_matrix(
         self,
         cluster_col=None,
