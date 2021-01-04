@@ -27,3 +27,4 @@ dependencies:
   - contextily
   - scikit-plot
   - mapclassify
+  - descartes  
