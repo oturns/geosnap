@@ -1,7 +1,6 @@
 name: test
 channels:
   - conda-forge
-  - alubbock   # pygraphviz builds for windows
 dependencies:
   - python=3.7
   - pandas
@@ -37,4 +36,4 @@ dependencies:
   - proplot
   - contextily
   - scikit-plot
-  - pygraphviz
+  - python-graphviz
