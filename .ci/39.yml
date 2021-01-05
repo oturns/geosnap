@@ -32,7 +32,7 @@ dependencies:
   - codecov
   - coverage
   - coveralls
-  - pywget
+  - python-wget
   - proplot
   - contextily
   - scikit-plot
