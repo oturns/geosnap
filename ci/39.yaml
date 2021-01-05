@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - alubbock   # pygraphviz builds for windows
 dependencies:
-  - python=3.6
+  - python=3.9
   - pandas
   - giddy >=2.2.1
   - libpysal
