@@ -1,19 +1,18 @@
 name: test
 channels:
   - conda-forge
-  - alubbock   # pygraphviz builds for windows
 dependencies:
-  - python=3.8
+  - python=3.9
   - pandas
   - giddy >=2.2.1
   - libpysal
   - spenc
   - cenpy
   - geopandas
-  - hdbscan
   - matplotlib
   - scikit-learn
   - seaborn
+  - hdbscan
   - pyarrow >=0.14.1
   - appdirs
   - dash
@@ -33,8 +32,8 @@ dependencies:
   - codecov
   - coverage
   - coveralls
-  - pywget
+  - python-wget
   - proplot
   - contextily
   - scikit-plot
-  - pygraphviz
+  - python-graphviz
