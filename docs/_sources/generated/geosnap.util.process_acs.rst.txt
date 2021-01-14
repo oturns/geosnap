@@ -1,6 +1,0 @@
-﻿geosnap.util.process\_acs
-=========================
-
-.. currentmodule:: geosnap.util
-
-.. autofunction:: process_acs

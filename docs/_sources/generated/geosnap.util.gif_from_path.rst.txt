@@ -1,6 +1,0 @@
-﻿geosnap.util.gif\_from\_path
-============================
-
-.. currentmodule:: geosnap.util
-
-.. autofunction:: gif_from_path
