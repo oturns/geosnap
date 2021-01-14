@@ -1,6 +1,0 @@
-﻿geosnap.harmonize.harmonize
-===========================
-
-.. currentmodule:: geosnap.harmonize
-
-.. autofunction:: harmonize
