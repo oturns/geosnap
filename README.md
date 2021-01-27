@@ -9,6 +9,7 @@
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/geosnap)
 ![PyPI](https://img.shields.io/pypi/v/geosnap)
 ![Conda (channel only)](https://img.shields.io/conda/vn/conda-forge/geosnap)
+![Conda](https://img.shields.io/conda/dn/conda-forge/geosnap)
 ![GitHub commits since latest release (branch)](https://img.shields.io/github/commits-since/spatialucr/geosnap/latest)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3526163.svg)](https://doi.org/10.5281/zenodo.3526163)
 
