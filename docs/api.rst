@@ -91,8 +91,8 @@ Community Analytics
    :toctree: generated/
    
    Community.cluster
-   Community.cluster_spatial
    Community.harmonize
+   Community.regionalize
    Community.sequence
    Community.simulate
    Community.transition
@@ -135,7 +135,7 @@ Model neighborhood differentiation using multivariate clustering algorithms
    :toctree: generated/
    
     analyze.cluster
-    analyze.cluster_spatial
+    analyze.regionalize
 
 Clustering algorithms
 ``````````````````````````````````
@@ -165,10 +165,11 @@ Spatial Clustering
    :toctree: generated/
 
     azp
+    kmeans_spatial
     max_p
     skater
     spenc
-    ward_spatial    
+    ward_spatial
 
     
 Neighborhood Dynamics Methods
