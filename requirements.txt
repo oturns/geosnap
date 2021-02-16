@@ -22,3 +22,4 @@ contextily
 descartes
 scikit-plot
 tobler>=0.4
+spopt>=0.1.1

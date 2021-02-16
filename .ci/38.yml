@@ -24,6 +24,8 @@ dependencies:
   - xlrd
   - region >=0.2.0
   - tobler >=0.2.1
+  - spopt >=0.1.1
+
   # testing
   - descartes
   - jupyter
