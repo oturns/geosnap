@@ -1,32 +1,26 @@
 """Tools for the spatial analysis of neighborhood change."""
 import esda
+import geopandas as gpd
 import numpy as np
 import pandas as pd
-import geopandas as gpd
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import silhouette_samples
-
-from libpysal.weights import attach_islands
+from libpysal.weights import attach_islands, lag_categorical
 from libpysal.weights.contiguity import Queen, Rook, Voronoi
 from libpysal.weights.distance import KNN, DistanceBand
-from libpysal.weights import lag_categorical
+from sklearn.metrics import silhouette_samples
+from sklearn.preprocessing import StandardScaler
 
 from .._data import _Map
 from .cluster import (
     affinity_propagation,
-    azp,
     gaussian_mixture,
     hdbscan,
     kmeans,
-    max_p,
-    skater,
     spectral,
-    spenc,
     ward,
-    ward_spatial,
 )
+from .regionalize import azp, max_p, skater, spenc, ward_spatial, kmeans_spatial
 
-np.seterr(divide='ignore', invalid='ignore')
+np.seterr(divide="ignore", invalid="ignore")
 
 Ws = {
     "queen": Queen,
@@ -349,7 +343,7 @@ def cluster(
         return gdf, models, model_name
 
 
-def cluster_spatial(
+def regionalize(
     gdf,
     n_clusters=6,
     spatial_weights="rook",
@@ -423,11 +417,10 @@ def cluster_spatial(
         "ward_spatial": ward_spatial,
         "skater": skater,
         "max_p": max_p,
+        "kmeans_spatial": kmeans_spatial,
     }
     if method not in specification.keys():
-        raise ValueError(
-            "`method` must be one of  ['ward_spatial', 'spenc', 'skater', 'azp', 'max_p']"
-        )
+        raise ValueError(f"`method` must be one of {specification.keys()}")
 
     if method in gdf.columns.tolist():
         model_name = method + str(len(gdf.columns[gdf.columns.str.startswith(method)]))
@@ -439,6 +432,8 @@ def cluster_spatial(
         raise ValueError("You must choose a clustering algorithm to use")
     if scaler == "std":
         scaler = StandardScaler()
+    if not weights_kwargs:
+        weights_kwargs = {}
 
     times = gdf[time_var].unique()
     gdf = gdf.set_index([time_var, id_var])
@@ -466,35 +461,22 @@ def cluster_spatial(
         if scaler:
             df[columns] = scaler.fit_transform(df[columns].values)
 
-        if weights_kwargs:
-            w0 = W.from_dataframe(df, **weights_kwargs)
-        else:
-            w0 = W.from_dataframe(df)
+        w0 = W.from_dataframe(df, **weights_kwargs)
         w1 = KNN.from_dataframe(df, k=1)
         ws = [w0, w1]
-
-        if threshold_variable and threshold_variable != "count":
-            data[threshold_variable] = gdf[threshold_variable]
-            threshold_var = data.threshold_variable.values
-            ws[0] = attach_islands(ws[0], ws[1])
-
-        elif threshold_variable == "count":
-            threshold_var = np.ones(len(data.loc[time]))
-            ws[0] = attach_islands(ws[0], ws[1])
-
-        else:
-            threshold_var = None
+        ws[0] = attach_islands(ws[0], ws[1])
 
         model = specification[method](
-            df[columns],
+            df,
+            columns=columns,
             w=ws[0],
             n_clusters=n_clusters,
-            threshold_variable=threshold_var,
+            threshold_variable=threshold_variable,
             threshold=threshold,
             **kwargs,
         )
 
-        labels = model.labels_.astype(str)
+        labels = pd.Series(model.labels_).astype(str)
         clusters = pd.DataFrame(
             {model_name: labels, time_var: df[time_var], id_var: df[id_var]}
         )
@@ -517,16 +499,16 @@ def cluster_spatial(
 
 def predict_labels(
     comm,
-    index_col='geoid',
-    time_col='year',
+    index_col="geoid",
+    time_col="year",
     model_name=None,
-    w_type='queen',
+    w_type="queen",
     w_options=None,
     base_year=None,
     new_colname=None,
     time_steps=1,
     increment=None,
-    seed=None
+    seed=None,
 ):
     np.random.seed(seed)
     if not new_colname:
@@ -541,7 +523,9 @@ def predict_labels(
         model_name and model_name in comm.gdf.columns
     ), "You must provide the name of a cluster model present on the Community gdf"
 
-    assert base_year, "Missing `base_year`. You must provide an initial time point with labels to begin simulation"
+    assert (
+        base_year
+    ), "Missing `base_year`. You must provide an initial time point with labels to begin simulation"
 
     gdf = comm.gdf.copy()
     gdf = gdf.dropna(subset=[model_name]).reset_index(drop=True)
