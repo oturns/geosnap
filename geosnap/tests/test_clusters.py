@@ -48,7 +48,7 @@ def test_hdbscan():
 def test_spenc():
 
     try:
-        r = reno.cluster_spatial(columns=columns, method="spenc")
+        r = reno.regionalize(columns=columns, method="spenc")
         assert len(r.gdf.spenc.unique()) == 7
     except AttributeError:
         print("spenc failed to import, but force-passing this test")
@@ -57,24 +57,24 @@ def test_spenc():
 
 def test_maxp():
 
-    r = reno.cluster_spatial(columns=columns, method="max_p", initial=10)
+    r = reno.regionalize(columns=columns, method="max_p", initial=10)
     assert len(r.gdf.max_p.unique()) >= 8
 
 
 def test_ward_spatial():
 
-    r = reno.cluster_spatial(columns=columns, method="ward_spatial", n_clusters=7)
+    r = reno.regionalize(columns=columns, method="ward_spatial", n_clusters=7)
     assert len(r.gdf.ward_spatial.unique()) == 8
 
 
 def test_skater():
 
-    r = reno.cluster_spatial(columns=columns, method="skater", n_clusters=10)
+    r = reno.regionalize(columns=columns, method="skater", n_clusters=10)
     assert len(r.gdf.skater.unique()) == 11
 
 
 def test_azp():
-    r = reno.cluster_spatial(columns=columns, method="azp", n_clusters=7)
+    r = reno.regionalize(columns=columns, method="azp", n_clusters=7)
     assert len(r.gdf.azp.unique()) == 8
 
 
