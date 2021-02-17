@@ -19,7 +19,7 @@ if os.path.exists('geosnap/tests/images'):
 columns = ["median_household_income", "p_poverty_rate", "p_unemployment_rate"]
 reno = Community.from_census(msa_fips="39900")
 reno = reno.cluster(columns=columns, method='kmeans')
-reno = reno.cluster_spatial(columns=columns, method='ward_spatial')
+reno = reno.regionalize(columns=columns, method='ward_spatial')
 
 def test_cont_timeseries():
     p = reno.plot_timeseries(column='median_household_income', years=[2010], dpi=50)
