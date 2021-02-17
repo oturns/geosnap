@@ -19,10 +19,10 @@ if not os.path.exists(data_dir):
     pathlib.Path(data_dir).mkdir(parents=True, exist_ok=True)
 
 # look for local storage and create if missing
-try:
-    storage = quilt3.Package.browse("geosnap_data/storage")
-except FileNotFoundError:
-    storage = quilt3.Package()
+# try:
+#     storage = quilt3.Package.browse("geosnap_data/storage")
+# except FileNotFoundError:
+#     storage = quilt3.Package()
 
 
 class _Map(dict):
@@ -113,35 +113,7 @@ class DataStore:
     """
 
     def __init__(self):
-        """Instantiate a new DataStore object."""
-        try:  # if any of these aren't found, stream them insteead
-            from quilt3.data.census import administrative, tracts_cartographic
-            #administrative = quilt3.Package.browse("census/administrative")
-            #tracts_cartographic = quilt3.Package.browse("census/tracts_cartographic")
-        except ImportError:
-            warn(
-                "Unable to locate local census data. Streaming instead.\n"
-                "If you plan to use census data repeatedly you can store it locally "
-                "with the io.store_census function for better performance"
-            )
-            try:
-                tracts_cartographic = quilt3.Package.browse(
-                    "census/tracts_cartographic", "s3://spatial-ucr"
-                )
-                administrative = quilt3.Package.browse(
-                    "census/administrative", "s3://spatial-ucr"
-                )
-
-            except Timeout:
-                warn(
-                    "Unable to locate local census data and unable to reach s3 bucket."
-                    "You will be unable to use built-in data during this session. "
-                    "If you need these data, please try downloading a local copy "
-                    "with the io.store_census function, then restart your "
-                    "python kernel and try again."
-                )
-        self.tracts_cartographic = tracts_cartographic
-        self.administrative = administrative
+        self
 
     def __dir__(self):
 
@@ -182,7 +154,8 @@ class DataStore:
         """
         try:
             from quilt3.data.census import blocks_2000
-            #blocks_2000 = quilt3.Package.browse("census/blocks_2000") # if any of these aren't found, stream them instead
+
+            # blocks_2000 = quilt3.Package.browse("census/blocks_2000") # if any of these aren't found, stream them instead
         except ImportError:
             warn(
                 "Unable to locate local census 2000 block data. Streaming instead.\n"
@@ -209,7 +182,9 @@ class DataStore:
         blks = {}
         for state in states:
             try:
-                blks[state] = pd.read_parquet(blocks_2000[f"{state}.parquet"].get_cached_path())
+                blks[state] = pd.read_parquet(
+                    blocks_2000[f"{state}.parquet"].get_cached_path()
+                )
             except:
                 blks[state] = blocks_2000[f"{state}.parquet"]()
             if fips:
@@ -241,7 +216,8 @@ class DataStore:
         """
         try:
             from quilt3.data.census import blocks_2010
-            #blocks_2010 = quilt3.Package.browse("census/blocks_2010")  # if any of these aren't found, stream them instead
+
+            # blocks_2010 = quilt3.Package.browse("census/blocks_2010")  # if any of these aren't found, stream them instead
         except ImportError:
             warn(
                 "Unable to locate local census 2010 block data. Streaming instead.\n"
@@ -267,7 +243,9 @@ class DataStore:
         blks = {}
         for state in states:
             try:
-                blks[state] = pd.read_parquet(blocks_2010[f"{state}.parquet"].get_cached_path())
+                blks[state] = pd.read_parquet(
+                    blocks_2010[f"{state}.parquet"].get_cached_path()
+                )
             except:
                 blks[state] = blocks_2010[f"{state}.parquet"]()
             if fips:
@@ -298,10 +276,13 @@ class DataStore:
 
         """
         try:
-            t = pd.read_parquet(self.tracts_cartographic["tracts_1990_500k.parquet"].get_cached_path())
+            t = pd.read_parquet(pathlib.Path(data_dir, "tracts_1990_500k.parquet"))
         except:
-            warn('streaming remote data. Use `geosnap.io.store_census() to store the data locally for better performance')
-            t = self.tracts_cartographic["tracts_1990_500k.parquet"]()
+            warn(
+                "streaming remote data. Use `geosnap.io.store_census() to store the data locally for better performance"
+            )
+            tracts_cartographic = quilt3.Package.browse("census/tracts_cartographic")
+            t = tracts_cartographic["tracts_1990_500k.parquet"]()
 
         if states:
             t = t[t.geoid.str[:2].isin(states)]
@@ -329,10 +310,13 @@ class DataStore:
 
         """
         try:
-            t = pd.read_parquet(self.tracts_cartographic["tracts_2000_500k.parquet"].get_cached_path())
+            t = pd.read_parquet(pathlib.Path(data_dir, "tracts_2000_500k.parquet"))
         except:
-            warn('streaming remote data. Use `geosnap.io.store_census() to store the data locally for better performance')
-            t = self.tracts_cartographic["tracts_2000_500k.parquet"]()
+            warn(
+                "streaming remote data. Use `geosnap.io.store_census() to store the data locally for better performance"
+            )
+            tracts_cartographic = quilt3.Package.browse("census/tracts_cartographic")
+            t = tracts_cartographic["tracts_2000_500k.parquet"]()
         if states:
             t = t[t.geoid.str[:2].isin(states)]
         t["year"] = 2000
@@ -359,10 +343,13 @@ class DataStore:
 
         """
         try:
-            t = pd.read_parquet(self.tracts_cartographic["tracts_2010_500k.parquet"].get_cached_path())
+            t = pd.read_parquet(pathlib.Path(data_dir, "tracts_2010_500k.parquet"))
         except:
-            warn('streaming remote data. Use `geosnap.io.store_census() to store the data locally for better performance')
-            t = self.tracts_cartographic["tracts_2010_500k.parquet"]()
+            warn(
+                "streaming remote data. Use `geosnap.io.store_census() to store the data locally for better performance"
+            )
+            tracts_cartographic = quilt3.Package.browse("census/tracts_cartographic")
+            t = tracts_cartographic["tracts_2010_500k.parquet"]()
 
         if states:
             t = t[t.geoid.str[:2].isin(states)]
@@ -392,14 +379,17 @@ class DataStore:
         """
         if convert:
             try:
-
                 return _convert_gdf(
-                    pd.read_parquet(self.administrative["msas.parquet"].get_cached_path()).sort_values(by="name")
+                    pd.read_parquet(pathlib.Path(data_dir, "msas.parquet")).sort_values(
+                        by="name"
+                    )
                 )
             except:
                 return _convert_gdf(self.administrative["msas.parquet"]())
         try:
-            return pd.read_parquet(self.administrative["msas.parquet"].get_cached_path()).sort_values(by="name")
+            return pd.read_parquet(pathlib.Path(data_dir, "msas.parquet")).sort_values(
+                by="name"
+            )
         except:
             return self.administrative["msas.parquet"]().sort_values(by="name")
 
@@ -420,13 +410,16 @@ class DataStore:
         """
         if convert:
             try:
-                return _convert_gdf(pd.read_parquet(self.administrative["states.parquet"].get_cached_path()))
+                return _convert_gdf(
+                    pd.read_parquet(pathlib.Path(data_dir, "states.parquet"))
+                )
             except:
                 return _convert_gdf(self.administrative["states.parquet"]())
         try:
-            return pd.read_parquet(self.administrative["states.parquet"].get_cached_path())
+            return pd.read_parquet(pathlib.Path(data_dir, "states.parquet"))
         except:
-            return self.administrative["states.parquet"]()
+            administrative = quilt3.Package.browse("census/administrative")
+            return administrative["states.parquet"]()
 
     def counties(self):
         """Nationwide counties as drawn in 2010.
@@ -444,9 +437,12 @@ class DataStore:
 
         """
         try:
-            return _convert_gdf(pd.read_parquet(self.administrative["counties.parquet"].get_cached_path()))
+            return _convert_gdf(
+                pd.read_parquet(pathlib.Path(data_dir, "counties.parquet"))
+            )
         except:
-            return _convert_gdf(self.administrative["counties.parquet"]())
+            administrative = quilt3.Package.browse("census/administrative")
+            return _convert_gdf(administrative["counties.parquet"]())
 
     def msa_definitions(self):
         """2010 Metropolitan Statistical Area definitions.
@@ -461,9 +457,10 @@ class DataStore:
 
         """
         try:
-            return pd.read_parquet(self.administrative["msa_definitions.parquet"].get_cached_path())
+            return pd.read_parquet(pathlib.Path(data_dir, "msa_definitions.parquet"))
         except:
-            return self.administrative["msa_definitions.parquet"]()
+            administrative = quilt3.Package.browse("census/administrative")
+            return administrative["msa_definitions.parquet"]()
 
     def ltdb(self):
         """Longitudinal Tract Database (LTDB).
@@ -475,7 +472,7 @@ class DataStore:
 
         """
         try:
-            return storage["ltdb"]()
+            return pd.read_parquet(pathlib.Path(data_dir, "ltdb.parquet"))
         except KeyError:
             print(
                 "Unable to locate LTDB data. Try saving the data again "
@@ -492,7 +489,7 @@ class DataStore:
 
         """
         try:
-            return storage["ncdb"]()
+            return pd.read_parquet(pathlib.Path(data_dir, "ncdb.parquet"))
         except KeyError:
             print(
                 "Unable to locate NCDB data. Try saving the data again "

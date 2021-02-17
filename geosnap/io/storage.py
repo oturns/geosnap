@@ -14,22 +14,17 @@ import quilt3
 from .._data import datasets
 from .util import adjust_inflation, convert_gdf
 
-_fipstable = pd.read_csv(
-    os.path.join(os.path.dirname(os.path.abspath(__file__)), "stfipstable.csv"),
-    converters={"FIPS Code": str},
-)
-
 appname = "geosnap"
 appauthor = "geosnap"
 data_dir = user_data_dir(appname, appauthor)
 if not os.path.exists(data_dir):
     pathlib.Path(data_dir).mkdir(parents=True, exist_ok=True)
 
-# look for local storage and create if missing
-try:
-    storage = quilt3.Package.browse("geosnap_data/storage")
-except FileNotFoundError:
-    storage = quilt3.Package()
+# # look for local storage and create if missing
+# try:
+#     storage = quilt3.Package.browse("geosnap_data/storage")
+# except FileNotFoundError:
+#     storage = quilt3.Package()
 
 
 def store_census():
@@ -43,8 +38,10 @@ def store_census():
         is 3.05 GB.
 
     """
-    quilt3.Package.install("census/tracts_cartographic", "s3://spatial-ucr")
-    quilt3.Package.install("census/administrative", "s3://spatial-ucr")
+    quilt3.Package.install("census/tracts_cartographic", "s3://spatial-ucr",
+                           dest=data_dir)
+    quilt3.Package.install("census/administrative", "s3://spatial-ucr",
+                           dest=data_dir)
 
 
 def store_blocks_2000():
@@ -219,8 +216,8 @@ def store_ltdb(sample, fullcount):
     df = df[keeps]
 
     df.to_parquet(os.path.join(data_dir, "ltdb.parquet"), compression="brotli")
-    storage.set("ltdb", os.path.join(data_dir, "ltdb.parquet"))
-    storage.build("geosnap_data/storage")
+    #storage.set("ltdb", os.path.join(data_dir, "ltdb.parquet"))
+    #storage.build("geosnap_data/storage")
 
 
 def store_ncdb(filepath):
@@ -321,8 +318,8 @@ def store_ncdb(filepath):
     df = df.loc[df.n_total_pop != 0]
 
     df.to_parquet(os.path.join(data_dir, "ncdb.parquet"), compression="brotli")
-    storage.set("ncdb", os.path.join(data_dir, "ncdb.parquet"))
-    storage.build("geosnap_data/storage")
+    #storage.set("ncdb", os.path.join(data_dir, "ncdb.parquet"))
+    #storage.build("geosnap_data/storage")
 
 
 def _fips_filter(
