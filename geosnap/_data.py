@@ -18,12 +18,6 @@ data_dir = user_data_dir(appname, appauthor)
 if not os.path.exists(data_dir):
     pathlib.Path(data_dir).mkdir(parents=True, exist_ok=True)
 
-# look for local storage and create if missing
-# try:
-#     storage = quilt3.Package.browse("geosnap_data/storage")
-# except FileNotFoundError:
-#     storage = quilt3.Package()
-
 
 class _Map(dict):
     """tabbable dict."""
@@ -177,12 +171,12 @@ class DataStore:
         if isinstance(states, (int,)):
             states = [states]
         blks = {}
-        
+
         for state in states:
             try:
                 blks[state] = pd.read_parquet(
                     pathlib.Path(pth, "f{state}.parquet")
-                    #blocks_2000[f"{state}.parquet"].get_cached_path()
+                    # blocks_2000[f"{state}.parquet"].get_cached_path()
                 )
             except:
                 blks[state] = blocks_2000[f"{state}.parquet"]()
@@ -280,7 +274,9 @@ class DataStore:
             warn(
                 "streaming remote data. Use `geosnap.io.store_census() to store the data locally for better performance"
             )
-            tracts_cartographic = quilt3.Package.browse("census/tracts_cartographic", "s3://spatial-ucr")
+            tracts_cartographic = quilt3.Package.browse(
+                "census/tracts_cartographic", "s3://spatial-ucr"
+            )
             t = tracts_cartographic["tracts_1990_500k.parquet"]()
 
         if states:
@@ -314,7 +310,9 @@ class DataStore:
             warn(
                 "streaming remote data. Use `geosnap.io.store_census() to store the data locally for better performance"
             )
-            tracts_cartographic = quilt3.Package.browse("census/tracts_cartographic", "s3://spatial-ucr")
+            tracts_cartographic = quilt3.Package.browse(
+                "census/tracts_cartographic", "s3://spatial-ucr"
+            )
             t = tracts_cartographic["tracts_2000_500k.parquet"]()
         if states:
             t = t[t.geoid.str[:2].isin(states)]
@@ -347,7 +345,9 @@ class DataStore:
             warn(
                 "streaming remote data. Use `geosnap.io.store_census() to store the data locally for better performance"
             )
-            tracts_cartographic = quilt3.Package.browse("census/tracts_cartographic", "s3://spatial-ucr")
+            tracts_cartographic = quilt3.Package.browse(
+                "census/tracts_cartographic", "s3://spatial-ucr"
+            )
             t = tracts_cartographic["tracts_2010_500k.parquet"]()
 
         if states:
@@ -384,14 +384,18 @@ class DataStore:
                     )
                 )
             except:
-                administrative = quilt3.Package.browse("census/administrative", "s3://spatial-ucr")
+                administrative = quilt3.Package.browse(
+                    "census/administrative", "s3://spatial-ucr"
+                )
                 return _convert_gdf(administrative["msas.parquet"]())
         try:
             return pd.read_parquet(pathlib.Path(data_dir, "msas.parquet")).sort_values(
                 by="name"
             )
         except:
-            administrative = quilt3.Package.browse("census/administrative", "s3://spatial-ucr")
+            administrative = quilt3.Package.browse(
+                "census/administrative", "s3://spatial-ucr"
+            )
             return administrative["msas.parquet"]().sort_values(by="name")
 
     def states(self, convert=True):
@@ -415,12 +419,16 @@ class DataStore:
                     pd.read_parquet(pathlib.Path(data_dir, "states.parquet"))
                 )
             except:
-                administrative = quilt3.Package.browse("census/administrative",  "s3://spatial-ucr")
+                administrative = quilt3.Package.browse(
+                    "census/administrative", "s3://spatial-ucr"
+                )
                 return _convert_gdf(administrative["states.parquet"]())
         try:
             return pd.read_parquet(pathlib.Path(data_dir, "states.parquet"))
         except:
-            administrative = quilt3.Package.browse("census/administrative",  "s3://spatial-ucr")
+            administrative = quilt3.Package.browse(
+                "census/administrative", "s3://spatial-ucr"
+            )
             return administrative["states.parquet"]()
 
     def counties(self):
@@ -443,7 +451,9 @@ class DataStore:
                 pd.read_parquet(pathlib.Path(data_dir, "counties.parquet"))
             )
         except:
-            administrative = quilt3.Package.browse("census/administrative",  "s3://spatial-ucr")
+            administrative = quilt3.Package.browse(
+                "census/administrative", "s3://spatial-ucr"
+            )
             return _convert_gdf(administrative["counties.parquet"]())
 
     def msa_definitions(self):
@@ -461,7 +471,9 @@ class DataStore:
         try:
             return pd.read_parquet(pathlib.Path(data_dir, "msa_definitions.parquet"))
         except:
-            administrative = quilt3.Package.browse("census/administrative",  "s3://spatial-ucr")
+            administrative = quilt3.Package.browse(
+                "census/administrative", "s3://spatial-ucr"
+            )
             return administrative["msa_definitions.parquet"]()
 
     def ltdb(self):

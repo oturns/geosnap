@@ -53,7 +53,6 @@
        - name: Pytest
          shell: bash -l {0}
          run: |
-           python geosnap/tests/get_data.py
            pytest -v geosnap --cov=geosnap --cov-report=xml
          env:
            LTDB_SAMPLE: ${{ secrets.COMBO_DATA }} # check whether we can pull secrets
