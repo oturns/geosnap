@@ -65,6 +65,6 @@
            file: ./coverage.xml
            name: geosnap-codecov
        - name: Notebook Tests
-         if: ${{ env.COMBO_DATA }}
+         if: ${{ secrets.COMBO_DATA }}
          shell: bash -l {0}
          run: jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 --ExecutePreprocessor.kernel_name=python3 examples/*.ipynb;

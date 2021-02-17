@@ -6,7 +6,6 @@ dependencies:
   - pandas
   - giddy >=2.2.1
   - libpysal
-  - spenc
   - cenpy
   - geopandas
   - matplotlib
@@ -22,7 +21,6 @@ dependencies:
   - tqdm
   - quilt3 >=3.1.11
   - xlrd
-  - region >=0.2.0
   - tobler >=0.2.1
   - spopt >=0.1.1
 
