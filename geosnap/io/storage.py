@@ -59,7 +59,9 @@ def store_blocks_2000():
         in place of streaming data for all census queries.
 
     """
-    quilt3.Package.install("census/blocks_2000", "s3://spatial-ucr")
+    pth = pathlib.Path(data_dir, "blocks_2000")
+    pathlib.Path(pth).mkdir(parents=True, exist_ok=True)    
+    quilt3.Package.install("census/blocks_2000", "s3://spatial-ucr", dest=pth)
 
 
 def store_blocks_2010():
@@ -72,7 +74,9 @@ def store_blocks_2010():
         in place of streaming data for all census queries.
 
     """
-    quilt3.Package.install("census/blocks_2010", "s3://spatial-ucr")
+    pth = pathlib.Path(data_dir, "blocks_2010")
+    pathlib.Path(pth).mkdir(parents=True, exist_ok=True)    
+    quilt3.Package.install("census/blocks_2010", "s3://spatial-ucr", dest=pth)
 
 
 def store_ltdb(sample, fullcount):
