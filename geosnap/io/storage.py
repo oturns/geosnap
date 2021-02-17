@@ -14,6 +14,11 @@ import quilt3
 from .._data import datasets
 from .util import adjust_inflation, convert_gdf
 
+_fipstable = pd.read_csv(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "stfipstable.csv"),
+    converters={"FIPS Code": str},
+)
+
 appname = "geosnap"
 appauthor = "geosnap"
 data_dir = user_data_dir(appname, appauthor)
