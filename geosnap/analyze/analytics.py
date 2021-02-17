@@ -126,7 +126,7 @@ class ModelResults:
         `comm.models.['model_name'].nearest_labels`
         """
         self.nearest_labels = pd.DataFrame()
-        self.nearest_labels["nearest_label"] = esda.nearest_label(
+        self.nearest_labels["nearest_label"] = esda.silhouettes.nearest_label(
             self.X.values, self.labels, **kwargs
         )
         self.nearest_labels.index = self.X.index
