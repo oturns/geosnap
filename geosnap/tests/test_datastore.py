@@ -38,10 +38,3 @@ def test_codebook():
     df = datasets.codebook()
     assert df.shape == (194, 12)
 
-@pytest.mark.xfail(reason="not testing proprietary datasets")
-def test_ltdb():
-    assert datasets.ltdb().shape == (330388, 192)
-
-@pytest.mark.xfail(reason="not testing proprietary datasets")
-def test_ncdb():
-    assert datasets.ncdb().shape == (328633, 77)

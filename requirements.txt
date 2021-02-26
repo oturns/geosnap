@@ -6,7 +6,6 @@ scikit-learn
 seaborn
 libpysal
 mapclassify
-spenc
 giddy>=2.2.1
 xlrd
 cenpy
@@ -16,9 +15,9 @@ dash
 dash-bootstrap-components
 tqdm
 quilt3>=3.1.11
-region>=0.2.1
 pyarrow>=0.14.1
 contextily
 descartes
 scikit-plot
 tobler>=0.4
+spopt>=0.1.1

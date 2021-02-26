@@ -25,11 +25,11 @@ data_dir = user_data_dir(appname, appauthor)
 if not os.path.exists(data_dir):
     pathlib.Path(data_dir).mkdir(parents=True, exist_ok=True)
 
-# look for local storage and create if missing
-try:
-    storage = quilt3.Package.browse("geosnap_data/storage")
-except FileNotFoundError:
-    storage = quilt3.Package()
+# # look for local storage and create if missing
+# try:
+#     storage = quilt3.Package.browse("geosnap_data/storage")
+# except FileNotFoundError:
+#     storage = quilt3.Package()
 
 
 def store_census():
@@ -43,8 +43,10 @@ def store_census():
         is 3.05 GB.
 
     """
-    quilt3.Package.install("census/tracts_cartographic", "s3://spatial-ucr")
-    quilt3.Package.install("census/administrative", "s3://spatial-ucr")
+    quilt3.Package.install("census/tracts_cartographic", "s3://spatial-ucr",
+                           dest=data_dir)
+    quilt3.Package.install("census/administrative", "s3://spatial-ucr",
+                           dest=data_dir)
 
 
 def store_blocks_2000():
@@ -57,7 +59,9 @@ def store_blocks_2000():
         in place of streaming data for all census queries.
 
     """
-    quilt3.Package.install("census/blocks_2000", "s3://spatial-ucr")
+    pth = pathlib.Path(data_dir, "blocks_2000")
+    pathlib.Path(pth).mkdir(parents=True, exist_ok=True)    
+    quilt3.Package.install("census/blocks_2000", "s3://spatial-ucr", dest=pth)
 
 
 def store_blocks_2010():
@@ -70,7 +74,9 @@ def store_blocks_2010():
         in place of streaming data for all census queries.
 
     """
-    quilt3.Package.install("census/blocks_2010", "s3://spatial-ucr")
+    pth = pathlib.Path(data_dir, "blocks_2010")
+    pathlib.Path(pth).mkdir(parents=True, exist_ok=True)    
+    quilt3.Package.install("census/blocks_2010", "s3://spatial-ucr", dest=pth)
 
 
 def store_ltdb(sample, fullcount):
@@ -219,8 +225,8 @@ def store_ltdb(sample, fullcount):
     df = df[keeps]
 
     df.to_parquet(os.path.join(data_dir, "ltdb.parquet"), compression="brotli")
-    storage.set("ltdb", os.path.join(data_dir, "ltdb.parquet"))
-    storage.build("geosnap_data/storage")
+    #storage.set("ltdb", os.path.join(data_dir, "ltdb.parquet"))
+    #storage.build("geosnap_data/storage")
 
 
 def store_ncdb(filepath):
@@ -321,8 +327,8 @@ def store_ncdb(filepath):
     df = df.loc[df.n_total_pop != 0]
 
     df.to_parquet(os.path.join(data_dir, "ncdb.parquet"), compression="brotli")
-    storage.set("ncdb", os.path.join(data_dir, "ncdb.parquet"))
-    storage.build("geosnap_data/storage")
+    #storage.set("ncdb", os.path.join(data_dir, "ncdb.parquet"))
+    #storage.build("geosnap_data/storage")
 
 
 def _fips_filter(

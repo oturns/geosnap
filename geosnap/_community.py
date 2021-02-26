@@ -13,7 +13,7 @@ import scikitplot as skplt
 
 from ._data import _Map, datasets
 from .analyze import cluster as _cluster
-from .analyze import cluster_spatial as _cluster_spatial
+from .analyze import regionalize as _cluster_spatial
 from .analyze import sequence as _sequence
 from .analyze import transition as _transition
 from .analyze import predict_labels as _predict_labels
@@ -45,8 +45,6 @@ class Community:
     harmonized : bool
         Whether neighborhood boundaries have been harmonized into a set of
         time-consistent units
-    **kwargs
-
 
     Attributes
     ----------
@@ -100,7 +98,6 @@ class Community:
         target_year: int
             Polygons from this year will become the target boundaries for
             spatial interpolation.
-
         weights_method : string
             The method that the harmonization will be conducted. This can be set to
 
@@ -108,25 +105,20 @@ class Community:
             * dasymetric :   harmonization using area-weighted interpolation with raster-based
                              ancillary data such as <https://www.mrlc.gov/data/nlcd-2016-land-cover-conus>
                              to mask out uninhabited land.
-
         extensive_variables : list
             The names of variables in each dataset of raw_community that contains
             extensive variables to be harmonized (see (2) in Notes).
-
         intensive_variables : list
             The names of variables in each dataset of raw_community that contains
             intensive variables to be harmonized (see (2) in Notes).
-
         allocate_total : bool
             True if total value of source area should be allocated.
             False if denominator is area of i. Note that the two cases
             would be identical when the area of the source polygon is
             exhausted by intersections. See (3) in Notes for more details.
-
         raster : str
             the path to a local raster image to be used as a dasymetric mask. If using
             "dasymetric" as the weights method, this is a required argument.
-
         codes : list of ints
             list of raster pixel values that should be considered as
             'populated'. Default values are consistent with the National Land Cover
@@ -140,13 +132,11 @@ class Community:
             The description of each code can be found here:
             <https://www.mrlc.gov/sites/default/files/metadata/landcover.html>
             Ignored if not using dasymetric harmonizatiton.
-
         force_crs_match : bool. Default is True.
             Wheter the Coordinate Reference System (CRS) of the polygon will be
             reprojected to the CRS of the raster file. It is recommended to
             leave this argument True.
             Only taken into consideration for harmonization raster based.
-
 
         Notes
         -----
@@ -262,7 +252,7 @@ class Community:
         comm.models[model_name] = model
         return comm
 
-    def cluster_spatial(
+    def regionalize(
         self,
         n_clusters=6,
         spatial_weights="rook",
@@ -716,37 +706,38 @@ class Community:
         Parameters
         ----------
         model_name : str , required
-                     model to be plotted
-        year       : int, optional
-                     year to be plotted if model created with pooling=='unique'
-        ctxmap     : contextily map provider, optional
-                     contextily basemap. Set to False for no basemap.
-                     Default is ctx.providers.Stamen.TonerLite
-        save_fig   : str, optional
-                     path to save figure if desired.
-        figsize    : tuple, optional
-                     an order tuple where x is width and y is height
-                     default is 12 inches wide and 3 inches high
-        title      : string, optional
-                     title of figure
-                     default is no title
-        alpha      : float, optional
-                     how transparent the plotted objects are
-                     Default is 0.5
-        cmap       : string, optional
-                     cmap to be plotted
-                     default is 'bwr'
-        dpi        : int, optional
-                     dpi of the saved image if save_fig=True
-                     default is 500
-        time_var   : string, optional
-                     the column in the community gdf that identifies time period
-                     default is 'year' from US census data
-        id_var     : string, optional
-                     column in gdf that identifies geographic units
-                     default is 'geoid' from US census data
-        kwargs     : **kwargs, optional
-                     pass through to matplotlib pyplot
+            model to be plotted
+        year : int, optional
+            year to be plotted if model created with pooling=='unique'
+        ctxmap : contextily map provider, optional
+            contextily basemap. Set to False for no basemap.
+            Default is ctx.providers.Stamen.TonerLite
+        save_fig : str, optional
+            path to save figure if desired.
+        figsize : tuple, optional
+            an order tuple where x is width and y is height
+            default is 12 inches wide and 3 inches high
+        title : string, optional
+            title of figure
+            default is no title
+        alpha : float, optional
+            how transparent the plotted objects are
+            Default is 0.5
+        cmap : string, optional
+            cmap to be plotted
+            default is 'bwr'
+        dpi : int, optional
+            dpi of the saved image if save_fig=True
+            default is 500
+        time_var : string, optional
+            the column in the community gdf that identifies time period
+            default is 'year' from US census data
+        id_var : string, optional
+            column in gdf that identifies geographic units
+            default is 'geoid' from US census data
+        kwargs : **kwargs, optional
+            pass through to matplotlib pyplot
+
         Returns
         -------
         path_silhouette scores of the passed model plotted onto community geography
@@ -1705,7 +1696,7 @@ class Community:
                 fips=fips,
                 data=tracts,
             )
-        
+
         # adjust for inflation if necessary
         if constant_dollars:
             newtracts = []
@@ -1721,7 +1712,6 @@ class Community:
                 df = adjust_inflation(df, inflate_cols, year, currency_year)
                 newtracts.append(df)
             gdf = pd.concat(newtracts)
-            
 
         return cls(gdf=gdf, harmonized=False)
 
