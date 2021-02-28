@@ -1888,10 +1888,11 @@ class Community:
             neighborhood units over time.
 
         """
-        assert len(set([gdf.crs for gdf in gdfs])) == 1, (
-            "These geodataframes have different CRS."
-            " A community constructed from these GeoDataFrames will have different CRS for different time periods or neighborhoods."
-            " In order to fix this error, please make the CRS for each GeoDataFrame the same."
+        crss = set([gdf.crs for gdf in gdfs])
+        assert len(crss) == 1, (
+            f"These geodataframes have {len(crss)} different CRS: "
+            f"{[i.to_string() for i in crss]}."
+            " To continue, reproject the geodataframes into a single consistent system."
             " See: https://geopandas.org/projections.html for more inforamtion."
         )
         gdf = pd.concat(gdfs, sort=True)
