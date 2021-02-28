@@ -79,7 +79,7 @@ def harmonize(
        Also, all GeoDataFrames must have the same Coordinate Reference System (CRS).
 
     2) A quick explanation of extensive and intensive variables can be found
-    here: http://ibis.geog.ubc.ca/courses/geob370/notes/intensive_extensive.htm
+    here: https://www.esri.com/about/newsroom/arcuser/understanding-statistical-data-for-mapping-purposes/
 
     3) For an extensive variable, the estimate at target polygon j (default case) is:
 
