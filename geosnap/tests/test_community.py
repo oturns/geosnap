@@ -49,6 +49,17 @@ def test_Community_from_gdfs():
 
     assert Community.from_geodataframes([t90, t00]).gdf.shape == (380, 192)
 
+def test_Community_from_gdfs_crs():
+
+    t90 = datasets.tracts_1990()
+    t00 = datasets.tracts_2000()
+    t90 = t90.to_crs(4236)
+    t00 = t00.to_crs(3857)
+    try:
+        Community.from_geodataframes([t90, t00])
+    except AssertionError:
+        print("From_gdfs constructor successfully detects inconsistent crs.")
+        pass
 
 def test_Community_from_lodes():
     dc = Community.from_lodes(state_fips="11", years=[2010, 2015])
