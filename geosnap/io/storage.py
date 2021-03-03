@@ -25,12 +25,6 @@ data_dir = user_data_dir(appname, appauthor)
 if not os.path.exists(data_dir):
     pathlib.Path(data_dir).mkdir(parents=True, exist_ok=True)
 
-# # look for local storage and create if missing
-# try:
-#     storage = quilt3.Package.browse("geosnap_data/storage")
-# except FileNotFoundError:
-#     storage = quilt3.Package()
-
 
 def store_census():
     """Save census data to the local quilt package storage.
