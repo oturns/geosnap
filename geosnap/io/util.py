@@ -88,10 +88,14 @@ def convert_census_gdb(
         df = df.dropna(axis=1, how="all")
         tables.append(df)
         if save_intermediate:
+            if i.contains("ACS_"):
+                df = gpd.GeoDataFrame(df)
             df.to_parquet(
                 pathlib.PurePath(output_dir, f"acs_{year}_{i}_{level}.parquet")
             )
     df = pd.concat(tables, axis=1)
+    if f"ACS_{year}_5YR_{level.upper()}" in layers:
+        df = gpd.GeoDataFrame(df)
     df.to_parquet(pathlib.PurePath(output_dir, f"acs_{year}_{level}.parquet"))
 
 
