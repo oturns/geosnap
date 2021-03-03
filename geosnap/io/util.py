@@ -1,7 +1,10 @@
 import os
-from warnings import warn
+import pathlib
+import urllib
 from urllib.error import HTTPError
+from warnings import warn
 
+import geopandas as gpd
 import pandas as pd
 from shapely import wkb, wkt
 
@@ -14,6 +17,86 @@ def _deserialize_wkb(str):
 
 def _deserialize_wkt(str):
     return wkt.loads(str)
+
+
+def get_census_gdb(years=None, geom_level="blockgroup", output_dir=None):
+    """Fetch file geodatabases of ACS demographic profile data from the Census bureau server.
+
+    Parameters
+    ----------
+    years : list, optional
+        set of years to download (2010 onward), defaults to 2010-2018
+    geom_level : str, optional
+        geographic unit to download (tract or blockgroup), by default "blockgroup"
+    output_dir : str, optional
+        output directory to write files, by default None
+    """
+    if not output_dir:
+        raise Exception("You must set an output directory")
+    levels = {"blockgroup": "bg", "tract": "tract"}
+
+    if not years:
+        years = range(2010, 2018)
+    for year in years:
+        fn = f"ACS_{year}_5YR_{levels[geom_level].upper()}.gdb.zip"
+        pth = pathlib.PurePath(output_dir, fn)
+
+        if year in [2010, 2011]:
+            if geom_level == "blockgroup":
+                raise Exception(f"blockgroup data not available for {year}")
+            fn = f"{year}_ACS_5YR_{geom_level.capitalize()}.gdb.zip"
+            out_fn = f"ACS_{year}_5YR_{levels[geom_level].upper()}.gdb.zip"
+            pth = pathlib.PurePath(output_dir, out_fn)
+        url = f"https://www2.census.gov/geo/tiger/TIGER_DP/{year}ACS/{fn}"
+        urllib.request.urlretrieve(url, pth)
+
+
+def reformat_acs_vars(col):
+    pieces = col.split("e")
+    formatted = pieces[0] + "_" + pieces[1].rjust(3, "0") + "E"
+    return formatted
+
+
+def convert_census_gdb(
+    file, layers, year=None, level="bg", save_intermediate=True, output_dir="."
+):
+    """Convert file geodatabases from Census into (set of) parquet files.
+
+    Parameters
+    ----------
+    file : str
+        path to file geodatabase
+    layers : list
+        set of layers to extract from gdb
+    year : str, optional
+        [description], by default None
+    level : str, optional
+        geographic level of data ('bg' for blockgroups or 'tr' for tract), by default "bg"
+    save_intermediate : bool, optional
+        if true, each layer will be stored separately as a parquet file, by default True
+    output_dir : str, optional
+        path to directory where parquet files will be written, by default "."
+    """
+    tables = []
+    for i in layers:
+        print(i)
+        df = gpd.read_file(
+            file, driver="FileGDB", layer=i, ignore_geometry=True
+        ).set_index("GEOID")
+        df = df[df.columns[df.columns.str.contains("e")]]
+        df.columns = pd.Series(df.columns).apply(reformat_acs_vars)
+        df = df.dropna(axis=1, how="all")
+        tables.append(df)
+        if save_intermediate:
+            if i.contains("ACS_"):
+                df = gpd.GeoDataFrame(df)
+            df.to_parquet(
+                pathlib.PurePath(output_dir, f"acs_{year}_{i}_{level}.parquet")
+            )
+    df = pd.concat(tables, axis=1)
+    if f"ACS_{year}_5YR_{level.upper()}" in layers:
+        df = gpd.GeoDataFrame(df)
+    df.to_parquet(pathlib.PurePath(output_dir, f"acs_{year}_{level}.parquet"))
 
 
 def get_lehd(dataset="wac", state="dc", year=2015):
@@ -94,15 +177,18 @@ def adjust_inflation(df, columns, given_year, base_year=2015):
     )
     if base_year not in inflation.YEAR.unique():
         try:
-            warn(f'Unable to find local adjustment year for {base_year}. Attempting from online data')
+            warn(
+                f"Unable to find local adjustment year for {base_year}. Attempting from online data"
+            )
             inflation = pd.read_excel(
                 "https://www.bls.gov/cpi/research-series/allitems.xlsx", skiprows=5
             )
 
-            assert base_year in inflation.YEAR.unique(), f"Unable to find adjustment values for {base_year}"
+            assert (
+                base_year in inflation.YEAR.unique()
+            ), f"Unable to find adjustment values for {base_year}"
         except Exception:
             raise ValueError(f"Unable to find adjustment values for {base_year}")
-
 
     inflation.columns = inflation.columns.str.lower()
     inflation.columns = inflation.columns.str.strip(".")
