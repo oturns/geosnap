@@ -80,16 +80,15 @@ def convert_census_gdb(
     tables = []
     for i in layers:
         print(i)
-        df = gpd.read_file(
-            file, driver="FileGDB", layer=i, ignore_geometry=True
-        ).set_index("GEOID")
-        df = df[df.columns[df.columns.str.contains("e")]]
-        df.columns = pd.Series(df.columns).apply(reformat_acs_vars)
+        df = gpd.read_file(file, driver="FileGDB", layer=i).set_index("GEOID")
+        if "ACS_" in i:
+            df = gpd.GeoDataFrame(df)
+        else:
+            df = df[df.columns[df.columns.str.contains("e")]]
+            df.columns = pd.Series(df.columns).apply(reformat_acs_vars)
         df = df.dropna(axis=1, how="all")
         tables.append(df)
         if save_intermediate:
-            if i.contains("ACS_"):
-                df = gpd.GeoDataFrame(df)
             df.to_parquet(
                 pathlib.PurePath(output_dir, f"acs_{year}_{i}_{level}.parquet")
             )
