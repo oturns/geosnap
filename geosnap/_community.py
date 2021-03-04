@@ -1646,6 +1646,9 @@ class Community:
 
         msa_states = []
         if msa_fips:
+            pr_metros = set(datasets.msa_definitions()[datasets.msa_definitions()['CBSA Title'].str.contains('PR')]['CBSA Code'].tolist())
+            if msa_fips in pr_metros:
+                raise Exception('geosnap does not yet include built-in data for Puerto Rico')
             msa_states += datasets.msa_definitions()[
                 datasets.msa_definitions()["CBSA Code"] == msa_fips
             ]["stcofips"].tolist()
@@ -1775,6 +1778,9 @@ class Community:
         years = list(set(years))
 
         if msa_fips:
+            pr_metros = set(datasets.msa_definitions()[datasets.msa_definitions()['CBSA Title'].str.contains('PR')]['CBSA Code'].tolist())
+            if msa_fips in pr_metros:
+                raise Exception('geosnap does not yet include built-in data for Puerto Rico')
             msa_counties = datasets.msa_definitions()[
                 datasets.msa_definitions()["CBSA Code"] == msa_fips
             ]["stcofips"].tolist()
@@ -1832,7 +1838,9 @@ class Community:
             gdf = gdf[gdf.representative_point().intersects(boundary.unary_union)]
 
         # grab state abbreviations
+        _fipstable = _fipstable[_fipstable['FIPS Code'] != '72'] # don't have PR
         names = (
+            
             _fipstable[_fipstable["FIPS Code"].isin(states)]["State Abbreviation"]
             .str.lower()
             .tolist()

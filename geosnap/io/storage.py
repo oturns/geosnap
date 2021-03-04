@@ -338,6 +338,9 @@ def _fips_filter(
             fips_list += each
 
     if msa_fips:
+        pr_metros = set(datasets.msa_definitions()[datasets.msa_definitions()['CBSA Title'].str.contains('PR')]['CBSA Code'].tolist())
+        if msa_fips in pr_metros:
+            raise Exception('geosnap does not yet include built-in data for Puerto Rico')
         fips_list += datasets.msa_definitions()[
             datasets.msa_definitions()["CBSA Code"] == msa_fips
         ]["stcofips"].tolist()
