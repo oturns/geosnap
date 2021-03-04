@@ -336,7 +336,8 @@ def _fips_filter(
             each = [each]
         if isinstance(each, (list,)):
             fips_list += each
-
+        if any(i.startswith('72') for i in fips_list):
+            raise Exception('geosnap does not yet include built-in data for Puerto Rico')
     if msa_fips:
         pr_metros = set(datasets.msa_definitions()[datasets.msa_definitions()['CBSA Title'].str.contains('PR')]['CBSA Code'].tolist())
         if msa_fips in pr_metros:
