@@ -1646,6 +1646,15 @@ class Community:
 
         msa_states = []
         if msa_fips:
+            pr_metros = set(
+                datasets.msa_definitions()[
+                    datasets.msa_definitions()["CBSA Title"].str.contains("PR")
+                ]["CBSA Code"].tolist()
+            )
+            if msa_fips in pr_metros:
+                raise Exception(
+                    "geosnap does not yet include built-in data for Puerto Rico"
+                )
             msa_states += datasets.msa_definitions()[
                 datasets.msa_definitions()["CBSA Code"] == msa_fips
             ]["stcofips"].tolist()
@@ -1775,6 +1784,15 @@ class Community:
         years = list(set(years))
 
         if msa_fips:
+            pr_metros = set(
+                datasets.msa_definitions()[
+                    datasets.msa_definitions()["CBSA Title"].str.contains("PR")
+                ]["CBSA Code"].tolist()
+            )
+            if msa_fips in pr_metros:
+                raise Exception(
+                    "geosnap does not yet include built-in data for Puerto Rico"
+                )
             msa_counties = datasets.msa_definitions()[
                 datasets.msa_definitions()["CBSA Code"] == msa_fips
             ]["stcofips"].tolist()
@@ -1842,6 +1860,8 @@ class Community:
 
         dfs = []
         for name in names:
+            if name == "PR":
+                raise Exception("does not yet include built-in data for Puerto Rico")
             for year in years:
                 try:
                     df = get_lehd(dataset=dataset, year=year, state=name)
