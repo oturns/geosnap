@@ -28,3 +28,4 @@ dependencies:
   - descartes  
   - spopt >=0.1.1
   - fsspec
+  - s3fs
