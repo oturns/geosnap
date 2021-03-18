@@ -1,6 +1,7 @@
 import os
 import pathlib
 import urllib
+import urllib.request
 from urllib.error import HTTPError
 from warnings import warn
 
@@ -31,6 +32,9 @@ def get_census_gdb(years=None, geom_level="blockgroup", output_dir=None):
     output_dir : str, optional
         output directory to write files, by default None
     """
+    opener = urllib.request.build_opener()
+    opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+    urllib.request.install_opener(opener)
     if not output_dir:
         raise Exception("You must set an output directory")
     levels = {"blockgroup": "bg", "tract": "tract"}
@@ -58,7 +62,7 @@ def reformat_acs_vars(col):
 
 
 def convert_census_gdb(
-    file, layers, year=None, level="bg", save_intermediate=True, output_dir="."
+    file, layers, year=None, level="bg", save_intermediate=True, combine=True, output_dir="."
 ):
     """Convert file geodatabases from Census into (set of) parquet files.
 
@@ -74,6 +78,8 @@ def convert_census_gdb(
         geographic level of data ('bg' for blockgroups or 'tr' for tract), by default "bg"
     save_intermediate : bool, optional
         if true, each layer will be stored separately as a parquet file, by default True
+    combine : bool
+        whether to store and concatenate intermediaate dataframes
     output_dir : str, optional
         path to directory where parquet files will be written, by default "."
     """
@@ -87,15 +93,17 @@ def convert_census_gdb(
             df = df[df.columns[df.columns.str.contains("e")]]
             df.columns = pd.Series(df.columns).apply(reformat_acs_vars)
         df = df.dropna(axis=1, how="all")
-        tables.append(df)
+        if combine:
+            tables.append(df)
         if save_intermediate:
             df.to_parquet(
                 pathlib.PurePath(output_dir, f"acs_{year}_{i}_{level}.parquet")
             )
-    df = pd.concat(tables, axis=1)
-    if f"ACS_{year}_5YR_{level.upper()}" in layers:
-        df = gpd.GeoDataFrame(df)
-    df.to_parquet(pathlib.PurePath(output_dir, f"acs_{year}_{level}.parquet"))
+    if combine:
+        df = pd.concat(tables, axis=1)
+        if f"ACS_{year}_5YR_{level.upper()}" in layers:
+            df = gpd.GeoDataFrame(df)
+        df.to_parquet(pathlib.PurePath(output_dir, f"acs_{year}_{level}.parquet"))
 
 
 def get_lehd(dataset="wac", state="dc", year=2015):
