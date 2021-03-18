@@ -23,6 +23,7 @@ dependencies:
   - xlrd
   - tobler >=0.2.1
   - spopt >=0.1.1
+  - fsspec
 
   # testing
   - descartes
