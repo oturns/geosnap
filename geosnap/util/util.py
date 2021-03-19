@@ -1,9 +1,10 @@
 """Utility functions."""
 
 import os
-import tempfile
-import matplotlib.pyplot as plt
+import re
 from pathlib import PurePath
+
+import matplotlib.pyplot as plt
 from matplotlib.animation import ArtistAnimation, PillowWriter
 
 
@@ -38,7 +39,7 @@ def gif_from_path(
     """
     assert filename, "You must provide an output filename ending in .gif"
     imgs = os.listdir(path)
-    imgs.sort()
+    imgs.sort(key=lambda var:[int(x) if x.isdigit() else x for x in re.findall(r'[^0-9]|[0-9]+', var)])
 
     fig, ax = plt.subplots(figsize=figsize)
     ax.axis("off")

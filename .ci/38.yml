@@ -23,7 +23,9 @@ dependencies:
   - xlrd
   - tobler >=0.2.1
   - spopt >=0.1.1
-
+  - fsspec
+  - s3fs
+  - botocore >=1.20.21
   # testing
   - descartes
   - jupyter

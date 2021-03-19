@@ -27,3 +27,7 @@ dependencies:
   - mapclassify
   - descartes  
   - spopt >=0.1.1
+  - fsspec
+  - s3fs
+  - botocore >=1.20.21
+  

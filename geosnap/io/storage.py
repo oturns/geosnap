@@ -12,7 +12,7 @@ import pandas as pd
 import quilt3
 
 from .._data import datasets
-from .util import adjust_inflation, convert_gdf
+from .util import adjust_inflation
 
 _fipstable = pd.read_csv(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), "stfipstable.csv"),
@@ -33,14 +33,14 @@ def store_census():
     -------
     None
         Data will be available in the geosnap.data.datasets and will be used
-        in place of streaming data for all census queries. The raster package
-        is 3.05 GB.
+        in place of streaming data for all census queries. The
+        census/administrative package is 185 MB.
 
     """
-    quilt3.Package.install("census/tracts_cartographic", "s3://spatial-ucr",
-                           dest=data_dir)
-    quilt3.Package.install("census/administrative", "s3://spatial-ucr",
-                           dest=data_dir)
+    quilt3.Package.install(
+        "census/tracts_cartographic", "s3://spatial-ucr", dest=data_dir
+    )
+    quilt3.Package.install("census/administrative", "s3://spatial-ucr", dest=data_dir)
 
 
 def store_blocks_2000():
@@ -54,7 +54,7 @@ def store_blocks_2000():
 
     """
     pth = pathlib.Path(data_dir, "blocks_2000")
-    pathlib.Path(pth).mkdir(parents=True, exist_ok=True)    
+    pathlib.Path(pth).mkdir(parents=True, exist_ok=True)
     quilt3.Package.install("census/blocks_2000", "s3://spatial-ucr", dest=pth)
 
 
@@ -69,7 +69,7 @@ def store_blocks_2010():
 
     """
     pth = pathlib.Path(data_dir, "blocks_2010")
-    pathlib.Path(pth).mkdir(parents=True, exist_ok=True)    
+    pathlib.Path(pth).mkdir(parents=True, exist_ok=True)
     quilt3.Package.install("census/blocks_2010", "s3://spatial-ucr", dest=pth)
 
 
@@ -204,7 +204,10 @@ def store_ltdb(sample, fullcount):
     df = pd.concat([ltdb_1970, ltdb_1980, ltdb_1990, ltdb_2000, ltdb_2010], sort=True)
 
     renamer = dict(
-        zip(datasets.codebook()["ltdb"].tolist(), datasets.codebook()["variable"].tolist())
+        zip(
+            datasets.codebook()["ltdb"].tolist(),
+            datasets.codebook()["variable"].tolist(),
+        )
     )
 
     df.rename(renamer, axis="columns", inplace=True)
@@ -219,8 +222,6 @@ def store_ltdb(sample, fullcount):
     df = df[keeps]
 
     df.to_parquet(os.path.join(data_dir, "ltdb.parquet"), compression="brotli")
-    #storage.set("ltdb", os.path.join(data_dir, "ltdb.parquet"))
-    #storage.build("geosnap_data/storage")
 
 
 def store_ncdb(filepath):
@@ -321,8 +322,8 @@ def store_ncdb(filepath):
     df = df.loc[df.n_total_pop != 0]
 
     df.to_parquet(os.path.join(data_dir, "ncdb.parquet"), compression="brotli")
-    #storage.set("ncdb", os.path.join(data_dir, "ncdb.parquet"))
-    #storage.build("geosnap_data/storage")
+    # storage.set("ncdb", os.path.join(data_dir, "ncdb.parquet"))
+    # storage.build("geosnap_data/storage")
 
 
 def _fips_filter(
@@ -336,12 +337,20 @@ def _fips_filter(
             each = [each]
         if isinstance(each, (list,)):
             fips_list += each
-        if any(i.startswith('72') for i in fips_list):
-            raise Exception('geosnap does not yet include built-in data for Puerto Rico')
+        if any(i.startswith("72") for i in fips_list):
+            raise Exception(
+                "geosnap does not yet include built-in data for Puerto Rico"
+            )
     if msa_fips:
-        pr_metros = set(datasets.msa_definitions()[datasets.msa_definitions()['CBSA Title'].str.contains('PR')]['CBSA Code'].tolist())
+        pr_metros = set(
+            datasets.msa_definitions()[
+                datasets.msa_definitions()["CBSA Title"].str.contains("PR")
+            ]["CBSA Code"].tolist()
+        )
         if msa_fips in pr_metros:
-            raise Exception('geosnap does not yet include built-in data for Puerto Rico')
+            raise Exception(
+                "geosnap does not yet include built-in data for Puerto Rico"
+            )
         fips_list += datasets.msa_definitions()[
             datasets.msa_definitions()["CBSA Code"] == msa_fips
         ]["stcofips"].tolist()
@@ -367,10 +376,9 @@ def _from_db(
     )
 
     # we know we're using 2010, need to drop the year column so no conficts
-    tracts = datasets.tracts_2010(convert=False)
-    tracts = tracts[["geoid", "wkb"]]
+    tracts = datasets.tracts_2010()
+    tracts = tracts[["geoid", "geometry"]]
     tracts = tracts[tracts.geoid.isin(df.geoid)]
-    tracts = convert_gdf(tracts)
 
     gdf = df.merge(tracts, on="geoid", how="left").set_index("geoid")
     gdf = gpd.GeoDataFrame(gdf)

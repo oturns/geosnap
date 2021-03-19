@@ -7,16 +7,12 @@ from warnings import warn
 
 import geopandas as gpd
 import pandas as pd
-import quilt3
 from appdirs import user_data_dir
 from requests.exceptions import Timeout
-from shapely import wkb, wkt
 
 appname = "geosnap"
 appauthor = "geosnap"
 data_dir = user_data_dir(appname, appauthor)
-if not os.path.exists(data_dir):
-    pathlib.Path(data_dir).mkdir(parents=True, exist_ok=True)
 
 
 class _Map(dict):
@@ -49,14 +45,6 @@ class _Map(dict):
     def __delitem__(self, key):
         super(_Map, self).__delitem__(key)
         del self.__dict__[key]
-
-
-def _deserialize_wkb(str):
-    return wkb.loads(str, hex=True)
-
-
-def _deserialize_wkt(str):
-    return wkt.loads(str)
 
 
 def _convert_gdf(df):
@@ -128,15 +116,13 @@ class DataStore:
 
         return atts
 
-    def blocks_2000(self, states=None, convert=True, fips=None):
+    def blocks_2000(self, states=None, fips=None):
         """Census blocks for 2000.
 
         Parameters
         ----------
         states : list-like
             list of state fips codes to return as a datafrrame.
-        convert : bool
-        if True, return geodataframe, else return dataframe (the default is True).
 
         Returns
         -------
@@ -146,58 +132,49 @@ class DataStore:
             stored as well-known binary on the 'wkb' column.
 
         """
-        pth = pathlib.Path(data_dir, "blocks_2000")
-        if not os.path.exists(pth):
-            warn(
-                "Unable to locate local census 2000 block data. Streaming instead.\n"
-                "If you plan to use census data repeatedly you can store it locally "
-                "with the io.store_blocks_2000 function for better performance"
-            )
-            try:
-                blocks_2000 = quilt3.Package.browse(
-                    "census/blocks_2000", "s3://spatial-ucr"
-                )
-
-            except Timeout:
-                warn(
-                    "Unable to locate local census data and unable to reach s3 bucket."
-                    "You will be unable to use built-in data during this session. "
-                    "Try downloading a local copy with the io.store_blocks_2000 function,"
-                    "then restart your python kernel and try again."
-                )
-
-        if isinstance(states, (str,)):
-            states = [states]
-        if isinstance(states, (int,)):
+        if isinstance(states, (str, int)):
             states = [states]
         blks = {}
-
         for state in states:
             try:
-                blks[state] = pd.read_parquet(
-                    pathlib.Path(pth, "f{state}.parquet")
-                    # blocks_2000[f"{state}.parquet"].get_cached_path()
+                blks[state] = gpd.read_parquet(
+                    pathlib.Path(data_dir, "blocks_2000", f"{state}.parquet")
                 )
-            except:
-                blks[state] = blocks_2000[f"{state}.parquet"]()
+            except Exception:
+                warn(
+                    "Unable to locate local census 2010 block data. Streaming instead.\n"
+                    "If you plan to use census data repeatedly you can store it locally "
+                    "with the io.store_blocks_2010 function for better performance"
+                )
+                try:
+                    blks[state] = gpd.read_parquet(
+                        f"s3://spatial-ucr/census/blocks_2000/{state}.parquet"
+                    )
+                except Timeout:
+                    warn(
+                        "Unable to locate local census data and unable to reach s3 bucket."
+                        "You will be unable to use built-in data during this session. "
+                        "If you need these data, please try downloading a local copy "
+                        "with the io.store_blocks_2010 function, then restart your "
+                        "python kernel and try again."
+                    )
+
             if fips:
                 blks[state] = blks[state][blks[state]["geoid"].str.startswith(fips)]
+
             blks[state]["year"] = 2000
         blocks = list(blks.values())
-        blocks = pd.concat(blocks, sort=True)
-        if convert:
-            return _convert_gdf(blocks)
+        blocks = gpd.GeoDataFrame(pd.concat(blocks, sort=True))
+
         return blocks
 
-    def blocks_2010(self, states=None, convert=True, fips=None):
+    def blocks_2010(self, states=None, fips=None):
         """Census blocks for 2010.
 
         Parameters
         ----------
         states : list-like
             list of state fips codes to return as a datafrrame.
-        convert : bool
-        if True, return geodataframe, else return dataframe (the default is True).
 
         Returns
         -------
@@ -207,59 +184,49 @@ class DataStore:
             stored as well-known binary on the 'wkb' column.
 
         """
-        try:
-            from quilt3.data.census import blocks_2010
-
-            # blocks_2010 = quilt3.Package.browse("census/blocks_2010")  # if any of these aren't found, stream them instead
-        except ImportError:
-            warn(
-                "Unable to locate local census 2010 block data. Streaming instead.\n"
-                "If you plan to use census data repeatedly you can store it locally "
-                "with the io.store_blocks_2010 function for better performance"
-            )
-            try:
-                blocks_2010 = quilt3.Package.browse(
-                    "census/blocks_2010", "s3://spatial-ucr"
-                )
-
-            except Timeout:
-                warn(
-                    "Unable to locate local census data and unable to reach s3 bucket."
-                    "You will be unable to use built-in data during this session. "
-                    "If you need these data, please try downloading a local copy "
-                    "with the io.store_blocks_2010 function, then restart your "
-                    "python kernel and try again."
-                )
-
         if isinstance(states, (str, int)):
             states = [states]
         blks = {}
         for state in states:
             try:
-                blks[state] = pd.read_parquet(
-                    blocks_2010[f"{state}.parquet"].get_cached_path()
+                blks[state] = gpd.read_parquet(
+                    pathlib.Path(data_dir, "blocks_2010", f"{state}.parquet")
                 )
-            except:
-                blks[state] = blocks_2010[f"{state}.parquet"]()
+            except Exception:
+                warn(
+                    "Unable to locate local census 2010 block data. Streaming instead.\n"
+                    "If you plan to use census data repeatedly you can store it locally "
+                    "with the io.store_blocks_2010 function for better performance"
+                )
+                try:
+                    blks[state] = gpd.read_parquet(
+                        f"s3://spatial-ucr/census/blocks_2010/{state}.parquet"
+                    )
+                except Timeout:
+                    warn(
+                        "Unable to locate local census data and unable to reach s3 bucket."
+                        "You will be unable to use built-in data during this session. "
+                        "If you need these data, please try downloading a local copy "
+                        "with the io.store_blocks_2010 function, then restart your "
+                        "python kernel and try again."
+                    )
+
             if fips:
                 blks[state] = blks[state][blks[state]["geoid"].str.startswith(fips)]
 
             blks[state]["year"] = 2010
         blocks = list(blks.values())
-        blocks = pd.concat(blocks, sort=True)
-        if convert:
-            return _convert_gdf(blocks)
+        blocks = gpd.GeoDataFrame(pd.concat(blocks, sort=True))
+
         return blocks
 
-    def tracts_1990(self, states=None, convert=True):
+    def tracts_1990(self, states=None):
         """Nationwide Census Tracts as drawn in 1990 (cartographic 500k).
 
         Parameters
         ----------
         states : list-like
             list of state fips to subset the national dataframe
-        convert : bool
-            if True, return geodataframe, else return dataframe (the default is True).
 
         Returns
         -------
@@ -269,33 +236,28 @@ class DataStore:
 
         """
         try:
-            t = pd.read_parquet(pathlib.Path(data_dir, "tracts_1990_500k.parquet"))
-        except:
+            t = gpd.read_parquet(pathlib.Path(data_dir, "tracts_1990_500k.parquet"))
+        except Exception:
             warn(
                 "streaming remote data. Use `geosnap.io.store_census() to store the data locally for better performance"
             )
-            tracts_cartographic = quilt3.Package.browse(
-                "census/tracts_cartographic", "s3://spatial-ucr"
+            t = gpd.read_parquet(
+                "s3://spatial-ucr/census/tracts_cartographic/tracts_1990_500k.parquet"
             )
-            t = tracts_cartographic["tracts_1990_500k.parquet"]()
 
         if states:
             t = t[t.geoid.str[:2].isin(states)]
         t["year"] = 1990
-        if convert:
-            return _convert_gdf(t)
-        else:
-            return t
 
-    def tracts_2000(self, states=None, convert=True):
+        return t
+
+    def tracts_2000(self, states=None):
         """Nationwide Census Tracts as drawn in 2000 (cartographic 500k).
 
         Parameters
         ----------
         states : list-like
             list of state fips to subset the national dataframe
-        convert : bool
-            if True, return geodataframe, else return dataframe (the default is True).
 
         Returns
         -------
@@ -305,32 +267,29 @@ class DataStore:
 
         """
         try:
-            t = pd.read_parquet(pathlib.Path(data_dir, "tracts_2000_500k.parquet"))
-        except:
+            t = gpd.read_parquet(pathlib.Path(data_dir, "tracts_2000_500k.parquet"))
+        except Exception:
             warn(
                 "streaming remote data. Use `geosnap.io.store_census() to store the data locally for better performance"
             )
-            tracts_cartographic = quilt3.Package.browse(
-                "census/tracts_cartographic", "s3://spatial-ucr"
+            t = gpd.read_parquet(
+                "s3://spatial-ucr/census/tracts_cartographic/tracts_2000_500k.parquet"
             )
-            t = tracts_cartographic["tracts_2000_500k.parquet"]()
         if states:
             t = t[t.geoid.str[:2].isin(states)]
         t["year"] = 2000
-        if convert:
-            return _convert_gdf(t)
-        else:
-            return t
 
-    def tracts_2010(self, states=None, convert=True):
+        return t
+
+    def tracts_2010(
+        self, states=None,
+    ):
         """Nationwide Census Tracts as drawn in 2010 (cartographic 500k).
 
         Parameters
         ----------
         states : list-like
             list of state fips to subset the national dataframe
-        convert : bool
-            if True, return geodataframe, else return dataframe (the default is True).
 
         Returns
         -------
@@ -340,34 +299,26 @@ class DataStore:
 
         """
         try:
-            t = pd.read_parquet(pathlib.Path(data_dir, "tracts_2010_500k.parquet"))
-        except:
+            t = gpd.read_parquet(pathlib.Path(data_dir, "tracts_2010_500k.parquet"))
+        except Exception:
             warn(
                 "streaming remote data. Use `geosnap.io.store_census() to store the data locally for better performance"
             )
-            tracts_cartographic = quilt3.Package.browse(
-                "census/tracts_cartographic", "s3://spatial-ucr"
+            t = gpd.read_parquet(
+                "s3://spatial-ucr/census/tracts_cartographic/tracts_2010_500k.parquet"
             )
-            t = tracts_cartographic["tracts_2010_500k.parquet"]()
 
         if states:
             t = t[t.geoid.str[:2].isin(states)]
         t["year"] = 2010
-        if convert:
-            return _convert_gdf(t)
-        else:
-            return t
+        return t
 
-    def msas(self, convert=True):
-        """Metropolitan Statistical Areas as drawn in 2010.
+    def msas(self):
+        """Metropolitan Statistical Areas as drawn in 2020.
 
         Data come from the U.S. Census Bureau's most recent TIGER/LINE files
-        https://www.census.gov/cgi-bin/geo/shapefiles/index.php?year=2018&layergroup=Core+Based+Statistical+Areas
+        https://www.census.gov/cgi-bin/geo/shapefiles/index.php?year=2020&layergroup=Core+Based+Statistical+Areas
 
-        Parameters
-        ----------
-        convert : bool
-            if True, return geodataframe, else return dataframe (the default is True).
 
         Returns
         -------
@@ -376,35 +327,17 @@ class DataStore:
             stored as well-known binary on the 'wkb' column.
 
         """
-        if convert:
-            try:
-                return _convert_gdf(
-                    pd.read_parquet(pathlib.Path(data_dir, "msas.parquet")).sort_values(
-                        by="name"
-                    )
-                )
-            except:
-                administrative = quilt3.Package.browse(
-                    "census/administrative", "s3://spatial-ucr"
-                )
-                return _convert_gdf(administrative["msas.parquet"]())
         try:
-            return pd.read_parquet(pathlib.Path(data_dir, "msas.parquet")).sort_values(
+            return gpd.read_parquet(pathlib.Path(data_dir, "msas.parquet")).sort_values(
                 by="name"
             )
-        except:
-            administrative = quilt3.Package.browse(
-                "census/administrative", "s3://spatial-ucr"
-            )
-            return administrative["msas.parquet"]().sort_values(by="name")
+        except Exception:
+            return gpd.read_parquet(
+                "s3://spatial-ucr/census/administrative/msas.parquet"
+            ).sort_values(by="name")
 
-    def states(self, convert=True):
+    def states(self):
         """States.
-
-        Parameters
-        ----------
-        convert : bool
-            if True, return geodataframe, else return dataframe (the default is True).
 
         Returns
         -------
@@ -413,23 +346,12 @@ class DataStore:
             stored as well-known binary on the 'wkb' column.
 
         """
-        if convert:
-            try:
-                return _convert_gdf(
-                    pd.read_parquet(pathlib.Path(data_dir, "states.parquet"))
-                )
-            except:
-                administrative = quilt3.Package.browse(
-                    "census/administrative", "s3://spatial-ucr"
-                )
-                return _convert_gdf(administrative["states.parquet"]())
         try:
-            return pd.read_parquet(pathlib.Path(data_dir, "states.parquet"))
-        except:
-            administrative = quilt3.Package.browse(
-                "census/administrative", "s3://spatial-ucr"
+            return gpd.read_parquet(pathlib.Path(data_dir, "states.parquet"))
+        except Exception:
+            return gpd.read_parquet(
+                "s3://spatial-ucr/census/administrative/states.parquet"
             )
-            return administrative["states.parquet"]()
 
     def counties(self):
         """Nationwide counties as drawn in 2010.
@@ -447,14 +369,11 @@ class DataStore:
 
         """
         try:
-            return _convert_gdf(
-                pd.read_parquet(pathlib.Path(data_dir, "counties.parquet"))
+            return gpd.read_parquet(pathlib.Path(data_dir, "counties.parquet"))
+        except Exception:
+            return gpd.read_parquet(
+                "s3://spatial-ucr/census/administrative/counties.parquet"
             )
-        except:
-            administrative = quilt3.Package.browse(
-                "census/administrative", "s3://spatial-ucr"
-            )
-            return _convert_gdf(administrative["counties.parquet"]())
 
     def msa_definitions(self):
         """2010 Metropolitan Statistical Area definitions.
@@ -470,11 +389,10 @@ class DataStore:
         """
         try:
             return pd.read_parquet(pathlib.Path(data_dir, "msa_definitions.parquet"))
-        except:
-            administrative = quilt3.Package.browse(
-                "census/administrative", "s3://spatial-ucr"
+        except Exception:
+            return pd.read_parquet(
+                "s3://spatial-ucr/census/administrative/msa_definitions.parquet"
             )
-            return administrative["msa_definitions.parquet"]()
 
     def ltdb(self):
         """Longitudinal Tract Database (LTDB).

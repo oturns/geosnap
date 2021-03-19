@@ -21,3 +21,6 @@ descartes
 scikit-plot
 tobler>=0.4
 spopt>=0.1.1
+fsspec
+s3fs
+botocore >=1.20.21
