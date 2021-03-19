@@ -26,7 +26,7 @@ def test_states():
 
 def test_msas():
     df = datasets.msas(convert=False)
-    assert df.shape == (945, 4)
+    assert df.shape == (939, 4)
 
 
 def test_msa_defs():
