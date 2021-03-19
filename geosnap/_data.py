@@ -13,8 +13,6 @@ from requests.exceptions import Timeout
 appname = "geosnap"
 appauthor = "geosnap"
 data_dir = user_data_dir(appname, appauthor)
-if not os.path.exists(data_dir):
-    pathlib.Path(data_dir).mkdir(parents=True, exist_ok=True)
 
 
 class _Map(dict):
@@ -47,7 +45,6 @@ class _Map(dict):
     def __delitem__(self, key):
         super(_Map, self).__delitem__(key)
         del self.__dict__[key]
-
 
 
 def _convert_gdf(df):
@@ -126,8 +123,6 @@ class DataStore:
         ----------
         states : list-like
             list of state fips codes to return as a datafrrame.
-        convert : bool
-        if True, return geodataframe, else return dataframe (the default is True).
 
         Returns
         -------
@@ -180,8 +175,6 @@ class DataStore:
         ----------
         states : list-like
             list of state fips codes to return as a datafrrame.
-        convert : bool
-        if True, return geodataframe, else return dataframe (the default is True).
 
         Returns
         -------
@@ -234,8 +227,6 @@ class DataStore:
         ----------
         states : list-like
             list of state fips to subset the national dataframe
-        convert : bool
-            if True, return geodataframe, else return dataframe (the default is True).
 
         Returns
         -------
@@ -260,15 +251,13 @@ class DataStore:
 
         return t
 
-    def tracts_2000(self, states=None, convert=True):
+    def tracts_2000(self, states=None):
         """Nationwide Census Tracts as drawn in 2000 (cartographic 500k).
 
         Parameters
         ----------
         states : list-like
             list of state fips to subset the national dataframe
-        convert : bool
-            if True, return geodataframe, else return dataframe (the default is True).
 
         Returns
         -------
@@ -292,15 +281,15 @@ class DataStore:
 
         return t
 
-    def tracts_2010(self, states=None, convert=True):
+    def tracts_2010(
+        self, states=None,
+    ):
         """Nationwide Census Tracts as drawn in 2010 (cartographic 500k).
 
         Parameters
         ----------
         states : list-like
             list of state fips to subset the national dataframe
-        convert : bool
-            if True, return geodataframe, else return dataframe (the default is True).
 
         Returns
         -------
@@ -324,16 +313,12 @@ class DataStore:
         t["year"] = 2010
         return t
 
-    def msas(self, convert=True):
-        """Metropolitan Statistical Areas as drawn in 2010.
+    def msas(self):
+        """Metropolitan Statistical Areas as drawn in 2020.
 
         Data come from the U.S. Census Bureau's most recent TIGER/LINE files
-        https://www.census.gov/cgi-bin/geo/shapefiles/index.php?year=2018&layergroup=Core+Based+Statistical+Areas
+        https://www.census.gov/cgi-bin/geo/shapefiles/index.php?year=2020&layergroup=Core+Based+Statistical+Areas
 
-        Parameters
-        ----------
-        convert : bool
-            if True, return geodataframe, else return dataframe (the default is True).
 
         Returns
         -------
@@ -342,31 +327,17 @@ class DataStore:
             stored as well-known binary on the 'wkb' column.
 
         """
-        if convert:
-            try:
-                return gpd.read_parquet(
-                    pathlib.Path(data_dir, "msas.parquet")
-                ).sort_values(by="name")
-            except Exception:
-                return gpd.read_parquet(
-                    "s3://spatial-ucr/census/administrative/msas.parquet"
-                ).sort_values(by="name")
         try:
-            return pd.read_parquet(pathlib.Path(data_dir, "msas.parquet")).sort_values(
+            return gpd.read_parquet(pathlib.Path(data_dir, "msas.parquet")).sort_values(
                 by="name"
             )
         except Exception:
-            return pd.read_parquet(
+            return gpd.read_parquet(
                 "s3://spatial-ucr/census/administrative/msas.parquet"
             ).sort_values(by="name")
 
-    def states(self, convert=True):
+    def states(self):
         """States.
-
-        Parameters
-        ----------
-        convert : bool
-            if True, return geodataframe, else return dataframe (the default is True).
 
         Returns
         -------
@@ -375,18 +346,10 @@ class DataStore:
             stored as well-known binary on the 'wkb' column.
 
         """
-        if convert:
-            try:
-                return gpd.read_parquet(pathlib.Path(data_dir, "states.parquet"))
-            except Exception:
-                return gpd.read_parquet(
-                    "s3://spatial-ucr/census/administrative/states.parquet"
-                )
-
         try:
-            return pd.read_parquet(pathlib.Path(data_dir, "states.parquet"))
+            return gpd.read_parquet(pathlib.Path(data_dir, "states.parquet"))
         except Exception:
-            return pd.read_parquet(
+            return gpd.read_parquet(
                 "s3://spatial-ucr/census/administrative/states.parquet"
             )
 
@@ -406,11 +369,8 @@ class DataStore:
 
         """
         try:
-            return _convert_gdf(
-                gpd.read_parquet(pathlib.Path(data_dir, "counties.parquet"))
-            )
+            return gpd.read_parquet(pathlib.Path(data_dir, "counties.parquet"))
         except Exception:
-
             return gpd.read_parquet(
                 "s3://spatial-ucr/census/administrative/counties.parquet"
             )
@@ -430,8 +390,9 @@ class DataStore:
         try:
             return pd.read_parquet(pathlib.Path(data_dir, "msa_definitions.parquet"))
         except Exception:
-            return pd.read_parquet("s3://spatial-ucr/census/administrative/msa_definitions.parquet")
-
+            return pd.read_parquet(
+                "s3://spatial-ucr/census/administrative/msa_definitions.parquet"
+            )
 
     def ltdb(self):
         """Longitudinal Tract Database (LTDB).
