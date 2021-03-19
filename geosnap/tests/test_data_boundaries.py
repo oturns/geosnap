@@ -4,7 +4,7 @@ from geosnap import datasets
 def test_metros():
 
     mets = datasets.msas()
-    assert mets.shape == (945, 4)
+    assert mets.shape == (939, 4)
 
 
 def test_tracts():

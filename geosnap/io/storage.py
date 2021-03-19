@@ -33,7 +33,7 @@ def store_census():
     -------
     None
         Data will be available in the geosnap.data.datasets and will be used
-        in place of streaming data for all census queries. The 
+        in place of streaming data for all census queries. The
         census/administrative package is 185 MB.
 
     """
@@ -367,10 +367,9 @@ def _from_db(
     )
 
     # we know we're using 2010, need to drop the year column so no conficts
-    tracts = datasets.tracts_2010(convert=False)
-    tracts = tracts[["geoid", "wkb"]]
+    tracts = datasets.tracts_2010()
+    tracts = tracts[["geoid", "geometry"]]
     tracts = tracts[tracts.geoid.isin(df.geoid)]
-    tracts = convert_gdf(tracts)
 
     gdf = df.merge(tracts, on="geoid", how="left").set_index("geoid")
     gdf = gpd.GeoDataFrame(gdf)

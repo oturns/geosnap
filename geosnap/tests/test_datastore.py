@@ -31,7 +31,7 @@ def test_msas():
 
 def test_msa_defs():
     df = datasets.msa_definitions()
-    assert df.shape == (1915, 13)
+    assert df.shape == (1916, 13)
 
 
 def test_codebook():
