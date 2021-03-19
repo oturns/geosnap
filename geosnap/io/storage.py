@@ -33,8 +33,8 @@ def store_census():
     -------
     None
         Data will be available in the geosnap.data.datasets and will be used
-        in place of streaming data for all census queries. The raster package
-        is 3.05 GB.
+        in place of streaming data for all census queries. The 
+        census/administrative package is 185 MB.
 
     """
     quilt3.Package.install("census/tracts_cartographic", "s3://spatial-ucr",
