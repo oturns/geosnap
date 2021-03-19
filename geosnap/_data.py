@@ -429,7 +429,7 @@ class DataStore:
         """
         try:
             return pd.read_parquet(pathlib.Path(data_dir, "msa_definitions.parquet"))
-        except:
+        except Exception:
             return pd.read_parquet("s3://spatial-ucr/census/administrative/msa_definitions.parquet")
 
 
