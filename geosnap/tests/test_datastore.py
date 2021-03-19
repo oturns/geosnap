@@ -1,5 +1,4 @@
 from geosnap import datasets
-import pytest
 
 def test_tracts90():
     df = datasets.tracts_1990()
@@ -7,12 +6,12 @@ def test_tracts90():
 
 
 def test_tracts00():
-    df = datasets.tracts_2000(convert=False)
+    df = datasets.tracts_2000()
     assert df.shape == (65677, 192)
 
 
 def test_tracts10():
-    df = datasets.tracts_2010(convert=False)
+    df = datasets.tracts_2010()
     assert df.shape == (72832, 194)
 
 
@@ -21,11 +20,11 @@ def test_counties():
 
 
 def test_states():
-    assert datasets.states(convert=False).shape == (51, 3)
+    assert datasets.states().shape == (51, 3)
 
 
 def test_msas():
-    df = datasets.msas(convert=False)
+    df = datasets.msas()
     assert df.shape == (939, 4)
 
 
@@ -37,4 +36,3 @@ def test_msa_defs():
 def test_codebook():
     df = datasets.codebook()
     assert df.shape == (194, 12)
-
