@@ -7,17 +7,6 @@ from warnings import warn
 
 import geopandas as gpd
 import pandas as pd
-from shapely import wkb, wkt
-
-from .._data import _convert_gdf as convert_gdf
-
-
-def _deserialize_wkb(str):
-    return wkb.loads(str, hex=True)
-
-
-def _deserialize_wkt(str):
-    return wkt.loads(str)
 
 
 def get_census_gdb(years=None, geom_level="blockgroup", output_dir=None):

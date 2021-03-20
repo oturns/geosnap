@@ -1,6 +1,5 @@
 """Tools for creating and manipulating neighborhood datasets."""
 
-import multiprocessing
 import os
 import pathlib
 from warnings import warn
@@ -8,7 +7,6 @@ from warnings import warn
 import geopandas as gpd
 import pandas as pd
 from appdirs import user_data_dir
-from requests.exceptions import Timeout
 
 appname = "geosnap"
 appauthor = "geosnap"
@@ -46,43 +44,6 @@ class _Map(dict):
         super(_Map, self).__delitem__(key)
         del self.__dict__[key]
 
-
-def _convert_gdf(df):
-    """Convert DataFrame to GeoDataFrame.
-
-    DataFrame to GeoDataFrame by converting wkt/wkb geometry representation
-    back to Shapely object.
-
-    Parameters
-    ----------
-    df : pandas.DataFrame
-        dataframe with column named either "wkt" or "wkb" that stores
-        geometric information as well-known text or well-known binary,
-        (hex encoded) respectively.
-
-    Returns
-    -------
-    geopandas.GeoDataFrame
-        geodataframe with converted `geometry` column.
-
-    """
-    df = df.copy()
-    df.reset_index(inplace=True, drop=True)
-
-    if "wkt" in df.columns.tolist():
-        with multiprocessing.Pool() as P:
-            df["geometry"] = P.map(_deserialize_wkt, df["wkt"])
-        df = df.drop(columns=["wkt"])
-
-    else:
-        with multiprocessing.Pool() as P:
-            df["geometry"] = P.map(_deserialize_wkb, df["wkb"])
-        df = df.drop(columns=["wkb"])
-
-    df = gpd.GeoDataFrame(df)
-    df.crs = 4326
-
-    return df
 
 
 class DataStore:
