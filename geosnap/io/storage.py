@@ -73,6 +73,41 @@ def store_blocks_2010():
     quilt3.Package.install("census/blocks_2010", "s3://spatial-ucr", dest=pth)
 
 
+def store_acs(years="all", level="tract"):
+    """Save census American Community Survey 5-year data to the local geosnap storage.
+       Each year is about 550mb for tract level and about 900mb for blockgroup level.
+
+     Parameters
+    ----------
+    years : list (optional)
+        subset of years to collect. Currently 2012-2018 vintages
+        are available. Pass 'all' (default) to fetch every available vintage.
+    level : str (optional)
+        geography level to fetch. Options: {'tract', 'bg'} for tract
+        or blockgroup
+
+    Returns
+    -------
+    None
+        Data will be available in the geosnap.data.datasets and will be used
+        in place of streaming data for all census queries.
+
+    """
+    pth = pathlib.Path(data_dir, "acs")
+    pathlib.Path(pth).mkdir(parents=True, exist_ok=True)
+    if isinstance("years", (str, int)):
+        years = [years]
+
+    if years == "all":
+        quilt3.Package.install("census/acs", "s3://spatial-ucr", dest=pth)
+    else:
+        p = quilt3.Package.browse("census/acs", "s3://spatial-ucr")
+        for year in years:
+            p[f"acs_{year}_{level}.parquet"].fetch(
+                dest=pathlib.Path(pth, f"acs_{year}_{level}.parquet")
+            )
+
+
 def store_ltdb(sample, fullcount):
     """
     Read & store data from Brown's Longitudinal Tract Database (LTDB).
