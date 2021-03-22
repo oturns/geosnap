@@ -51,5 +51,5 @@ def test_Community_from_gdfs():
 
 
 def test_Community_from_lodes():
-    dc = Community.from_lodes(state_fips="11", years=[2010, 2015])
-    assert dc.gdf.shape == (6046, 57)
+    dc = Community.from_lodes(state_fips="10", years=[2008, 2015])
+    assert dc.gdf.shape == (8674, 57)

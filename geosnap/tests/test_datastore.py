@@ -1,18 +1,24 @@
 from geosnap import datasets
 
+
+def test_acs():
+    df = datasets.acs(year=2012, states=["11"])
+    assert df.shape == (179, 104)
+
+
 def test_tracts90():
-    df = datasets.tracts_1990()
-    assert df.shape == (60658, 164)
+    df = datasets.tracts_1990(states=["11"])
+    assert df.shape == (192, 164)
 
 
 def test_tracts00():
-    df = datasets.tracts_2000()
-    assert df.shape == (65677, 192)
+    df = datasets.tracts_2000(states=["11"])
+    assert df.shape == (188, 192)
 
 
 def test_tracts10():
-    df = datasets.tracts_2010()
-    assert df.shape == (72832, 194)
+    df = datasets.tracts_2010(states=["11"])
+    assert df.shape == (179, 194)
 
 
 def test_counties():

@@ -1,6 +1,5 @@
 """Tools for creating and manipulating neighborhood datasets."""
 
-import multiprocessing
 import os
 import pathlib
 from warnings import warn
@@ -8,7 +7,6 @@ from warnings import warn
 import geopandas as gpd
 import pandas as pd
 from appdirs import user_data_dir
-from requests.exceptions import Timeout
 
 appname = "geosnap"
 appauthor = "geosnap"
@@ -47,43 +45,6 @@ class _Map(dict):
         del self.__dict__[key]
 
 
-def _convert_gdf(df):
-    """Convert DataFrame to GeoDataFrame.
-
-    DataFrame to GeoDataFrame by converting wkt/wkb geometry representation
-    back to Shapely object.
-
-    Parameters
-    ----------
-    df : pandas.DataFrame
-        dataframe with column named either "wkt" or "wkb" that stores
-        geometric information as well-known text or well-known binary,
-        (hex encoded) respectively.
-
-    Returns
-    -------
-    geopandas.GeoDataFrame
-        geodataframe with converted `geometry` column.
-
-    """
-    df = df.copy()
-    df.reset_index(inplace=True, drop=True)
-
-    if "wkt" in df.columns.tolist():
-        with multiprocessing.Pool() as P:
-            df["geometry"] = P.map(_deserialize_wkt, df["wkt"])
-        df = df.drop(columns=["wkt"])
-
-    else:
-        with multiprocessing.Pool() as P:
-            df["geometry"] = P.map(_deserialize_wkb, df["wkb"])
-        df = df.drop(columns=["wkb"])
-
-    df = gpd.GeoDataFrame(df)
-    df.crs = 4326
-
-    return df
-
 
 class DataStore:
     """Storage for geosnap data. Currently supports US Census data.
@@ -100,6 +61,7 @@ class DataStore:
     def __dir__(self):
 
         atts = [
+            "acs",
             "blocks_2000",
             "blocks_2010",
             "codebook",
@@ -115,6 +77,41 @@ class DataStore:
         ]
 
         return atts
+
+    def acs(self, year=2018, level="tract", states=None):
+        """American Community Survey Data.
+
+        Parameters
+        ----------
+        year : str
+            vingage of ACS release.
+        level : str
+            geographic level
+        states : list, optional
+            subset of states (as 2-digit fips) to return 
+
+        Returns
+        -------
+        geopandas.GeoDataFrame
+            geodataframe of ACS data indexed by FIPS code
+        """
+        try:
+            t = gpd.read_parquet(
+                pathlib.Path(data_dir, "acs", f"acs_{year}_{level}.parquet")
+            )
+        except Exception:
+            warn(
+                "streaming remote data. Use `geosnap.io.store_acs() to store the data locally for better performance"
+            )
+            t = gpd.read_parquet(
+                f"s3://spatial-ucr/census/acs/acs_{year}_{level}.parquet"
+            )
+        t = t.reset_index().rename(columns={"GEOID": "geoid"})
+
+        if states:
+            t = t[t.geoid.str[:2].isin(states)]
+        t["year"] = year
+        return t
 
     def blocks_2000(self, states=None, fips=None):
         """Census blocks for 2000.
@@ -146,18 +143,9 @@ class DataStore:
                     "If you plan to use census data repeatedly you can store it locally "
                     "with the io.store_blocks_2010 function for better performance"
                 )
-                try:
-                    blks[state] = gpd.read_parquet(
-                        f"s3://spatial-ucr/census/blocks_2000/{state}.parquet"
-                    )
-                except Timeout:
-                    warn(
-                        "Unable to locate local census data and unable to reach s3 bucket."
-                        "You will be unable to use built-in data during this session. "
-                        "If you need these data, please try downloading a local copy "
-                        "with the io.store_blocks_2010 function, then restart your "
-                        "python kernel and try again."
-                    )
+                blks[state] = gpd.read_parquet(
+                    f"s3://spatial-ucr/census/blocks_2000/{state}.parquet"
+                )
 
             if fips:
                 blks[state] = blks[state][blks[state]["geoid"].str.startswith(fips)]
@@ -198,18 +186,9 @@ class DataStore:
                     "If you plan to use census data repeatedly you can store it locally "
                     "with the io.store_blocks_2010 function for better performance"
                 )
-                try:
-                    blks[state] = gpd.read_parquet(
-                        f"s3://spatial-ucr/census/blocks_2010/{state}.parquet"
-                    )
-                except Timeout:
-                    warn(
-                        "Unable to locate local census data and unable to reach s3 bucket."
-                        "You will be unable to use built-in data during this session. "
-                        "If you need these data, please try downloading a local copy "
-                        "with the io.store_blocks_2010 function, then restart your "
-                        "python kernel and try again."
-                    )
+                blks[state] = gpd.read_parquet(
+                    f"s3://spatial-ucr/census/blocks_2010/{state}.parquet"
+                )
 
             if fips:
                 blks[state] = blks[state][blks[state]["geoid"].str.startswith(fips)]

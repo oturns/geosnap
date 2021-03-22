@@ -21,6 +21,7 @@ including U.S. Census data from 1990-2010, LEHD data from any vintage, and exter
 .. autosummary::
    :toctree: generated/
 
+    io.store_acs
     io.store_census
     io.store_blocks_2000
     io.store_blocks_2010
@@ -39,6 +40,7 @@ It also provides a storage container `datasets` that provides access to datasets
    :toctree: generated/
    
     datasets
+    datasets.acs
     datasets.blocks_2000
     datasets.blocks_2010
     datasets.codebook
@@ -175,7 +177,7 @@ Spatial Clustering
 Neighborhood Dynamics Methods
 '''''''''''''''''''''''''''''''''''''''''''''
 
-Model neighborhood change using optimal-matching algorithms or spatial discrete markov chains
+Model neighborhood change using optimal-matching algorithms or spatial discrete Markov chains
 
 .. currentmodule:: geosnap
 

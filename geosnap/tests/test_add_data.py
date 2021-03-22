@@ -38,3 +38,6 @@ def test_get_lehd():
 
     assert wac.shape == (3074, 52)
     assert rac.shape == (4382, 42)
+
+def test_store_acs():
+    io.store_acs(2012)
