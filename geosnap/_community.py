@@ -933,10 +933,12 @@ class Community:
         save_fig=None,
         dpi=200,
         legend_kwds="default",
+        missing_kwds="default",
         figsize=None,
         ncols=None,
         nrows=None,
         ctxmap=ctx.providers.Stamen.TonerLite,
+        alpha=1,
         **kwargs,
     ):
         """Plot an attribute from a Community arranged as a timeseries.
@@ -975,6 +977,8 @@ class Community:
                        default is 500
         legend_kwds  : dictionary, optional
                        parameters for the legend
+        missing_kwds  : dictionary, optional
+                       parameters for the plotting missing data
                        Default is 1 column on the bottom of the graph.
         ncols        : int, optional
                        number of columns in the figure
@@ -989,6 +993,8 @@ class Community:
         ctxmap       : contextily map provider, optional
                        contextily basemap. Set to False for no basemap.
                        Default is Stamen.TonerLite
+        alpha : int (optional)
+            Transparency parameter passed to matplotlib
         """
         # proplot needs to be used as a function-level import,
         # as it influences all figures when imported at the top of the file
@@ -1004,6 +1010,13 @@ class Community:
             cmap = "Blues"
         if legend_kwds == "default":
             legend_kwds = {"ncols": 1, "loc": "b"}
+        if missing_kwds == "default":
+            missing_kwds = {
+                "color": "lightgrey",
+                "edgecolor": "red",
+                "hatch": "///",
+                "label": "Missing values",
+            }
         if ctxmap:  # need to convert crs to mercator before graphing
             if df.crs != 3857:
                 df = df.to_crs(epsg=3857)
@@ -1027,12 +1040,8 @@ class Community:
                         cmap=cmap,
                         legend=legend,
                         legend_kwds=legend_kwds,
-                        missing_kwds={
-                            "color": "lightgrey",
-                            "edgecolor": "red",
-                            "hatch": "///",
-                            "label": "Missing values",
-                        },
+                        missing_kwds=missing_kwds,
+                        alpha=alpha,
                     )
                 else:
                     if pooled:
@@ -1046,6 +1055,8 @@ class Community:
                             **kwargs,
                             legend=legend,
                             legend_kwds=legend_kwds,
+                            alpha=alpha,
+
                         )
                     else:
                         df[df.year == year].plot(
@@ -1057,6 +1068,8 @@ class Community:
                             **kwargs,
                             legend=legend,
                             legend_kwds=legend_kwds,
+                            alpha=alpha,
+
                         )
                 if ctxmap:  # need set basemap of each graph
                     ctx.add_basemap(axs[i], source=ctxmap)
@@ -1077,6 +1090,8 @@ class Community:
                         cmap=cmap,
                         legend=legend,
                         legend_kwds=legend_kwds,
+                        alpha=alpha,
+
                     )
                 else:
                     df[df.year == year].plot(
@@ -1088,6 +1103,7 @@ class Community:
                         **kwargs,
                         legend=legend,
                         legend_kwds=legend_kwds,
+                        alpha=alpha,
                     )
                 if ctxmap:  # need set basemap of each graph
                     ctx.add_basemap(axs[i], source=ctxmap)
@@ -1176,7 +1192,8 @@ class Community:
         if not gdf.crs == 3857:
             gdf = gdf.to_crs(3857)
         if not time_periods:
-            time_periods = gdf[time_col].unique()
+            time_periods = list(gdf[time_col].unique())
+        time_periods = sorted(time_periods)
         with tempfile.TemporaryDirectory() as tmpdirname:
             for i, time in enumerate(time_periods):
                 fig, ax = plt.subplots(figsize=figsize)
@@ -1380,7 +1397,7 @@ class Community:
             number of time periods to simulate
         time_col : str, optional
             column on the community gdf that denotes the time index. For builtin data, this is "year"
-        seed: int, optional\
+        seed: int, optional
             seed passed to numpy random number generator
 
         Returns
