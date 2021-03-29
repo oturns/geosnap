@@ -1275,7 +1275,7 @@ class Community:
         """
         assert id_var in self.gdf.columns.to_list(), (
             "id_var is not in the columns."
-            " Please use an appropriate index that properly idientifies spatial units."
+            " Please use an appropriate index that properly identifies spatial units."
         )
 
         mar = _transition(
