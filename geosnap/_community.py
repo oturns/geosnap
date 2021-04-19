@@ -1920,5 +1920,12 @@ class Community:
             neighborhood units over time.
 
         """
+        crss = set([gdf.crs for gdf in gdfs])
+        assert len(crss) == 1, (
+            f"These geodataframes have {len(crss)} different CRS: "
+            f"{[i.to_string() for i in crss]}."
+            " To continue, reproject the geodataframes into a single consistent system."
+            " See: https://geopandas.org/projections.html for more inforamtion."
+        )
         gdf = pd.concat(gdfs, sort=True)
         return cls(gdf=gdf)
