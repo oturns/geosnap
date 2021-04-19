@@ -1273,6 +1273,11 @@ class Community:
                           if w_type is given, return a Spatial_Markov instance
 
         """
+        assert id_var in self.gdf.columns.to_list(), (
+            f"id_var: {id_var} is not in the columns."
+            " Please use an appropriate index that properly identifies spatial units."
+        )
+
         mar = _transition(
             self.gdf,
             cluster_col,
