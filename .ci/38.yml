@@ -9,7 +9,7 @@ dependencies:
   - cenpy
   - geopandas
   - hdbscan
-  - matplotlib ==3.3.4
+  - matplotlib <=3.3.*
   - scikit-learn
   - seaborn
   - pyarrow >=0.14.1
