@@ -3,7 +3,7 @@ nose-progressive
 nose-exclude
 coverage
 coveralls
-matplotlib
+matplotlib>=3.3.4
 pytest
 pytest-mpl
 pytest-cov

@@ -1,7 +1,7 @@
 numpy
 pandas
 geopandas
-matplotlib
+matplotlib>=3.3.4
 scikit-learn
 seaborn
 libpysal
