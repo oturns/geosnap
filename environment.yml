@@ -8,7 +8,7 @@ dependencies:
   - libpysal
   - cenpy
   - geopandas
-  - matplotlib
+  - matplotlib >=3.3.4
   - scikit-learn
   - seaborn
   - pyarrow >=0.14.1
