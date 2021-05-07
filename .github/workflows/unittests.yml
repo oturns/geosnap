@@ -40,7 +40,7 @@
          shell: bash -l {0}
          run: python geosnap/tests/_dl_data.py
          env:
-            COMBO_DATA: ${{ secrets.COMBO_DATA }}
+           COMBO_DATA: ${{ secrets.COMBO_DATA }}
        
        - name: run tests - bash
          shell: bash -l {0}
