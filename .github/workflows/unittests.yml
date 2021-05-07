@@ -32,15 +32,32 @@
            environment-file: ${{ matrix.environment-file }}
            micromamba-version: 'latest'
      
-       - name: install geosnap
+     
+       - name: install geosnap - bash
          shell: bash -l {0}
          run: pip install -e . --no-deps --force-reinstall
+         if: matrix.os != 'windows-latest'
        
-       - name: download data
+       - name: install geosnap - powershell
+         shell: powershell
+         run: pip install -e . --no-deps --force-reinstall
+         if: matrix.os == 'windows-latest'
+      
+      
+       - name: download data - bash
          shell: bash -l {0}
          run: python geosnap/tests/_dl_data.py
          env:
            COMBO_DATA: ${{ secrets.COMBO_DATA }}
+         if: matrix.os != 'windows-latest'
+      
+       - name: download data - powershell
+         shell: powershell
+         run: python geosnap/tests/_dl_data.py
+         env:
+           COMBO_DATA: ${{ secrets.COMBO_DATA }}
+         if: matrix.os == 'windows-latest'
+       
        
        - name: run tests - bash
          shell: bash -l {0}
@@ -60,6 +77,7 @@
            NCDB: ${{ secrets.COMBO_DATA }}
          if: matrix.os == 'windows-latest'
        
+       
        - name: codecov
          uses: codecov/codecov-action@v1
          with:
@@ -67,7 +85,13 @@
            file: ./coverage.xml
            name: geosnap-codecov
        
-       - name: notebook tests
-         if: ${{ env.COMBO_DATA }}
+       
+       - name: notebook tests - bash
+         if: ${{ env.COMBO_DATA }} && matrix.os != 'windows-latest'
          shell: bash -l {0}
+         run: jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 --ExecutePreprocessor.kernel_name=python3 examples/*.ipynb;
+         
+       - name: notebook tests - powershell
+         if: ${{ env.COMBO_DATA }} && matrix.os == 'windows-latest'
+         shell: powershell
          run: jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 --ExecutePreprocessor.kernel_name=python3 examples/*.ipynb;
