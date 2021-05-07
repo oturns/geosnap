@@ -51,7 +51,7 @@
            NCDB: ${{ secrets.COMBO_DATA }}
          if: matrix.os != 'windows-latest'
        
-      - name: run tests - powershell
+       - name: run tests - powershell
          shell: powershell
          run: pytest -v geosnap --cov=geosnap --cov-report=xml
          env:
