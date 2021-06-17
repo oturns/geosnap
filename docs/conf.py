@@ -264,10 +264,6 @@ numpydoc_xref_param_type=True
 plot_include_source = True
 
 
-def setup(app):
-    app.add_stylesheet("pysal-styles.css")
-
-
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
