@@ -84,14 +84,3 @@
            token: ${{ secrets.CODECOV_TOKEN }}
            file: ./coverage.xml
            name: geosnap-codecov
-       
-       
-       - name: notebook tests - bash
-         if: ${{ env.COMBO_DATA }} && matrix.os != 'windows-latest'
-         shell: bash -l {0}
-         run: jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 --ExecutePreprocessor.kernel_name=python3 examples/*.ipynb;
-         
-       - name: notebook tests - powershell
-         if: ${{ env.COMBO_DATA }} && matrix.os == 'windows-latest'
-         shell: powershell
-         run: jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 --ExecutePreprocessor.kernel_name=python3 examples/*.ipynb;
