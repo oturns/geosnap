@@ -1697,14 +1697,14 @@ class Community:
             states = None
 
         df_dict = {
-            1990: datasets.tracts_1990(states=states),
-            2000: datasets.tracts_2000(states=states),
-            2010: datasets.tracts_2010(states=states),
+            1990: datasets.tracts_1990,
+            2000: datasets.tracts_2000,
+            2010: datasets.tracts_2010,
         }
 
         tracts = []
         for year in years:
-            tracts.append(df_dict[year])
+            tracts.append(df_dict[year](states=states))
         tracts = pd.concat(tracts, sort=False)
 
         if isinstance(boundary, gpd.GeoDataFrame):
