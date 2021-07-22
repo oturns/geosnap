@@ -26,6 +26,7 @@ dependencies:
   - fsspec
   - s3fs
   - botocore >=1.20.21
+  - segregation >=2.0
   # testing
   - descartes
   - jupyter
