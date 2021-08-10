@@ -4,6 +4,7 @@ from segregation.singlegroup import Entropy
 from numpy.testing import assert_array_almost_equal
 from geosnap.analyze.segdyn import *
 
+
 reno = Community.from_census(msa_fips="39900")
 groups = ["n_nonhisp_black_persons", "n_nonhisp_white_persons", "n_hispanic_persons", 'n_asian_persons']
 gdf = reno.gdf.to_crs(reno.gdf.estimate_utm_crs())
@@ -11,7 +12,7 @@ gdf = gdf.fillna(0)
 
 
 def test_multigroup_tempdyn():
-
+    np.seterr(divide='ignore', invalid='ignore')
     df = multigroup_tempdyn(gdf.copy(), groups=groups)
     assert_array_almost_equal(df.values, np.array(
       [[0.2887, 0.3492, 0.3639],
