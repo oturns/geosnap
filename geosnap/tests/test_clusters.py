@@ -1,4 +1,4 @@
-from geosnap import Community, io
+from geosnap import Community
 import numpy as np
 
 reno = Community.from_census(msa_fips="39900")
@@ -47,12 +47,8 @@ def test_hdbscan():
 
 def test_spenc():
 
-    try:
-        r = reno.regionalize(columns=columns, method="spenc")
-        assert len(r.gdf.spenc.unique()) == 7
-    except AttributeError:
-        print("spenc failed to import, but force-passing this test")
-        pass  # temporary fix for spenc
+    r = reno.regionalize(columns=columns, method="spenc")
+    assert len(r.gdf.spenc.unique()) == 7
 
 
 def test_maxp():
@@ -84,4 +80,4 @@ def test_seed():
     np.random.seed(12345)
     r = reno.cluster(columns=columns, method='ward')
     card = r.gdf.groupby('ward').count()['geoid'].values
-    np.testing.assert_array_equal(card, [27, 83, 19, 51, 38,  7])
+    np.testing.assert_array_equal(card, [27, 83, 19, 51, 38, 7])
