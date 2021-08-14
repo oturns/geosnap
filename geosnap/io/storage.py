@@ -95,12 +95,12 @@ def store_acs(years="all", level="tract"):
     """
     pth = pathlib.Path(data_dir, "acs")
     pathlib.Path(pth).mkdir(parents=True, exist_ok=True)
-    if isinstance("years", (str, int)):
-        years = [years]
 
     if years == "all":
         quilt3.Package.install("census/acs", "s3://spatial-ucr", dest=pth)
     else:
+        if isinstance("years", (str, int)):
+            years = [years]
         p = quilt3.Package.browse("census/acs", "s3://spatial-ucr")
         for year in years:
             p[f"acs_{year}_{level}.parquet"].fetch(
