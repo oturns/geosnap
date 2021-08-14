@@ -77,25 +77,25 @@ def convert_census_gdb(
     output_dir : str, optional
         path to directory where parquet files will be written, by default "."
     """
-    tables = []
+    #tables = []
     for i in layers:
         print(i)
-        df = gpd.read_file(file, driver="FileGDB", layer=i).set_index("GEOID")
+        df = gpd.read_file(file, driver="FileGDB", layer=i)#quit.set_index("GEOID10")
         if "ACS_" in i:
             df = gpd.GeoDataFrame(df)
         else:
             df = df[df.columns[df.columns.str.contains("e")]]
             df.columns = pd.Series(df.columns).apply(reformat_acs_vars)
         df = df.dropna(axis=1, how="all")
-        tables.append(df)
+        #tables.append(df)
         if save_intermediate:
             df.to_parquet(
                 pathlib.PurePath(output_dir, f"acs_{year}_{i}_{level}.parquet")
             )
-    df = pd.concat(tables, axis=1)
-    if f"ACS_{year}_5YR_{level.upper()}" in layers:
-        df = gpd.GeoDataFrame(df)
-    df.to_parquet(pathlib.PurePath(output_dir, f"acs_{year}_{level}.parquet"))
+    #df = pd.concat(tables, axis=1)
+    #if f"ACS_{year}_5YR_{level.upper()}" in layers:
+    #    df = gpd.GeoDataFrame(df)
+    #df.to_parquet(pathlib.PurePath(output_dir, f"acs_{year}_{level}.parquet"))
 
 
 def get_lehd(dataset="wac", state="dc", year=2015):
