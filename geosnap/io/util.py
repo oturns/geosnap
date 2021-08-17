@@ -22,7 +22,7 @@ def get_census_gdb(years=None, geom_level="blockgroup", output_dir=None):
         output directory to write files, by default None
     """
     opener = urllib.request.build_opener()
-    opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+    opener.addheaders = [("User-agent", "Mozilla/5.0")]
     urllib.request.install_opener(opener)
     if not output_dir:
         raise Exception("You must set an output directory")
@@ -51,7 +51,13 @@ def reformat_acs_vars(col):
 
 
 def convert_census_gdb(
-    file, layers, year=None, level="bg", save_intermediate=True, combine=True, output_dir="."
+    file,
+    layers,
+    year=None,
+    level="bg",
+    save_intermediate=True,
+    combine=True,
+    output_dir=".",
 ):
     """Convert file geodatabases from Census into (set of) parquet files.
 
@@ -172,10 +178,10 @@ def adjust_inflation(df, columns, given_year, base_year=2015):
         )
     )
     if base_year not in inflation.YEAR.unique():
+        warn(
+            f"Unable to find local adjustment year for {base_year}. Attempting from online data"
+        )
         try:
-            warn(
-                f"Unable to find local adjustment year for {base_year}. Attempting from online data"
-            )
             inflation = pd.read_excel(
                 "https://www.bls.gov/cpi/research-series/allitems.xlsx", skiprows=5
             )
