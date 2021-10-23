@@ -23,11 +23,11 @@ reno = reno.regionalize(columns=columns, method='ward_spatial')
 
 def test_cont_timeseries():
     p = reno.plot_timeseries(column='median_household_income', years=[2010], dpi=50)
-    assert isinstance(p, proplot.ui.SubplotsContainer)
+    assert isinstance(p, proplot.gridspec.SubplotGrid)
 
 def test_cat_timeseries():
     p = reno.plot_timeseries(column='kmeans', categorical=True, years=[2010], dpi=50)
-    assert isinstance(p, proplot.ui.SubplotsContainer)
+    assert isinstance(p, proplot.gridspec.SubplotGrid)
 
 def test_heatmaps():
     p = reno.plot_transition_matrix(cluster_col='kmeans', figsize=(2,2))

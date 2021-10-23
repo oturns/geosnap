@@ -21,13 +21,12 @@ dependencies:
   - quilt3 >=3.1.11
   - xlrd
   - tobler >=0.4
-  - proplot
+  - proplot >=9
   - contextily
   - scikit-plot
   - mapclassify
   - descartes  
   - spopt >=0.1.1
-  - fsspec
   - s3fs
   - botocore >=1.20.21
   - segregation >=2.0

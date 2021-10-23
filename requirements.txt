@@ -25,4 +25,4 @@ fsspec
 s3fs
 botocore >=1.20.21
 segregation>=2.1
-proplot
+proplot>=9
