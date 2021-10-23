@@ -53,7 +53,6 @@ def kmeans(
     random_state=None,
     copy_x=True,
     algorithm="auto",
-    precompute_distances="auto",
     **kwargs,
 ):
     """K-Means clustering.
@@ -88,7 +87,6 @@ def kmeans(
             n_init=n_init,
             max_iter=max_iter,
             tol=tol,
-            precompute_distances=precompute_distances,
             verbose=0,
             random_state=random_state,
             copy_x=copy_x,
