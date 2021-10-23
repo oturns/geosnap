@@ -1,7 +1,5 @@
 import os
 import pathlib
-import urllib
-import urllib.request
 from urllib.error import HTTPError
 from warnings import warn
 
@@ -9,27 +7,29 @@ import geopandas as gpd
 import pandas as pd
 
 
-def get_census_gdb(years=None, geom_level="blockgroup", output_dir=None):
+def get_census_gdb(years=None, geom_level="blockgroup", output_dir="."):
     """Fetch file geodatabases of ACS demographic profile data from the Census bureau server.
 
     Parameters
     ----------
     years : list, optional
-        set of years to download (2010 onward), defaults to 2010-2018
+        set of years to download (2010 onward), defaults to 2010-2019
     geom_level : str, optional
         geographic unit to download (tract or blockgroup), by default "blockgroup"
     output_dir : str, optional
-        output directory to write files, by default None
+        output directory to write files, by default "."
     """
-    opener = urllib.request.build_opener()
-    opener.addheaders = [("User-agent", "Mozilla/5.0")]
-    urllib.request.install_opener(opener)
-    if not output_dir:
-        raise Exception("You must set an output directory")
+    try:
+        from download import download
+    except ImportError:
+        raise ImportError(
+            "this function requires choldgraf's `download` package\n"
+            "`pip install git+https://github.com/choldgraf/download`"
+        )
     levels = {"blockgroup": "bg", "tract": "tract"}
 
     if not years:
-        years = range(2010, 2018)
+        years = range(2010, 2020)
     for year in years:
         fn = f"ACS_{year}_5YR_{levels[geom_level].upper()}.gdb.zip"
         pth = pathlib.PurePath(output_dir, fn)
@@ -40,11 +40,26 @@ def get_census_gdb(years=None, geom_level="blockgroup", output_dir=None):
             fn = f"{year}_ACS_5YR_{geom_level.capitalize()}.gdb.zip"
             out_fn = f"ACS_{year}_5YR_{levels[geom_level].upper()}.gdb.zip"
             pth = pathlib.PurePath(output_dir, out_fn)
-        url = f"https://www2.census.gov/geo/tiger/TIGER_DP/{year}ACS/{fn}"
-        urllib.request.urlretrieve(url, pth)
+        url = f"ftp://ftp2.census.gov/geo/tiger/TIGER_DP/{year}ACS/{fn}"
+        download(url, pth)
 
 
 def reformat_acs_vars(col):
+    """Convert variable names to the same format used by the Census Detailed Tables API.
+
+    See <https://api.census.gov/data/2019/acs/acs5/variables.html> for variable descriptions
+
+
+    Parameters
+    ----------
+    col : str
+        column name to adjust
+
+    Returns
+    -------
+    str
+        reformatted column name
+    """
     pieces = col.split("e")
     formatted = pieces[0] + "_" + pieces[1].rjust(3, "0") + "E"
     return formatted
@@ -52,8 +67,8 @@ def reformat_acs_vars(col):
 
 def convert_census_gdb(
     file,
-    layers,
     year=None,
+    layers=None,
     level="bg",
     save_intermediate=True,
     combine=True,
@@ -65,23 +80,40 @@ def convert_census_gdb(
     ----------
     file : str
         path to file geodatabase
-    layers : list
-        set of layers to extract from gdb
-    year : str, optional
-        [description], by default None
+    year : str
+        year that the data should be named by. If none, will try to infer from the filename
+        based on convention from the Census Bureau FTP server
+    layers : list, optional
+        set of layers to extract from geodatabase. If none (default), all layers will be extracted
     level : str, optional
         geographic level of data ('bg' for blockgroups or 'tr' for tract), by default "bg"
     save_intermediate : bool, optional
         if true, each layer will be stored separately as a parquet file, by default True
-    combine : bool
-        whether to store and concatenate intermediaate dataframes
+    combine : bool, optional
+        whether to store and concatenate intermediate dataframes, default is True
     output_dir : str, optional
         path to directory where parquet files will be written, by default "."
     """
+    try:
+        import pyogrio as ogr
+    except ImportError:
+        raise ImportError(
+            "this function requires the `pyogrio` package\n" "`conda install pyogrio`"
+        )
+    if not layers:  # grab them all except the metadata
+        year_suffix = file.split(".")[0].split("_")[1][-2:]
+        meta_str = f"{level.upper()}_METADATA_20{year_suffix}"
+        layers = [layer[0] for layer in ogr.list_layers(file)]
+        if meta_str in layers:
+            layers.remove(meta_str)
+    if (
+        not year
+    ):  # make a strong assumption about the name of the file coming from census
+        year = file.split("_")[1]
     tables = []
     for i in layers:
         print(i)
-        df = gpd.read_file(file, driver="FileGDB", layer=i).set_index("GEOID")
+        df = ogr.read_dataframe(file, layer=i).set_index("GEOID")
         if "ACS_" in i:
             df = gpd.GeoDataFrame(df)
         else:

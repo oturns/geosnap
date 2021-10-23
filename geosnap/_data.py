@@ -104,8 +104,8 @@ class DataStore:
                 "streaming remote data. Use `geosnap.io.store_acs() to store the data locally for better performance"
             )
             t = gpd.read_parquet(
-                f"s3://spatial-ucr/census/acs/acs_{year}_{level}.parquet"
-            )
+                f"s3://spatial-ucr/census/acs/acs_{year}_{level}.parquet",storage_options={"anon": True}
+            ),
         t = t.reset_index().rename(columns={"GEOID": "geoid"})
 
         if states:
@@ -144,7 +144,7 @@ class DataStore:
                     "with the io.store_blocks_2010 function for better performance"
                 )
                 blks[state] = gpd.read_parquet(
-                    f"s3://spatial-ucr/census/blocks_2000/{state}.parquet"
+                    f"s3://spatial-ucr/census/blocks_2000/{state}.parquet",storage_options={"anon": True}
                 )
 
             if fips:
@@ -187,7 +187,7 @@ class DataStore:
                     "with the io.store_blocks_2010 function for better performance"
                 )
                 blks[state] = gpd.read_parquet(
-                    f"s3://spatial-ucr/census/blocks_2010/{state}.parquet"
+                    f"s3://spatial-ucr/census/blocks_2010/{state}.parquet",storage_options={"anon": True}
                 )
 
             if fips:
@@ -221,7 +221,7 @@ class DataStore:
                 "streaming remote data. Use `geosnap.io.store_census() to store the data locally for better performance"
             )
             t = gpd.read_parquet(
-                "s3://spatial-ucr/census/tracts_cartographic/tracts_1990_500k.parquet"
+                "s3://spatial-ucr/census/tracts_cartographic/tracts_1990_500k.parquet",storage_options={"anon": True}
             )
 
         if states:
@@ -252,7 +252,7 @@ class DataStore:
                 "streaming remote data. Use `geosnap.io.store_census() to store the data locally for better performance"
             )
             t = gpd.read_parquet(
-                "s3://spatial-ucr/census/tracts_cartographic/tracts_2000_500k.parquet"
+                "s3://spatial-ucr/census/tracts_cartographic/tracts_2000_500k.parquet",storage_options={"anon": True}
             )
         if states:
             t = t[t.geoid.str[:2].isin(states)]
@@ -284,7 +284,7 @@ class DataStore:
                 "streaming remote data. Use `geosnap.io.store_census() to store the data locally for better performance"
             )
             t = gpd.read_parquet(
-                "s3://spatial-ucr/census/tracts_cartographic/tracts_2010_500k.parquet"
+                "s3://spatial-ucr/census/tracts_cartographic/tracts_2010_500k.parquet",storage_options={"anon": True}
             )
 
         if states:
@@ -312,7 +312,7 @@ class DataStore:
             )
         except Exception:
             return gpd.read_parquet(
-                "s3://spatial-ucr/census/administrative/msas.parquet"
+                "s3://spatial-ucr/census/administrative/msas.parquet",storage_options={"anon": True}
             ).sort_values(by="name")
 
     def states(self):
@@ -329,7 +329,7 @@ class DataStore:
             return gpd.read_parquet(pathlib.Path(data_dir, "states.parquet"))
         except Exception:
             return gpd.read_parquet(
-                "s3://spatial-ucr/census/administrative/states.parquet"
+                "s3://spatial-ucr/census/administrative/states.parquet",storage_options={"anon": True}
             )
 
     def counties(self):
@@ -351,7 +351,7 @@ class DataStore:
             return gpd.read_parquet(pathlib.Path(data_dir, "counties.parquet"))
         except Exception:
             return gpd.read_parquet(
-                "s3://spatial-ucr/census/administrative/counties.parquet"
+                "s3://spatial-ucr/census/administrative/counties.parquet",storage_options={"anon": True}
             )
 
     def msa_definitions(self):
