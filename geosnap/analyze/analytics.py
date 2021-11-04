@@ -180,8 +180,8 @@ def cluster(
     best_model=False,
     columns=None,
     verbose=False,
-    time_var="year",
-    id_var="geoid",
+    temporal_index="year",
+    unit_index="geoid",
     scaler="std",
     pooling="fixed",
     **kwargs,
@@ -203,10 +203,10 @@ def cluster(
         subset of columns on which to apply the clustering
     verbose : bool, optional
         whether to print warning messages (the default is False).
-    time_var : str, optional
+    temporal_index : str, optional
         which column on the dataframe defines time and or sequencing of the
         long-form data. Default is "year"
-    id_var : str, optional
+    unit_index : str, optional
         which column on the long-form dataframe identifies the stable units
         over time. In a wide-form dataset, this would be the unique index
     scaler : None or scaler from sklearn.preprocessing, optional
@@ -258,8 +258,8 @@ def cluster(
     if not columns:
         raise ValueError("You must provide a subset of columns as input")
 
-    times = gdf[time_var].unique()
-    gdf = gdf.set_index([time_var, id_var])
+    times = gdf[temporal_index].unique()
+    gdf = gdf.set_index([temporal_index, unit_index])
 
     # this is the dataset we'll operate on
     data = gdf.copy()[columns]
@@ -292,14 +292,18 @@ def cluster(
         labels = model.labels_.astype(str)
         data = data.reset_index()
         clusters = pd.DataFrame(
-            {model_name: labels, time_var: data[time_var], id_var: data[id_var]}
+            {
+                model_name: labels,
+                temporal_index: data[temporal_index],
+                unit_index: data[unit_index],
+            }
         )
-        clusters.set_index([time_var, id_var], inplace=True)
+        clusters.set_index([temporal_index, unit_index], inplace=True)
         clusters = clusters[~clusters.index.duplicated(keep="first")]
         gdf = gdf.join(clusters, how="left")
         gdf = gdf.reset_index()
         results = ModelResults(
-            X=data.set_index([id_var, time_var]),
+            X=data.set_index([unit_index, temporal_index]),
             columns=columns,
             labels=model.labels_,
             instance=model,
@@ -313,7 +317,7 @@ def cluster(
         data = data.reset_index()
 
         for time in times:
-            df = data[data[time_var] == time]
+            df = data[data[temporal_index] == time]
 
             model = specification[method](
                 df[columns],
@@ -325,12 +329,12 @@ def cluster(
 
             labels = model.labels_.astype(str)
             clusters = pd.DataFrame(
-                {model_name: labels, time_var: time, id_var: df[id_var]}
+                {model_name: labels, temporal_index: time, unit_index: df[unit_index]}
             )
-            clusters.set_index([time_var, id_var], inplace=True)
+            clusters.set_index([temporal_index, unit_index], inplace=True)
             gdf.update(clusters)
             results = ModelResults(
-                X=df.set_index([id_var, time_var]),
+                X=df.set_index([unit_index, temporal_index]),
                 columns=columns,
                 labels=model.labels_,
                 instance=model,
@@ -351,8 +355,8 @@ def regionalize(
     columns=None,
     threshold_variable="count",
     threshold=10,
-    time_var="year",
-    id_var="geoid",
+    temporal_index="year",
+    unit_index="geoid",
     scaler="std",
     weights_kwargs=None,
     **kwargs,
@@ -381,10 +385,10 @@ def regionalize(
         been aggregated
     threshold : numeric
         threshold to use for max-p clustering (the default is 10).
-    time_var : str
+    temporal_index : str
         which column on the dataframe defines time and or sequencing of the
         long-form data. Default is "year"
-    id_var : str
+    unit_index : str
         which column on the long-form dataframe identifies the stable units
         over time. In a wide-form dataset, this would be the unique index
     weights_kwargs : dict
@@ -435,8 +439,8 @@ def regionalize(
     if not weights_kwargs:
         weights_kwargs = {}
 
-    times = gdf[time_var].unique()
-    gdf = gdf.set_index([time_var, id_var])
+    times = gdf[temporal_index].unique()
+    gdf = gdf.set_index([temporal_index, unit_index])
 
     # this is the dataset we'll operate on
     data = gdf.copy()[columns + ["geometry"]]
@@ -456,7 +460,7 @@ def regionalize(
     # loop over each time period, standardize the data and build a weights matrix
     for time in times:
         df = data.loc[time].dropna(how="any", subset=columns).reset_index()
-        df[time_var] = time
+        df[temporal_index] = time
 
         if scaler:
             df[columns] = scaler.fit_transform(df[columns].values)
@@ -478,13 +482,17 @@ def regionalize(
 
         labels = pd.Series(model.labels_).astype(str)
         clusters = pd.DataFrame(
-            {model_name: labels, time_var: df[time_var], id_var: df[id_var]}
+            {
+                model_name: labels,
+                temporal_index: df[temporal_index],
+                unit_index: df[unit_index],
+            }
         )
-        clusters = clusters.drop_duplicates(subset=[id_var])
-        clusters.set_index([time_var, id_var], inplace=True)
+        clusters = clusters.drop_duplicates(subset=[unit_index])
+        clusters.set_index([temporal_index, unit_index], inplace=True)
         gdf.update(clusters)
         results = ModelResults(
-            X=df.set_index([id_var, time_var]).drop("geometry", axis=1),
+            X=df.set_index([unit_index, temporal_index]).drop("geometry", axis=1),
             columns=columns,
             labels=model.labels_,
             instance=model,
@@ -499,8 +507,8 @@ def regionalize(
 
 def predict_labels(
     comm,
-    index_col="geoid",
-    time_col="year",
+    unit_index="geoid",
+    temporal_index="year",
     model_name=None,
     w_type="queen",
     w_options=None,
@@ -529,11 +537,17 @@ def predict_labels(
 
     gdf = comm.gdf.copy()
     gdf = gdf.dropna(subset=[model_name]).reset_index(drop=True)
-    t = comm.transition(model_name, w_type=w_type)
+    t = comm.transition(
+        model_name,
+        w_type=w_type,
+        unit_index=unit_index,
+        temporal_index=temporal_index,
+        w_options=w_options,
+    )
 
     if time_steps == 1:
 
-        gdf = gdf[gdf[time_col] == base_year].reset_index(drop=True)
+        gdf = gdf[gdf[temporal_index] == base_year].reset_index(drop=True)
         w = Ws[w_type].from_dataframe(gdf, **w_options)
         lags = lag_categorical(w, gdf[model_name].values)
         lags = lags.astype(int)
@@ -553,7 +567,7 @@ def predict_labels(
             except:
                 labels[i] = np.random.choice(t.classes, p=t.p[cluster])
         labels = pd.Series(labels, name=new_colname)
-        out = gdf[[index_col, "geometry"]]
+        out = gdf[[unit_index, "geometry"]]
         predicted = pd.concat([labels, out], axis=1)
         return gpd.GeoDataFrame(predicted)
 
@@ -562,8 +576,8 @@ def predict_labels(
             increment
         ), "You must set the `increment` argument to simulate multiple time steps"
         predictions = []
-        gdf = gdf[gdf[time_col] == base_year]
-        gdf = gdf[[index_col, model_name, time_col, "geometry"]]
+        gdf = gdf[gdf[temporal_index] == base_year]
+        gdf = gdf[[unit_index, model_name, temporal_index, "geometry"]]
         current_time = base_year + increment
         gdf = gdf.dropna(subset=[model_name]).reset_index(drop=True)
         w = Ws[w_type].from_dataframe(gdf, **w_options)
@@ -590,8 +604,8 @@ def predict_labels(
                 except:
                     labels[i] = np.random.choice(t.classes, p=t.p[cluster])
             labels = pd.Series(labels, name=model_name)
-            out = gdf[[index_col, "geometry"]]
-            out[time_col] = current_time
+            out = gdf[[unit_index, "geometry"]]
+            out[temporal_index] = current_time
             predicted = pd.concat([labels, out], axis=1)
             predictions.append(gpd.GeoDataFrame(predicted).dropna(subset=[model_name]))
             current_time += increment

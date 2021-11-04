@@ -1,6 +1,11 @@
 from geosnap import datasets
 
 
+def test_data_dir():
+    loc = datasets.show_data_dir()
+    assert len(loc) > 5
+
+
 def test_acs():
     df = datasets.acs(year=2012, states=["11"])
     assert df.shape == (179, 104)
