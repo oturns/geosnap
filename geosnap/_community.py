@@ -330,13 +330,16 @@ class Community:
         cluster_col=None,
         w_type="queen",
         w_options=None,
+        temporal_index="year",
+        unit_index="geoid",
+        permutations=0,
         figsize=(13, 12),
         n_rows=3,
         n_cols=3,
         suptitle=None,
+        title_kwds=None,
         savefig=None,
         dpi=300,
-        **kwargs,
     ):
         """Plot global and spatially-conditioned transition matrices as heatmaps
 
@@ -344,10 +347,21 @@ class Community:
         ----------
         cluster_col : str
             column on the Community.gdf containing neighborhood type labels
-        w_type : str {'queen', 'rook'}
-            which type of libpysal spatial weights objects to encode connectivity
+        temporal_index : string, optional
+            Column defining time and or sequencing of the long-form data.
+            Default is "year".
+        unit_index : string, optional
+            Column identifying the unique id of spatial units.
+            Default is "geoid".
+        w_type : string, optional
+            Type of spatial weights type ("rook", "queen", "knn" or
+            "kernel") to be used for spatial structure. Default is
+            None, if non-spatial Markov transition rates are desired.
         w_options : dict
             additional options passed to a libpysal weights constructor (e.g. `k` for a KNN weights matrix)
+        permutations : int, optional
+            number of permutations for use in randomization based
+            inference (the default is 0).
         figsize : tuple, optional
             size of the resulting figure (13, 12)
         n_rows : int, optional
@@ -373,13 +387,16 @@ class Community:
             cluster_col=cluster_col,
             w_type=w_type,
             w_options=w_options,
+            temporal_index=temporal_index,
+            unit_index=unit_index,
+            permutations=permutations,
             figsize=figsize,
             n_rows=n_rows,
             n_cols=n_cols,
             suptitle=suptitle,
+            title_kwds=title_kwds,
             savefig=savefig,
             dpi=dpi,
-            **kwargs,
         )
         return ax
 
@@ -1260,7 +1277,7 @@ class Community:
         cluster_col : string or int
             Column name for the neighborhood segmentation, such as
             "ward", "kmeans", etc.
-        temporal_index        : string, optional
+        temporal_index : string, optional
             Column defining time and or sequencing of the long-form data.
             Default is "year".
         unit_index : string, optional

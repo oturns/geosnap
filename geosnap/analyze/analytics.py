@@ -292,7 +292,11 @@ def cluster(
         labels = model.labels_.astype(str)
         data = data.reset_index()
         clusters = pd.DataFrame(
-            {model_name: labels, temporal_index: data[temporal_index], unit_index: data[unit_index]}
+            {
+                model_name: labels,
+                temporal_index: data[temporal_index],
+                unit_index: data[unit_index],
+            }
         )
         clusters.set_index([temporal_index, unit_index], inplace=True)
         clusters = clusters[~clusters.index.duplicated(keep="first")]
@@ -478,7 +482,11 @@ def regionalize(
 
         labels = pd.Series(model.labels_).astype(str)
         clusters = pd.DataFrame(
-            {model_name: labels, temporal_index: df[temporal_index], unit_index: df[unit_index]}
+            {
+                model_name: labels,
+                temporal_index: df[temporal_index],
+                unit_index: df[unit_index],
+            }
         )
         clusters = clusters.drop_duplicates(subset=[unit_index])
         clusters.set_index([temporal_index, unit_index], inplace=True)
@@ -529,7 +537,13 @@ def predict_labels(
 
     gdf = comm.gdf.copy()
     gdf = gdf.dropna(subset=[model_name]).reset_index(drop=True)
-    t = comm.transition(model_name, w_type=w_type, unit_index=unit_index, temporal_index=temporal_index, w_options=w_options,)
+    t = comm.transition(
+        model_name,
+        w_type=w_type,
+        unit_index=unit_index,
+        temporal_index=temporal_index,
+        w_options=w_options,
+    )
 
     if time_steps == 1:
 

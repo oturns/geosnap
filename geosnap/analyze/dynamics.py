@@ -3,16 +3,26 @@
 from giddy.markov import Markov, Spatial_Markov
 from giddy.sequence import Sequence
 from libpysal.weights.contiguity import Queen, Rook
-from libpysal.weights.distance import KNN, Kernel
+from libpysal.weights.distance import KNN, Kernel, DistanceBand
+from libpysal.weights import Voronoi
 from sklearn.cluster import AgglomerativeClustering
+import geopandas as gpd
 
+Ws = {
+    "queen": Queen,
+    "rook": Rook,
+    "voronoi": Voronoi,
+    "knn": KNN,
+    "kernel": Kernel,
+    "distanceband": DistanceBand,
+}
 
 def transition(
     gdf,
     cluster_col,
     temporal_index="year",
     unit_index="geoid",
-    w_type=None,
+    w_type="rook",
     w_options=None,
     permutations=0,
 ):
@@ -38,7 +48,7 @@ def transition(
         "kernel") to be used for spatial structure. Default is
         None, if non-spatial Markov transition rates are desired.
     w_options : dict
-        additional options passed to a libpysal weights constructor 
+        additional options passed to a libpysal weights constructor
         (e.g. `k` for a KNN weights matrix)
     permutations : int, optional
         number of permutations for use in randomization based
@@ -102,10 +112,9 @@ def transition(
     if w_type is None:
         mar = Markov(y)  # class markov modeling
     else:
-        gdf_one = gdf_temp.drop_duplicates([unit_index])
-        gdf_wide = df_wide.merge(gdf_one, left_index=True, right_on=unit_index)
-        w_dict = {"rook": Rook, "queen": Queen, "knn": KNN, "kernel": Kernel}
-        w = w_dict[w_type].from_dataframe(gdf_wide, **w_options)
+        geoms = gdf_temp.groupby(unit_index).first()[gdf_temp.geometry.name]
+        gdf_wide = df_wide.merge(geoms, left_index=True, right_index=True)
+        w = Ws[w_type].from_dataframe(gpd.GeoDataFrame(gdf_wide), **w_options)
         w.transform = "r"
         mar = Spatial_Markov(
             y, w, permutations=permutations, discrete=True, variable_name=cluster_col

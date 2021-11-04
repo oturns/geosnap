@@ -12,6 +12,9 @@ def plot_transition_matrix(
     cluster_col=None,
     w_type="queen",
     w_options=None,
+    temporal_index="year",
+    unit_index="geoid",
+    permutations=0,
     figsize=(13, 12),
     n_rows=3,
     n_cols=3,
@@ -29,10 +32,21 @@ def plot_transition_matrix(
          a geosnap Community instance
      cluster_col : str
          column on the Community.gdf containing neighborhood type labels
-     w_type : str {'queen', 'rook'}
-         which type of libpysal spatial weights objects to encode connectivity
-     w_options : dict
-         additional options passed to a libpysal weights constructor (e.g. `k` for a KNN weights matrix)
+    temporal_index        : string, optional
+        Column defining time and or sequencing of the long-form data.
+        Default is "year".
+    unit_index : string, optional
+        Column identifying the unique id of spatial units.
+        Default is "geoid".
+    w_type : string, optional
+        Type of spatial weights type ("rook", "queen", "knn" or
+        "kernel") to be used for spatial structure. Default is
+        None, if non-spatial Markov transition rates are desired.
+    w_options : dict
+        additional options passed to a libpysal weights constructor (e.g. `k` for a KNN weights matrix)
+    permutations : int, optional
+        number of permutations for use in randomization based
+        inference (the default is 0).
      figsize : tuple, optional
          size of the resulting figure (13, 12)
      n_rows : int, optional
@@ -47,7 +61,7 @@ def plot_transition_matrix(
          location the plot will be saved
      dpi : int, optional
          dpi of the resulting image, default is 300
- 
+
      Returns
      -------
      matplotlib Axes
@@ -61,7 +75,14 @@ def plot_transition_matrix(
             "fontsize": 20,
         }
 
-    sm = community.transition(cluster_col=cluster_col, w_type=w_type)
+    sm = community.transition(
+        cluster_col=cluster_col,
+        temporal_index=temporal_index,
+        unit_index=unit_index,
+        w_type=w_type,
+        permutations=permutations,
+        w_options=w_options,
+    )
 
     _, axs = plt.subplots(n_rows, n_cols, figsize=figsize)
     axs = axs.flatten()
@@ -127,6 +148,10 @@ def plot_transition_graphs(
     cluster_col=None,
     output_dir=".",
     w_type="queen",
+    w_options=None,
+    temporal_index="year",
+    unit_index="geoid",
+    permutations=0,
     layout="dot",
     args="-n -Groot=0 -Goverlap=false -Gnodesep=0.01 -Gfont_size=1 -Gmindist=3.5 -Gsize=30,30!",
 ):
@@ -145,8 +170,21 @@ def plot_transition_graphs(
         column on the Community.gdf containing neighborhood type labels
     output_dir : str
         the location that output images will be placed
-    w_type : str {'queen', 'rook'}
-        which type of libpysal spatial weights objects to encode connectivity
+    temporal_index        : string, optional
+        Column defining time and or sequencing of the long-form data.
+        Default is "year".
+    unit_index : string, optional
+        Column identifying the unique id of spatial units.
+        Default is "geoid".
+    w_type : string, optional
+        Type of spatial weights type ("rook", "queen", "knn" or
+        "kernel") to be used for spatial structure. Default is
+        None, if non-spatial Markov transition rates are desired.
+    w_options : dict
+        additional options passed to a libpysal weights constructor (e.g. `k` for a KNN weights matrix)
+    permutations : int, optional
+        number of permutations for use in randomization based
+        inference (the default is 0).
     layout : str, 'dot'
         graphviz layout for plotting
     args : str, optional
@@ -161,8 +199,14 @@ def plot_transition_graphs(
         import pygraphviz
     except ImportError:
         raise ImportError("You must have pygraphviz installed to use graph plotting")
-    sm = community.transition(cluster_col=cluster_col, w_type=w_type)
-
+    sm = community.transition(
+        cluster_col=cluster_col,
+        temporal_index=temporal_index,
+        unit_index=unit_index,
+        w_type=w_type,
+        permutations=permutations,
+        w_options=w_options,
+    )
     # plot the global transition matrix
     p = sm.p
     graph = np.round(p, 2)
