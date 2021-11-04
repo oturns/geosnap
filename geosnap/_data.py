@@ -71,12 +71,25 @@ class DataStore:
             "msas",
             "ncdb",
             "states",
+            "show_data_dir"
             "tracts_1990",
             "tracts_2000",
             "tracts_2010",
         ]
 
         return atts
+
+    def show_data_dir(self):
+        """Print the location of the local geosnap data storage directory.
+
+        Returns
+        -------
+        string
+            location of local storage directory.
+        """
+        print(data_dir)
+        return data_dir
+
 
     def acs(self, year=2018, level="tract", states=None):
         """American Community Survey Data.

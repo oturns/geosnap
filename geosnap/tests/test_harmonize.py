@@ -16,7 +16,6 @@ def test_harmonize_area():
         2000,
         extensive_variables=["n_total_housing_units"],
         intensive_variables=["p_vacant_housing_units"],
-        raster=local_raster
     )
 
     assert_allclose(

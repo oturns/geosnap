@@ -1,4 +1,3 @@
-__version__ = "0.7.0"
 
 r"""
 
@@ -33,3 +32,6 @@ from . import visualize
 from . import harmonize
 from ._data import datasets, _Map
 from ._community import Community
+
+from . import _version
+__version__ = _version.get_versions()['version']

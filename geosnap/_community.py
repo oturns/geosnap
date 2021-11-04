@@ -466,8 +466,8 @@ class Community:
         cmap="bwr",
         title="",
         dpi=500,
-        time_var="year",
-        id_var="geoid",
+        temporal_index="year",
+        unit_index="geoid",
         **kwargs,
     ):
         """Plot of the silhouette scores of a Community model.
@@ -498,10 +498,10 @@ class Community:
         dpi        : int, optional
                      dpi of the saved image if save_fig=True
                     default is 500
-        time_var   : string, optional
+        temporal_index   : string, optional
                      the column in the community gdf that identifies time period
                      default is 'year' from US census data
-        id_var     : string, optional
+        unit_index     : string, optional
                      column in gdf that identifies geographic units
                      default is 'geoid' from US census data
         kwargs     : **kwargs, optional
@@ -528,7 +528,7 @@ class Community:
                 df = df.to_crs(epsg=3857)
         if not year:
             ax[0].hist(self.models[model_name].silhouettes["silhouettes"])
-            df.join(self.models[model_name].silhouettes, on=[id_var, time_var]).plot(
+            df.join(self.models[model_name].silhouettes, on=[unit_index, temporal_index]).plot(
                 "silhouettes",
                 ax=ax[1],
                 alpha=alpha,
@@ -543,7 +543,7 @@ class Community:
         else:
             ax[0].hist(self.models[model_name][year].silhouettes["silhouettes"])
             df[df.year == year].join(
-                self.models[model_name][year].silhouettes, on=[id_var, time_var]
+                self.models[model_name][year].silhouettes, on=[unit_index, temporal_index]
             ).plot(
                 "silhouettes",
                 ax=ax[1],
@@ -576,8 +576,8 @@ class Community:
         title="",
         alpha=0.5,
         dpi=500,
-        time_var="year",
-        id_var="geoid",
+        temporal_index="year",
+        unit_index="geoid",
         **kwargs,
     ):
         """Plot the nearest_labels of the community model.
@@ -605,10 +605,10 @@ class Community:
         dpi        : int, optional
                      dpi of the saved image if save_fig=True
                      default is 500
-        time_var   : string, optional
+        temporal_index   : string, optional
                      the column in the community gdf that identifies time period
                      default is 'year' from US census data
-        id_var     : string, optional
+        unit_index     : string, optional
                      column in gdf that identifies geographic units
                      default is 'geoid' from US census data
         kwargs     : **kwargs, optional
@@ -640,7 +640,7 @@ class Community:
                 df = df.to_crs(epsg=3857)
         if not year:
             temp_df = df.join(
-                self.models[model_name].nearest_labels, on=[id_var, time_var]
+                self.models[model_name].nearest_labels, on=[unit_index, temporal_index]
             )
             temp_df = temp_df[["nearest_label", "geometry", model_name]]
             temp_df.set_index(model_name, inplace=True)
@@ -658,9 +658,9 @@ class Community:
                 ctx.add_basemap(ax[1], source=ctxmap)
         else:
             temp_df = df.join(
-                self.models[model_name][year].nearest_labels, on=[id_var, time_var]
+                self.models[model_name][year].nearest_labels, on=[unit_index, temporal_index]
             )
-            temp_df = temp_df[["nearest_label", time_var, "geometry", model_name]]
+            temp_df = temp_df[["nearest_label", temporal_index, "geometry", model_name]]
             temp_df.set_index(model_name, inplace=True)
             df[df.year == year].plot(
                 model_name, ax=ax[0], alpha=alpha, legend=True, categorical=True
@@ -697,8 +697,8 @@ class Community:
         alpha=0.5,
         cmap="bwr",
         dpi=500,
-        time_var="year",
-        id_var="geoid",
+        temporal_index="year",
+        unit_index="geoid",
         **kwargs,
     ):
         """Plot the path_silhouettes of Commmunity model.
@@ -729,10 +729,10 @@ class Community:
         dpi : int, optional
             dpi of the saved image if save_fig=True
             default is 500
-        time_var : string, optional
+        temporal_index : string, optional
             the column in the community gdf that identifies time period
             default is 'year' from US census data
-        id_var : string, optional
+        unit_index : string, optional
             column in gdf that identifies geographic units
             default is 'geoid' from US census data
         kwargs : **kwargs, optional
@@ -755,7 +755,7 @@ class Community:
         if not year:
             ax[0].hist(self.models[model_name].path_silhouettes["path_silhouettes"])
             self.gdf.join(
-                self.models[model_name][year].path_silhouettes, on=[id_var, time_var]
+                self.models[model_name][year].path_silhouettes, on=[unit_index, temporal_index]
             ).plot(
                 "path_silhouettes",
                 ax=ax[1],
@@ -773,7 +773,7 @@ class Community:
                 self.models[model_name][year].path_silhouettes["path_silhouettes"]
             )
             self.gdf[self.gdf.year == year].join(
-                self.models[model_name][year].path_silhouettes, on=[id_var, time_var]
+                self.models[model_name][year].path_silhouettes, on=[unit_index, temporal_index]
             ).plot(
                 "path_silhouettes",
                 ax=ax[1],
@@ -806,8 +806,8 @@ class Community:
         alpha=0.5,
         cmap="bwr",
         dpi=500,
-        time_var="year",
-        id_var="geoid",
+        temporal_index="year",
+        unit_index="geoid",
         **kwargs,
     ):
         """Plot boundary_silhouettes of the Commiunity model.
@@ -838,10 +838,10 @@ class Community:
         dpi        : int, optional
                      dpi of the saved image if save_fig=True
                      default is 500
-        time_var   : string, optional
+        temporal_index   : string, optional
                      the column in the community gdf that identifies time period
                      default is 'year' from US census data
-        id_var     : string, optional
+        unit_index     : string, optional
                      column in gdf that identifies geographic units
                      default is 'geoid' from US census data
         kwargs     : **kwargs, optional
@@ -871,7 +871,7 @@ class Community:
             )
             self.gdf.join(
                 self.models[model_name][year].boundary_silhouettes,
-                on=[id_var, time_var],
+                on=[unit_index, temporal_index],
             ).plot(
                 "boundary_silhouettes",
                 ax=ax[1],
@@ -897,7 +897,7 @@ class Community:
             )
             self.gdf[self.gdf.year == year].join(
                 self.models[model_name][year].boundary_silhouettes,
-                on=[id_var, time_var],
+                on=[unit_index, temporal_index],
             ).plot(
                 "boundary_silhouettes",
                 ax=ax[1],
@@ -1124,7 +1124,7 @@ class Community:
         column=None,
         filename=None,
         title="",
-        time_col="year",
+        temporal_index="year",
         time_periods=None,
         scheme="quantiles",
         k=5,
@@ -1151,7 +1151,7 @@ class Community:
                         output file name
         title        : str, optional
                        desired title of figure
-        time_col     : str, required
+        temporal_index     : str, required
                         column on the Community.gdf that stores time periods
         time_periods:  list, optional
                         subset of time periods to include in the animation. If None, then all times will be used
@@ -1192,14 +1192,14 @@ class Community:
         if not gdf.crs == 3857:
             gdf = gdf.to_crs(3857)
         if not time_periods:
-            time_periods = list(gdf[time_col].unique())
+            time_periods = list(gdf[temporal_index].unique())
         time_periods = sorted(time_periods)
         with tempfile.TemporaryDirectory() as tmpdirname:
             for i, time in enumerate(time_periods):
                 fig, ax = plt.subplots(figsize=figsize)
                 outpath = PurePath(tmpdirname, f"file_{i}.png")
                 if categorical:
-                    gdf[gdf[time_col] == time].plot(
+                    gdf[gdf[temporal_index] == time].plot(
                         column,
                         categorical=True,
                         ax=ax,
@@ -1209,7 +1209,7 @@ class Community:
                     )
                 else:
                     classifier = schemes[scheme](gdf[column].dropna().values, k=k)
-                    gdf[gdf[time_col] == time].plot(
+                    gdf[gdf[temporal_index] == time].plot(
                         column,
                         scheme="user_defined",
                         classification_kwds={"bins": classifier.bins},
@@ -1237,7 +1237,7 @@ class Community:
             )
 
     def transition(
-        self, cluster_col, time_var="year", id_var="geoid", w_type=None, permutations=0
+        self, cluster_col, temporal_index="year", unit_index="geoid", w_type=None, w_options=None, permutations=0
     ):
         """
         (Spatial) Markov approach to transitional dynamics of neighborhoods.
@@ -1251,16 +1251,18 @@ class Community:
         cluster_col     : string or int
                           Column name for the neighborhood segmentation, such as
                           "ward", "kmeans", etc.
-        time_var        : string, optional
+        temporal_index        : string, optional
                           Column defining time and or sequencing of the long-form data.
                           Default is "year".
-        id_var          : string, optional
+        unit_index          : string, optional
                           Column identifying the unique id of spatial units.
                           Default is "geoid".
         w_type          : string, optional
                           Type of spatial weights type ("rook", "queen", "knn" or
                           "kernel") to be used for spatial structure. Default is
                           None, if non-spatial Markov transition rates are desired.
+        w_options : dict
+            additional options passed to a libpysal weights constructor (e.g. `k` for a KNN weights matrix)
         permutations    : int, optional
                           number of permutations for use in randomization based
                           inference (the default is 0).
@@ -1273,18 +1275,19 @@ class Community:
                           if w_type is given, return a Spatial_Markov instance
 
         """
-        assert id_var in self.gdf.columns.to_list(), (
-            f"id_var: {id_var} is not in the columns."
+        assert unit_index in self.gdf.columns.to_list(), (
+            f"unit_index: {unit_index} is not in the columns."
             " Please use an appropriate index that properly identifies spatial units."
         )
 
         mar = _transition(
             self.gdf,
             cluster_col,
-            time_var=time_var,
-            id_var=id_var,
+            temporal_index=temporal_index,
+            unit_index=unit_index,
             w_type=w_type,
             permutations=permutations,
+            w_options=w_options
         )
         return mar
 
@@ -1295,8 +1298,8 @@ class Community:
         subs_mat=None,
         dist_type=None,
         indel=None,
-        time_var="year",
-        id_var="geoid",
+        temporal_index="year",
+        unit_index="geoid",
     ):
         """
         Pairwise sequence analysis to evaluate the distance/dissimilarity
@@ -1331,10 +1334,10 @@ class Community:
                           transitions. Based on :cite:`Biemann:2011`.
         indel           : float, optional
                           insertion/deletion cost.
-        time_var        : string, optional
+        temporal_index   : string, optional
                           Column defining time and or sequencing of the long-form data.
                           Default is "year".
-        id_var          : string, optional
+        unit_index       : string, optional
                           Column identifying the unique id of spatial units.
                           Default is "geoid".
 
@@ -1359,8 +1362,8 @@ class Community:
             subs_mat=subs_mat,
             dist_type=dist_type,
             indel=indel,
-            time_var=time_var,
-            id_var=id_var,
+            temporal_index=temporal_index,
+            unit_index=unit_index,
         )
         gdf_new = Community(gdf_temp)
         return gdf_new, df_wide, seq_dis_mat
@@ -1368,14 +1371,14 @@ class Community:
     def simulate(
         self,
         model_name=None,
-        index_col="geoid",
+        unit_index="geoid",
         w_type="queen",
         w_options=None,
         base_year=2010,
         new_colname="predicted",
         increment=10,
         time_steps=3,
-        time_col="year",
+        temporal_index="year",
         seed=None,
     ):
         """Simulate community dynamics using spatial Markov transition rules.
@@ -1384,7 +1387,7 @@ class Community:
         ----------
         model_name : [type], optional
             [description], by default None
-        index_col : str, optional
+        unit_index : str, optional
             column on the community gdf that denotes the unique index of geographic units
             for U.S. census data this is "geoid" (which is the default)
         w_type : str {'queen', 'rook'}
@@ -1400,7 +1403,7 @@ class Community:
             number of units in each time step (e.g. for a model based on decennial census data, this is 10)
         time_steps : int, optional
             number of time periods to simulate
-        time_col : str, optional
+        temporal_index : str, optional
             column on the community gdf that denotes the time index. For builtin data, this is "year"
         seed: int, optional
             seed passed to numpy random number generator
@@ -1420,10 +1423,10 @@ class Community:
                 w_options=w_options,
                 base_year=base_year,
                 new_colname=new_colname,
-                index_col=index_col,
+                unit_index=unit_index,
                 increment=increment,
                 time_steps=time_steps,
-                time_col=time_col,
+                temporal_index=temporal_index,
                 seed=seed,
             )
             return gdf
@@ -1435,10 +1438,10 @@ class Community:
                 w_options=w_options,
                 base_year=base_year,
                 new_colname=new_colname,
-                index_col=index_col,
+                unit_index=unit_index,
                 increment=increment,
                 time_steps=time_steps,
-                time_col=time_col,
+                temporal_index=temporal_index,
                 seed=seed,
             )
             gdfs = pd.concat(gdfs)

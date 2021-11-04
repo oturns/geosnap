@@ -8,7 +8,7 @@ from sklearn.cluster import AgglomerativeClustering
 
 
 def transition(
-    gdf, cluster_col, time_var="year", id_var="geoid", w_type=None, permutations=0
+    gdf, cluster_col, temporal_index="year", unit_index="geoid", w_type=None, w_options=None, permutations=0
 ):
     """
     (Spatial) Markov approach to transitional dynamics of neighborhoods.
@@ -21,16 +21,18 @@ def transition(
     cluster_col     : string or int
                       Column name for the neighborhood segmentation, such as
                       "ward", "kmeans", etc.
-    time_var        : string, optional
+    temporal_index        : string, optional
                       Column defining time and or sequencing of the long-form data.
                       Default is "year".
-    id_var          : string, optional
+    unit_index          : string, optional
                       Column identifying the unique id of spatial units.
                       Default is "geoid".
     w_type          : string, optional
                       Type of spatial weights type ("rook", "queen", "knn" or
                       "kernel") to be used for spatial structure. Default is
                       None, if non-spatial Markov transition rates are desired.
+    w_options : dict
+            additional options passed to a libpysal weights constructor (e.g. `k` for a KNN weights matrix)
     permutations    : int, optional
                       number of permutations for use in randomization based
                       inference (the default is 0).
@@ -77,11 +79,13 @@ def transition(
        [0.28571429, 0.        , 0.        , 0.        , 0.        ,
         0.71428571]])
     """
+    if not w_options:
+        w_options = {}
 
     gdf_temp = gdf.copy().reset_index()
-    df = gdf_temp[[id_var, time_var, cluster_col]]
+    df = gdf_temp[[unit_index, temporal_index, cluster_col]]
     df_wide = (
-        df.pivot(index=id_var, columns=time_var, values=cluster_col)
+        df.pivot(index=unit_index, columns=temporal_index, values=cluster_col)
         .dropna()
         .astype("int")
     )
@@ -89,10 +93,10 @@ def transition(
     if w_type is None:
         mar = Markov(y)  # class markov modeling
     else:
-        gdf_one = gdf_temp.drop_duplicates([id_var])
-        gdf_wide = df_wide.merge(gdf_one, left_index=True, right_on=id_var)
+        gdf_one = gdf_temp.drop_duplicates([unit_index])
+        gdf_wide = df_wide.merge(gdf_one, left_index=True, right_on=unit_index)
         w_dict = {"rook": Rook, "queen": Queen, "knn": KNN, "kernel": Kernel}
-        w = w_dict[w_type].from_dataframe(gdf_wide)
+        w = w_dict[w_type].from_dataframe(gdf_wide, **w_options)
         w.transform = "r"
         mar = Spatial_Markov(
             y, w, permutations=permutations, discrete=True, variable_name=cluster_col
@@ -107,8 +111,8 @@ def sequence(
     subs_mat=None,
     dist_type=None,
     indel=None,
-    time_var="year",
-    id_var="geoid",
+    temporal_index="year",
+    unit_index="geoid",
 ):
     """
     Pairwise sequence analysis and sequence clustering.
@@ -143,10 +147,10 @@ def sequence(
                       0 cost between the same type), symmetric and non-negative.
     indel           : float, optional
                       insertion/deletion cost.
-    time_var        : string, optional
+    temporal_index        : string, optional
                       Column defining time and or sequencing of the long-form data.
                       Default is "year".
-    id_var          : string, optional
+    unit_index          : string, optional
                       Column identifying the unique id of spatial units.
                       Default is "geoid".
 
@@ -182,9 +186,9 @@ def sequence(
     """
 
     gdf_temp = gdf.copy().reset_index()
-    df = gdf_temp[[id_var, time_var, cluster_col]]
+    df = gdf_temp[[unit_index, temporal_index, cluster_col]]
     df_wide = (
-        df.pivot(index=id_var, columns=time_var, values=cluster_col)
+        df.pivot(index=unit_index, columns=temporal_index, values=cluster_col)
         .dropna()
         .astype("int")
     )
@@ -195,7 +199,7 @@ def sequence(
     model = AgglomerativeClustering(n_clusters=seq_clusters).fit(seq_dis_mat)
     name_seq = dist_type + "_%d" % (seq_clusters)
     df_wide[name_seq] = model.labels_
-    gdf_temp = gdf_temp.merge(df_wide[[name_seq]], left_on=id_var, right_index=True)
+    gdf_temp = gdf_temp.merge(df_wide[[name_seq]], left_on=unit_index, right_index=True)
     gdf_temp = gdf_temp.reset_index()
 
     return gdf_temp, df_wide, seq_dis_mat

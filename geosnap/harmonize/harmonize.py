@@ -7,6 +7,7 @@ from tobler.dasymetric import masked_area_interpolate
 from tobler.util.util import _check_presence_of_crs
 from tqdm.auto import tqdm
 
+
 def harmonize(
     raw_community,
     target_year=None,
@@ -17,8 +18,8 @@ def harmonize(
     raster=None,
     codes=[21, 22, 23, 24],
     force_crs_match=True,
-    index="geoid",
-    time_col="year",
+    temporal_index="year",
+    unit_index='geoid'
 ):
     r"""
     Use spatial interpolation to standardize neighborhood boundaries over time.
@@ -27,35 +28,28 @@ def harmonize(
     ----------
     raw_community : list of geopandas.GeoDataFrames
         Multiple GeoDataFrames given by a list (see (1) in Notes).
-
     target_year : string
         The target year that represents the bondaries of all datasets generated
         in the harmonization. Could be, for example '2010'.
-
     weights_method : string
         The method that the harmonization will be conducted. This can be set to:
             * "area"                      : harmonization using simple area-weighted interprolation.
             * "dasymetric"                : harmonization using area-weighted interpolation with raster-based
                                             ancillary data to mask out uninhabited land.
-
     extensive_variables : list
         The names of variables in each dataset of raw_community that contains
         extensive variables to be harmonized (see (2) in Notes).
-
     intensive_variables : list
         The names of variables in each dataset of raw_community that contains
         intensive variables to be harmonized (see (2) in Notes).
-
     allocate_total : boolean
         True if total value of source area should be allocated.
         False if denominator is area of i. Note that the two cases
         would be identical when the area of the source polygon is
         exhausted by intersections. See (3) in Notes for more details.
-
     raster : str
         the path to a local raster image to be used as a dasymetric mask. If using
         "dasymetric" this is a required argument.
-
     codes : list of ints
         list of raster pixel values that should be considered as
         'populated'. Since this draw inspiration using the National Land Cover
@@ -65,12 +59,14 @@ def harmonize(
         found here:
         https://www.mrlc.gov/sites/default/files/metadata/landcover.html
         Ignored if not using dasymetric harmonizatiton.
-
     force_crs_match : bool. Default is True.
         Wheter the Coordinate Reference System (CRS) of the polygon will be
         reprojected to the CRS of the raster file. It is recommended to
         leave this argument True.
         Only taken into consideration for harmonization raster based.
+    unit_index : str
+        name of column in the Community gdf that denotes unique unit identifiers, default is "geoid"
+
 
 
     Notes
@@ -105,7 +101,8 @@ def harmonize(
         w_{i,j} = a_{i,j} / \sum_k a_{k,j}
 
     """
-    assert target_year, ('target_year is a required parameter')
+    assert unit_index in raw_community.columns, f"{unit_index} must be available"
+    assert target_year, "target_year is a required parameter"
     if extensive_variables is None and intensive_variables is None:
         raise ValueError(
             "You must pass a set of extensive and/or intensive variables to interpolate"
@@ -118,18 +115,18 @@ def harmonize(
 
     _check_presence_of_crs(raw_community)
     dfs = raw_community.copy()
-    times = dfs[time_col].unique().tolist()
+    times = dfs[temporal_index].unique().tolist()
     times.remove(target_year)
 
-    target_df = dfs[dfs[time_col] == target_year].reset_index()
+    target_df = dfs[dfs[temporal_index] == target_year].reset_index()
 
     interpolated_dfs = {}
     interpolated_dfs[target_year] = target_df.copy()
 
-    with tqdm(total=len(times), desc=f'Converting {len(times)} time periods') as pbar:
+    with tqdm(total=len(times), desc=f"Converting {len(times)} time periods") as pbar:
         for i in times:
             pbar.write(f"Harmonizing {i}")
-            source_df = dfs[dfs[time_col] == i]
+            source_df = dfs[dfs[temporal_index] == i]
 
             if weights_method == "area":
 
@@ -153,6 +150,7 @@ def harmonize(
                         allocate_total=allocate_total,
                         codes=codes,
                         raster=raster,
+                        force_crs_match=force_crs_match,
                     )
                 except IOError:
                     raise IOError(
@@ -167,14 +165,13 @@ def harmonize(
             profiles.append(profile)
 
             profile["geometry"] = target_df["geometry"]
-            profile[index] = target_df[index]
-            profile[time_col] = i
+            profile[unit_index] = target_df[unit_index]
+            profile[temporal_index] = i
 
             interpolated_dfs[i] = profile
             pbar.update(1)
         pbar.set_description("Complete")
         pbar.close()
-
 
     harmonized_df = gpd.GeoDataFrame(
         pd.concat(list(interpolated_dfs.values()), sort=True)

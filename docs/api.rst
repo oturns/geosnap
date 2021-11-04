@@ -49,6 +49,7 @@ It also provides a storage container `datasets` that provides access to datasets
     datasets.msa_definitions
     datasets.msas
     datasets.ncdb
+    datasets.show_data_dir
     datasets.states
     datasets.tracts_1990
     datasets.tracts_2000
@@ -187,6 +188,21 @@ Model neighborhood change using optimal-matching algorithms or spatial discrete 
    analyze.linc
    analyze.sequence
    analyze.transition
+
+Segregation Dynamics Methods
+'''''''''''''''''''''''''''''''''''''''''''''
+
+Rapidly compute and compare changes in segregation measures over time and across space
+
+.. currentmodule:: geosnap.analyze
+
+.. autosummary::
+   :toctree: generated/
+   
+    segdyn.singlegroup_tempdyn
+    segdyn.multigroup_tempdyn
+    segdyn.spacetime_dyn
+
 
 .. _harmonize_api:
 
