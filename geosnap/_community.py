@@ -528,7 +528,9 @@ class Community:
                 df = df.to_crs(epsg=3857)
         if not year:
             ax[0].hist(self.models[model_name].silhouettes["silhouettes"])
-            df.join(self.models[model_name].silhouettes, on=[unit_index, temporal_index]).plot(
+            df.join(
+                self.models[model_name].silhouettes, on=[unit_index, temporal_index]
+            ).plot(
                 "silhouettes",
                 ax=ax[1],
                 alpha=alpha,
@@ -543,7 +545,8 @@ class Community:
         else:
             ax[0].hist(self.models[model_name][year].silhouettes["silhouettes"])
             df[df.year == year].join(
-                self.models[model_name][year].silhouettes, on=[unit_index, temporal_index]
+                self.models[model_name][year].silhouettes,
+                on=[unit_index, temporal_index],
             ).plot(
                 "silhouettes",
                 ax=ax[1],
@@ -658,7 +661,8 @@ class Community:
                 ctx.add_basemap(ax[1], source=ctxmap)
         else:
             temp_df = df.join(
-                self.models[model_name][year].nearest_labels, on=[unit_index, temporal_index]
+                self.models[model_name][year].nearest_labels,
+                on=[unit_index, temporal_index],
             )
             temp_df = temp_df[["nearest_label", temporal_index, "geometry", model_name]]
             temp_df.set_index(model_name, inplace=True)
@@ -755,7 +759,8 @@ class Community:
         if not year:
             ax[0].hist(self.models[model_name].path_silhouettes["path_silhouettes"])
             self.gdf.join(
-                self.models[model_name][year].path_silhouettes, on=[unit_index, temporal_index]
+                self.models[model_name][year].path_silhouettes,
+                on=[unit_index, temporal_index],
             ).plot(
                 "path_silhouettes",
                 ax=ax[1],
@@ -773,7 +778,8 @@ class Community:
                 self.models[model_name][year].path_silhouettes["path_silhouettes"]
             )
             self.gdf[self.gdf.year == year].join(
-                self.models[model_name][year].path_silhouettes, on=[unit_index, temporal_index]
+                self.models[model_name][year].path_silhouettes,
+                on=[unit_index, temporal_index],
             ).plot(
                 "path_silhouettes",
                 ax=ax[1],
@@ -1056,7 +1062,6 @@ class Community:
                             legend=legend,
                             legend_kwds=legend_kwds,
                             alpha=alpha,
-
                         )
                     else:
                         df[df.year == year].plot(
@@ -1069,7 +1074,6 @@ class Community:
                             legend=legend,
                             legend_kwds=legend_kwds,
                             alpha=alpha,
-
                         )
                 if ctxmap:  # need set basemap of each graph
                     ctx.add_basemap(axs[i], source=ctxmap)
@@ -1091,7 +1095,6 @@ class Community:
                         legend=legend,
                         legend_kwds=legend_kwds,
                         alpha=alpha,
-
                     )
                 else:
                     df[df.year == year].plot(
@@ -1237,7 +1240,13 @@ class Community:
             )
 
     def transition(
-        self, cluster_col, temporal_index="year", unit_index="geoid", w_type=None, w_options=None, permutations=0
+        self,
+        cluster_col,
+        temporal_index="year",
+        unit_index="geoid",
+        w_type=None,
+        w_options=None,
+        permutations=0,
     ):
         """
         (Spatial) Markov approach to transitional dynamics of neighborhoods.
@@ -1248,31 +1257,30 @@ class Community:
 
         Parameters
         ----------
-        cluster_col     : string or int
-                          Column name for the neighborhood segmentation, such as
-                          "ward", "kmeans", etc.
+        cluster_col : string or int
+            Column name for the neighborhood segmentation, such as
+            "ward", "kmeans", etc.
         temporal_index        : string, optional
-                          Column defining time and or sequencing of the long-form data.
-                          Default is "year".
-        unit_index          : string, optional
-                          Column identifying the unique id of spatial units.
-                          Default is "geoid".
-        w_type          : string, optional
-                          Type of spatial weights type ("rook", "queen", "knn" or
-                          "kernel") to be used for spatial structure. Default is
-                          None, if non-spatial Markov transition rates are desired.
+            Column defining time and or sequencing of the long-form data.
+            Default is "year".
+        unit_index : string, optional
+            Column identifying the unique id of spatial units.
+            Default is "geoid".
+        w_type : string, optional
+            Type of spatial weights type ("rook", "queen", "knn" or
+            "kernel") to be used for spatial structure. Default is
+            None, if non-spatial Markov transition rates are desired.
         w_options : dict
             additional options passed to a libpysal weights constructor (e.g. `k` for a KNN weights matrix)
-        permutations    : int, optional
-                          number of permutations for use in randomization based
-                          inference (the default is 0).
-
+        permutations : int, optional
+            number of permutations for use in randomization based
+            inference (the default is 0).
 
         Returns
         ---------
-        mar             : giddy.markov.Markov or giddy.markov.Spatial_Markov
-                          if w_type=None, return a classic Markov instance;
-                          if w_type is given, return a Spatial_Markov instance
+        mar : giddy.markov.Markov or giddy.markov.Spatial_Markov
+            if w_type=None, return a classic Markov instance;
+            if w_type is given, return a Spatial_Markov instance
 
         """
         assert unit_index in self.gdf.columns.to_list(), (
@@ -1287,7 +1295,7 @@ class Community:
             unit_index=unit_index,
             w_type=w_type,
             permutations=permutations,
-            w_options=w_options
+            w_options=w_options,
         )
         return mar
 

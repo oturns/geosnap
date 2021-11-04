@@ -8,40 +8,47 @@ from sklearn.cluster import AgglomerativeClustering
 
 
 def transition(
-    gdf, cluster_col, temporal_index="year", unit_index="geoid", w_type=None, w_options=None, permutations=0
+    gdf,
+    cluster_col,
+    temporal_index="year",
+    unit_index="geoid",
+    w_type=None,
+    w_options=None,
+    permutations=0,
 ):
     """
     (Spatial) Markov approach to transitional dynamics of neighborhoods.
 
     Parameters
     ----------
-    gdf             : geopandas.GeoDataFrame or pandas.DataFrame
-                      Long-form geopandas.GeoDataFrame or pandas.DataFrame containing neighborhood
-                      attributes with a column defining neighborhood clusters.
-    cluster_col     : string or int
-                      Column name for the neighborhood segmentation, such as
-                      "ward", "kmeans", etc.
-    temporal_index        : string, optional
-                      Column defining time and or sequencing of the long-form data.
-                      Default is "year".
-    unit_index          : string, optional
-                      Column identifying the unique id of spatial units.
-                      Default is "geoid".
-    w_type          : string, optional
-                      Type of spatial weights type ("rook", "queen", "knn" or
-                      "kernel") to be used for spatial structure. Default is
-                      None, if non-spatial Markov transition rates are desired.
+    gdf : geopandas.GeoDataFrame or pandas.DataFrame
+        Long-form geopandas.GeoDataFrame or pandas.DataFrame containing neighborhood
+        attributes with a column defining neighborhood clusters.
+    cluster_col : string or int
+        Column name for the neighborhood segmentation, such as
+        "ward", "kmeans", etc.
+    temporal_index : string, optional
+        Column defining time and or sequencing of the long-form data.
+        Default is "year".
+    unit_index : string, optional
+        Column identifying the unique id of spatial units.
+        Default is "geoid".
+    w_type : string, optional
+        Type of spatial weights type ("rook", "queen", "knn" or
+        "kernel") to be used for spatial structure. Default is
+        None, if non-spatial Markov transition rates are desired.
     w_options : dict
-            additional options passed to a libpysal weights constructor (e.g. `k` for a KNN weights matrix)
-    permutations    : int, optional
-                      number of permutations for use in randomization based
-                      inference (the default is 0).
+        additional options passed to a libpysal weights constructor 
+        (e.g. `k` for a KNN weights matrix)
+    permutations : int, optional
+        number of permutations for use in randomization based
+        inference (the default is 0).
 
     Returns
     --------
-    mar             : giddy.markov.Markov instance or giddy.markov.Spatial_Markov
-                      if w_type=None, a classic Markov instance is returned. 
-                      if w_type is given, a Spatial_Markov instance is returned.
+    mar : giddy.markov.Markov instance or giddy.markov.Spatial_Markov
+        if w_type=None, a classic Markov instance is returned. 
+        if w_type is given, a Spatial_Markov instance is returned.
 
     Examples
     --------
@@ -81,7 +88,9 @@ def transition(
     """
     if not w_options:
         w_options = {}
-
+    assert (
+        unit_index in gdf.columns
+    ), f"The unit_index ({unit_index}) column is not in the geodataframe"
     gdf_temp = gdf.copy().reset_index()
     df = gdf_temp[[unit_index, temporal_index, cluster_col]]
     df_wide = (
@@ -184,7 +193,9 @@ def sequence(
            [5., 3., 2., 0., 0.]])
 
     """
-
+    assert (
+        unit_index in gdf.columns
+    ), f"The unit_index ({unit_index}) column is not in the geodataframe"
     gdf_temp = gdf.copy().reset_index()
     df = gdf_temp[[unit_index, temporal_index, cluster_col]]
     df_wide = (

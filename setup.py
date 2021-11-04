@@ -1,17 +1,15 @@
 # coding: utf-8
-
-from setuptools import setup, find_packages
-
-from distutils.command.build_py import build_py
-
 import os
+from distutils.command.build_py import build_py
+from setuptools import find_packages, setup
+import versioneer
 
 with open("README.md", encoding="utf8") as file:
     long_description = file.read()
 
 # Get __version__ from libpysal/__init__.py without importing the package
 # __version__ has to be defined in the first line
-with open('geosnap/__init__.py', 'r') as f:
+with open("geosnap/__init__.py", "r") as f:
     exec(f.readline())
 
 
@@ -47,14 +45,15 @@ def setup_package():
 
     setup(
         name="geosnap",
-        version=__version__,
+        version=versioneer.get_version(),
+        cmdclass=versioneer.get_cmdclass({"build_py": build_py}),
         description="Geospatial Neighborhood Analysis Package",
         long_description=long_description,
         long_description_content_type="text/markdown",
         maintainer="geosnap Developers",
         maintainer_email="pysal-dev@googlegroups.com",
         url="https://spatialucr.github.io/geosnap-guide",
-        download_url='https://pypi.python.org/pypi/geosnap',
+        download_url="https://pypi.python.org/pypi/geosnap",
         license="BSD",
         py_modules=["geosnap"],
         packages=find_packages(),
@@ -75,7 +74,9 @@ def setup_package():
         install_requires=install_reqs,
         extras_require=extras_reqs,
         include_package_data=True,
-        package_data={"geosnap": ["io/variables.csv", "io/stfipstable.csv", "io/lodes.csv"]},
+        package_data={
+            "geosnap": ["io/variables.csv", "io/stfipstable.csv", "io/lodes.csv"]
+        },
         python_requires=">3.5",
     )
 
