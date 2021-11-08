@@ -26,13 +26,13 @@ def plot_transition_matrix(
 ):
     """Plot global and spatially-conditioned transition matrices as heatmaps.
 
-     Parameters
-     ----------
-     community : geosnap.Community
-         a geosnap Community instance
-     cluster_col : str
-         column on the Community.gdf containing neighborhood type labels
-    temporal_index        : string, optional
+    Parameters
+    ----------
+    community : geosnap.Community
+        a geosnap Community instance
+    cluster_col : str
+        column on the Community.gdf containing neighborhood type labels
+    temporal_index : string, optional
         Column defining time and or sequencing of the long-form data.
         Default is "year".
     unit_index : string, optional
@@ -47,26 +47,26 @@ def plot_transition_matrix(
     permutations : int, optional
         number of permutations for use in randomization based
         inference (the default is 0).
-     figsize : tuple, optional
-         size of the resulting figure (13, 12)
-     n_rows : int, optional
-         rows in the plot; n_rows * n_cols must be >= the number of neighborhood types
-     n_cols : int, optional
-         columns in the plot; n_rows * n_cols must be >= the number of neighborhood types
-     suptitle : str, optional
-         title of the figure
-     title_kwds : dict, optional
-         additional keyword options for formatting the title
-     savefig : str, optional
-         location the plot will be saved
-     dpi : int, optional
-         dpi of the resulting image, default is 300
+    figsize : tuple, optional
+        size of the resulting figure (13, 12)
+    n_rows : int, optional
+        rows in the plot; n_rows * n_cols must be >= the number of neighborhood types
+    n_cols : int, optional
+        columns in the plot; n_rows * n_cols must be >= the number of neighborhood types
+    suptitle : str, optional
+        title of the figure
+    title_kwds : dict, optional
+        additional keyword options for formatting the title
+    savefig : str, optional
+        location the plot will be saved
+    dpi : int, optional
+        dpi of the resulting image, default is 300
 
-     Returns
-     -------
-     matplotlib Axes
-         the axes on which the plots are drawn
-     """
+    Returns
+    -------
+    matplotlib Axes
+        the axes on which the plots are drawn
+    """
     if not n_rows and not n_cols:
         n_cols = len(community.gdf[cluster_col].unique()) + 1
         n_rows = 1

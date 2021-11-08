@@ -198,6 +198,8 @@ class Community:
         verbose=False,
         scaler="std",
         pooling="fixed",
+        temporal_index="year",
+        unit_index="geoid",
         **kwargs,
     ):
         """Create a geodemographic typology by running a cluster analysis on the study area's neighborhood attributes.
@@ -215,6 +217,13 @@ class Community:
             subset of columns on which to apply the clustering
         verbose : bool, optional
             whether to print warning messages (the default is False).
+        temporal_index : str
+            which column on the dataframe defines time and or sequencing of the
+            long-form data. Default is "year"
+        unit_index : str
+            which column on the long-form dataframe identifies the stable units
+            over time. In a wide-form dataset, this would be the unique index.
+            Default is "geoid"
         scaler : None or scaler from sklearn.preprocessing, optional
             a scikit-learn preprocessing class that will be used to rescale the
             data. Defaults to sklearn.preprocessing.StandardScaler
@@ -242,6 +251,8 @@ class Community:
             verbose=verbose,
             scaler=scaler,
             pooling=pooling,
+            temporal_index=temporal_index,
+            unit_index=unit_index,
             **kwargs,
         )
 
@@ -261,8 +272,10 @@ class Community:
         columns=None,
         threshold_variable="count",
         threshold=10,
+        unit_index="geoid",
+        temporal_index='year',
+        scaler="std",
         return_model=False,
-        scaler=None,
         weights_kwargs=None,
         **kwargs,
     ):
@@ -289,6 +302,13 @@ class Community:
             been aggregated
         threshold : numeric, optional
             threshold to use for max-p clustering (the default is 10).
+        temporal_index : str
+            which column on the dataframe defines time and or sequencing of the
+            long-form data. Default is "year"
+        unit_index : str
+            which column on the long-form dataframe identifies the stable units
+            over time. In a wide-form dataset, this would be the unique index.
+            Default is "geoid"
         scaler : None or scaler from sklearn.preprocessing, optional
             a scikit-learn preprocessing class that will be used to rescale the
             data. Defaults to sklearn.preprocessing.StandardScaler
@@ -315,6 +335,8 @@ class Community:
             return_model=return_model,
             scaler=scaler,
             weights_kwargs=weights_kwargs,
+            unit_index=unit_index,
+            temporal_index=temporal_index,
             **kwargs,
         )
 
@@ -341,7 +363,7 @@ class Community:
         savefig=None,
         dpi=300,
     ):
-        """Plot global and spatially-conditioned transition matrices as heatmaps
+        """Plot global and spatially-conditioned transition matrices as heatmaps.
 
         Parameters
         ----------
