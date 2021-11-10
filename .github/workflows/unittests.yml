@@ -70,7 +70,7 @@
        
        - name: run tests - powershell
          shell: powershell
-         run: pytest -v geosnap --cov=geosnap --cov-report=xml
+         run: pytest -v geosnap
          env:
            LTDB_SAMPLE: ${{ secrets.COMBO_DATA }} # check whether we can pull secrets
            LTDB_FULL: ${{ secrets.COMBO_DATA }}
@@ -86,3 +86,4 @@
            flags: unittests # optional
            name: geosnap-codecov
            verbose: true 
+         if: matrix.os != 'windows-latest'
