@@ -361,9 +361,11 @@ def regionalize(
     weights_kwargs=None,
     **kwargs,
 ):
-    """Create a *spatial* geodemographic typology by running a cluster
-    analysis on the metro area's neighborhood attributes and including a
-    contiguity constraint.
+    """Create a *spatial* geodemographic typology (regionalization).
+
+    Run a cluster analysis on the metro area's neighborhood attributes including a
+    contiguity constraint. Geographic units are grouped together when they share similar
+    characteristics and are also near one another in space.
 
     Parameters
     ----------
