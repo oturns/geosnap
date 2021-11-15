@@ -118,7 +118,7 @@ class DataStore:
             )
             t = gpd.read_parquet(
                 f"s3://spatial-ucr/census/acs/acs_{year}_{level}.parquet",storage_options={"anon": True}
-            ),
+            )
         t = t.reset_index().rename(columns={"GEOID": "geoid"})
 
         if states:
