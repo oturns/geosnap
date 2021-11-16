@@ -3,3 +3,6 @@ omit =
     *tests*
     geosnap/util/*
     geosnap/visualize/*
+    tools/*
+    geosnap/io/util/*
+    
