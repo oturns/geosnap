@@ -23,6 +23,9 @@ from .util import gif_from_path as _gif_from_path
 from .visualize import plot_transition_matrix as _plot_transitions
 from .visualize import plot_transition_graphs as _plot_transition_graphs
 
+import warnings
+warnings.simplefilter('always', UserWarning)
+
 schemes = {}
 for classifier in classifiers.CLASSIFIERS:
     schemes[classifier.lower()] = getattr(classifiers, classifier)
