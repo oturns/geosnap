@@ -204,9 +204,9 @@ def adjust_inflation(df, columns, given_year, base_year=2015):
     """
     # get inflation adjustment table from BLS
 
-    inflation = pd.read_parquet(
+    inflation = pd.read_csv(
         os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), "bls_inflation.parquet"
+            os.path.dirname(os.path.abspath(__file__)), "bls_inflation.csv"
         )
     )
     if base_year not in inflation.YEAR.unique():

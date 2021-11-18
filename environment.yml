@@ -21,7 +21,7 @@ dependencies:
   - quilt3 >=3.6
   - xlrd
   - tobler >=0.4
-  - proplot >=9
+  - proplot >=0.9
   - contextily
   - scikit-plot
   - mapclassify
