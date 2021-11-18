@@ -14,7 +14,7 @@ palettable
 dash
 dash-bootstrap-components
 tqdm
-quilt3>=3.1.11
+quilt3>=3.6
 pyarrow>=0.14.1
 contextily
 descartes
@@ -25,5 +25,5 @@ fsspec
 s3fs
 botocore >=1.20.21
 segregation>=2.1
-proplot>=9
+proplot>=0.9
 versioneer
