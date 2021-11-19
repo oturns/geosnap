@@ -206,7 +206,7 @@ def adjust_inflation(df, columns, given_year, base_year=2015):
 
     inflation = pd.read_csv(
         os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), "bls_inflation.csv"
+            os.path.dirname(os.path.abspath(__file__)), "bls.csv"
         )
     )
     if base_year not in inflation.YEAR.unique():
