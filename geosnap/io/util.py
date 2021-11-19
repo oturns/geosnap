@@ -203,12 +203,19 @@ def adjust_inflation(df, columns, given_year, base_year=2015):
 
     """
     # get inflation adjustment table from BLS
+    try:
 
-    inflation = pd.read_csv(
-        os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), "bls.csv"
+        inflation = pd.read_csv(
+            os.path.join(
+                os.path.dirname(os.path.abspath(__file__)), "inflation.csv"
+            )
         )
-    )
+    except FileNotFoundError:
+        warn('Unable to read local inflation adjustment file. Streaming from BLS')
+        inflation = pd.read_excel(
+                "https://www.bls.gov/cpi/research-series/allitems.xlsx", skiprows=5
+            )
+
     if base_year not in inflation.YEAR.unique():
         warn(
             f"Unable to find local adjustment year for {base_year}. Attempting from online data"
