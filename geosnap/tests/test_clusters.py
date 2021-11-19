@@ -48,7 +48,7 @@ def test_hdbscan():
 def test_spenc():
 
     r = reno.regionalize(columns=columns, method="spenc")
-    assert len(r.gdf.spenc.unique()) >= 7
+    assert len(r.gdf.spenc.unique()) >= 6
 
 
 def test_maxp():
