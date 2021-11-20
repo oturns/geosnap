@@ -209,21 +209,6 @@ def adjust_inflation(df, columns, given_year, base_year=2015):
             os.path.dirname(os.path.abspath(__file__)), "bls_inflation.parquet"
         )
     )
-    if base_year not in inflation.YEAR.unique():
-        warn(
-            f"Unable to find local adjustment year for {base_year}. Attempting from online data"
-        )
-        try:
-            inflation = pd.read_excel(
-                "https://www.bls.gov/cpi/research-series/allitems.xlsx", skiprows=5
-            )
-
-            assert (
-                base_year in inflation.YEAR.unique()
-            ), f"Unable to find adjustment values for {base_year}"
-        except Exception:
-            raise ValueError(f"Unable to find adjustment values for {base_year}")
-
     inflation.columns = inflation.columns.str.lower()
     inflation.columns = inflation.columns.str.strip(".")
     inflation = inflation.dropna(subset=["year"])

@@ -75,7 +75,8 @@ def setup_package():
         extras_require=extras_reqs,
         include_package_data=True,
         package_data={
-            "geosnap": ["io/variables.csv", "io/stfipstable.csv", "io/lodes.csv"]
+            "geosnap": ["io/variables.csv", "io/stfipstable.csv", "io/lodes.csv",
+                        "io/bls_inflation.parquet"]
         },
         python_requires=">3.5",
     )
