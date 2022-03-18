@@ -22,7 +22,7 @@ dependencies:
   - quilt3 >=3.6
   - xlrd
   - tobler >=0.2.1
-  - spopt >=0.1.1
+  - spopt >=0.3.0
   - fsspec
   - s3fs
   - botocore >=1.20.21
