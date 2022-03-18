@@ -8,6 +8,7 @@ from libpysal.weights.contiguity import Queen, Rook, Voronoi
 from libpysal.weights.distance import KNN, DistanceBand
 from sklearn.metrics import silhouette_samples
 from sklearn.preprocessing import StandardScaler
+from spopt.region.base import form_single_component
 
 from .._data import _Map
 from .cluster import (
@@ -466,14 +467,12 @@ def regionalize(
             df[columns] = scaler.fit_transform(df[columns].values)
 
         w0 = W.from_dataframe(df, **weights_kwargs)
-        w1 = KNN.from_dataframe(df, k=1)
-        ws = [w0, w1]
-        ws[0] = attach_islands(ws[0], ws[1])
+        w0 = form_single_component(gdf, w0, linkage='single')
 
         model = specification[method](
             df,
             columns=columns,
-            w=ws[0],
+            w=w0,
             n_clusters=n_clusters,
             threshold_variable=threshold_variable,
             threshold=threshold,
@@ -496,7 +495,7 @@ def regionalize(
             columns=columns,
             labels=model.labels_,
             instance=model,
-            W=ws[0],
+            W=w0,
         )
         models[time] = results
 

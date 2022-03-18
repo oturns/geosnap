@@ -20,7 +20,7 @@ contextily
 descartes
 scikit-plot
 tobler>=0.4
-spopt>=0.1.1
+git+ssh://git@github.com/sjsrey/spopt.git@eef58e64429ff4bc25ed2bf1d715b4ed3cc284ef
 fsspec
 s3fs
 botocore >=1.20.21
