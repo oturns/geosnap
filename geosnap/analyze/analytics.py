@@ -467,7 +467,7 @@ def regionalize(
             df[columns] = scaler.fit_transform(df[columns].values)
 
         w0 = W.from_dataframe(df, **weights_kwargs)
-        w0 = form_single_component(gdf, w0, linkage='single')
+        w0 = form_single_component(df, w0, linkage='single')
 
         model = specification[method](
             df,
