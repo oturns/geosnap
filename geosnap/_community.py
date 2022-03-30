@@ -1,34 +1,47 @@
 """A Community is a thin wrapper around a long-form time-series geodataframe."""
 import tempfile
+import warnings
 from pathlib import PurePath
 from warnings import warn
 
 import contextily as ctx
-import geopandas as gpd
 import mapclassify.classifiers as classifiers
 import matplotlib.pyplot as plt
-import pandas as pd
 import numpy as np
-import scikitplot as skplt
+import pandas as pd
 
-from ._data import _Map, datasets
+from ._data import _Map
 from .analyze import cluster as _cluster
+from .analyze import predict_markov_labels as _predict_labels
 from .analyze import regionalize as _cluster_spatial
 from .analyze import sequence as _sequence
 from .analyze import transition as _transition
-from .analyze import predict_labels as _predict_labels
 from .harmonize import harmonize as _harmonize
-from .io import _fips_filter, _fipstable, _from_db, get_lehd, adjust_inflation
+from .io import get_census as _get_census
+from .io import get_lodes as _get_lodes
+from .io import get_ltdb as _get_ltdb
+from .io import get_ncdb as _get_ncdb
+from ._data import DataStore
 from .util import gif_from_path as _gif_from_path
-from .visualize import plot_transition_matrix as _plot_transitions
 from .visualize import plot_transition_graphs as _plot_transition_graphs
+from .visualize import plot_transition_matrix as _plot_transitions
 
-import warnings
-warnings.simplefilter('always', UserWarning)
+warnings.simplefilter("always", UserWarning)
 
 schemes = {}
 for classifier in classifiers.CLASSIFIERS:
     schemes[classifier.lower()] = getattr(classifiers, classifier)
+
+
+def _implicit_storage_deprecation(store):
+    if store is None:
+        warn(
+            "Creating a community from an uninstantiated datastore is deprecated and will raise an error in future versions.  "
+            "Please use `datastore=geosnap.io.DataStore` and pass it to the Community constructor",
+            DeprecationWarning,
+        )
+        return DataStore()
+    return store
 
 
 class Community:
@@ -203,7 +216,7 @@ class Community:
         pooling="fixed",
         temporal_index="year",
         unit_index="geoid",
-        **kwargs,
+        cluster_kwargs=None,
     ):
         """Create a geodemographic typology by running a cluster analysis on the study area's neighborhood attributes.
 
@@ -244,6 +257,8 @@ class Community:
             as a new column. If the cluster is already present, the name will be incremented
 
         """
+        if not cluster_kwargs:
+            cluster_kwargs = dict()
         harmonized = self.harmonized
         gdf, model, model_name = _cluster(
             gdf=self.gdf.copy(),
@@ -256,7 +271,7 @@ class Community:
             pooling=pooling,
             temporal_index=temporal_index,
             unit_index=unit_index,
-            **kwargs,
+            cluster_kwargs=cluster_kwargs,
         )
 
         comm = Community(gdf, harmonized=harmonized)
@@ -271,16 +286,14 @@ class Community:
         n_clusters=6,
         spatial_weights="rook",
         method=None,
-        best_model=False,
         columns=None,
         threshold_variable="count",
         threshold=10,
         unit_index="geoid",
-        temporal_index='year',
+        temporal_index="year",
         scaler="std",
-        return_model=False,
         weights_kwargs=None,
-        **kwargs,
+        region_kwargs=None,
     ):
         """Create a *spatial* geodemographic typology by running a cluster analysis on the metro area's neighborhood attributes and including a contiguity constraint.
 
@@ -325,22 +338,22 @@ class Community:
 
         """
         harmonized = self.harmonized
+        if not region_kwargs:
+            region_kwargs = dict()
 
         gdf, model, model_name = _cluster_spatial(
             gdf=self.gdf.copy(),
             n_clusters=n_clusters,
             spatial_weights=spatial_weights,
             method=method,
-            best_model=best_model,
             columns=columns,
             threshold_variable=threshold_variable,
             threshold=threshold,
-            return_model=return_model,
             scaler=scaler,
             weights_kwargs=weights_kwargs,
             unit_index=unit_index,
             temporal_index=temporal_index,
-            **kwargs,
+            region_kwargs=region_kwargs,
         )
 
         comm = Community(gdf, harmonized=harmonized)
@@ -466,506 +479,6 @@ class Community:
             args=args,
             output_dir=output_dir,
         )
-
-    def plot_silhouette(self, model_name=None, year=None, **kwargs):
-        """Make silhouette plot of the Community model.
-
-        Parameters
-        ----------
-        model_name : str , required
-                     model to be silhouette plotted
-        year       : int, optional
-                     year to be plotted if model created with pooling=='unique'
-        kwargs     : **kwargs, optional
-                     pass through to plot_silhouette()
-        Returns
-        -------
-        silhouette plot of given model.
-
-        """
-        if not year:
-            fig = skplt.metrics.plot_silhouette(
-                self.models[model_name].X.values,
-                self.models[model_name].labels,
-                **kwargs,
-            )
-        else:
-            fig = skplt.metrics.plot_silhouette(
-                self.models[model_name][year].X.values,
-                self.models[model_name][year].labels,
-                **kwargs,
-            )
-        return fig
-
-    def plot_silhouette_map(
-        self,
-        model_name=None,
-        year=None,
-        ctxmap=ctx.providers.Stamen.TonerLite,
-        save_fig=None,
-        figsize=(12, 3),
-        alpha=0.5,
-        cmap="bwr",
-        title="",
-        dpi=500,
-        temporal_index="year",
-        unit_index="geoid",
-        **kwargs,
-    ):
-        """Plot of the silhouette scores of a Community model.
-
-        Parameters
-        ----------
-        model_name : str , required
-                     model to be plotted
-        year       : int, optional
-                     year to be plotted if model created with pooling=='unique'
-        ctxmap     : contextily map provider, optional
-                     contextily basemap. Set to False for no basemap.
-                     Default is ctx.providers.Stamen.TonerLite
-        save_fig   : str, optional
-                     path to save figure if desired.
-        figsize    : tuple, optional
-                     an order tuple where x is width and y is height
-                     default is 12 inches wide and 3 inches high
-        alpha      : float, optional
-                     how transparent the plotted objects are
-                     Default is 0.5
-        cmap       : string, optional
-                     cmap to be plotted
-                     default is 'bwr'
-        title      : string, optional
-                     title of figure
-                     default is no title
-        dpi        : int, optional
-                     dpi of the saved image if save_fig=True
-                    default is 500
-        temporal_index   : string, optional
-                     the column in the community gdf that identifies time period
-                     default is 'year' from US census data
-        unit_index     : string, optional
-                     column in gdf that identifies geographic units
-                     default is 'geoid' from US census data
-        kwargs     : **kwargs, optional
-                     pass through to matplotlib pyplot
-        Returns
-        -------
-        silhouette scores mapped onto community geography
-
-        """
-        # Check for and use previously calculated values for graphs
-        # Checking both arrays at the same time would be more efficient, but
-        # comparing NumPy arrays with `and` is not allowed, and many solutions that try to compare numpy arrays
-        # directly require error handling, so check if objects contain numpy arrays separately.
-        df = self.gdf.copy()
-        if not year:
-            if self.models[model_name].silhouettes is None:
-                self.models[model_name].sil_scores()
-        else:
-            if self.models[model_name][year].silhouettes is None:
-                self.models[model_name][year].sil_scores()
-        f, ax = plt.subplots(1, 2, figsize=figsize)
-        if ctxmap:  # need to convert crs to mercator before graphing
-            if df.crs != 3857:
-                df = df.to_crs(epsg=3857)
-        if not year:
-            ax[0].hist(self.models[model_name].silhouettes["silhouettes"])
-            df.join(
-                self.models[model_name].silhouettes, on=[unit_index, temporal_index]
-            ).plot(
-                "silhouettes",
-                ax=ax[1],
-                alpha=alpha,
-                legend=True,
-                vmin=-1,
-                vmax=1,
-                cmap=cmap,
-                **kwargs,
-            )
-            if ctxmap:
-                ctx.add_basemap(ax[1], source=ctxmap)
-        else:
-            ax[0].hist(self.models[model_name][year].silhouettes["silhouettes"])
-            df[df.year == year].join(
-                self.models[model_name][year].silhouettes,
-                on=[unit_index, temporal_index],
-            ).plot(
-                "silhouettes",
-                ax=ax[1],
-                alpha=alpha,
-                legend=True,
-                vmin=-1,
-                vmax=1,
-                cmap=cmap,
-                **kwargs,
-            )
-            if ctxmap:
-                ctx.add_basemap(ax[1], source=ctxmap)
-        ax[1].axis("off")
-        #  using both tight_layout() and passing title makes plots and title overlap, so only use one
-        if title:
-            f.suptitle(title)
-        else:
-            f.tight_layout()
-        if save_fig:
-            f.savefig(save_fig, dpi=dpi, bbox_inches="tight")
-        return ax
-
-    def plot_next_best_label(
-        self,
-        model_name=None,
-        year=None,
-        ctxmap=ctx.providers.Stamen.TonerLite,
-        save_fig=None,
-        figsize=(12, 3),
-        title="",
-        alpha=0.5,
-        dpi=500,
-        temporal_index="year",
-        unit_index="geoid",
-        **kwargs,
-    ):
-        """Plot the nearest_labels of the community model.
-
-        Parameters
-        ----------
-        model_name : str , required
-                     model to be plotted
-        year       : int, optional
-                     year to be plotted if model created with pooling=='unique'
-        ctxmap     : contextily map provider, optional
-                     contextily basemap. Set to False for no basemap.
-                     Default is ctx.providers.Stamen.TonerLite
-        save_fig   : str, optional
-                     path to save figure if desired.
-        figsize    : tuple, optional
-                     an order tuple where x is width and y is height
-                     default is 12 inches wide and 3 inches high
-        title      : string, optional
-                     title of figure
-                     default is no title
-        alpha      : float, optional
-                     how transparent the plotted objects are
-                     Default is 0.5
-        dpi        : int, optional
-                     dpi of the saved image if save_fig=True
-                     default is 500
-        temporal_index   : string, optional
-                     the column in the community gdf that identifies time period
-                     default is 'year' from US census data
-        unit_index     : string, optional
-                     column in gdf that identifies geographic units
-                     default is 'geoid' from US census data
-        kwargs     : **kwargs, optional
-                     pass through to matplotlib pyplot
-        Returns
-        -------
-        nearest_labels scores of the passed model plotted onto community geography
-        and an array made up of the the model labels and nearest labels that was used to graph the values
-
-        """
-        df = self.gdf.copy()
-        if isinstance(self.models[model_name], dict) and not year:
-            raise InputError(
-                "This model has unique results for each time period; You must supply a value for `year`"
-            )
-
-        # If the user has already calculated, respect already calculated values
-        if not year:
-            if self.models[model_name].nearest_labels is None:
-                self.models[model_name].nearest_label().astype(int)
-        else:
-            if self.models[model_name][year].nearest_labels is None:
-                self.models[model_name][year].nearest_label().astype(int)
-        f, ax = plt.subplots(1, 2, figsize=figsize)
-        if ctxmap:
-            if df.crs == 3857:
-                pass
-            else:  # need to convert crs to mercator before graphing
-                df = df.to_crs(epsg=3857)
-        if not year:
-            temp_df = df.join(
-                self.models[model_name].nearest_labels, on=[unit_index, temporal_index]
-            )
-            temp_df = temp_df[["nearest_label", "geometry", model_name]]
-            temp_df.set_index(model_name, inplace=True)
-            df.plot(model_name, ax=ax[0], alpha=0.5, legend=True, categorical=True)
-            temp_df.plot(
-                "nearest_label",
-                ax=ax[1],
-                legend=True,
-                categorical=True,
-                alpha=alpha,
-                **kwargs,
-            )
-            if ctxmap:
-                ctx.add_basemap(ax[0], source=ctxmap)
-                ctx.add_basemap(ax[1], source=ctxmap)
-        else:
-            temp_df = df.join(
-                self.models[model_name][year].nearest_labels,
-                on=[unit_index, temporal_index],
-            )
-            temp_df = temp_df[["nearest_label", temporal_index, "geometry", model_name]]
-            temp_df.set_index(model_name, inplace=True)
-            df[df.year == year].plot(
-                model_name, ax=ax[0], alpha=alpha, legend=True, categorical=True
-            )
-            temp_df[temp_df.year == year].plot(
-                "nearest_label",
-                ax=ax[1],
-                alpha=alpha,
-                legend=True,
-                categorical=True,
-                **kwargs,
-            )
-            if ctxmap:
-                ctx.add_basemap(ax[0], source=ctxmap)
-                ctx.add_basemap(ax[1], source=ctxmap)
-        ax[0].axis("off")
-        ax[1].axis("off")
-        if title:
-            f.suptitle(title)
-        else:
-            f.tight_layout()
-        if save_fig:
-            f.savefig(save_fig, dpi=dpi, bbox_inches="tight")
-        return ax
-
-    def plot_path_silhouette(
-        self,
-        model_name=None,
-        year=None,
-        ctxmap=ctx.providers.Stamen.TonerLite,
-        save_fig=None,
-        figsize=(12, 3),
-        title="",
-        alpha=0.5,
-        cmap="bwr",
-        dpi=500,
-        temporal_index="year",
-        unit_index="geoid",
-        **kwargs,
-    ):
-        """Plot the path_silhouettes of Commmunity model.
-
-        Parameters
-        ----------
-        model_name : str , required
-            model to be plotted
-        year : int, optional
-            year to be plotted if model created with pooling=='unique'
-        ctxmap : contextily map provider, optional
-            contextily basemap. Set to False for no basemap.
-            Default is ctx.providers.Stamen.TonerLite
-        save_fig : str, optional
-            path to save figure if desired.
-        figsize : tuple, optional
-            an order tuple where x is width and y is height
-            default is 12 inches wide and 3 inches high
-        title : string, optional
-            title of figure
-            default is no title
-        alpha : float, optional
-            how transparent the plotted objects are
-            Default is 0.5
-        cmap : string, optional
-            cmap to be plotted
-            default is 'bwr'
-        dpi : int, optional
-            dpi of the saved image if save_fig=True
-            default is 500
-        temporal_index : string, optional
-            the column in the community gdf that identifies time period
-            default is 'year' from US census data
-        unit_index : string, optional
-            column in gdf that identifies geographic units
-            default is 'geoid' from US census data
-        kwargs : **kwargs, optional
-            pass through to matplotlib pyplot
-
-        Returns
-        -------
-        path_silhouette scores of the passed model plotted onto community geography
-
-        """
-        if not year:
-            if self.models[model_name].path_silhouettes is None:
-                self.models[model_name].path_sil()
-        else:
-            if self.models[model_name][year].path_silhouettes is None:
-                self.models[model_name][year].path_sil()
-        f, ax = plt.subplots(1, 2, figsize=figsize)
-        if ctxmap:  # need to convert crs to mercator before graphing
-            self.gdf = self.gdf.to_crs(epsg=3857)
-        if not year:
-            ax[0].hist(self.models[model_name].path_silhouettes["path_silhouettes"])
-            self.gdf.join(
-                self.models[model_name][year].path_silhouettes,
-                on=[unit_index, temporal_index],
-            ).plot(
-                "path_silhouettes",
-                ax=ax[1],
-                alpha=alpha,
-                legend=True,
-                vmin=-1,
-                vmax=1,
-                cmap=cmap,
-                **kwargs,
-            )
-            if ctxmap:
-                ctx.add_basemap(ax[1], source=ctxmap)
-        else:
-            ax[0].hist(
-                self.models[model_name][year].path_silhouettes["path_silhouettes"]
-            )
-            self.gdf[self.gdf.year == year].join(
-                self.models[model_name][year].path_silhouettes,
-                on=[unit_index, temporal_index],
-            ).plot(
-                "path_silhouettes",
-                ax=ax[1],
-                alpha=alpha,
-                legend=True,
-                vmin=-1,
-                vmax=1,
-                cmap=cmap,
-                **kwargs,
-            )
-            if ctxmap:
-                ctx.add_basemap(ax[1], source=ctxmap)
-        ax[1].axis("off")
-        if title:
-            f.suptitle(title)
-        else:
-            f.tight_layout()
-        if save_fig:
-            f.savefig(save_fig, dpi=dpi, bbox_inches="tight")
-        return ax
-
-    def plot_boundary_silhouette(
-        self,
-        model_name=None,
-        year=None,
-        ctxmap=ctx.providers.Stamen.TonerLite,
-        save_fig=None,
-        figsize=(12, 3),
-        title="",
-        alpha=0.5,
-        cmap="bwr",
-        dpi=500,
-        temporal_index="year",
-        unit_index="geoid",
-        **kwargs,
-    ):
-        """Plot boundary_silhouettes of the Commiunity model.
-
-        Parameters
-        ----------
-        model_name : str , required
-                     model to be silhouette plotted
-        year       : int, optional
-                     year to be plotted if model created with pooling=='unique'
-        ctxmap     : contextily map provider, optional
-                     contextily basemap. Set to False for no basemap.
-                     Default is ctx.providers.Stamen.TonerLite
-        figsize    : tuple, optional
-                     an order tuple where x is width and y is height
-                     default is 12 inches wide and 3 inches high
-        title      : string, optional
-                     title of figure
-                     default is no title
-        save_fig   : str, optional
-                     path to save figure if desired.
-        alpha      : float, optional
-                     how transparent the plotted objects are
-                     Default is 0.5
-        cmap       : string, optional
-                     cmap to be plotted
-                     default is 'bwr'
-        dpi        : int, optional
-                     dpi of the saved image if save_fig=True
-                     default is 500
-        temporal_index   : string, optional
-                     the column in the community gdf that identifies time period
-                     default is 'year' from US census data
-        unit_index     : string, optional
-                     column in gdf that identifies geographic units
-                     default is 'geoid' from US census data
-        kwargs     : **kwargs, optional
-                     pass through to matplotlib pyplot
-        Returns
-        -------
-        boundary_silhouette scores of the passed model plotted onto community geography
-
-        """
-        # If the user has already calculated , respect already calculated values
-        if not year:
-            if self.models[model_name].boundary_silhouettes is None:
-                self.models[model_name].boundary_sil()
-        else:
-            if self.models[model_name][year].boundary_silhouettes is None:
-                self.models[model_name][year].boundary_sil()
-        f, ax = plt.subplots(1, 2, figsize=figsize)
-        if ctxmap:  # need to convert crs to mercator before graphing
-            self.gdf = self.gdf.to_crs(epsg=3857)
-        # To make visualization of boundary_silhouettes informative we need to remove the graphing of zero values
-        if not year:
-            ax[0].hist(
-                self.models[model_name].boundary_silhouettes["boundary_silhouettes"][
-                    self.models[model_name].boundary_silhouettes["boundary_silhouettes"]
-                    != 0
-                ]
-            )
-            self.gdf.join(
-                self.models[model_name][year].boundary_silhouettes,
-                on=[unit_index, temporal_index],
-            ).plot(
-                "boundary_silhouettes",
-                ax=ax[1],
-                legend=True,
-                alpha=alpha,
-                vmin=-1,
-                vmax=1,
-                cmap=cmap,
-                **kwargs,
-            )
-            if ctxmap:
-                ctx.add_basemap(ax[1], source=ctxmap)
-        else:
-            ax[0].hist(
-                self.models[model_name][year].boundary_silhouettes[
-                    "boundary_silhouettes"
-                ][
-                    self.models[model_name][year].boundary_silhouettes[
-                        "boundary_silhouettes"
-                    ]
-                    != 0
-                ]
-            )
-            self.gdf[self.gdf.year == year].join(
-                self.models[model_name][year].boundary_silhouettes,
-                on=[unit_index, temporal_index],
-            ).plot(
-                "boundary_silhouettes",
-                ax=ax[1],
-                legend=True,
-                alpha=alpha,
-                vmin=-1,
-                vmax=1,
-                cmap=cmap,
-                **kwargs,
-            )
-            if ctxmap:
-                ctx.add_basemap(ax[1], source=ctxmap)
-        ax[1].axis("off")
-        if title:
-            f.suptitle(title)
-        else:
-            f.tight_layout()
-        if save_fig:
-            f.savefig(save_fig, dpi=dpi, bbox_inches="tight")
-        return ax
 
     def plot_timeseries(
         self,
@@ -1464,11 +977,17 @@ class Community:
             If simulating multiple timesteps, the return is a new Community instance with simulated label values as its gdf.
             If simulating a single time step, the return is a single geodataframe
         """
+        assert (
+            self.harmonized
+        ), "Predictions based on transition models require harmonized data"
+
+        gdf = self.gdf.copy()
+        gdf = gdf.dropna(subset=[model_name]).reset_index(drop=True)
         np.random.seed(seed)
-        if time_steps == 1:
-            gdf = _predict_labels(
-                self,
-                model_name=model_name,
+
+        gdfs = _predict_labels(
+                self.gdf,
+                cluster_col=model_name,
                 w_type=w_type,
                 w_options=w_options,
                 base_year=base_year,
@@ -1479,25 +998,7 @@ class Community:
                 temporal_index=temporal_index,
                 seed=seed,
             )
-            return gdf
-        else:
-            gdfs = _predict_labels(
-                self,
-                model_name=model_name,
-                w_type=w_type,
-                w_options=w_options,
-                base_year=base_year,
-                new_colname=new_colname,
-                unit_index=unit_index,
-                increment=increment,
-                time_steps=time_steps,
-                temporal_index=temporal_index,
-                seed=seed,
-            )
-            gdfs = pd.concat(gdfs)
-            gdfs = gdfs.dropna(subset=[model_name])
-            gdfs[model_name] = gdfs[model_name].astype(int)
-            return Community.from_geodataframes(gdfs=[gdfs])
+        return Community.from_geodataframes(gdfs=[gdfs])
 
     ###### Constructor Methods ######
     #################################
@@ -1505,6 +1006,7 @@ class Community:
     @classmethod
     def from_ltdb(
         cls,
+        datastore=None,
         state_fips=None,
         county_fips=None,
         msa_fips=None,
@@ -1552,37 +1054,23 @@ class Community:
 
 
         """
-        if years == "all":
-            years = [1970, 1980, 1990, 2000, 2010]
-        if isinstance(boundary, gpd.GeoDataFrame):
-            tracts = datasets.tracts_2010()[["geoid", "geometry"]]
-            ltdb = datasets.ltdb().reset_index()
-            if boundary.crs != tracts.crs:
-                warn(
-                    "Unable to determine whether boundary CRS is WGS84 "
-                    "if this produces unexpected results, try reprojecting"
-                )
-            tracts = tracts[
-                tracts.representative_point().intersects(boundary.unary_union)
-            ]
-            gdf = ltdb[ltdb["geoid"].isin(tracts["geoid"])]
-            gdf = gpd.GeoDataFrame(gdf.merge(tracts, on="geoid", how="left"))
-
-        else:
-            gdf = _from_db(
-                data=datasets.ltdb(),
-                state_fips=state_fips,
-                county_fips=county_fips,
-                msa_fips=msa_fips,
-                fips=fips,
-                years=years,
-            )
+        datastore = _implicit_storage_deprecation(datastore)
+        gdf = _get_ltdb(
+            datastore,
+            state_fips=state_fips,
+            county_fips=county_fips,
+            msa_fips=msa_fips,
+            fips=fips,
+            boundary=boundary,
+            years=years,
+        )
 
         return cls(gdf=gdf.reset_index(), harmonized=True)
 
     @classmethod
     def from_ncdb(
         cls,
+        datastore=None,
         state_fips=None,
         county_fips=None,
         msa_fips=None,
@@ -1629,37 +1117,24 @@ class Community:
             Community with NCDB data
 
         """
-        if years == "all":
-            years = [1970, 1980, 1990, 2000, 2010]
-        if isinstance(boundary, gpd.GeoDataFrame):
-            tracts = datasets.tracts_2010()[["geoid", "geometry"]]
-            ncdb = datasets.ncdb().reset_index()
-            if boundary.crs != tracts.crs:
-                warn(
-                    "Unable to determine whether boundary CRS is WGS84 "
-                    "if this produces unexpected results, try reprojecting"
-                )
-            tracts = tracts[
-                tracts.representative_point().intersects(boundary.unary_union)
-            ]
-            gdf = ncdb[ncdb["geoid"].isin(tracts["geoid"])]
-            gdf = gpd.GeoDataFrame(gdf.merge(tracts, on="geoid", how="left"))
+        datastore = _implicit_storage_deprecation(datastore)
 
-        else:
-            gdf = _from_db(
-                data=datasets.ncdb(),
-                state_fips=state_fips,
-                county_fips=county_fips,
-                msa_fips=msa_fips,
-                fips=fips,
-                years=years,
-            )
+        gdf = _get_ncdb(
+            datastore=datastore,
+            state_fips=state_fips,
+            county_fips=county_fips,
+            msa_fips=msa_fips,
+            fips=fips,
+            boundary=boundary,
+            years=years,
+        )
 
         return cls(gdf=gdf.reset_index(), harmonized=True)
 
     @classmethod
     def from_census(
         cls,
+        datastore=None,
         state_fips=None,
         county_fips=None,
         msa_fips=None,
@@ -1714,94 +1189,26 @@ class Community:
             Community with unharmonized census data
 
         """
-        if years == "all":
-            years = [1990, 2000, 2010]
-        if isinstance(years, (str, int)):
-            years = [years]
+        datastore = _implicit_storage_deprecation(datastore)
 
-        msa_states = []
-        if msa_fips:
-            pr_metros = set(
-                datasets.msa_definitions()[
-                    datasets.msa_definitions()["CBSA Title"].str.contains("PR")
-                ]["CBSA Code"].tolist()
-            )
-            if msa_fips in pr_metros:
-                raise Exception(
-                    "geosnap does not yet include built-in data for Puerto Rico"
-                )
-            msa_states += datasets.msa_definitions()[
-                datasets.msa_definitions()["CBSA Code"] == msa_fips
-            ]["stcofips"].tolist()
-        msa_states = [i[:2] for i in msa_states]
-
-        # build a list of states in the dataset
-        allfips = []
-        for i in [state_fips, county_fips, fips, msa_states]:
-            if i:
-                if isinstance(i, (str,)):
-                    i = [i]
-                for each in i:
-                    allfips.append(each[:2])
-        states = list(set(allfips))
-
-        # if using a boundary there will be no fips, so reset states to None
-        if len(states) == 0:
-            states = None
-
-        df_dict = {
-            1990: datasets.tracts_1990,
-            2000: datasets.tracts_2000,
-            2010: datasets.tracts_2010,
-        }
-
-        tracts = []
-        for year in years:
-            tracts.append(df_dict[year](states=states))
-        tracts = pd.concat(tracts, sort=False)
-
-        if isinstance(boundary, gpd.GeoDataFrame):
-            if boundary.crs != tracts.crs:
-                warn(
-                    "Unable to determine whether boundary CRS is WGS84 "
-                    "if this produces unexpected results, try reprojecting"
-                )
-            tracts = tracts[
-                tracts.representative_point().intersects(boundary.unary_union)
-            ]
-            gdf = tracts.copy()
-
-        else:
-
-            gdf = _fips_filter(
-                state_fips=state_fips,
-                county_fips=county_fips,
-                msa_fips=msa_fips,
-                fips=fips,
-                data=tracts,
-            )
-
-        # adjust for inflation if necessary
-        if constant_dollars:
-            newtracts = []
-            inflate_cols = [
-                "median_home_value",
-                "median_contract_rent",
-                "per_capita_income",
-                "median_household_income",
-            ]
-
-            for year in years:
-                df = gdf[gdf.year == year]
-                df = adjust_inflation(df, inflate_cols, year, currency_year)
-                newtracts.append(df)
-            gdf = pd.concat(newtracts)
+        gdf = _get_census(
+            datastore,
+            state_fips=state_fips,
+            county_fips=county_fips,
+            msa_fips=msa_fips,
+            fips=fips,
+            boundary=boundary,
+            years=years,
+            constant_dollars=constant_dollars,
+            currency_year=currency_year,
+        )
 
         return cls(gdf=gdf, harmonized=False)
 
     @classmethod
     def from_lodes(
         cls,
+        datastore=None,
         state_fips=None,
         county_fips=None,
         msa_fips=None,
@@ -1852,107 +1259,18 @@ class Community:
             Community with LODES data
 
         """
-        if isinstance(years, (str,)):
-            years = int(years)
-        if isinstance(years, (int,)):
-            years = [years]
-        years = list(set(years))
+        datastore = _implicit_storage_deprecation(datastore)
 
-        if msa_fips:
-            pr_metros = set(
-                datasets.msa_definitions()[
-                    datasets.msa_definitions()["CBSA Title"].str.contains("PR")
-                ]["CBSA Code"].tolist()
-            )
-            if msa_fips in pr_metros:
-                raise Exception(
-                    "geosnap does not yet include built-in data for Puerto Rico"
-                )
-            msa_counties = datasets.msa_definitions()[
-                datasets.msa_definitions()["CBSA Code"] == msa_fips
-            ]["stcofips"].tolist()
-
-        else:
-            msa_counties = None
-
-        # build a list of states in the dataset
-        allfips = []
-        stateset = []
-        for i in [state_fips, county_fips, msa_counties, fips]:
-            if i:
-                if isinstance(i, (str,)):
-                    i = [i]
-                for each in i:
-                    allfips.append(each)
-                    stateset.append(each[:2])
-            states = list(set(stateset))
-
-        if any(year < 2010 for year in years):
-            gdf00 = datasets.blocks_2000(states=states, fips=(tuple(allfips)))
-            gdf00 = gdf00.drop(columns=["year"])
-            gdf00 = _fips_filter(
-                state_fips=state_fips,
-                county_fips=county_fips,
-                msa_fips=msa_fips,
-                fips=fips,
-                data=gdf00,
-            )
-            if isinstance(boundary, gpd.GeoDataFrame):
-                if boundary.crs != gdf00.crs:
-                    warn(
-                        "Unable to determine whether boundary CRS is WGS84 "
-                        "if this produces unexpected results, try reprojecting"
-                    )
-                gdf00 = gdf00[
-                    gdf00.representative_point().intersects(boundary.unary_union)
-                ]
-
-        gdf = datasets.blocks_2010(states=states, fips=(tuple(allfips)))
-        gdf = gdf.drop(columns=["year"])
-        gdf = _fips_filter(
+        out = _get_lodes(
+            datastore=datastore,
             state_fips=state_fips,
             county_fips=county_fips,
             msa_fips=msa_fips,
             fips=fips,
-            data=gdf,
+            boundary=boundary,
+            years=years,
+            dataset=dataset,
         )
-        if isinstance(boundary, gpd.GeoDataFrame):
-            if boundary.crs != gdf.crs:
-                warn(
-                    "Unable to determine whether boundary CRS is WGS84 "
-                    "if this produces unexpected results, try reprojecting"
-                )
-            gdf = gdf[gdf.representative_point().intersects(boundary.unary_union)]
-
-        # grab state abbreviations
-        names = (
-            _fipstable[_fipstable["FIPS Code"].isin(states)]["State Abbreviation"]
-            .str.lower()
-            .tolist()
-        )
-        if isinstance(names, str):
-            names = [names]
-
-        dfs = []
-        for name in names:
-            if name == "PR":
-                raise Exception("does not yet include built-in data for Puerto Rico")
-            for year in years:
-                try:
-                    df = get_lehd(dataset=dataset, year=year, state=name)
-                    df["year"] = year
-                    if year < 2010:
-                        df = gdf00.merge(df, on="geoid", how="inner")
-                    else:
-                        df = gdf.merge(df, on="geoid", how="inner")
-                    df = df.set_index(["geoid", "year"])
-                    dfs.append(df)
-                except ValueError:
-                    warn(f"{name.upper()} {year} not found!")
-                    pass
-        out = pd.concat(dfs, sort=True)
-        out = out[~out.index.duplicated(keep="first")]
-        out = out.reset_index()
 
         return cls(gdf=out, harmonized=False)
 

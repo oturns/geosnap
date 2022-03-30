@@ -25,11 +25,9 @@ dependencies:
   - spopt >=0.3.0
   - fsspec
   - s3fs
-  - botocore >=1.20.21
   - segregation >=2.0
   - versioneer
   # testing
-  - descartes
   - jupyter
   - pytest
   - pytest-cov

@@ -4,7 +4,7 @@ import numpy
 import os
 import shutil
 import pytest
-
+from geosnap import DataStore
 
 try:
     import pygraphviz

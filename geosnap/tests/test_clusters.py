@@ -1,7 +1,8 @@
 from geosnap import Community
 import numpy as np
+from geosnap import DataStore
 
-reno = Community.from_census(msa_fips="39900")
+reno = Community.from_census(msa_fips="39900",datastore=DataStore())
 columns = ["median_household_income", "p_poverty_rate", "p_unemployment_rate"]
 
 # Aspatial Clusters
@@ -32,7 +33,7 @@ def test_kmeans():
 
 def test_aff_prop():
 
-    r = reno.cluster(columns=columns, method="affinity_propagation", preference=-100)
+    r = reno.cluster(columns=columns, method="affinity_propagation", cluster_kwargs=dict(preference=-100))
     assert len(r.gdf.affinity_propagation.unique()) == 3
 
 
@@ -53,7 +54,7 @@ def test_spenc():
 
 def test_maxp():
 
-    r = reno.regionalize(columns=columns, method="max_p", initial=10)
+    r = reno.regionalize(columns=columns, method="max_p", region_kwargs=dict(initial=10))
     assert len(r.gdf.max_p.unique()) >= 8
 
 

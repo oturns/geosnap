@@ -1,12 +1,14 @@
 """Transition and sequence analysis of neighborhood change."""
 
+import geopandas as gpd
+import numpy as np
+import pandas as pd
 from giddy.markov import Markov, Spatial_Markov
 from giddy.sequence import Sequence
+from libpysal.weights import Voronoi, lag_categorical
 from libpysal.weights.contiguity import Queen, Rook
-from libpysal.weights.distance import KNN, Kernel, DistanceBand
-from libpysal.weights import Voronoi
+from libpysal.weights.distance import KNN, DistanceBand, Kernel
 from sklearn.cluster import AgglomerativeClustering
-import geopandas as gpd
 
 Ws = {
     "queen": Queen,
@@ -16,6 +18,7 @@ Ws = {
     "kernel": Kernel,
     "distanceband": DistanceBand,
 }
+
 
 def transition(
     gdf,
@@ -57,7 +60,7 @@ def transition(
     Returns
     --------
     mar : giddy.markov.Markov instance or giddy.markov.Spatial_Markov
-        if w_type=None, a classic Markov instance is returned. 
+        if w_type=None, a classic Markov instance is returned.
         if w_type is given, a Spatial_Markov instance is returned.
 
     Examples
@@ -223,3 +226,136 @@ def sequence(
     gdf_temp = gdf_temp.reset_index()
 
     return gdf_temp, df_wide, seq_dis_mat
+
+
+def predict_markov_labels(
+    gdf,
+    unit_index="geoid",
+    temporal_index="year",
+    cluster_col=None,
+    w_type="queen",
+    w_options=None,
+    base_year=None,
+    new_colname=None,
+    time_steps=1,
+    increment=None,
+    seed=None,
+):
+    """Predict neighborhood labels based on spatial Markov transition model
+
+    Parameters
+    ----------
+    gdf : geopandas.GeoDataFrame
+        a long-form geodataframe with a column of labels to be simulated with a spatial Markov model
+    unit_index : str, 
+        column on dataframe that identifies unique geographic units, by default "geoid"
+    temporal_index : str
+        column on dataframe that identifies unique time periods, by default "year"
+    cluster_col : str
+        column on the dataframe that stores cluster or other labels to be simulated
+    w_type : str, optional
+        type of spatial weights matrix to include in the transition model, by default "queen"
+    w_options : dict, optional
+        additional keyword arguments passed to the libpysal weights constructor
+    base_year : int or str, optional
+        the year from which to begin simulation (i.e. the set of labels to define the first
+        period of the Markov sequence)
+    new_colname : str, optional
+        new column name to store predicted labels under. Defaults to "predicted"
+    time_steps : int, optional
+        the number of time-steps to simulate, by default 1
+    increment : str or int, optional
+        styled increment each time-step referrs to. For example, for a model fitted to decadal
+        Census data, each time-step refers to a period of ten years, so an increment of 10 ensures
+        that the temporal index aligns appropriately with the time steps being simulated
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
+    np.random.seed(seed)
+    if not new_colname:
+        new_colname = "predicted"
+    if not w_options:
+        w_options = {}
+
+    assert (
+        cluster_col and cluster_col in gdf.columns
+    ), "You must provide the name of a cluster model present on the Community gdf"
+
+    assert (
+        base_year
+    ), "Missing `base_year`. You must provide an initial time point with labels to begin simulation"
+
+    gdf = gdf.copy()
+    gdf = gdf.dropna(subset=[cluster_col]).reset_index(drop=True)
+    t = transition(
+        gdf,
+        cluster_col,
+        w_type=w_type,
+        unit_index=unit_index,
+        temporal_index=temporal_index,
+        w_options=w_options,
+    )
+
+    if time_steps == 1:
+
+        gdf = gdf[gdf[temporal_index] == base_year].reset_index(drop=True)
+        w = Ws[w_type].from_dataframe(gdf, **w_options)
+        predicted = _draw_labels(w, gdf, cluster_col, t, unit_index)
+        if new_colname:
+            predicted = predicted.rename(columns={cluster_col: new_colname})
+        return predicted
+
+    else:
+        assert (
+            increment
+        ), "You must set the `increment` argument to simulate multiple time steps"
+        predictions = []
+        gdf = gdf[gdf[temporal_index] == base_year]
+        gdf = gdf[[unit_index, cluster_col, temporal_index, "geometry"]]
+        current_time = base_year + increment
+        gdf = gdf.dropna(subset=[cluster_col]).reset_index(drop=True)
+        w = Ws[w_type].from_dataframe(gdf, **w_options)
+        predictions.append(gdf)
+
+        for step in range(time_steps):
+            # use the last known set of labels  to get the spatial context for each geog unit
+            gdf = predictions[step - 1].copy()
+            
+            predicted = _draw_labels(w, gdf, cluster_col, t, unit_index)
+            predicted[temporal_index] = current_time
+            predictions.append(predicted)
+            current_time += increment
+        gdf = gpd.GeoDataFrame(pd.concat(predictions))
+        gdf[cluster_col] = gdf[cluster_col].astype(int)
+        if new_colname:
+            gdf = gdf.rename(columns={cluster_col: new_colname})
+        return gdf
+
+
+def _draw_labels(w, gdf, cluster_col, markov, unit_index):
+    gdf = gdf.copy()
+    lags = lag_categorical(w, gdf[cluster_col].values)
+    lags = lags.astype(int)
+
+    labels = {}
+    for i, cluster in gdf[cluster_col].astype(int).iteritems():
+        probs = np.nan_to_num(markov.P)[lags[i]][cluster]
+        probs /= (
+            probs.sum()
+        )  # correct for tolerance, see https://stackoverflow.com/questions/25985120/numpy-1-9-0-valueerror-probabilities-do-not-sum-to-1
+        try:
+            # in case obs have a modal neighbor never before seen in the model
+            # (so all transition probs are 0)
+            # fall back to the aspatial transition matrix
+
+            labels[i] = np.random.choice(markov.classes, p=probs)
+        except:
+            labels[i] = np.random.choice(markov.classes, p=markov.p[cluster])
+    labels = pd.Series(labels, name=cluster_col)
+    labels = labels.astype(int)
+    out = gdf[[unit_index, gdf.geometry.name]]
+    predicted = gpd.GeoDataFrame(pd.concat([labels, out], axis=1))
+    return predicted

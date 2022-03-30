@@ -14,7 +14,7 @@
    unittests:
      name: CI (${{ matrix.os }}-${{ matrix.environment-file }})
      runs-on: ${{ matrix.os }}
-     continue-on-error: ${{ matrix.experimental }}
+     continue-on-error: true
      timeout-minutes: 90 
      strategy:
        matrix:

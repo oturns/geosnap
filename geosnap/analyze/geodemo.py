@@ -1,9 +1,9 @@
-"""Tools for the spatial analysis of neighborhood change."""
+"""Tools for modeling the demographic compostition of neighborhoods and regions over time"""
+
 import esda
 import geopandas as gpd
 import numpy as np
 import pandas as pd
-from libpysal.weights import attach_islands, lag_categorical
 from libpysal.weights.contiguity import Queen, Rook, Voronoi
 from libpysal.weights.distance import KNN, DistanceBand
 from sklearn.metrics import silhouette_samples
@@ -11,7 +11,7 @@ from sklearn.preprocessing import StandardScaler
 from spopt.region.base import form_single_component
 
 from .._data import _Map
-from .cluster import (
+from ._cluster_wrappers import (
     affinity_propagation,
     gaussian_mixture,
     hdbscan,
@@ -19,7 +19,8 @@ from .cluster import (
     spectral,
     ward,
 )
-from .regionalize import azp, max_p, skater, spenc, ward_spatial, kmeans_spatial
+from ._region_wrappers import azp, kmeans_spatial, max_p, skater, spenc, ward_spatial
+from .dynamics import transition
 
 np.seterr(divide="ignore", invalid="ignore")
 
@@ -33,40 +34,29 @@ Ws = {
 
 
 class ModelResults:
-    """Stores data about cluster and cluster_spatial models.
+    """Storage for clustering and regionalization results.
 
     Attributes
     ----------
-    X: array-like
-        data used to compute model
-    columns: list-like
-        columns used in model
+    df: pandas.DataFrame
+        data used to estimate the model
+    columns: list
+        variables in the dataframe used in the model
     W: libpysal.weights.W
         libpysal spatial weights matrix used in model
     labels: array-like
-        labels of each column
+        `cluster` or `region` label assigned to each observation
     instance: instance of model class used to generate neighborhood labels.
         fitted model instance, e.g sklearn.cluster.AgglomerativeClustering object
         or other model class used to estimate class labels
-    nearest_labels: dataframe
-        container for dataframe of nearest_labels
-    silhouettes: dataframe
-        container for dataframe of silhouette scores
-    path_silhouettes: dataframe
-        container for dataframe of path_silhouette scores
-    boundary_silhouettes: dataframe
-        container for dataframe of boundary_silhouette scores
-    model_type: string
-        says whether the model is spatial or aspatial (contains a W object)
-
     """
 
-    def __init__(self, X, columns, labels, instance, W):
+    def __init__(self, df, columns, labels, instance, W):
         """Initialize a new ModelResults instance.
 
         Parameters
         ----------
-        X: array-like
+        df: array-like
             data of the cluster
         columns: list-like
             columns used to compute model
@@ -76,35 +66,20 @@ class ModelResults:
             labels of each column
         instance: AgglomerativeCluserting object, or other model specific object type
             how many clusters model was computed with
-        nearest_labels: dataframe
-            container for dataframe of nearest_labels
-        silhouettes: dataframe
-            container for dataframe of silhouette scores
-        path_silhouettes: dataframe
-            container for dataframe of path_silhouette scores
-        boundary_silhouettes: dataframe
-            container for dataframe of boundary_silhouette scores
-        model_type: string
-            says whether the model is spatial or aspatial (contains a W object)
         """
         self.columns = columns
-        self.X = X
+        self.df = df
         self.W = W
         self.instance = instance
         self.labels = labels
-        self.nearest_labels = None
-        self.silhouettes = None
-        self.path_silhouettes = None
-        self.boundary_silhouettes = None
         if self.W is None:
             self.model_type = "aspatial"
         else:
             self.model_type = "spatial"
 
     # Standalone funcs to calc these if you don't want to graph them
-    def sil_scores(self, **kwargs):
-        """
-        Calculate silhouette scores for the current model.
+    def silhouette_scores(self, **kwargs):
+        """Calculate silhouette scores for the current model.
 
         Returns
         -------
@@ -112,14 +87,13 @@ class ModelResults:
         """
         self.silhouettes = pd.DataFrame()
         self.silhouettes["silhouettes"] = silhouette_samples(
-            self.X.values, self.labels, **kwargs
+            self.df[self.columns].values, self.labels, **kwargs
         )
         self.silhouettes.index = self.X.index
         return self.silhouettes
 
     def nearest_label(self, **kwargs):
-        """
-        Calculate nearest_labels for the current model.
+        """Calculate nearest_labels for the current model.
 
         Returns
         -------
@@ -130,10 +104,10 @@ class ModelResults:
         self.nearest_labels["nearest_label"] = esda.silhouettes.nearest_label(
             self.X.values, self.labels, **kwargs
         )
-        self.nearest_labels.index = self.X.index
+        self.nearest_labels.index = self.df.index
         return self.nearest_labels
 
-    def boundary_sil(self, **kwargs):
+    def boundary_silhouette(self, **kwargs):
         """
         Calculate boundary silhouette scores for the current model.
 
@@ -148,12 +122,12 @@ class ModelResults:
         )
         self.boundary_silhouettes = pd.DataFrame()
         self.boundary_silhouettes["boundary_silhouettes"] = esda.boundary_silhouette(
-            self.X.values, self.labels, self.W, **kwargs
+            self.df.values, self.labels, self.W, **kwargs
         )
-        self.boundary_silhouettes.index = self.X.index
+        self.boundary_silhouettes.index = self.df.index
         return self.boundary_silhouettes
 
-    def path_sil(self, **kwargs):
+    def path_silhouette(self, **kwargs):
         """
         Calculate path silhouette scores for the current model.
 
@@ -170,7 +144,7 @@ class ModelResults:
         self.path_silhouettes["path_silhouettes"] = esda.path_silhouette(
             self.X.values, self.labels, self.W, **kwargs
         )
-        self.path_silhouettes.index = self.X.index
+        self.path_silhouettes.index = self.df.index
         return self.path_silhouettes
 
 
@@ -185,7 +159,7 @@ def cluster(
     unit_index="geoid",
     scaler="std",
     pooling="fixed",
-    **kwargs,
+    cluster_kwargs=None,
 ):
     """Create a geodemographic typology by running a cluster analysis on the study area's neighborhood attributes.
 
@@ -236,6 +210,9 @@ def cluster(
         name of model to be stored in a Community
 
     """
+    if not cluster_kwargs:
+        cluster_kwargs = dict()
+
     specification = {
         "ward": ward,
         "kmeans": kmeans,
@@ -244,8 +221,10 @@ def cluster(
         "spectral": spectral,
         "hdbscan": hdbscan,
     }
+
     if scaler == "std":
         scaler = StandardScaler()
+
     if method not in specification.keys():
         raise ValueError(
             "`method` must of one of ['kmeans', 'ward', 'affinity_propagation', 'spectral', 'gaussian_mixture', 'hdbscan']"
@@ -267,7 +246,6 @@ def cluster(
     data = data.dropna(how="any", subset=columns)
 
     if scaler:
-
         if pooling in ["fixed", "unique"]:
             # if fixed (or unique), scale within each time period
             for time in times:
@@ -288,7 +266,7 @@ def cluster(
             n_clusters=n_clusters,
             best_model=best_model,
             verbose=verbose,
-            **kwargs,
+            **cluster_kwargs,
         )
         labels = model.labels_.astype(str)
         data = data.reset_index()
@@ -304,7 +282,7 @@ def cluster(
         gdf = gdf.join(clusters, how="left")
         gdf = gdf.reset_index()
         results = ModelResults(
-            X=data.set_index([unit_index, temporal_index]),
+            df=data.set_index([unit_index, temporal_index]),
             columns=columns,
             labels=model.labels_,
             instance=model,
@@ -325,7 +303,7 @@ def cluster(
                 n_clusters=n_clusters,
                 best_model=best_model,
                 verbose=verbose,
-                **kwargs,
+                **cluster_kwargs,
             )
 
             labels = model.labels_.astype(str)
@@ -335,7 +313,7 @@ def cluster(
             clusters.set_index([temporal_index, unit_index], inplace=True)
             gdf.update(clusters)
             results = ModelResults(
-                X=df.set_index([unit_index, temporal_index]),
+                df=df.set_index([unit_index, temporal_index]),
                 columns=columns,
                 labels=model.labels_,
                 instance=model,
@@ -360,7 +338,7 @@ def regionalize(
     unit_index="geoid",
     scaler="std",
     weights_kwargs=None,
-    **kwargs,
+    region_kwargs=None,
 ):
     """Create a *spatial* geodemographic typology by running a cluster
     analysis on the metro area's neighborhood attributes and including a
@@ -416,6 +394,9 @@ def regionalize(
         name of model to be stored in a Community
 
     """
+    if not region_kwargs:
+        region_kwargs = dict()
+
     specification = {
         "azp": azp,
         "spenc": spenc,
@@ -424,6 +405,7 @@ def regionalize(
         "max_p": max_p,
         "kmeans_spatial": kmeans_spatial,
     }
+
     if method not in specification.keys():
         raise ValueError(f"`method` must be one of {specification.keys()}")
 
@@ -454,7 +436,6 @@ def regionalize(
         W = spatial_weights
 
     models = _Map()
-    ws = {}
     clusters = []
     gdf[model_name] = np.nan
 
@@ -467,7 +448,7 @@ def regionalize(
             df[columns] = scaler.fit_transform(df[columns].values)
 
         w0 = W.from_dataframe(df, **weights_kwargs)
-        w0 = form_single_component(df, w0, linkage='single')
+        w0 = form_single_component(df, w0, linkage="single")
 
         model = specification[method](
             df,
@@ -476,7 +457,7 @@ def regionalize(
             n_clusters=n_clusters,
             threshold_variable=threshold_variable,
             threshold=threshold,
-            **kwargs,
+            **region_kwargs,
         )
 
         labels = pd.Series(model.labels_).astype(str)
@@ -490,8 +471,9 @@ def regionalize(
         clusters = clusters.drop_duplicates(subset=[unit_index])
         clusters.set_index([temporal_index, unit_index], inplace=True)
         gdf.update(clusters)
+
         results = ModelResults(
-            X=df.set_index([unit_index, temporal_index]).drop("geometry", axis=1),
+            df=df.set_index([unit_index, temporal_index]).drop("geometry", axis=1),
             columns=columns,
             labels=model.labels_,
             instance=model,
@@ -503,109 +485,3 @@ def regionalize(
 
     return gdf, models, model_name
 
-
-def predict_labels(
-    comm,
-    unit_index="geoid",
-    temporal_index="year",
-    model_name=None,
-    w_type="queen",
-    w_options=None,
-    base_year=None,
-    new_colname=None,
-    time_steps=1,
-    increment=None,
-    seed=None,
-):
-    np.random.seed(seed)
-    if not new_colname:
-        new_colname = "predicted"
-    if not w_options:
-        w_options = {}
-
-    assert (
-        comm.harmonized
-    ), "Predictions based on transition models require harmonized data"
-    assert (
-        model_name and model_name in comm.gdf.columns
-    ), "You must provide the name of a cluster model present on the Community gdf"
-
-    assert (
-        base_year
-    ), "Missing `base_year`. You must provide an initial time point with labels to begin simulation"
-
-    gdf = comm.gdf.copy()
-    gdf = gdf.dropna(subset=[model_name]).reset_index(drop=True)
-    t = comm.transition(
-        model_name,
-        w_type=w_type,
-        unit_index=unit_index,
-        temporal_index=temporal_index,
-        w_options=w_options,
-    )
-
-    if time_steps == 1:
-
-        gdf = gdf[gdf[temporal_index] == base_year].reset_index(drop=True)
-        w = Ws[w_type].from_dataframe(gdf, **w_options)
-        lags = lag_categorical(w, gdf[model_name].values)
-        lags = lags.astype(int)
-
-        labels = {}
-        for i, cluster in gdf[model_name].astype(int).iteritems():
-            probs = np.nan_to_num(t.P)[lags[i]][cluster]
-            probs /= (
-                probs.sum()
-            )  # correct for tolerance, see https://stackoverflow.com/questions/25985120/numpy-1-9-0-valueerror-probabilities-do-not-sum-to-1
-            try:
-                # in case obs have a modal neighbor never before seen in the model
-                # (so all transition probs are 0)
-                # fall back to the aspatial transition matrix
-
-                labels[i] = np.random.choice(t.classes, p=probs)
-            except:
-                labels[i] = np.random.choice(t.classes, p=t.p[cluster])
-        labels = pd.Series(labels, name=new_colname)
-        out = gdf[[unit_index, "geometry"]]
-        predicted = pd.concat([labels, out], axis=1)
-        return gpd.GeoDataFrame(predicted)
-
-    else:
-        assert (
-            increment
-        ), "You must set the `increment` argument to simulate multiple time steps"
-        predictions = []
-        gdf = gdf[gdf[temporal_index] == base_year]
-        gdf = gdf[[unit_index, model_name, temporal_index, "geometry"]]
-        current_time = base_year + increment
-        gdf = gdf.dropna(subset=[model_name]).reset_index(drop=True)
-        w = Ws[w_type].from_dataframe(gdf, **w_options)
-        predictions.append(gdf)
-
-        for step in range(time_steps):
-            # use the last known set of labels  to get the spatial context for each geog unit
-            gdf = predictions[step - 1].copy()
-            lags = lag_categorical(w, gdf[model_name].values)
-            lags = lags.astype(int)
-            labels = {}
-            for i, cluster in gdf[model_name].astype(int).iteritems():
-                #  use labels and spatial context to get the transition probabilities for each unit
-                probs = np.nan_to_num(t.P)[lags[i]][cluster]
-                probs /= (
-                    probs.sum()
-                )  # correct for tolerance, see https://stackoverflow.com/questions/25985120/numpy-1-9-0-valueerror-probabilities-do-not-sum-to-1
-                try:
-                    #  draw from the conditional probabilities for each unit
-                    # in case obs have a modal neighbor never before seen in the model
-                    # (so all transition probs are 0)
-                    # fall back to the aspatial transition matrix
-                    labels[i] = np.random.choice(t.classes, p=probs)
-                except:
-                    labels[i] = np.random.choice(t.classes, p=t.p[cluster])
-            labels = pd.Series(labels, name=model_name)
-            out = gdf[[unit_index, "geometry"]]
-            out[temporal_index] = current_time
-            predicted = pd.concat([labels, out], axis=1)
-            predictions.append(gpd.GeoDataFrame(predicted).dropna(subset=[model_name]))
-            current_time += increment
-        return predictions

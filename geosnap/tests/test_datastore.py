@@ -1,4 +1,5 @@
-from geosnap import datasets
+from geosnap import DataStore
+datasets=DataStore()
 
 
 def test_data_dir():
