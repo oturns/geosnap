@@ -4,6 +4,8 @@ Indicators of Neighborhood Change
 
 from collections import defaultdict
 import numpy as np
+import geopandas as gpd
+import pandas as pd
 
 def _labels_to_neighborhoods(labels):
     """Convert a list of labels to neighborhoods dictionary
@@ -108,8 +110,32 @@ def linc(labels_sequence):
         intersection = set.intersection(*neighbors)
         union = set.union(*neighbors)
         n_union = len(union)
-        if n_union == 1: # singleton at all points in time
-            lincs[i] = 0.
+        if n_union == 1:  # singleton at all points in time
+            lincs[i] = 0.0
         else:
-            lincs[i] = 1.0 - ((len(intersection)-1)/(n_union-1))
+            lincs[i] = 1.0 - ((len(intersection) - 1) / (n_union - 1))
     return lincs
+
+
+def lincs_from_gdf(
+    gdf, unit_index, temporal_index, cluster_col, perspective="time", periods="all"
+):
+    gdf = gdf.copy()
+    if periods == "all":
+        periods = gdf[temporal_index].unique()
+    geoms = gdf.groupby(unit_index).first()[gdf.geometry.name]
+    gdf = gpd.GeoDataFrame(
+        gdf.pivot(index=unit_index, columns=temporal_index, values=cluster_col)
+        .dropna()
+        .astype("int")
+    ).merge(geoms, left_on=unit_index, right_index=True)
+    if perspective == "category":
+        l = linc([gdf[p].values for p in periods])
+        out = pd.DataFrame(l, index=periods)
+        return out
+    elif perspective == "time":
+        l = linc([gdf[p].values.T for p in periods])
+        gdf["linc"] = l
+        return gdf
+    else:
+        raise ValueError("perspective must be one of {`time`, `category`}")
