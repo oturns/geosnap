@@ -131,8 +131,8 @@ def lincs_from_gdf(
         name of column in dataframe that identifies unique spatial units
     temporal_index : str
         name of column in dataframe that identifies unique time periods
-    cluster_col : _tystrpe_
-        _description_
+    cluster_col : str
+        name of column in dataframe that identifies "neighborhood" labels for each unit
     perspective : str, optional
         orientation for calculating lincs; if `time`, lincs represent the change
         experienced in each time period across units. If `unit`, lincs represent
