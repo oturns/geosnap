@@ -7,6 +7,7 @@ import numpy as np
 import geopandas as gpd
 import pandas as pd
 
+
 def _labels_to_neighborhoods(labels):
     """Convert a list of labels to neighborhoods dictionary
 
@@ -120,6 +121,31 @@ def linc(labels_sequence):
 def lincs_from_gdf(
     gdf, unit_index, temporal_index, cluster_col, perspective="time", periods="all"
 ):
+    """generate local indicators of neighborhood change from a long-form geodataframe
+
+    Parameters
+    ----------
+    gdf : geopandas.GeoDataFrame
+        long-form dataframe holding neighborhood/category labels
+    unit_index : str
+        name of column in dataframe that identifies unique spatial units
+    temporal_index : str
+        name of column in dataframe that identifies unique time periods
+    cluster_col : _tystrpe_
+        _description_
+    perspective : str, optional
+        orientation for calculating lincs; if `time`, lincs represent the change
+        experienced in each time period across units. If `unit`, lincs represent
+        the change experienced by each  unit over time by default "time"
+    periods : list, optional
+        list of time periods to include in the analysis. If "all", then all unique
+        entries in the `temporal_index` column will be used (by default "all")
+
+    Returns
+    -------
+    geopandas.GeoDataFrame
+        dataframe with linc values as rows
+    """
     gdf = gdf.copy()
     if periods == "all":
         periods = gdf[temporal_index].unique()
