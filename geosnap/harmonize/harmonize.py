@@ -147,7 +147,7 @@ def harmonize(
                         extensive_variables=extensive_variables,
                         intensive_variables=intensive_variables,
                         allocate_total=allocate_total,
-                        codes=codes,
+                        pixel_values=codes,
                         raster=raster,
                     )
                 except IOError:

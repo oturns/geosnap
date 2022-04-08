@@ -21,7 +21,7 @@ dependencies:
   - tqdm
   - quilt3 >=3.6
   - xlrd
-  - tobler >=0.2.1
+  - tobler >=0.8.2
   - spopt >=0.3.0
   - fsspec
   - s3fs

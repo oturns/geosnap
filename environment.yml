@@ -20,7 +20,7 @@ dependencies:
   - tqdm
   - quilt3 >=3.6
   - xlrd
-  - tobler >=0.4
+  - tobler >=0.8.2
   - proplot >=0.9
   - contextily
   - scikit-plot
