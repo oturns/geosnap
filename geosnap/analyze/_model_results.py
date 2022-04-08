@@ -706,7 +706,7 @@ class ModelResults:
         -------
         geopandas.GeoDataFrame
             long-form geodataframe with predicted cluster labels stored in the `new_colname` column
-        """        
+        """
         if not base_year:
             base_year = max(self.df[self.temporal_index].unique())
             warn(

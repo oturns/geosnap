@@ -247,7 +247,7 @@ def predict_markov_labels(
     ----------
     gdf : geopandas.GeoDataFrame
         a long-form geodataframe with a column of labels to be simulated with a spatial Markov model
-    unit_index : str, 
+    unit_index : str,
         column on dataframe that identifies unique geographic units, by default "geoid"
     temporal_index : str
         column on dataframe that identifies unique time periods, by default "year"
@@ -324,12 +324,12 @@ def predict_markov_labels(
         for step in range(time_steps):
             # use the last known set of labels  to get the spatial context for each geog unit
             gdf = predictions[step - 1].copy()
-            
+
             predicted = _draw_labels(w, gdf, cluster_col, t, unit_index)
             predicted[temporal_index] = current_time
             predictions.append(predicted)
             current_time += increment
-        gdf = gpd.GeoDataFrame(pd.concat(predictions),crs=crs)
+        gdf = gpd.GeoDataFrame(pd.concat(predictions), crs=crs)
         gdf[cluster_col] = gdf[cluster_col].astype(int)
         if new_colname:
             gdf = gdf.rename(columns={cluster_col: new_colname})

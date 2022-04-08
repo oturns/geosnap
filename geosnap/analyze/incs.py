@@ -130,10 +130,6 @@ def lincs_from_gdf(gdf, unit_index, temporal_index, cluster_col, periods="all"):
         name of column in dataframe that identifies unique time periods
     cluster_col : str
         name of column in dataframe that identifies "neighborhood" labels for each unit
-    perspective : str, optional
-        orientation for calculating lincs; if `time`, lincs represent the change
-        experienced in each time period across units. If `unit`, lincs represent
-        the change experienced by each  unit over time by default "time"
     periods : list, optional
         list of time periods to include in the analysis. If "all", then all unique
         entries in the `temporal_index` column will be used (by default "all")
@@ -148,7 +144,9 @@ def lincs_from_gdf(gdf, unit_index, temporal_index, cluster_col, periods="all"):
     if periods == "all":
         periods = gdf[temporal_index].unique()
     gdf = gdf[gdf[temporal_index].isin(periods)]
-    geoms = gpd.GeoDataFrame(gdf.groupby(unit_index).first()[gdf.geometry.name], crs=crs)
+    geoms = gpd.GeoDataFrame(
+        gdf.groupby(unit_index).first()[gdf.geometry.name], crs=crs
+    )
     df = gpd.GeoDataFrame(
         gdf.pivot(index=unit_index, columns=temporal_index, values=cluster_col)
         .dropna()
