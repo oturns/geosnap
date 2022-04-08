@@ -10,20 +10,16 @@ giddy>=2.2.1
 xlrd
 cenpy
 appdirs
-palettable
-dash
-dash-bootstrap-components
 tqdm
 quilt3>=3.6
 pyarrow>=0.14.1
 contextily
 descartes
 scikit-plot
-tobler>=0.4
-spopt>=0.1.1
+tobler>=0.8.2
+spopt>=0.3.0
 fsspec
 s3fs
-botocore >=1.20.21
 segregation>=2.1
 proplot>=0.9
 versioneer

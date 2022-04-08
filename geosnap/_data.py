@@ -8,9 +8,6 @@ import geopandas as gpd
 import pandas as pd
 from appdirs import user_data_dir
 
-appname = "geosnap"
-appauthor = "geosnap"
-data_dir = user_data_dir(appname, appauthor)
 
 def _fetcher(local_path, remote_path, warning_msg):
     try:
@@ -57,14 +54,21 @@ class _Map(dict):
 class DataStore:
     """Storage for geosnap data. Currently supports US Census data.
 
-        Unless otherwise noted, data are collected from the U.S. Census Bureau's TIGER/LINE Files
-        https://www.census.gov/cgi-bin/geo/shapefiles/index.php?year=2018 and converted to
-        parquet files.
+    Unless otherwise noted, data are collected from the U.S. Census Bureau's TIGER/LINE Files
+    https://www.census.gov/cgi-bin/geo/shapefiles/index.php?year=2018 and converted to
+    parquet files.
 
     """
 
-    def __init__(self):
+    def __init__(self, data_dir="auto"):
         self
+        appname = "geosnap"
+        appauthor = "geosnap"
+
+        if data_dir == "auto":
+            self.data_dir = user_data_dir(appname, appauthor)
+        else:
+            self.data_dir = data_dir
 
     def __dir__(self):
 
@@ -87,7 +91,7 @@ class DataStore:
 
         return atts
 
-    def show_data_dir(self):
+    def show_data_dir(self, verbose=True):
         """Print the location of the local geosnap data storage directory.
 
         Returns
@@ -95,8 +99,9 @@ class DataStore:
         string
             location of local storage directory.
         """
-        print(data_dir)
-        return data_dir
+        if verbose:
+            print(self.data_dir)
+        return self.data_dir
 
     def acs(self, year=2018, level="tract", states=None):
         """American Community Survey Data.
@@ -108,14 +113,14 @@ class DataStore:
         level : str
             geographic level
         states : list, optional
-            subset of states (as 2-digit fips) to return 
+            subset of states (as 2-digit fips) to return
 
         Returns
         -------
         geopandas.GeoDataFrame
             geodataframe of ACS data indexed by FIPS code
         """
-        local_path = pathlib.Path(data_dir, "acs", f"acs_{year}_{level}.parquet")
+        local_path = pathlib.Path(self.data_dir, "acs", f"acs_{year}_{level}.parquet")
         remote_path = f"s3://spatial-ucr/census/acs/acs_{year}_{level}.parquet"
         msg = "Streaming data from S3. Use `geosnap.io.store_acs()` to store the data locally for better performance"
         t = _fetcher(local_path, remote_path, msg)
@@ -151,7 +156,7 @@ class DataStore:
             states = [states]
         blks = {}
         for state in states:
-            local = pathlib.Path(data_dir, "blocks_2000", f"{state}.parquet")
+            local = pathlib.Path(self.data_dir, "blocks_2000", f"{state}.parquet")
             remote = f"s3://spatial-ucr/census/blocks_2000/{state}.parquet"
             blks[state] = _fetcher(local, remote, msg)
 
@@ -189,7 +194,7 @@ class DataStore:
             states = [states]
         blks = {}
         for state in states:
-            local = pathlib.Path(data_dir, "blocks_2010", f"{state}.parquet")
+            local = pathlib.Path(self.data_dir, "blocks_2010", f"{state}.parquet")
             remote = f"s3://spatial-ucr/census/blocks_2010/{state}.parquet"
             blks[state] = _fetcher(local, remote, msg)
 
@@ -218,7 +223,7 @@ class DataStore:
 
         """
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
-        local = pathlib.Path(data_dir, "tracts_1990_500k.parquet")
+        local = pathlib.Path(self.data_dir, "tracts_1990_500k.parquet")
         remote = "s3://spatial-ucr/census/tracts_cartographic/tracts_1990_500k.parquet"
         t = _fetcher(local, remote, msg)
         if states:
@@ -242,7 +247,7 @@ class DataStore:
             stored as well-known binary on the 'wkb' column.
 
         """
-        local = pathlib.Path(data_dir, "tracts_2000_500k.parquet")
+        local = pathlib.Path(self.data_dir, "tracts_2000_500k.parquet")
         remote = "s3://spatial-ucr/census/tracts_cartographic/tracts_2000_500k.parquet"
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
         t = _fetcher(local, remote, msg)
@@ -253,7 +258,8 @@ class DataStore:
         return t
 
     def tracts_2010(
-        self, states=None,
+        self,
+        states=None,
     ):
         """Nationwide Census Tracts as drawn in 2010 (cartographic 500k).
 
@@ -270,7 +276,7 @@ class DataStore:
 
         """
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
-        local = pathlib.Path(data_dir, "tracts_2010_500k.parquet")
+        local = pathlib.Path(self.data_dir, "tracts_2010_500k.parquet")
         remote = "s3://spatial-ucr/census/tracts_cartographic/tracts_2010_500k.parquet"
         t = _fetcher(local, remote, msg)
 
@@ -293,7 +299,7 @@ class DataStore:
             stored as well-known binary on the 'wkb' column.
 
         """
-        local = pathlib.Path(data_dir, "msas.parquet")
+        local = pathlib.Path(self.data_dir, "msas.parquet")
         remote = "s3://spatial-ucr/census/administrative/msas.parquet"
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
         t = _fetcher(local, remote, msg)
@@ -310,7 +316,7 @@ class DataStore:
             stored as well-known binary on the 'wkb' column.
 
         """
-        local = pathlib.Path(data_dir, "states.parquet")
+        local = pathlib.Path(self.data_dir, "states.parquet")
         remote = "s3://spatial-ucr/census/administrative/states.parquet"
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
 
@@ -332,7 +338,7 @@ class DataStore:
             stored as well-known binary on the 'wkb' column.
 
         """
-        local= pathlib.Path(data_dir, "counties.parquet")
+        local = pathlib.Path(self.data_dir, "counties.parquet")
         remote = "s3://spatial-ucr/census/administrative/counties.parquet"
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
         t = _fetcher(local, remote, msg)
@@ -350,7 +356,7 @@ class DataStore:
             dataframe that stores state/county --> MSA crosswalk definitions.
 
         """
-        local = pathlib.Path(data_dir, "msa_definitions.parquet")
+        local = pathlib.Path(self.data_dir, "msa_definitions.parquet")
         remote = "s3://spatial-ucr/census/administrative/msa_definitions.parquet"
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
         try:
@@ -371,7 +377,7 @@ class DataStore:
 
         """
         try:
-            return pd.read_parquet(pathlib.Path(data_dir, "ltdb.parquet"))
+            return pd.read_parquet(pathlib.Path(self.data_dir, "ltdb.parquet"))
         except KeyError:
             print(
                 "Unable to locate LTDB data. Try saving the data again "
@@ -388,7 +394,7 @@ class DataStore:
 
         """
         try:
-            return pd.read_parquet(pathlib.Path(data_dir, "ncdb.parquet"))
+            return pd.read_parquet(pathlib.Path(self.data_dir, "ncdb.parquet"))
         except KeyError:
             print(
                 "Unable to locate NCDB data. Try saving the data again "

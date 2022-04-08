@@ -4,7 +4,7 @@ import numpy
 import os
 import shutil
 import pytest
-
+from geosnap import DataStore
 
 try:
     import pygraphviz
@@ -16,17 +16,25 @@ except ImportError:
 if os.path.exists('geosnap/tests/images'):
     shutil.rmtree('geosnap/tests/images')
 
-columns = ["median_household_income", "p_poverty_rate", "p_unemployment_rate"]
+columns = ["median_household_income", "p_poverty_rate", "p_unemployment_rate", 'n_total_pop']
 reno = Community.from_census(msa_fips="39900")
 reno = reno.cluster(columns=columns, method='kmeans')
 reno = reno.regionalize(columns=columns, method='ward_spatial')
 
-def test_cont_timeseries():
-    p = reno.plot_timeseries(column='median_household_income', years=[2010], dpi=50)
+def test_cont_timeseries_pooled():
+    p = reno.plot_timeseries(column='median_household_income', temporal_index='year', time_subset=[2010], dpi=50)
+    assert isinstance(p, proplot.gridspec.SubplotGrid)
+
+def test_cont_timeseries_unpooled():
+    p = reno.plot_timeseries(column='median_household_income', temporal_index='year', time_subset=[2010], dpi=50, pooled=False)
+    assert isinstance(p, proplot.gridspec.SubplotGrid)
+
+def test_cont_timeseries_unpooled_layout():
+    p = reno.plot_timeseries(column='median_household_income', temporal_index='year', time_subset=[2000,2010], nrows=2, ncols=1, dpi=50, pooled=False)
     assert isinstance(p, proplot.gridspec.SubplotGrid)
 
 def test_cat_timeseries():
-    p = reno.plot_timeseries(column='kmeans', categorical=True, years=[2010], dpi=50)
+    p = reno.plot_timeseries(column='kmeans', categorical=True, temporal_index='year', time_subset=[2010],dpi=50)
     assert isinstance(p, proplot.gridspec.SubplotGrid)
 
 def test_heatmaps():
@@ -46,17 +54,21 @@ def test_animation():
     assert 'animation.gif' in os.listdir('geosnap/tests/images')
 
 def test_boundary_silplot():
-    p = reno.plot_boundary_silhouette(model_name='ward_spatial', year=2010, dpi=50)
-    assert isinstance(p, numpy.ndarray)
+    p = reno.plot_boundary_silhouette(dpi=50, model_name='ward_spatial')
+    assert isinstance(p, proplot.gridspec.SubplotGrid
+)
 
 def test_path_silplot():
-    p = reno.plot_path_silhouette(model_name='ward_spatial', year=2010, dpi=50)
-    assert isinstance(p, numpy.ndarray)
+    p = reno.plot_path_silhouette(dpi=50, model_name='ward_spatial')
+    assert isinstance(p, proplot.gridspec.SubplotGrid
+)
 
 def test_next_label_plot():
-    p = reno.plot_next_best_label('kmeans')
-    assert isinstance(p, numpy.ndarray)
+    p = reno.plot_next_best_label(model_name='kmeans')
+    assert isinstance(p, proplot.gridspec.SubplotGrid
+)
 
 def test_silmap_plot():
-    p = reno.plot_silhouette_map('kmeans', dpi=50)
-    assert isinstance(p, numpy.ndarray)
+    p = reno.plot_silhouette_map(dpi=50, model_name='kmeans')
+    assert isinstance(p, proplot.gridspec.SubplotGrid
+)

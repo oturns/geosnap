@@ -5,28 +5,35 @@ import pathlib
 import zipfile
 from warnings import warn
 
-from appdirs import user_data_dir
-
 import geopandas as gpd
 import pandas as pd
 import quilt3
+from appdirs import user_data_dir
 
-from .._data import datasets
+from .._data import DataStore
 from .util import adjust_inflation
+
+datasets = DataStore()
 
 _fipstable = pd.read_csv(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), "stfipstable.csv"),
     converters={"FIPS Code": str},
 )
 
-appname = "geosnap"
-appauthor = "geosnap"
-data_dir = user_data_dir(appname, appauthor)
-if not os.path.exists(data_dir):
-    pathlib.Path(data_dir).mkdir(parents=True, exist_ok=True)
+
+def _make_data_dir(data_dir="auto"):
+    appname = "geosnap"
+    appauthor = "geosnap"
+
+    if data_dir == "auto":
+        data_dir = user_data_dir(appname, appauthor)
+
+    if not os.path.exists(data_dir):
+        pathlib.Path(data_dir).mkdir(parents=True, exist_ok=True)
+    return data_dir
 
 
-def store_census():
+def store_census(data_dir="auto", verbose=True):
     """Save census data to the local quilt package storage.
 
     Returns
@@ -38,12 +45,16 @@ def store_census():
 
     """
     quilt3.Package.install(
-        "census/tracts_cartographic", "s3://spatial-ucr", dest=data_dir
+        "census/tracts_cartographic", "s3://spatial-ucr", dest=_make_data_dir(data_dir)
     )
-    quilt3.Package.install("census/administrative", "s3://spatial-ucr", dest=data_dir)
+    quilt3.Package.install(
+        "census/administrative", "s3://spatial-ucr", dest=_make_data_dir(data_dir)
+    )
+    if verbose:
+        print(f"Data stored in {_make_data_dir(data_dir)}")
 
 
-def store_blocks_2000():
+def store_blocks_2000(data_dir="auto"):
     """Save census 2000 census block data to the local quilt package storage.
 
     Returns
@@ -53,12 +64,12 @@ def store_blocks_2000():
         in place of streaming data for all census queries.
 
     """
-    pth = pathlib.Path(data_dir, "blocks_2000")
+    pth = pathlib.Path(_make_data_dir(data_dir), "blocks_2000")
     pathlib.Path(pth).mkdir(parents=True, exist_ok=True)
     quilt3.Package.install("census/blocks_2000", "s3://spatial-ucr", dest=pth)
 
 
-def store_blocks_2010():
+def store_blocks_2010(data_dir="auto"):
     """Save census 2010 census block data to the local quilt package storage.
 
     Returns
@@ -68,12 +79,12 @@ def store_blocks_2010():
         in place of streaming data for all census queries.
 
     """
-    pth = pathlib.Path(data_dir, "blocks_2010")
+    pth = pathlib.Path(_make_data_dir(data_dir), "blocks_2010")
     pathlib.Path(pth).mkdir(parents=True, exist_ok=True)
     quilt3.Package.install("census/blocks_2010", "s3://spatial-ucr", dest=pth)
 
 
-def store_acs(years="all", level="tract"):
+def store_acs(years="all", level="tract", data_dir="auto"):
     """Save census American Community Survey 5-year data to the local geosnap storage.
        Each year is about 550mb for tract level and about 900mb for blockgroup level.
 
@@ -93,11 +104,12 @@ def store_acs(years="all", level="tract"):
         in place of streaming data for all census queries.
 
     """
-    pth = pathlib.Path(data_dir, "acs")
+    pth = pathlib.Path(_make_data_dir(data_dir), "acs")
     pathlib.Path(pth).mkdir(parents=True, exist_ok=True)
 
     if years == "all":
         quilt3.Package.install("census/acs", "s3://spatial-ucr", dest=pth)
+
     else:
         if isinstance("years", (str, int)):
             years = [years]
@@ -108,7 +120,7 @@ def store_acs(years="all", level="tract"):
             )
 
 
-def store_ltdb(sample, fullcount):
+def store_ltdb(sample, fullcount, data_dir="auto"):
     """
     Read & store data from Brown's Longitudinal Tract Database (LTDB).
 
@@ -256,10 +268,12 @@ def store_ltdb(sample, fullcount):
     ]
     df = df[keeps]
 
-    df.to_parquet(os.path.join(data_dir, "ltdb.parquet"), compression="brotli")
+    df.to_parquet(
+        os.path.join(_make_data_dir(data_dir), "ltdb.parquet"), compression="brotli"
+    )
 
 
-def store_ncdb(filepath):
+def store_ncdb(filepath, data_dir="auto"):
     """
     Read & store data from Geolytics's Neighborhood Change Database.
 
@@ -356,9 +370,9 @@ def store_ncdb(filepath):
 
     df = df.loc[df.n_total_pop != 0]
 
-    df.to_parquet(os.path.join(data_dir, "ncdb.parquet"), compression="brotli")
-    # storage.set("ncdb", os.path.join(data_dir, "ncdb.parquet"))
-    # storage.build("geosnap_data/storage")
+    df.to_parquet(
+        os.path.join(_make_data_dir(data_dir), "ncdb.parquet"), compression="brotli"
+    )
 
 
 def _fips_filter(

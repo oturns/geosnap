@@ -4,6 +4,8 @@ Indicators of Neighborhood Change
 
 from collections import defaultdict
 import numpy as np
+import geopandas as gpd
+
 
 def _labels_to_neighborhoods(labels):
     """Convert a list of labels to neighborhoods dictionary
@@ -15,8 +17,8 @@ def _labels_to_neighborhoods(labels):
     Returns
     -------
     neighborhoods: dictionary
-                   key is the label for each neighborhood, value is the list of
-                   area indexes defining that neighborhood
+        key is the label for each neighborhood, value is the list of
+        area indexes defining that neighborhood
 
     Examples
     --------
@@ -108,8 +110,52 @@ def linc(labels_sequence):
         intersection = set.intersection(*neighbors)
         union = set.union(*neighbors)
         n_union = len(union)
-        if n_union == 1: # singleton at all points in time
-            lincs[i] = 0.
+        if n_union == 1:  # singleton at all points in time
+            lincs[i] = 0.0
         else:
-            lincs[i] = 1.0 - ((len(intersection)-1)/(n_union-1))
+            lincs[i] = 1.0 - ((len(intersection) - 1) / (n_union - 1))
     return lincs
+
+
+def lincs_from_gdf(gdf, unit_index, temporal_index, cluster_col, periods="all"):
+    """generate local indicators of neighborhood change from a long-form geodataframe
+
+    Parameters
+    ----------
+    gdf : geopandas.GeoDataFrame
+        long-form dataframe holding neighborhood/category labels
+    unit_index : str
+        name of column in dataframe that identifies unique spatial units
+    temporal_index : str
+        name of column in dataframe that identifies unique time periods
+    cluster_col : str
+        name of column in dataframe that identifies "neighborhood" labels for each unit
+    perspective : str, optional
+        orientation for calculating lincs; if `time`, lincs represent the change
+        experienced in each time period across units. If `unit`, lincs represent
+        the change experienced by each  unit over time by default "time"
+    periods : list, optional
+        list of time periods to include in the analysis. If "all", then all unique
+        entries in the `temporal_index` column will be used (by default "all")
+
+    Returns
+    -------
+    geopandas.GeoDataFrame
+        dataframe with linc values as rows
+    """
+    gdf = gdf[[unit_index, temporal_index, cluster_col, gdf.geometry.name]]
+    crs = gdf.crs
+    if periods == "all":
+        periods = gdf[temporal_index].unique()
+    gdf = gdf[gdf[temporal_index].isin(periods)]
+    geoms = gpd.GeoDataFrame(gdf.groupby(unit_index).first()[gdf.geometry.name], crs=crs)
+    df = gpd.GeoDataFrame(
+        gdf.pivot(index=unit_index, columns=temporal_index, values=cluster_col)
+        .dropna()
+        .astype("int"),
+    )
+    gdf = geoms.join(df)
+
+    linc_vals = linc(gdf[sorted(periods)].T.values)
+    gdf["linc"] = linc_vals
+    return gdf.reset_index()

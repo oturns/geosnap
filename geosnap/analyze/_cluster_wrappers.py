@@ -171,7 +171,7 @@ def spectral(
         The eigenvalue decomposition strategy to use. AMG requires pyamg to be installed. It can be
         faster on very large, sparse problems, but may also lead to instabilities.
     n_components : integer, optional, default=n_clusters
-        Number of eigen vectors to use for the spectral embedding
+        Number of eigenvectors to use for the spectral embedding
     random_state : int, RandomState instance or None (default)
         A pseudo random number generator used for the initialization of the lobpcg eigen vectors
         decomposition when eigen_solver='amg' and by the K-Means initialization. Use an int to make

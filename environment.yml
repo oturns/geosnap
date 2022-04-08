@@ -20,15 +20,13 @@ dependencies:
   - tqdm
   - quilt3 >=3.6
   - xlrd
-  - tobler >=0.4
+  - tobler >=0.8.2
   - proplot >=0.9
   - contextily
   - scikit-plot
   - mapclassify
-  - descartes  
   - spopt >=0.1.1
   - s3fs
-  - botocore >=1.20.21
   - segregation >=2.0
   - versioneer
 

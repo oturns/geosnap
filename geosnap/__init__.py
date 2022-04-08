@@ -30,7 +30,7 @@ from . import io
 from . import util
 from . import visualize
 from . import harmonize
-from ._data import datasets, _Map
+from ._data import datasets, _Map, DataStore
 from ._community import Community
 
 from . import _version

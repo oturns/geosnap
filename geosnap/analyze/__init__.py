@@ -1,4 +1,4 @@
-from .analytics import cluster, regionalize, ModelResults, predict_labels
-from .dynamics import sequence, transition
-from .incs import linc
+from .geodemo import cluster, regionalize, ModelResults
+from .dynamics import sequence, transition, predict_markov_labels
+from .incs import linc, lincs_from_gdf
 from . import segdyn

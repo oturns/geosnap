@@ -42,8 +42,8 @@ def get_config():
     cfg.VCS = "git"
     cfg.style = "pep440"
     cfg.tag_prefix = "v"
-    cfg.parentdir_prefix = "tobler-"
-    cfg.versionfile_source = "tobler/_version.py"
+    cfg.parentdir_prefix = "geosnap-"
+    cfg.versionfile_source = "geosnap/_version.py"
     cfg.verbose = False
     return cfg
 
