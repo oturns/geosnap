@@ -1,3 +1,4 @@
+from unicodedata import decimal
 from numpy.testing import assert_allclose
 import os
 import quilt3
@@ -46,7 +47,7 @@ def test_harmonize_area_weighted():
         weights_method="dasymetric",
         raster=local_raster
     )
-    assert harmonized_nlcd_weighted.gdf.n_total_housing_units.sum() == 900620.0
+    assert harmonized_nlcd_weighted.gdf.n_total_housing_units.sum().round(0) == 900620.0
     assert_allclose(
-        harmonized_nlcd_weighted.gdf.p_vacant_housing_units.sum(), 8832.8796, rtol=1e-03
+        harmonized_nlcd_weighted.gdf.p_vacant_housing_units.sum(), 8832.8796, rtol=1e-03, 
     )
