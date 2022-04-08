@@ -1,4 +1,4 @@
-from functools import cache, cached_property
+from functools import cached_property
 
 import esda
 import geopandas as gpd
