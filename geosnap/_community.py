@@ -1074,7 +1074,7 @@ class Community:
             years=years,
         )
 
-        return cls(gdf=gdf.reset_index(), harmonized=True)
+        return cls(gdf=gdf, harmonized=True)
 
     @classmethod
     def from_census(
