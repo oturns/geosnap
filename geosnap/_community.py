@@ -203,6 +203,7 @@ class Community:
         pooling="fixed",
         temporal_index="year",
         unit_index="geoid",
+        random_state=None,
         cluster_kwargs=None,
     ):
         """Create a geodemographic typology by running a cluster analysis on the study area's neighborhood attributes.
@@ -258,6 +259,7 @@ class Community:
             pooling=pooling,
             temporal_index=temporal_index,
             unit_index=unit_index,
+            random_state=random_state,
             cluster_kwargs=cluster_kwargs,
             return_model=True,
         )

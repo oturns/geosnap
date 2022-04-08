@@ -42,6 +42,7 @@ def cluster(
     unit_index="geoid",
     scaler="std",
     pooling="fixed",
+    random_state=None,
     cluster_kwargs=None,
     model_colname=None,
     return_model=False,
@@ -168,6 +169,7 @@ def cluster(
             n_clusters=n_clusters,
             best_model=best_model,
             verbose=verbose,
+            random_state=random_state,
             **cluster_kwargs,
         )
         labels = model.labels_.astype(str)

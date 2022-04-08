@@ -21,7 +21,7 @@ def _import_tryer(package, func, name):
 # Sklearn a-spatial models
 
 
-def ward(X, n_clusters=5, **kwargs):
+def ward(X, n_clusters=5,  **kwargs):
     """Agglomerative clustering using Ward linkage.
 
     Parameters
@@ -106,6 +106,7 @@ def affinity_propagation(
     copy=True,
     affinity="euclidean",
     verbose=False,
+    random_state=None,
     **kwargs,
 ):
     """Clustering with Affinity Propagation.
@@ -122,6 +123,8 @@ def affinity_propagation(
         algorithm
     max_iter : int, optional, default: 1000
         Maximum number of iterations
+    random_state : int, RandomState instance or None, default=None
+        Pseudo-random number generator to control the starting state. Use an int for reproducible results across function calls. 
 
     Returns
     -------
@@ -136,6 +139,7 @@ def affinity_propagation(
         copy=copy,
         affinity=affinity,
         verbose=verbose,
+        random_state=random_state
     )
     model.fit(X)
     return model
@@ -196,6 +200,8 @@ def spectral(
     n_jobs : int or None, optional (default=None)
         The number of parallel jobs to run. None means 1 unless in a joblib.parallel_backend context.
         -1 means using all processors. See Glossary for more details.
+    random_state : int, RandomState instance or None, default=None
+        Pseudo-random number generator to control the starting state. Use an int for reproducible results across function calls. 
     **kwargs : dict
         additional wkargs.
 
@@ -248,8 +254,8 @@ def gaussian_mixture(
         Criterion
     max_clusters: int, optional, default:10
         The max number of clusters to test if using `best_model` option
-    random_state: int, optional, default: None
-        The seed used to generate replicable results
+    random_state : int, RandomState instance or None, default=None
+        Pseudo-random number generator to control the starting state. Use an int for reproducible results across function calls. 
     kwargs
 
     Returns
