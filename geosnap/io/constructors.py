@@ -66,7 +66,7 @@ def get_ltdb(
             )
         tracts = tracts[tracts.representative_point().intersects(boundary.unary_union)]
         gdf = ltdb[ltdb["geoid"].isin(tracts["geoid"])]
-        gdf = gpd.GeoDataFrame(gdf.merge(tracts, on="geoid", how="left"))
+        gdf = gpd.GeoDataFrame(gdf.merge(tracts, on="geoid", how="left"), crs=4326)
 
     else:
         gdf = _from_db(
@@ -77,8 +77,7 @@ def get_ltdb(
             fips=fips,
             years=years,
         )
-
-    return gdf
+    return gdf.reset_index()
 
 
 def get_ncdb(
@@ -141,7 +140,7 @@ def get_ncdb(
             )
         tracts = tracts[tracts.representative_point().intersects(boundary.unary_union)]
         gdf = ncdb[ncdb["geoid"].isin(tracts["geoid"])]
-        gdf = gpd.GeoDataFrame(gdf.merge(tracts, on="geoid", how="left"))
+        gdf = gpd.GeoDataFrame(gdf.merge(tracts, on="geoid", how="left"), crs=4326)
 
     else:
         gdf = _from_db(

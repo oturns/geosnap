@@ -63,7 +63,11 @@ def kmeans_spatial(data, columns, w, n_clusters=5, **kwargs):
     fitted cluster instance: sklearn.cluster.AgglomerativeClustering
 
     """
-    model = RegionKMeansHeuristic(data[columns].values, n_clusters=n_clusters, w=w,)
+    model = RegionKMeansHeuristic(
+        data[columns].values,
+        n_clusters=n_clusters,
+        w=w,
+    )
     model.solve()
     return model
 
@@ -171,7 +175,12 @@ def azp(data, w, columns, n_clusters=5, **kwargs):
     fitted cluster instance: region.p_regions.azp.AZP
 
     """
-    model = AZP(data, n_clusters=n_clusters, w=w, attrs_name=columns,)
+    model = AZP(
+        data,
+        n_clusters=n_clusters,
+        w=w,
+        attrs_name=columns,
+    )
     model.solve()
     return model
 

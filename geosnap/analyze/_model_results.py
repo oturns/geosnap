@@ -1,4 +1,5 @@
 from functools import cached_property
+from warnings import warn
 
 import esda
 import geopandas as gpd
@@ -6,6 +7,7 @@ import scikitplot as skplt
 from sklearn.metrics import silhouette_samples
 
 from ..visualize.mapping import plot_timeseries
+from .dynamics import predict_markov_labels as _predict_markov_labels
 from .incs import lincs_from_gdf
 
 
@@ -669,3 +671,50 @@ class ModelResults:
         )
 
         return ax
+
+    def predict_markov_labels(
+        self,
+        w_type="queen",
+        w_options=None,
+        base_year=None,
+        new_colname=None,
+        time_steps=1,
+        increment=None,
+        seed=None,
+    ):
+        """Predict neighborhood labels from the model in future time periods using a spatial Markov transition model
+
+        Parameters
+        ----------
+        w_type : str, optional
+            type of spatial weights matrix to include in the transition model, by default "queen"
+        w_options : dict, optional
+            additional keyword arguments passed to the libpysal weights constructor
+        base_year : int or str, optional
+            the year from which to begin simulation (i.e. the set of labels to define the first
+            period of the Markov sequence). Defaults to the last year of available labels
+        new_colname : str, optional
+            new column name to store predicted labels under. Defaults to "predicted"
+        time_steps : int, optional
+            the number of time-steps to simulate, by default 1
+        increment : str or int, optional
+            styled increment each time-step referrs to. For example, for a model fitted to decadal
+            Census data, each time-step refers to a period of ten years, so an increment of 10 ensures
+            that the temporal index aligns appropriately with the time steps being simulated
+
+        Returns
+        -------
+        geopandas.GeoDataFrame
+            long-form geodataframe with predicted cluster labels stored in the `new_colname` column
+        """
+        if not base_year:
+            base_year = max(self.df[self.temporal_index].unique())
+            warn(
+                f"No base_year provided. Using the last period for which labels are known:  {base_year} "
+            )
+        inputs = locals()
+        del inputs["self"]
+        output = _predict_markov_labels(
+            self.df, self.unit_index, self.temporal_index, self.name, **inputs
+        )
+        return output
