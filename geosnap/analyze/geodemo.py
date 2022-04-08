@@ -1,12 +1,10 @@
-"""Tools for modeling the demographic compostition of neighborhoods and regions over time"""
+"""Functions for clustering and regionalization with spatiotemporal data"""
 
-import esda
 import geopandas as gpd
 import numpy as np
 import pandas as pd
 from libpysal.weights.contiguity import Queen, Rook, Voronoi
 from libpysal.weights.distance import KNN, DistanceBand
-from sklearn.metrics import silhouette_samples
 from sklearn.preprocessing import StandardScaler
 from spopt.region.base import form_single_component
 
@@ -19,8 +17,8 @@ from ._cluster_wrappers import (
     spectral,
     ward,
 )
+from ._model_results import ModelResults
 from ._region_wrappers import azp, kmeans_spatial, max_p, skater, spenc, ward_spatial
-from .dynamics import transition
 
 np.seterr(divide="ignore", invalid="ignore")
 
@@ -31,121 +29,6 @@ Ws = {
     "knn": KNN,
     "distanceband": DistanceBand,
 }
-
-
-class ModelResults:
-    """Storage for clustering and regionalization results.
-
-    Attributes
-    ----------
-    df: pandas.DataFrame
-        data used to estimate the model
-    columns: list
-        variables in the dataframe used in the model
-    W: libpysal.weights.W
-        libpysal spatial weights matrix used in model
-    labels: array-like
-        `cluster` or `region` label assigned to each observation
-    instance: instance of model class used to generate neighborhood labels.
-        fitted model instance, e.g sklearn.cluster.AgglomerativeClustering object
-        or other model class used to estimate class labels
-    """
-
-    def __init__(self, df, columns, labels, instance, W):
-        """Initialize a new ModelResults instance.
-
-        Parameters
-        ----------
-        df: array-like
-            data of the cluster
-        columns: list-like
-            columns used to compute model
-        W: libpysal.weights.W
-            libpysal spatial weights matrix used in model
-        labels: array-like
-            labels of each column
-        instance: AgglomerativeCluserting object, or other model specific object type
-            how many clusters model was computed with
-        """
-        self.columns = columns
-        self.df = df
-        self.W = W
-        self.instance = instance
-        self.labels = labels
-        if self.W is None:
-            self.model_type = "aspatial"
-        else:
-            self.model_type = "spatial"
-
-    # Standalone funcs to calc these if you don't want to graph them
-    def silhouette_scores(self, **kwargs):
-        """Calculate silhouette scores for the current model.
-
-        Returns
-        -------
-        silhouette scores stored in a dataframe accessible from `comm.models.['model_name'].silhouettes`
-        """
-        self.silhouettes = pd.DataFrame()
-        self.silhouettes["silhouettes"] = silhouette_samples(
-            self.df[self.columns].values, self.labels, **kwargs
-        )
-        self.silhouettes.index = self.X.index
-        return self.silhouettes
-
-    def nearest_label(self, **kwargs):
-        """Calculate nearest_labels for the current model.
-
-        Returns
-        -------
-        nearest_labels stored in a dataframe accessible from:
-        `comm.models.['model_name'].nearest_labels`
-        """
-        self.nearest_labels = pd.DataFrame()
-        self.nearest_labels["nearest_label"] = esda.silhouettes.nearest_label(
-            self.X.values, self.labels, **kwargs
-        )
-        self.nearest_labels.index = self.df.index
-        return self.nearest_labels
-
-    def boundary_silhouette(self, **kwargs):
-        """
-        Calculate boundary silhouette scores for the current model.
-
-        Returns
-        -------
-        boundary silhouette scores stored in a dataframe accessible from:
-        `comm.models.['model_name'].boundary_silhouettes`
-        """
-        assert self.model_type == "spatial", (
-            "Model is aspatial (lacks a W object), but has been passed to a spatial diagnostic."
-            " Try aspatial diagnostics like nearest_label() or sil_scores()"
-        )
-        self.boundary_silhouettes = pd.DataFrame()
-        self.boundary_silhouettes["boundary_silhouettes"] = esda.boundary_silhouette(
-            self.df.values, self.labels, self.W, **kwargs
-        )
-        self.boundary_silhouettes.index = self.df.index
-        return self.boundary_silhouettes
-
-    def path_silhouette(self, **kwargs):
-        """
-        Calculate path silhouette scores for the current model.
-
-        Returns
-        -------
-        path silhouette scores stored in a dataframe accessible from:
-        `comm.models.['model_name'].path_silhouettes`
-        """
-        assert self.model_type == "spatial", (
-            "Model is aspatial(lacks a W object), but has been passed to a spatial diagnostic."
-            " Try aspatial diagnostics like nearest_label() or sil_scores()"
-        )
-        self.path_silhouettes = pd.DataFrame()
-        self.path_silhouettes["path_silhouettes"] = esda.path_silhouette(
-            self.X.values, self.labels, self.W, **kwargs
-        )
-        self.path_silhouettes.index = self.df.index
-        return self.path_silhouettes
 
 
 def cluster(
@@ -160,6 +43,8 @@ def cluster(
     scaler="std",
     pooling="fixed",
     cluster_kwargs=None,
+    model_colname=None,
+    return_model=False,
 ):
     """Create a geodemographic typology by running a cluster analysis on the study area's neighborhood attributes.
 
@@ -194,22 +79,35 @@ def cluster(
         * pooled : data are pooled across all time periods
         * unique : if scaling, apply the scaler to each time period, then generate
           clusters unique to each time period.
+    model_colname : str
+        column name for storing cluster labels on the output dataframe. If no name is provided,
+        the colun will be named after the clustering method. If there is already a column
+        named after the clustering method, the name will be incremented with a number
 
     Returns
     -------
     gdf : geopandas.GeoDataFrame
-        GeoDataFrame with a column of neighborhood cluster labels
-        appended as a new column. If cluster method exists as a column on the DataFrame
+        GeoDataFrame with a column (model_colname) of neighborhood cluster labels
+        appended as a new column. If model_colname exists as a column on the DataFrame
         then the column will be incremented.
 
     model : named tuple
         A tuple with attributes X, columns, labels, instance, W, which store the
         input matrix, column labels, fitted model instance, and spatial weights matrix
 
-    model_name : str
-        name of model to be stored in a Community
-
     """
+    assert temporal_index in gdf.columns, (
+        "The column given as temporal_index:, "
+        f"{temporal_index} was not found in the geodataframe. ",
+        "If you need only a single time period, you can create a dummy "
+        "column with `gdf['_time'])=1` and pass `_time` as temporal_index",
+    )
+
+    assert unit_index in gdf.columns, (
+        "The column given as unit_index:, "
+        f"{unit_index} was not found in the geodataframe. ",
+        "If you need only a single time period, you can pass " "`unit_index=gdf.index`",
+    )
     if not cluster_kwargs:
         cluster_kwargs = dict()
 
@@ -229,12 +127,16 @@ def cluster(
         raise ValueError(
             "`method` must of one of ['kmeans', 'ward', 'affinity_propagation', 'spectral', 'gaussian_mixture', 'hdbscan']"
         )
-
-    # if we already have a column named after the clustering method, then increment it.
-    if method in gdf.columns.tolist():
-        model_name = method + str(len(gdf.columns[gdf.columns.str.startswith(method)]))
+    if model_colname is None:
+        # if we already have a column named after the clustering method, then increment it.
+        if method in gdf.columns.tolist():
+            model_colname = method + str(
+                len(gdf.columns[gdf.columns.str.startswith(method)])
+            )
+        else:
+            model_colname = method
     else:
-        model_name = method
+        model_colname = method
     if not columns:
         raise ValueError("You must provide a subset of columns as input")
 
@@ -272,7 +174,7 @@ def cluster(
         data = data.reset_index()
         clusters = pd.DataFrame(
             {
-                model_name: labels,
+                model_colname: labels,
                 temporal_index: data[temporal_index],
                 unit_index: data[unit_index],
             }
@@ -281,22 +183,29 @@ def cluster(
         clusters = clusters[~clusters.index.duplicated(keep="first")]
         gdf = gdf.join(clusters, how="left")
         gdf = gdf.reset_index()
+        model_data = gdf[
+            columns + [temporal_index, unit_index, model_colname, gdf.geometry.name]
+        ].dropna()
         results = ModelResults(
-            df=data.set_index([unit_index, temporal_index]),
+            df=model_data,
             columns=columns,
             labels=model.labels_,
             instance=model,
             W=None,
+            name=model_colname,
+            temporal_index=temporal_index,
+            unit_index=unit_index,
         )
-        return gdf, results, model_name
+        if return_model:
+            return gdf, results
+        return gdf
 
     elif pooling == "unique":
         models = _Map()
-        gdf[model_name] = np.nan
-        data = data.reset_index()
+        gdf[model_colname] = np.nan
 
         for time in times:
-            df = data[data[temporal_index] == time]
+            df = data[data[temporal_index] == time].reset_index()
 
             model = specification[method](
                 df[columns],
@@ -308,22 +217,31 @@ def cluster(
 
             labels = model.labels_.astype(str)
             clusters = pd.DataFrame(
-                {model_name: labels, temporal_index: time, unit_index: df[unit_index]}
+                {
+                    model_colname: labels,
+                    temporal_index: time,
+                    unit_index: df[unit_index],
+                }
             )
             clusters.set_index([temporal_index, unit_index], inplace=True)
             gdf.update(clusters)
+            clusters = gpd.GeoDataFrame(
+                clusters.join(gdf[[gdf.geometry.name]], how="left"), crs=gdf.crs
+            ).reset_index()
             results = ModelResults(
-                df=df.set_index([unit_index, temporal_index]),
+                df=clusters,
                 columns=columns,
                 labels=model.labels_,
                 instance=model,
                 W=None,
+                name=model_colname,
+                temporal_index=temporal_index,
+                unit_index=unit_index,
             )
             models[time] = results
-
-        gdf = gdf.reset_index()
-
-        return gdf, models, model_name
+        if return_model:
+            return gdf, models
+        return gdf
 
 
 def regionalize(
@@ -339,6 +257,8 @@ def regionalize(
     scaler="std",
     weights_kwargs=None,
     region_kwargs=None,
+    model_colname=None,
+    return_model=False,
 ):
     """Create a *spatial* geodemographic typology by running a cluster
     analysis on the metro area's neighborhood attributes and including a
@@ -376,6 +296,10 @@ def regionalize(
     scaler : None or scaler class from sklearn.preprocessing
         a scikit-learn preprocessing class that will be used to rescale the
         data. Defaults to sklearn.preprocessing.StandardScaler
+    model_colname : str
+        column name for storing cluster labels on the output dataframe. If no name is provided,
+        the colun will be named after the clustering method. If there is already a column
+        named after the clustering method, the name will be incremented with a number
 
     Returns
     -------
@@ -390,10 +314,19 @@ def regionalize(
         instance, W, which store the input matrix, column labels, fitted model instance,
         and spatial weights matrix
 
-    model_name : str
-        name of model to be stored in a Community
-
     """
+    assert temporal_index in gdf.columns, (
+        "The column given as temporal_index:, "
+        f"{temporal_index} was not found in the geodataframe. ",
+        "If you need only a single time period, you can create a dummy "
+        "column with `gdf['_time'])=1` and pass `_time` as temporal_index",
+    )
+
+    assert unit_index in gdf.columns, (
+        "The column given as unit_index:, "
+        f"{unit_index} was not found in the geodataframe. ",
+        "If you need only a single time period, you can pass " "`unit_index=gdf.index`",
+    )
     if not region_kwargs:
         region_kwargs = dict()
 
@@ -408,11 +341,15 @@ def regionalize(
 
     if method not in specification.keys():
         raise ValueError(f"`method` must be one of {specification.keys()}")
-
-    if method in gdf.columns.tolist():
-        model_name = method + str(len(gdf.columns[gdf.columns.str.startswith(method)]))
+    if model_colname is None:
+        if method in gdf.columns.tolist():
+            model_colname = method + str(
+                len(gdf.columns[gdf.columns.str.startswith(method)])
+            )
+        else:
+            model_colname = method
     else:
-        model_name = method
+        model_colname = method
     if not columns:
         raise ValueError("You must provide a subset of columns as input")
     if not method:
@@ -426,7 +363,10 @@ def regionalize(
     gdf = gdf.set_index([temporal_index, unit_index])
 
     # this is the dataset we'll operate on
-    data = gdf.copy()[columns + ["geometry"]]
+    allcols = columns + ["geometry"]
+    if threshold_variable != "count":
+        allcols = allcols + [threshold_variable]
+    data = gdf.copy()[allcols]
 
     contiguity_weights = {"queen": Queen, "rook": Rook}
 
@@ -437,7 +377,7 @@ def regionalize(
 
     models = _Map()
     clusters = []
-    gdf[model_name] = np.nan
+    gdf[model_colname] = np.nan
 
     # loop over each time period, standardize the data and build a weights matrix
     for time in times:
@@ -463,7 +403,7 @@ def regionalize(
         labels = pd.Series(model.labels_).astype(str)
         clusters = pd.DataFrame(
             {
-                model_name: labels,
+                model_colname: labels,
                 temporal_index: df[temporal_index],
                 unit_index: df[unit_index],
             }
@@ -471,17 +411,23 @@ def regionalize(
         clusters = clusters.drop_duplicates(subset=[unit_index])
         clusters.set_index([temporal_index, unit_index], inplace=True)
         gdf.update(clusters)
+        clusters = gpd.GeoDataFrame(
+            clusters.join(gdf.drop(columns=[model_colname]), how="left"), crs=gdf.crs
+        ).reset_index()
 
         results = ModelResults(
-            df=df.set_index([unit_index, temporal_index]).drop("geometry", axis=1),
+            df=clusters,
             columns=columns,
             labels=model.labels_,
             instance=model,
             W=w0,
+            name=model_colname,
+            temporal_index=temporal_index,
+            unit_index=unit_index,
         )
         models[time] = results
 
-    gdf = gdf.reset_index()
+    if return_model:
+        return gdf.reset_index(), models
 
-    return gdf, models, model_name
-
+    return gdf.reset_index()

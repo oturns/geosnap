@@ -3,7 +3,7 @@ import numpy as np
 from geosnap import DataStore
 
 reno = Community.from_census(msa_fips="39900",datastore=DataStore())
-columns = ["median_household_income", "p_poverty_rate", "p_unemployment_rate"]
+columns = ["median_household_income", "p_poverty_rate", "p_unemployment_rate",]
 
 # Aspatial Clusters
 
@@ -52,9 +52,14 @@ def test_spenc():
     assert len(r.gdf.spenc.unique()) >= 6
 
 
-def test_maxp():
+def test_maxp_count():
 
     r = reno.regionalize(columns=columns, method="max_p", region_kwargs=dict(initial=10))
+    assert len(r.gdf.max_p.unique()) >= 8
+
+def test_maxp_thresh():
+
+    r = reno.regionalize(columns=columns, method="max_p", region_kwargs=dict(initial=10), threshold_variable='n_total_pop', threshold=10000)
     assert len(r.gdf.max_p.unique()) >= 8
 
 

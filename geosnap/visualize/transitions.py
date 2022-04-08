@@ -5,10 +5,11 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 import networkx as nx
+from ..analyze.dynamics import transition
 
 
 def plot_transition_matrix(
-    community,
+    gdf,
     cluster_col=None,
     w_type="queen",
     w_options=None,
@@ -68,14 +69,15 @@ def plot_transition_matrix(
         the axes on which the plots are drawn
     """
     if not n_rows and not n_cols:
-        n_cols = len(community.gdf[cluster_col].unique()) + 1
+        n_cols = len(gdf[cluster_col].unique()) + 1
         n_rows = 1
     if not title_kwds:
         title_kwds = {
             "fontsize": 20,
         }
 
-    sm = community.transition(
+    sm = transition(
+        gdf,
         cluster_col=cluster_col,
         temporal_index=temporal_index,
         unit_index=unit_index,
@@ -144,7 +146,7 @@ def plot_transition_matrix(
 
 
 def plot_transition_graphs(
-    community,
+    gdf,
     cluster_col=None,
     output_dir=".",
     w_type="queen",
@@ -170,7 +172,7 @@ def plot_transition_graphs(
         column on the Community.gdf containing neighborhood type labels
     output_dir : str
         the location that output images will be placed
-    temporal_index        : string, optional
+    temporal_index : string, optional
         Column defining time and or sequencing of the long-form data.
         Default is "year".
     unit_index : string, optional
@@ -199,7 +201,8 @@ def plot_transition_graphs(
         import pygraphviz
     except ImportError:
         raise ImportError("You must have pygraphviz installed to use graph plotting")
-    sm = community.transition(
+    sm = transition(
+        gdf,
         cluster_col=cluster_col,
         temporal_index=temporal_index,
         unit_index=unit_index,
@@ -212,7 +215,7 @@ def plot_transition_graphs(
     graph = np.round(p, 2)
 
     dt = [("weight", float)]
-    A = np.matrix(graph, dtype=dt)
+    A = np.array(graph, dtype=dt)
     G = nx.DiGraph(A)
     G.edges(data=True)
     labels = nx.get_edge_attributes(G, "weight")
@@ -228,7 +231,7 @@ def plot_transition_graphs(
         graph = np.round(p, 2)
 
         dt = [("weight", float)]
-        A = np.matrix(graph, dtype=dt)
+        A = np.array(graph, dtype=dt)
         G = nx.DiGraph(A)
         G.edges(data=True)
         labels = nx.get_edge_attributes(G, "weight")

@@ -13,7 +13,7 @@ from appdirs import user_data_dir
 from .._data import DataStore
 from .util import adjust_inflation
 
-datasets=DataStore()
+datasets = DataStore()
 
 _fipstable = pd.read_csv(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), "stfipstable.csv"),

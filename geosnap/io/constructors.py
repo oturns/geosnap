@@ -5,10 +5,6 @@ from .util import get_lehd
 from warnings import warn
 
 
-###### Constructor Methods ######
-#################################
-
-
 def get_ltdb(
     datastore,
     state_fips=None,
@@ -158,7 +154,6 @@ def get_ncdb(
         )
 
     return gdf.reset_index()
-
 
 
 def get_census(
@@ -359,34 +354,9 @@ def get_lodes(
         years = [years]
     years = list(set(years))
 
-    if msa_fips:
-        pr_metros = set(
-            datastore.msa_definitions()[
-                datastore.msa_definitions()["CBSA Title"].str.contains("PR")
-            ]["CBSA Code"].tolist()
-        )
-        if msa_fips in pr_metros:
-            raise Exception(
-                "geosnap does not yet include built-in data for Puerto Rico"
-            )
-        msa_counties = datasets.msa_definitions()[
-            datastore.msa_definitions()["CBSA Code"] == msa_fips
-        ]["stcofips"].tolist()
+    msa_counties = _msa_to_county(datastore, msa_fips)
 
-    else:
-        msa_counties = None
-
-    # build a list of states in the dataset
-    allfips = []
-    stateset = []
-    for i in [state_fips, county_fips, msa_counties, fips]:
-        if i:
-            if isinstance(i, (str,)):
-                i = [i]
-            for each in i:
-                allfips.append(each)
-                stateset.append(each[:2])
-        states = list(set(stateset))
+    states, allfips = _fips_to_states(state_fips, county_fips, msa_counties, fips)
 
     if any(year < 2010 for year in years):
         gdf00 = datastore.blocks_2000(states=states, fips=(tuple(allfips)))
@@ -443,7 +413,7 @@ def get_lodes(
                     df = gdf00.merge(df, right_index=True, left_on="geoid", how="left")
                 else:
                     df = gdf.merge(df, right_index=True, left_on="geoid", how="left")
-                df['year'] = year
+                df["year"] = year
                 df = df.reset_index().set_index(["geoid", "year"])
                 dfs.append(df)
             except ValueError:
@@ -454,3 +424,38 @@ def get_lodes(
     out = out.reset_index()
 
     return out
+
+
+def _msa_to_county(datastore, msa_fips):
+    if msa_fips:
+        pr_metros = set(
+            datastore.msa_definitions()[
+                datastore.msa_definitions()["CBSA Title"].str.contains("PR")
+            ]["CBSA Code"].tolist()
+        )
+        if msa_fips in pr_metros:
+            raise Exception(
+                "geosnap does not yet include built-in data for Puerto Rico"
+            )
+        msa_counties = datastore.msa_definitions()[
+            datastore.msa_definitions()["CBSA Code"] == msa_fips
+        ]["stcofips"].tolist()
+
+    else:
+        msa_counties = None
+    return msa_counties
+
+
+def _fips_to_states(state_fips, county_fips, msa_counties, fips):
+    # build a list of states in the dataset
+    allfips = []
+    stateset = []
+    for i in [state_fips, county_fips, msa_counties, fips]:
+        if i:
+            if isinstance(i, (str,)):
+                i = [i]
+            for each in i:
+                allfips.append(each)
+                stateset.append(each[:2])
+        states = list(set(stateset))
+    return states, allfips

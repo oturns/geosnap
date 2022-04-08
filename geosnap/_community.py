@@ -1,16 +1,11 @@
 """A Community is a thin wrapper around a long-form time-series geodataframe."""
-import tempfile
 import warnings
-from pathlib import PurePath
 from warnings import warn
 
-import contextily as ctx
-import mapclassify.classifiers as classifiers
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from ._data import _Map
+from ._data import DataStore, _Map
 from .analyze import cluster as _cluster
 from .analyze import predict_markov_labels as _predict_labels
 from .analyze import regionalize as _cluster_spatial
@@ -21,16 +16,12 @@ from .io import get_census as _get_census
 from .io import get_lodes as _get_lodes
 from .io import get_ltdb as _get_ltdb
 from .io import get_ncdb as _get_ncdb
-from ._data import DataStore
-from .util import gif_from_path as _gif_from_path
+from .visualize import animate_timeseries as _animate_timeseries
+from .visualize import plot_timeseries as _plot_timeseries
 from .visualize import plot_transition_graphs as _plot_transition_graphs
 from .visualize import plot_transition_matrix as _plot_transitions
 
 warnings.simplefilter("always", UserWarning)
-
-schemes = {}
-for classifier in classifiers.CLASSIFIERS:
-    schemes[classifier.lower()] = getattr(classifiers, classifier)
 
 
 def _implicit_storage_deprecation(store):
@@ -105,7 +96,6 @@ class Community:
         allocate_total=True,
         raster=None,
         codes="developed",
-        force_crs_match=True,
     ):
         """Standardize inconsistent boundaries into time-static ones.
 
@@ -188,8 +178,6 @@ class Community:
             New data are added to the input Community
 
         """
-        # convert the long-form into a list of dataframes
-        # data = [x[1] for x in self.gdf.groupby("year")]
         if codes == "developed":
             codes = [21, 22, 23, 24]
         gdf = _harmonize(
@@ -201,7 +189,6 @@ class Community:
             allocate_total=allocate_total,
             raster=raster,
             codes=codes,
-            force_crs_match=force_crs_match,
         )
         return Community(gdf, harmonized=True)
 
@@ -260,7 +247,7 @@ class Community:
         if not cluster_kwargs:
             cluster_kwargs = dict()
         harmonized = self.harmonized
-        gdf, model, model_name = _cluster(
+        gdf, model = _cluster(
             gdf=self.gdf.copy(),
             n_clusters=n_clusters,
             method=method,
@@ -272,13 +259,14 @@ class Community:
             temporal_index=temporal_index,
             unit_index=unit_index,
             cluster_kwargs=cluster_kwargs,
+            return_model=True,
         )
 
         comm = Community(gdf, harmonized=harmonized)
         comm.models.update(
             self.models
         )  # keep any existing models in the input Community
-        comm.models[model_name] = model
+        comm.models[model.name] = model
         return comm
 
     def regionalize(
@@ -341,7 +329,7 @@ class Community:
         if not region_kwargs:
             region_kwargs = dict()
 
-        gdf, model, model_name = _cluster_spatial(
+        gdf, models = _cluster_spatial(
             gdf=self.gdf.copy(),
             n_clusters=n_clusters,
             spatial_weights=spatial_weights,
@@ -354,13 +342,14 @@ class Community:
             unit_index=unit_index,
             temporal_index=temporal_index,
             region_kwargs=region_kwargs,
+            return_model=True,
         )
 
         comm = Community(gdf, harmonized=harmonized)
         comm.models.update(
             self.models
         )  # keep any existing models in the input Community
-        comm.models[model_name] = model
+        comm.models[models[list(models.keys())[0]].name] = models
         return comm
 
     def plot_transition_matrix(
@@ -421,7 +410,7 @@ class Community:
             the axes on which the plots are drawn
         """
         ax = _plot_transitions(
-            self,
+            self.gdf,
             cluster_col=cluster_col,
             w_type=w_type,
             w_options=w_options,
@@ -472,7 +461,7 @@ class Community:
         None
         """
         _plot_transition_graphs(
-            self,
+            self.gdf,
             cluster_col=cluster_col,
             w_type=w_type,
             layout=layout,
@@ -484,7 +473,8 @@ class Community:
         self,
         column,
         title="",
-        years=None,
+        temporal_index="year",
+        time_subset=None,
         scheme="quantiles",
         k=5,
         pooled=True,
@@ -498,7 +488,7 @@ class Community:
         figsize=None,
         ncols=None,
         nrows=None,
-        ctxmap=ctx.providers.Stamen.TonerLite,
+        ctxmap="default",
         alpha=1,
         **kwargs,
     ):
@@ -559,122 +549,9 @@ class Community:
         """
         # proplot needs to be used as a function-level import,
         # as it influences all figures when imported at the top of the file
-        import proplot as plot
-
-        if categorical:  # there's no pooled classification for categorical
-            pooled = False
-
-        df = self.gdf
-        if categorical and not cmap:
-            cmap = "Accent"
-        elif not cmap:
-            cmap = "Blues"
-        if legend_kwds == "default":
-            legend_kwds = {"ncols": 1, "loc": "b"}
-        if missing_kwds == "default":
-            missing_kwds = {
-                "color": "lightgrey",
-                "edgecolor": "red",
-                "hatch": "///",
-                "label": "Missing values",
-            }
-        if ctxmap:  # need to convert crs to mercator before graphing
-            if df.crs != 3857:
-                df = df.to_crs(epsg=3857)
-        if (
-            pooled
-        ):  # if pooling the classifier, create one from scratch and pass to user defined
-            classifier = schemes[scheme](self.gdf[column].dropna().values, k=k)
-        if not years:
-            if nrows is None and ncols is None:
-                f, axs = plot.subplots(ncols=len(df.year.unique()), figsize=figsize)
-            else:
-                f, axs = plot.subplots(ncols=ncols, nrows=nrows, figsize=figsize)
-            for i, year in enumerate(
-                sorted(df.year.unique())
-            ):  # sort to prevent graphing out of order
-                if categorical:
-                    df[df.year == year].plot(
-                        column=column,
-                        ax=axs[i],
-                        categorical=True,
-                        cmap=cmap,
-                        legend=legend,
-                        legend_kwds=legend_kwds,
-                        missing_kwds=missing_kwds,
-                        alpha=alpha,
-                    )
-                else:
-                    if pooled:
-                        df[df.year == year].plot(
-                            column=column,
-                            ax=axs[i],
-                            scheme="user_defined",
-                            classification_kwds={"bins": classifier.bins},
-                            k=k,
-                            cmap=cmap,
-                            **kwargs,
-                            legend=legend,
-                            legend_kwds=legend_kwds,
-                            alpha=alpha,
-                        )
-                    else:
-                        df[df.year == year].plot(
-                            column=column,
-                            ax=axs[i],
-                            scheme=scheme,
-                            k=k,
-                            cmap=cmap,
-                            **kwargs,
-                            legend=legend,
-                            legend_kwds=legend_kwds,
-                            alpha=alpha,
-                        )
-                if ctxmap:  # need set basemap of each graph
-                    ctx.add_basemap(axs[i], source=ctxmap)
-                axs[i].format(title=year)
-        else:
-            if nrows is None and ncols is None:
-                f, axs = plot.subplots(ncols=len(years))
-            else:
-                f, axs = plot.subplots(ncols=ncols, nrows=nrows)
-            for i, year in enumerate(
-                years
-            ):  # display in whatever order list is passed in
-                if categorical:
-                    df[df.year == year].plot(
-                        column=column,
-                        ax=axs[i],
-                        categorical=True,
-                        cmap=cmap,
-                        legend=legend,
-                        legend_kwds=legend_kwds,
-                        alpha=alpha,
-                    )
-                else:
-                    df[df.year == year].plot(
-                        column=column,
-                        ax=axs[i],
-                        scheme=scheme,
-                        k=k,
-                        cmap=cmap,
-                        **kwargs,
-                        legend=legend,
-                        legend_kwds=legend_kwds,
-                        alpha=alpha,
-                    )
-                if ctxmap:  # need set basemap of each graph
-                    ctx.add_basemap(axs[i], source=ctxmap)
-                axs[i].format(title=year)
-
-        if not title:  # only use title when passed
-            axs.format(suptitle=column)
-        else:
-            axs.format(suptitle=title)
-        axs.axis("off")
-
-        if save_fig:
-            f.savefig(save_fig, dpi=dpi, bbox_inches="tight")
+        inputs = locals()
+        del inputs["self"]
+        axs = _plot_timeseries(self.gdf, **inputs)
         return axs
 
     def animate_timeseries(
@@ -697,7 +574,7 @@ class Community:
         title_fontsize=40,
         subtitle_fontsize=38,
         figsize=(20, 20),
-        ctxmap=ctx.providers.Stamen.TonerLite,
+        ctxmap="default",
     ):
         """Create an animated gif from a Community timeseries.
 
@@ -742,57 +619,125 @@ class Community:
         repeat_delay : int, optional
                         time before animation repeats in miliseconds, default 1000
         """
-        gdf = self.gdf.copy()
-        if categorical and not cmap:
-            cmap = "Accent"
-        elif not cmap:
-            cmap = "Blues"
-        if not gdf.crs == 3857:
-            gdf = gdf.to_crs(3857)
-        if not time_periods:
-            time_periods = list(gdf[temporal_index].unique())
-        time_periods = sorted(time_periods)
-        with tempfile.TemporaryDirectory() as tmpdirname:
-            for i, time in enumerate(time_periods):
-                fig, ax = plt.subplots(figsize=figsize)
-                outpath = PurePath(tmpdirname, f"file_{i}.png")
-                if categorical:
-                    gdf[gdf[temporal_index] == time].plot(
-                        column,
-                        categorical=True,
-                        ax=ax,
-                        alpha=alpha,
-                        legend=legend,
-                        cmap=cmap,
-                    )
-                else:
-                    classifier = schemes[scheme](gdf[column].dropna().values, k=k)
-                    gdf[gdf[temporal_index] == time].plot(
-                        column,
-                        scheme="user_defined",
-                        classification_kwds={"bins": classifier.bins},
-                        k=k,
-                        ax=ax,
-                        alpha=alpha,
-                        legend=legend,
-                        cmap=cmap,
-                    )
-                ctx.add_basemap(ax=ax, source=ctxmap)
-                ax.axis("off")
-                ax.set_title(f"{time}", fontsize=subtitle_fontsize)
-                fig.suptitle(f"{title}", fontsize=title_fontsize)
+        inputs = locals()
+        del inputs["self"]
+        _animate_timeseries(self.gdf, **inputs)
 
-                plt.tight_layout()
-                plt.savefig(outpath, dpi=dpi)
+    def plot_boundary_silhouette(
+        self,
+        model_name,
+        time_periods="all",
+        ctxmap="default",
+        figsize=None,
+        nrows=None,
+        ncols=None,
+        save_fig=None,
+        alpha=0.5,
+        cmap="bwr",
+        scheme="quantiles",
+        k=6,
+        title="Boundary Silhouette",
+        dpi=500,
+        plot_kwargs=None,
+        web_mercator=True,
+    ):
+        inputs = locals()
+        del inputs["self"]
+        del inputs["model_name"]
+        model = self.models[model_name]
+        if isinstance(model, dict):
+            for key in model.keys():
+                ax = model[key].plot_boundary_silhouette(**inputs)
+        else:
+            ax = model.plot_boundary_silhouette(**inputs)
+        return ax
 
-            _gif_from_path(
-                tmpdirname,
-                interval=interval,
-                repeat_delay=repeat_delay,
-                filename=filename,
-                fps=fps,
-                dpi=dpi,
-            )
+    def plot_path_silhouette(
+        self,
+        model_name,
+        time_periods="all",
+        ctxmap="default",
+        figsize=None,
+        nrows=None,
+        ncols=None,
+        save_fig=None,
+        alpha=0.5,
+        cmap="bwr",
+        scheme="quantiles",
+        k=6,
+        title="Path Silhouette",
+        dpi=500,
+        plot_kwargs=None,
+        web_mercator=True,
+    ):
+        inputs = locals()
+        del inputs["self"]
+        del inputs["model_name"]
+        model = self.models[model_name]
+        if isinstance(model, dict):
+            for key in model.keys():
+                ax = model[key].plot_path_silhouette(**inputs)
+        else:
+            ax = model.plot_path_silhouette(**inputs)
+        return ax
+
+    def plot_silhouette_map(
+        self,
+        model_name,
+        time_periods="all",
+        ctxmap="default",
+        figsize=None,
+        nrows=None,
+        ncols=None,
+        save_fig=None,
+        alpha=0.5,
+        cmap="bwr",
+        scheme="quantiles",
+        k=8,
+        title="Silhouette Score",
+        dpi=500,
+        plot_kwargs=None,
+        web_mercator=True,
+    ):
+        inputs = locals()
+        del inputs["self"]
+        del inputs["model_name"]
+        model = self.models[model_name]
+        if isinstance(model, dict):
+            for key in model.keys():
+                ax = model[key].plot_silhouette_map(**inputs)
+        else:
+            ax = model.plot_silhouette_map(**inputs)
+        return ax
+
+    def plot_next_best_label(
+        self,
+        model_name,
+        time_periods="all",
+        ctxmap="default",
+        figsize=None,
+        nrows=None,
+        ncols=None,
+        save_fig=None,
+        alpha=0.5,
+        cmap="set1",
+        scheme="quantiles",
+        k=8,
+        title="Next-Best Label",
+        dpi=500,
+        plot_kwargs=None,
+        web_mercator=True,
+    ):
+        inputs = locals()
+        del inputs["self"]
+        del inputs["model_name"]
+        model = self.models[model_name]
+        if isinstance(model, dict):
+            for key in model.keys():
+                ax = model[key].plot_next_best_label(**inputs)
+        else:
+            ax = model.plot_next_best_label(**inputs)
+        return ax
 
     def transition(
         self,
@@ -986,18 +931,18 @@ class Community:
         np.random.seed(seed)
 
         gdfs = _predict_labels(
-                self.gdf,
-                cluster_col=model_name,
-                w_type=w_type,
-                w_options=w_options,
-                base_year=base_year,
-                new_colname=new_colname,
-                unit_index=unit_index,
-                increment=increment,
-                time_steps=time_steps,
-                temporal_index=temporal_index,
-                seed=seed,
-            )
+            self.gdf,
+            cluster_col=model_name,
+            w_type=w_type,
+            w_options=w_options,
+            base_year=base_year,
+            new_colname=new_colname,
+            unit_index=unit_index,
+            increment=increment,
+            time_steps=time_steps,
+            temporal_index=temporal_index,
+            seed=seed,
+        )
         return Community.from_geodataframes(gdfs=[gdfs])
 
     ###### Constructor Methods ######

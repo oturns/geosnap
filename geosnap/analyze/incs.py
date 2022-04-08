@@ -5,7 +5,6 @@ Indicators of Neighborhood Change
 from collections import defaultdict
 import numpy as np
 import geopandas as gpd
-import pandas as pd
 
 
 def _labels_to_neighborhoods(labels):
@@ -18,8 +17,8 @@ def _labels_to_neighborhoods(labels):
     Returns
     -------
     neighborhoods: dictionary
-                   key is the label for each neighborhood, value is the list of
-                   area indexes defining that neighborhood
+        key is the label for each neighborhood, value is the list of
+        area indexes defining that neighborhood
 
     Examples
     --------
@@ -118,9 +117,7 @@ def linc(labels_sequence):
     return lincs
 
 
-def lincs_from_gdf(
-    gdf, unit_index, temporal_index, cluster_col, perspective="time", periods="all"
-):
+def lincs_from_gdf(gdf, unit_index, temporal_index, cluster_col, periods="all"):
     """generate local indicators of neighborhood change from a long-form geodataframe
 
     Parameters
@@ -146,22 +143,19 @@ def lincs_from_gdf(
     geopandas.GeoDataFrame
         dataframe with linc values as rows
     """
-    gdf = gdf.copy()
+    gdf = gdf[[unit_index, temporal_index, cluster_col, gdf.geometry.name]]
+    crs = gdf.crs
     if periods == "all":
         periods = gdf[temporal_index].unique()
-    geoms = gdf.groupby(unit_index).first()[gdf.geometry.name]
-    gdf = gpd.GeoDataFrame(
+    gdf = gdf[gdf[temporal_index].isin(periods)]
+    geoms = gpd.GeoDataFrame(gdf.groupby(unit_index).first()[gdf.geometry.name], crs=crs)
+    df = gpd.GeoDataFrame(
         gdf.pivot(index=unit_index, columns=temporal_index, values=cluster_col)
         .dropna()
-        .astype("int")
-    ).merge(geoms, left_on=unit_index, right_index=True)
-    if perspective == "category":
-        l = linc([gdf[p].values for p in periods])
-        out = pd.DataFrame(l, index=periods)
-        return out
-    elif perspective == "time":
-        l = linc([gdf[p].values.T for p in periods])
-        gdf["linc"] = l
-        return gdf
-    else:
-        raise ValueError("perspective must be one of {`time`, `category`}")
+        .astype("int"),
+    )
+    gdf = geoms.join(df)
+
+    linc_vals = linc(gdf[sorted(periods)].T.values)
+    gdf["linc"] = linc_vals
+    return gdf.reset_index()

@@ -17,7 +17,6 @@ def harmonize(
     allocate_total=True,
     raster=None,
     codes=[21, 22, 23, 24],
-    force_crs_match=True,
     temporal_index="year",
     unit_index='geoid'
 ):
@@ -150,7 +149,6 @@ def harmonize(
                         allocate_total=allocate_total,
                         codes=codes,
                         raster=raster,
-                        force_crs_match=force_crs_match,
                     )
                 except IOError:
                     raise IOError(
@@ -175,6 +173,6 @@ def harmonize(
 
     harmonized_df = gpd.GeoDataFrame(
         pd.concat(list(interpolated_dfs.values()), sort=True)
-    )
+    ).drop(columns=['index'])
 
     return harmonized_df
