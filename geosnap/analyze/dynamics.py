@@ -223,7 +223,7 @@ def sequence(
     name_seq = dist_type + "_%d" % (seq_clusters)
     df_wide[name_seq] = model.labels_
     gdf_temp = gdf_temp.merge(df_wide[[name_seq]], left_on=unit_index, right_index=True)
-    gdf_temp = gdf_temp.reset_index()
+    gdf_temp = gdf_temp.reset_index(drop=True)
 
     return gdf_temp, df_wide, seq_dis_mat
 
@@ -271,9 +271,10 @@ def predict_markov_labels(
 
     Returns
     -------
-    _type_
-        _description_
+    geopandas.GeoDataFrame
+        long-form geodataframe with predicted cluster labels stored in the `new_colname` column
     """
+    crs = gdf.crs
     np.random.seed(seed)
     if not new_colname:
         new_colname = "predicted"
@@ -328,7 +329,7 @@ def predict_markov_labels(
             predicted[temporal_index] = current_time
             predictions.append(predicted)
             current_time += increment
-        gdf = gpd.GeoDataFrame(pd.concat(predictions))
+        gdf = gpd.GeoDataFrame(pd.concat(predictions),crs=crs)
         gdf[cluster_col] = gdf[cluster_col].astype(int)
         if new_colname:
             gdf = gdf.rename(columns={cluster_col: new_colname})

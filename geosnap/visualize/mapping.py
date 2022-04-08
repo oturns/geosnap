@@ -163,6 +163,8 @@ def plot_timeseries(
 
     df = gdf.copy()
     if web_mercator:
+        assert df.crs, ("Unable to reproject because geodataframe has no CRS "
+        "Please set a coordinate system or pass `web_mercator=False`")
         if not df.crs.equals(3857):
             df = df.to_crs(3857)
     if categorical and not cmap:
