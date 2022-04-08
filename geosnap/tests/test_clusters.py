@@ -83,7 +83,38 @@ def test_azp():
 # Test seeding
 
 def test_seed():
+    # Ward is deterministic
     np.random.seed(12345)
     r = reno.cluster(columns=columns, method='ward')
     card = r.gdf.groupby('ward').count()['geoid'].values
     np.testing.assert_array_equal(card, [27, 83, 19, 51, 38, 7])
+
+
+
+def test_random_state():
+
+    # no seeds
+    reno = Community.from_census(msa_fips="39900",datastore=DataStore())
+    r1 = reno.cluster(columns=columns, method='kmeans', n_clusters=5)
+    r2 = reno.cluster(columns=columns, method='kmeans', n_clusters=5)
+    card1 = r1.gdf.groupby('kmeans').count()['geoid'].values
+    card1.sort()
+    card2 = r2.gdf.groupby('kmeans').count()['geoid'].values
+    card2.sort()
+    # test that the cardinalities are different
+    np.testing.assert_raises(AssertionError, np.testing.assert_array_equal, card1, card2)
+
+
+
+    # seeds
+    reno = Community.from_census(msa_fips="39900",datastore=DataStore())
+    seed = 10
+    r1 = reno.cluster(columns=columns, method='kmeans', n_clusters=5, random_state=seed)
+    r2 = reno.cluster(columns=columns, method='kmeans', n_clusters=5, random_state=seed)
+    card1 = r1.gdf.groupby('kmeans').count()['geoid'].values
+    card1.sort()
+    card2 = r2.gdf.groupby('kmeans').count()['geoid'].values
+    card2.sort()
+    # test that the cardinalities are identical
+    np.testing.assert_array_equal(card1, card2)
+
