@@ -16,7 +16,7 @@
 `geosnap` provides a suite of tools for exploring, modeling, and visualizing the social context and spatial extent of neighborhoods and regions over time. It brings together state-of-the-art techniques from [geodemographics](https://en.wikipedia.org/wiki/Geodemography), [regionalization](https://www.sciencedirect.com/topics/earth-and-planetary-sciences/regionalism), [spatial data science](https://geographicdata.science/book), and [segregation analysis](https://github.com/pysal/segregation) to support social science research, public policy analysis, and urban planning. It provides a simple interface tailored to formal analysis of spatiotemporal urban data.
 
 <p align="center">
-<img width=75% src='docs/figs/Washington-Arlington-Alexandria_DC-VA-MD-WV.gif' alt='DC Transitions' style=' display: block; margin-left: auto; margin-right: auto;'/>
+<img width='auto' src='docs/figs/Washington-Arlington-Alexandria_DC-VA-MD-WV.gif' alt='DC Transitions' style=' display: block; margin-left: auto; margin-right: auto; max-height: 540px'/>
 </p>
 
 
@@ -50,20 +50,14 @@ This means that while geosnap has native support for commonly-used datasets like
 The package helps answer questions such as:
 
 - Where are the socially-homogenous districts in the city?
-  
   - Have the composition of these districts or their location shifted over time?
-
 - What are the characteristics of prototypical neighborhoods in city or region X?
-
 - Have the locations of different neighborhood prototypes changed over time? e.g:
   - do central-city neighborhoods show signs of gentrification?(and/or does poverty appear to be suburbanizing?)
   - is there equitable access to fair housing in high-opportunity neighborhoods (or a dearth of resources in highly-segregated neighborhoods)?
-
 - Which neighborhoods have experienced dramatic change in several important variables? (and are they clustered together in space?)
-
 - If spatial and temporal trends hold, how might we expect neighborhoods to look in the future?
   - how does the region look differently if units 1,2, and 3 are changed to a different type in the current time period?
-
 - Has the region become more or less segregated over time?
   - at which spatial scales?
   - is the change statistically significant?
