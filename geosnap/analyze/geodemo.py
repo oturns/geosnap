@@ -136,8 +136,7 @@ def cluster(
             )
         else:
             model_colname = method
-    else:
-        model_colname = method
+
     if not columns:
         raise ValueError("You must provide a subset of columns as input")
 
@@ -204,10 +203,11 @@ def cluster(
 
     elif pooling == "unique":
         models = _Map()
+        data = data.reset_index()
         gdf[model_colname] = np.nan
 
         for time in times:
-            df = data[data[temporal_index] == time].reset_index()
+            df = data.query(f"{temporal_index}=={time}").reset_index(drop=True)
 
             model = specification[method](
                 df[columns],
@@ -217,18 +217,20 @@ def cluster(
                 **cluster_kwargs,
             )
 
-            labels = model.labels_.astype(str)
+            labels = pd.Series(model.labels_, name=model_colname).astype(str)
             clusters = pd.DataFrame(
                 {
                     model_colname: labels,
-                    temporal_index: time,
+                    temporal_index: df[temporal_index],
                     unit_index: df[unit_index],
                 }
             )
+            clusters = clusters.drop_duplicates(subset=[unit_index])
             clusters.set_index([temporal_index, unit_index], inplace=True)
             gdf.update(clusters)
             clusters = gpd.GeoDataFrame(
-                clusters.join(gdf[[gdf.geometry.name]], how="left"), crs=gdf.crs
+                clusters.join(gdf.drop(columns=[model_colname]), how="left"),
+                crs=gdf.crs,
             ).reset_index()
             results = ModelResults(
                 df=clusters,
@@ -242,8 +244,8 @@ def cluster(
             )
             models[time] = results
         if return_model:
-            return gdf, models
-        return gdf
+            return gdf.reset_index(), models
+        return gdf.reset_index()
 
 
 def regionalize(
