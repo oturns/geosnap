@@ -16,7 +16,7 @@
 `geosnap` provides a suite of tools for exploring, modeling, and visualizing the social context and spatial extent of neighborhoods and regions over time. It brings together state-of-the-art techniques from [geodemographics](https://en.wikipedia.org/wiki/Geodemography), [regionalization](https://www.sciencedirect.com/topics/earth-and-planetary-sciences/regionalism), [spatial data science](https://geographicdata.science/book), and [segregation analysis](https://github.com/pysal/segregation) to support social science research, public policy analysis, and urban planning. It provides a simple interface tailored to formal analysis of spatiotemporal urban data.
 
 <p align="center">
-<img width='auto' src='docs/figs/Washington-Arlington-Alexandria_DC-VA-MD-WV.gif' alt='DC Transitions' style=' display: block; margin-left: auto; margin-right: auto; max-height: 540px'/>
+<img width='50%' src='docs/figs/Washington-Arlington-Alexandria_DC-VA-MD-WV.gif' alt='DC Transitions' style=' display: block; margin-left: auto; margin-right: auto; max-height: 540px'/>
 </p>
 
 
