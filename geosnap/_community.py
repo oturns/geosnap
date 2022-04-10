@@ -205,6 +205,7 @@ class Community:
         unit_index="geoid",
         random_state=None,
         cluster_kwargs=None,
+        model_colname=None
     ):
         """Create a geodemographic typology by running a cluster analysis on the study area's neighborhood attributes.
 
@@ -237,6 +238,10 @@ class Community:
             * fixed : scaling is fixed to each time period
             * pooled : data are pooled across all time periods
             * unique : if scaling, apply the scaler to each time period, then generate clusters unique to each time period.
+        model_colname : str
+            column name for storing cluster labels on the output dataframe. If no name is provided,
+            the colun will be named after the clustering method. If there is already a column
+            named after the clustering method, the name will be incremented with a number
 
         Returns
         -------
@@ -262,6 +267,8 @@ class Community:
             random_state=random_state,
             cluster_kwargs=cluster_kwargs,
             return_model=True,
+            model_colname=model_colname
+            
         )
 
         comm = Community(gdf, harmonized=harmonized)
@@ -284,6 +291,7 @@ class Community:
         scaler="std",
         weights_kwargs=None,
         region_kwargs=None,
+        model_colname=None
     ):
         """Create a *spatial* geodemographic typology by running a cluster analysis on the metro area's neighborhood attributes and including a contiguity constraint.
 
@@ -318,6 +326,10 @@ class Community:
         scaler : None or scaler from sklearn.preprocessing, optional
             a scikit-learn preprocessing class that will be used to rescale the
             data. Defaults to sklearn.preprocessing.StandardScaler
+        model_colname : str
+            column name for storing cluster labels on the output dataframe. If no name is provided,
+            the colun will be named after the clustering method. If there is already a column
+            named after the clustering method, the name will be incremented with a number
 
         Returns
         -------
@@ -345,6 +357,7 @@ class Community:
             temporal_index=temporal_index,
             region_kwargs=region_kwargs,
             return_model=True,
+            model_colname=model_colname
         )
 
         comm = Community(gdf, harmonized=harmonized)
