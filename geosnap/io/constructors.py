@@ -5,6 +5,121 @@ from .util import get_lehd
 from warnings import warn
 
 
+def get_nces(
+    datastore,
+    years="1516",
+    dataset='sabs'
+):
+
+    if isinstance(years, (str,)):
+        years = [int(years)]
+    elif isinstance(years, (int,)):
+        years = [years]
+
+    dflist = []
+    for year in years:
+        df = datastore.nces(
+            year=year,
+            dataset=dataset
+        )
+        dflist.append(df)
+    gdf = pd.concat(dflist)
+    return gdf.reset_index(drop=True)
+
+
+def get_ejscreen(
+    datastore,
+    state_fips=None,
+    county_fips=None,
+    msa_fips=None,
+    fips=None,
+    years="all",
+):
+
+    if years == "all":
+        years = list(range(2015, 2021))
+
+    elif isinstance(years, (str,)):
+        years = [int(years)]
+    elif isinstance(years, (int,)):
+        years = [years]
+
+    msa_counties = _msa_to_county(datastore, msa_fips)
+
+    states, allfips = _fips_to_states(state_fips, county_fips, msa_counties, fips)
+
+    dflist = []
+    for year in years:
+        df = datastore.ejscreen(
+            states=states,
+            year=year,
+        )
+        df = _fips_filter(
+            state_fips=state_fips,
+            county_fips=county_fips,
+            msa_fips=msa_fips,
+            fips=fips,
+            data=df,
+        )
+        dflist.append(df)
+    gdf = pd.concat(dflist)
+    return gdf.reset_index(drop=True)
+
+def get_acs(
+    datastore,
+    level="bg",
+    state_fips=None,
+    county_fips=None,
+    msa_fips=None,
+    fips=None,
+    years="all",
+    constant_dollars=True,
+    currency_year=2019,
+):
+    inflate_cols = [
+        "median_home_value",
+        "median_contract_rent",
+        "per_capita_income",
+        "median_household_income",
+    ]
+
+    if years == "all":
+        years = list(range(2012, 2020))
+
+    elif isinstance(years, (str,)):
+        years = [int(years)]
+    elif isinstance(years, (int,)):
+        years = [years]
+
+    msa_counties = _msa_to_county(datastore, msa_fips)
+
+    states, allfips = _fips_to_states(state_fips, county_fips, msa_counties, fips)
+
+    dflist = []
+    for year in years:
+        df = datastore.acs(
+            level=level,
+            states=states,
+            year=year,
+        )
+        df = _fips_filter(
+            state_fips=state_fips,
+            county_fips=county_fips,
+            msa_fips=msa_fips,
+            fips=fips,
+            data=df,
+        )
+        if constant_dollars:
+            try:
+                df = adjust_inflation(df, inflate_cols, year, currency_year)
+            except:
+                warn('Currenct columns unavailable at this resolution; not adjusting for inflation')
+        dflist.append(df)
+    gdf = pd.concat(dflist)
+    return gdf.reset_index(drop=True)
+
+
+
 def get_ltdb(
     datastore,
     state_fips=None,
@@ -14,7 +129,7 @@ def get_ltdb(
     boundary=None,
     years="all",
 ):
-    """Create a new Community from LTDB data.
+    """Extract a subset of data from LTDB as a long-form geodataframe
 
         Instiantiate a new Community from pre-harmonized LTDB data. To use
         you must first download and register LTDB data with geosnap using
@@ -292,7 +407,7 @@ def get_census(
             newtracts.append(df)
         gdf = pd.concat(newtracts)
 
-    return gdf
+    return gdf.reset_index(drop=True)
 
 
 def get_lodes(
@@ -451,8 +566,10 @@ def _fips_to_states(state_fips, county_fips, msa_counties, fips):
     stateset = []
     for i in [state_fips, county_fips, msa_counties, fips]:
         if i:
-            if isinstance(i, (str,)):
+            if isinstance(i, str):
                 i = [i]
+            elif isinstance(i, int):
+                i = [str(i)]
             for each in i:
                 allfips.append(each)
                 stateset.append(each[:2])

@@ -38,7 +38,17 @@ class ModelResults:
     """
 
     def __init__(
-        self, df, columns, labels, instance, W, name, unit_index, temporal_index
+        self,
+        df,
+        columns,
+        labels,
+        instance,
+        W,
+        name,
+        unit_index,
+        temporal_index,
+        scaler,
+        pooling,
     ):
         """Initialize a new ModelResults instance.
 
@@ -69,6 +79,8 @@ class ModelResults:
         self.name = name
         self.unit_index = unit_index
         self.temporal_index = temporal_index
+        self.scaler = scaler
+        self.pooling = pooling
 
     @cached_property
     def lincs(self):
@@ -102,6 +114,16 @@ class ModelResults:
         """
         df = self.df.copy()
         df = df.dropna(subset=self.columns)
+        time_idx = self.temporal_index
+        if self.scaler:
+            if self.pooling in ["fixed", "unique"]:
+                # if fixed (or unique), scale within each time period
+                for time in df[time_idx].unique():
+                    df.loc[ df[time_idx] ==time, self.columns] = self.scaler.fit_transform(df.loc[ df[time_idx] ==time, self.columns].values)
+
+            elif self.pooling == "pooled":
+                # if pooled, scale the whole series at once
+                df.loc[:, self.columns] = self.scaler.fit_transform(df.values)
         return gpd.GeoDataFrame(
             {
                 "silhouette_score": silhouette_samples(
@@ -155,6 +177,16 @@ class ModelResults:
             "Model is aspatial (lacks a W object), but has been passed to a spatial diagnostic."
             " Try aspatial diagnostics like nearest_label() or sil_scores()"
         )
+        time_idx = self.temporal_index
+        if self.scaler:
+            if self.pooling in ["fixed", "unique"]:
+                # if fixed (or unique), scale within each time period
+                for time in df[time_idx].unique():
+                    df.loc[ df[time_idx] ==time, self.columns] = self.scaler.fit_transform(df.loc[ df[time_idx] ==time, self.columns].values)
+
+            elif self.pooling == "pooled":
+                # if pooled, scale the whole series at once
+                df.loc[:, self.columns] = self.scaler.fit_transform(df.values)
         return gpd.GeoDataFrame(
             {
                 "boundary_silhouette": esda.boundary_silhouette(
@@ -180,6 +212,16 @@ class ModelResults:
         """
         df = self.df.copy()
         df = df.dropna(subset=self.columns)
+        time_idx = self.temporal_index
+        if self.scaler:
+            if self.pooling in ["fixed", "unique"]:
+                # if fixed (or unique), scale within each time period
+                for time in df[time_idx].unique():
+                    df.loc[ df[time_idx] ==time, self.columns] = self.scaler.fit_transform(df.loc[ df[time_idx] ==time, self.columns].values)
+
+            elif self.pooling == "pooled":
+                # if pooled, scale the whole series at once
+                df.loc[:, self.columns] = self.scaler.fit_transform(df.values)
         assert self.model_type == "spatial", (
             "Model is aspatial(lacks a W object), but has been passed to a spatial diagnostic."
             " Try aspatial diagnostics like nearest_label() or sil_scores()"
@@ -214,8 +256,19 @@ class ModelResults:
             silhouette plot created by scikit-plot.
 
         """
+        df = self.df.copy()
+        time_idx = self.temporal_index
+        if self.scaler:
+            if self.pooling in ["fixed", "unique"]:
+                # if fixed (or unique), scale within each time period
+                for time in df[time_idx].unique():
+                    df.loc[ df[time_idx] ==time, self.columns] = self.scaler.fit_transform(df.loc[ df[time_idx] ==time, self.columns].values)
+
+            elif self.pooling == "pooled":
+                # if pooled, scale the whole series at once
+                df.loc[:, self.columns] = self.scaler.fit_transform(df.values)
         fig = skplt.metrics.plot_silhouette(
-            self.df[self.columns].values, self.labels, metric=metric, title=title
+            df[self.columns].values, self.labels, metric=metric, title=title
         )
 
         return fig

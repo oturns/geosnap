@@ -84,6 +84,87 @@ def store_blocks_2010(data_dir="auto"):
     quilt3.Package.install("census/blocks_2010", "s3://spatial-ucr", dest=pth)
 
 
+def store_ejscreen(years="all", data_dir="auto"):
+    """Save EPA EJScreen data to the local geosnap storage.
+       Each year is about 1GB.
+
+     Parameters
+    ----------
+    years : list (optional)
+        subset of years to collect. Currently 2015-2020 vintages
+        are available. Pass 'all' (default) to fetch every available vintage.
+
+    Returns
+    -------
+    None
+        Data will be available in the geosnap.data.datasets and will be used
+        in place of streaming data for all census queries.
+
+    """
+    pth = pathlib.Path(_make_data_dir(data_dir), "epa")
+    pathlib.Path(pth).mkdir(parents=True, exist_ok=True)
+
+    if years == "all":
+        quilt3.Package.install("epa/ejscreen", "s3://spatial-ucr", dest=pth)
+
+    else:
+        if isinstance("years", (str, int)):
+            years = [years]
+        p = quilt3.Package.browse("epa/ejscreen", "s3://spatial-ucr")
+        for year in years:
+            p[f"ejscreen_{year}.parquet"].fetch(
+                dest=pathlib.Path(pth, f"ejscreen_{year}.parquet")
+            )
+
+
+def store_nces(years="all", dataset="all", data_dir="auto"):
+    """Save NCES data to the local geosnap storage.
+       Each year is about 1GB.
+
+     Parameters
+    ----------
+    years : list (optional)
+        subset of years to collect. Pass 'all' (default) to fetch every available vintage.
+    dataset : str in {"sabs", "districts", "schools"}
+        which dataset to store. Defaults to "all" which include all three
+
+    Returns
+    -------
+    None
+        Data will be available in the geosnap.data.datasets and will be used
+        in place of streaming data for all census queries.
+
+    """
+
+    if dataset == "all":
+        datasets = ["sabs", "districts", "schools"]
+    else:
+        datasets = [dataset]
+
+    pth = pathlib.Path(_make_data_dir(data_dir), "nces")
+    pathlib.Path(pth).mkdir(parents=True, exist_ok=True)
+
+    for d in datasets:
+        if years == "all":
+            quilt3.Package.install(f"nces/{d}", "s3://spatial-ucr", dest=pth)
+
+        else:
+            if isinstance("years", (str, int)):
+                years = [years]
+            if d == "districts":
+                p = quilt3.Package.browse(f"nces/{d}", "s3://spatial-ucr")
+                for year in years:
+                    p[f"school_districts_{year}.parquet"].fetch(
+                        dest=pathlib.Path(pth, 'nces', f"school_districts_{year}.parquet")
+                    )
+            else:
+                p = quilt3.Package.browse(f"nces/{d}", "s3://spatial-ucr")
+                for year in years:
+                    p[f"{d}_{year}.parquet"].fetch(
+                        dest=pathlib.Path(pth, 'nces' f"{d}_{year}.parquet")
+                    )
+
+
 def store_acs(years="all", level="tract", data_dir="auto"):
     """Save census American Community Survey 5-year data to the local geosnap storage.
        Each year is about 550mb for tract level and about 900mb for blockgroup level.
@@ -138,7 +219,7 @@ def store_ltdb(sample, fullcount, data_dir="auto"):
 
     Returns
     -------
-    pandas.DataFrame
+    None
 
     """
     sample_zip = zipfile.ZipFile(sample)
