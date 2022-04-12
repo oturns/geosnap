@@ -246,14 +246,12 @@ def get_ltdb(
     if isinstance(boundary, gpd.GeoDataFrame):
         tracts = datastore.tracts_2010()[["geoid", "geometry"]]
         ltdb = datastore.ltdb().reset_index()
-        if boundary.crs != tracts.crs:
-            warn(
-                "Unable to determine whether boundary CRS is WGS84 "
-                "if this produces unexpected results, try reprojecting"
-            )
+        if not boundary.crs.equals(4326):
+            boundary = boundary.copy().to_crs(4326)
         tracts = tracts[tracts.representative_point().intersects(boundary.unary_union)]
         gdf = ltdb[ltdb["geoid"].isin(tracts["geoid"])]
         gdf = gpd.GeoDataFrame(gdf.merge(tracts, on="geoid", how="left"), crs=4326)
+        gdf = gdf[gdf['year'].isin(years)]
 
     else:
         gdf = _from_db(
@@ -313,14 +311,12 @@ def get_ncdb(
     if isinstance(boundary, gpd.GeoDataFrame):
         tracts = datastore.tracts_2010()[["geoid", "geometry"]]
         ncdb = datastore.ncdb().reset_index()
-        if boundary.crs != tracts.crs:
-            warn(
-                "Unable to determine whether boundary CRS is WGS84 "
-                "if this produces unexpected results, try reprojecting"
-            )
+        if not boundary.crs.equals(4326):
+            boundary = boundary.copy().to_crs(4326)
         tracts = tracts[tracts.representative_point().intersects(boundary.unary_union)]
         gdf = ncdb[ncdb["geoid"].isin(tracts["geoid"])]
         gdf = gpd.GeoDataFrame(gdf.merge(tracts, on="geoid", how="left"), crs=4326)
+        gdf = gdf[gdf['year'].isin(years)]
 
     else:
         gdf = _from_db(
@@ -432,11 +428,8 @@ def get_census(
     tracts = pd.concat(tracts, sort=False)
 
     if isinstance(boundary, gpd.GeoDataFrame):
-        if boundary.crs != tracts.crs:
-            warn(
-                "Unable to determine whether boundary CRS is WGS84 "
-                "if this produces unexpected results, try reprojecting"
-            )
+        if not boundary.crs.equals(4326):
+            boundary = boundary.copy().to_crs(4326)
         tracts = tracts[tracts.representative_point().intersects(boundary.unary_union)]
         gdf = tracts.copy()
 
@@ -526,6 +519,9 @@ def get_lodes(
     msa_counties = _msa_to_county(datastore, msa_fips)
 
     states, allfips = _fips_to_states(state_fips, county_fips, msa_counties, fips)
+    if boundary:
+        if not boundary.crs.equals(4326):
+            boundary = boundary.copy().to_crs(4326)
 
     if any(year < 2010 for year in years):
         gdf00 = datastore.blocks_2000(states=states, fips=(tuple(allfips)))

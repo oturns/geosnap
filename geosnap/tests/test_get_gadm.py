@@ -1,7 +1,7 @@
 from geosnap.io import get_gadm
 import pytest
 
-GADM_DOWN=True
+GADM_DOWN=False
 
 @pytest.mark.skipif( GADM_DOWN, reason="GADM is down at the moment")
 def test_get_gadm():

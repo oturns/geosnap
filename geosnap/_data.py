@@ -139,7 +139,7 @@ class DataStore:
         Parameters
         ----------
         year : str
-            vingage of NCES release formatted as a 4-character string representing
+            vintage of NCES release formatted as a 4-character string representing
             the school year. For example the 2015-2016 academic year is '1516'
         dataset : str
             which dataset to query. Options include `sabs`, `school_districts`, and `schools`
@@ -154,7 +154,7 @@ class DataStore:
         else:
             selector = dataset
         local_path = pathlib.Path(
-            self.data_dir, "nces", f"{selector}_{year}.parquet"
+            self.data_dir, "nces", f"{dataset}_{year}.parquet"
         )
         remote_path = f"s3://spatial-ucr/nces/{selector}/{dataset}_{year}.parquet"
         msg = "Streaming data from S3. Use `geosnap.io.store_nces()` to store the data locally for better performance"
