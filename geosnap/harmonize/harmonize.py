@@ -9,7 +9,7 @@ from tqdm.auto import tqdm
 
 
 def harmonize(
-    raw_community,
+    gdf,
     target_year=None,
     weights_method="area",
     extensive_variables=None,
@@ -18,15 +18,15 @@ def harmonize(
     raster=None,
     codes=[21, 22, 23, 24],
     temporal_index="year",
-    unit_index='geoid'
+    unit_index="geoid",
 ):
     r"""
     Use spatial interpolation to standardize neighborhood boundaries over time.
 
     Parameters
     ----------
-    raw_community : list of geopandas.GeoDataFrames
-        Multiple GeoDataFrames given by a list (see (1) in Notes).
+    gdf : geopandas.GeoDataFrames
+        Long-form geodataframe with time periods represented by `temporal_index`
     target_year : string
         The target year that represents the bondaries of all datasets generated
         in the harmonization. Could be, for example '2010'.
@@ -100,7 +100,7 @@ def harmonize(
         w_{i,j} = a_{i,j} / \sum_k a_{k,j}
 
     """
-    assert unit_index in raw_community.columns, f"{unit_index} must be available"
+    assert unit_index in gdf.columns, f"{unit_index} must be available"
     assert target_year, "target_year is a required parameter"
     if extensive_variables is None and intensive_variables is None:
         raise ValueError(
@@ -112,8 +112,9 @@ def harmonize(
         intensive_variables = []
     all_vars = extensive_variables + intensive_variables
 
-    _check_presence_of_crs(raw_community)
-    dfs = raw_community.copy()
+    _check_presence_of_crs(gdf)
+    crs = gdf.crs
+    dfs = gdf.copy()
     times = dfs[temporal_index].unique().tolist()
     times.remove(target_year)
 
@@ -172,7 +173,7 @@ def harmonize(
         pbar.close()
 
     harmonized_df = gpd.GeoDataFrame(
-        pd.concat(list(interpolated_dfs.values()), sort=True)
-    ).drop(columns=['index'])
+        pd.concat(list(interpolated_dfs.values()), sort=True), crs=crs
+    ).drop(columns=["index"])
 
     return harmonized_df

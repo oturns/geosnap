@@ -151,6 +151,7 @@ def lincs_from_gdf(gdf, unit_index, temporal_index, cluster_col, periods="all"):
         gdf.pivot(index=unit_index, columns=temporal_index, values=cluster_col)
         .dropna()
         .astype("int"),
+        
     )
     gdf = geoms.join(df)
 

@@ -1,3 +1,4 @@
+from types import MethodWrapperType
 from geosnap import Community
 import proplot
 import numpy

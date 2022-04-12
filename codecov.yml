@@ -20,7 +20,7 @@ coverage:
     - "geosnap/visualize/commviz.py"
     - "geosnap/visualize/viz.py"
     - "geosnap/io/util.py"
-    - "_version.py"
+    - "geosnap/_version.py"
 comment:
   layout: "reach, diff, files"
   behavior: once
