@@ -5,12 +5,27 @@ from .util import get_lehd
 from warnings import warn
 
 
-def get_nces(
-    datastore,
-    years="1516",
-    dataset='sabs'
-):
+def get_nces(datastore, years="1516", dataset="sabs"):
+    """Extract a subset of data from the National Center for Educational Statistics as a long-form geodataframe.
 
+    Parameters
+    ----------
+    datastore : geosnap.DataStore
+        an instantiated DataStore object
+    years : str, optional
+        set of academic years to return formatted as a 4-digit string representing the two years
+        from a single period of the academic calendar. For example, the 2015-2016 academic year
+        is represented as "1516". Defaults to "1516"
+    dataset : str, optional
+        which NCES dataset to query. Options include `sabs`, `districts`, or `schools`
+        Defaults to 'sabs'
+
+    Returns
+    -------
+    geopandas.GeoDataFrame
+        long-form geodataframe with 'year' column representing each time period
+
+    """
     if isinstance(years, (str,)):
         years = [int(years)]
     elif isinstance(years, (int,)):
@@ -18,10 +33,7 @@ def get_nces(
 
     dflist = []
     for year in years:
-        df = datastore.nces(
-            year=year,
-            dataset=dataset
-        )
+        df = datastore.nces(year=year, dataset=dataset)
         dflist.append(df)
     gdf = pd.concat(dflist)
     return gdf.reset_index(drop=True)
@@ -35,7 +47,35 @@ def get_ejscreen(
     fips=None,
     years="all",
 ):
+    """Extract a subset of data from the EPA EJSCREEN as a long-form geodataframe.
 
+    Parameters
+    ----------
+    datastore : geosnap.DataStore
+        an instantiated DataStore object
+    state_fips : list or str
+        string or list of strings of two-digit fips codes defining states
+        to include in the study area.
+    county_fips : list or str
+        string or list of strings of five-digit fips codes defining
+        counties to include in the study area.
+    msa_fips : list or str
+        string or list of strings of fips codes defining
+        MSAs to include in the study area.
+    fips : list or str
+        string or list of strings of fips codes (any length) defining
+        census units to include in the study area.
+    years : str, optional
+        list of years to include in the extract. Following Census convention, years
+        are named by the conclusion of the 5-year period. For example the 2011-2015
+        sample is represented as `2015`. Defaults to "all" which includes every dataset
+        available (curently 2012-2019)
+
+    Returns
+    -------
+    geopandas.GeoDataFrame
+        long-form geodataframe with 'year' column representing each time period
+    """
     if years == "all":
         years = list(range(2015, 2021))
 
@@ -65,6 +105,7 @@ def get_ejscreen(
     gdf = pd.concat(dflist)
     return gdf.reset_index(drop=True)
 
+
 def get_acs(
     datastore,
     level="bg",
@@ -76,6 +117,44 @@ def get_acs(
     constant_dollars=True,
     currency_year=2019,
 ):
+    """_summary_
+
+    Parameters
+    ----------
+    datastore : geosnap.DataStore
+        an instantiated DataStore object
+    state_fips : list or str, optional
+        string or list of strings of two-digit fips codes defining states
+        to include in the study area.
+    county_fips : list or str, optional
+        string or list of strings of five-digit fips codes defining
+        counties to include in the study area.
+    msa_fips : list or str, optional
+        string or list of strings of fips codes defining
+        MSAs to include in the study area.
+    fips : list or str, optional
+        string or list of strings of five-digit fips codes defining
+        counties to include in the study area.
+    boundary : geopandas.GeoDataFrame, optional
+        geodataframe that defines the total extent of the study area.
+        This will be used to clip tracts lazily by selecting all
+        `GeoDataFrame.representative_point()`s that intersect the
+        boundary gdf
+    years : list of ints, required
+        list of years to include in the study data
+        (the default is [1990, 2000, 2010]).
+    constant_dollars : bool, optional
+        whether to standardize currency columns to constant dollars. If true,
+        each year will be expressed in dollars set by the `currency_year` parameter
+    currency_year : int, optional
+        If adjusting for inflation, this parameter sets the year in which dollar values will
+        be expressed
+
+    Returns
+    -------
+    geopandas.GeoDataFrame
+        long-form geodataframe with 'year' column representing each time period
+    """
     inflate_cols = [
         "median_home_value",
         "median_contract_rent",
@@ -113,11 +192,12 @@ def get_acs(
             try:
                 df = adjust_inflation(df, inflate_cols, year, currency_year)
             except:
-                warn('Currenct columns unavailable at this resolution; not adjusting for inflation')
+                warn(
+                    "Currenct columns unavailable at this resolution; not adjusting for inflation"
+                )
         dflist.append(df)
     gdf = pd.concat(dflist)
     return gdf.reset_index(drop=True)
-
 
 
 def get_ltdb(
@@ -129,18 +209,12 @@ def get_ltdb(
     boundary=None,
     years="all",
 ):
-    """Extract a subset of data from LTDB as a long-form geodataframe
-
-        Instiantiate a new Community from pre-harmonized LTDB data. To use
-        you must first download and register LTDB data with geosnap using
-        the `store_ltdb` function. Pass lists of states, counties, or any
-        arbitrary FIPS codes to create a community. All fips code arguments
-        are additive, so geosnap will include the largest unique set.
-        Alternatively, you may provide a boundary to use as a clipping
-        feature.
+    """Extract a subset of data from the Longitudinal Tract Database (LTDB) as a long-form geodataframe.
 
     Parameters
     ----------
+    datastore : geosnap.DataStore
+        an instantiated DataStore object
     state_fips : list or str
         string or list of strings of two-digit fips codes defining states
         to include in the study area.
@@ -165,9 +239,7 @@ def get_ltdb(
     Returns
     -------
     geopandas.GeoDataFrame
-        long-form geodataframe (with repeated geometries for each time period)
-
-
+        long-form geodataframe with 'year' column representing each time period
     """
     if years == "all":
         years = [1970, 1980, 1990, 2000, 2010]
@@ -204,18 +276,12 @@ def get_ncdb(
     boundary=None,
     years="all",
 ):
-    """Create a new Community from NCDB data.
-
-        Instiantiate a new Community from pre-harmonized NCDB data. To use
-        you must first download and register LTDB data with geosnap using
-        the `store_ncdb` function. Pass lists of states, counties, or any
-        arbitrary FIPS codes to create a community. All fips code arguments
-        are additive, so geosnap will include the largest unique set.
-        Alternatively, you may provide a boundary to use as a clipping
-        feature.
+    """Extract a subset of data from the Neighborhood Change Database (NCDB).
 
     Parameters
     ----------
+    datastore : geosnap.DataStore
+        an instantiated DataStore object
     state_fips : list or str
         string or list of strings of two-digit fips codes defining states
         to include in the study area.
@@ -240,8 +306,7 @@ def get_ncdb(
     Returns
     -------
     Community
-        Community with NCDB data
-
+        long-form geodataframe with 'year' column representing each time period
     """
     if years == "all":
         years = [1970, 1980, 1990, 2000, 2010]
@@ -281,18 +346,12 @@ def get_census(
     constant_dollars=True,
     currency_year=2015,
 ):
-    """Create a new Community from original vintage US Census data.
-
-        Instiantiate a new Community from . To use
-        you must first download and register census data with geosnap using
-        the `store_census` function. Pass lists of states, counties, or any
-        arbitrary FIPS codes to create a community. All fips code arguments
-        are additive, so geosnap will include the largest unique set.
-        Alternatively, you may provide a boundary to use as a clipping
-        feature.
+    """Extract a subset of data from the decennial U.S. Census as a long-form geodataframe.
 
     Parameters
     ----------
+    datastore : geosnap.DataStore
+        an instantiated DataStore object
     state_fips : list or str, optional
         string or list of strings of two-digit fips codes defining states
         to include in the study area.
@@ -322,8 +381,8 @@ def get_census(
 
     Returns
     -------
-    Community
-        Community with unharmonized census data
+    geopandas.GeoDataFrame
+        long-form geodataframe with 'year' column representing each time period
 
     """
     if years == "all":
@@ -420,17 +479,13 @@ def get_lodes(
     years=2015,
     dataset="wac",
 ):
-    """Create a new Community from Census LEHD/LODES data.
+    """Extract a subset of data from Census LEHD/LODES .
 
-        Instantiate a new Community from LODES data.
-        Pass lists of states, counties, or any
-        arbitrary FIPS codes to create a community. All fips code arguments
-        are additive, so geosnap will include the largest unique set.
-        Alternatively, you may provide a boundary to use as a clipping
-        feature.
 
     Parameters
     ----------
+    datastore : geosnap.DataStore
+        an instantiated DataStore object
     state_fips : list or str, optional
         string or list of strings of two-digit fips codes defining states
         to include in the study area.
@@ -458,8 +513,8 @@ def get_lodes(
 
     Returns
     -------
-    Community
-        Community with LODES data
+    geopandas.GeoDataFrame
+        long-form geodataframe with 'year' column representing each time period
 
     """
     if isinstance(years, (str,)):
