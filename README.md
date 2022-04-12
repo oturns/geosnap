@@ -43,7 +43,7 @@ Understanding neighborhood context is critical for social science research, publ
 
 * the relevant dimensions of neighborhood change are fluid, as are the thresholds that define meaningful change
 
-To address those challenges, geonsnap incorporates tools from the PySAL ecosystem and scikit-learn along with internal data-wrangling that helps keep inputs and outputs simple for users. It operates on long-form geodataframes and includes logic for common transformations, like harmonizing geographic boundaries over time, and standardizing variables within their time-period prior to conducting pooled geodemographic clustering.
+To address those challenges, geosnap incorporates tools from the PySAL ecosystem and scikit-learn along with internal data-wrangling that helps keep inputs and outputs simple for users. It operates on long-form geodataframes and includes logic for common transformations, like harmonizing geographic boundaries over time, and standardizing variables within their time-period prior to conducting pooled geodemographic clustering.
 
 This means that while geosnap has native support for commonly-used datasets like the Longitudinal Tract Database [(LTDB)](https://www.brown.edu/academics/spatial-structures-in-social-sciences/ltdb-following-neighborhoods-over-time), or the Neighborhood Change Database [(NCDB)](https://geolytics.com/products/normalized-data/neighborhood-change-database), it can also incorporate a wide variety of datasets, at _any_ spatial resolution, as long as the user understands the implications of the interpolation process.
 
