@@ -1,5 +1,5 @@
 <p align="center">
-<img height=200 src="docs/figs/geosnap_long.png" alt="geosnap"/>
+<img height=200 src="https://github.com/spatialucr/geosnap/raw/master/docs/figs/geosnap_long.png" alt="geosnap"/>
 </p>
 
 <h2 align="center" style="margin-top:-10px">The Geospatial Neighborhood Analysis Package</h2> 
@@ -16,7 +16,7 @@
 `geosnap` provides a suite of tools for exploring, modeling, and visualizing the social context and spatial extent of neighborhoods and regions over time. It brings together state-of-the-art techniques from [geodemographics](https://en.wikipedia.org/wiki/Geodemography), [regionalization](https://www.sciencedirect.com/topics/earth-and-planetary-sciences/regionalism), [spatial data science](https://geographicdata.science/book), and [segregation analysis](https://github.com/pysal/segregation) to support social science research, public policy analysis, and urban planning. It provides a simple interface tailored to formal analysis of spatiotemporal urban data.
 
 <p align="center">
-<img width='50%' src='docs/figs/Washington-Arlington-Alexandria_DC-VA-MD-WV.gif' alt='DC Transitions' style=' display: block; margin-left: auto; margin-right: auto; max-height: 540px'/>
+<img width='50%' src='https://github.com/spatialucr/geosnap/raw/master/docs/figs/Washington-Arlington-Alexandria_DC-VA-MD-WV.gif' alt='DC Transitions' style=' display: block; margin-left: auto; margin-right: auto; max-height: 540px'/>
 </p>
 
 
@@ -47,7 +47,9 @@ To address those challenges, geonsnap incorporates tools from the PySAL ecosyste
 
 This means that while geosnap has native support for commonly-used datasets like the Longitudinal Tract Database [(LTDB)](https://www.brown.edu/academics/spatial-structures-in-social-sciences/ltdb-following-neighborhoods-over-time), or the Neighborhood Change Database [(NCDB)](https://geolytics.com/products/normalized-data/neighborhood-change-database), it can also incorporate a wide variety of datasets, at _any_ spatial resolution, as long as the user understands the implications of the interpolation process.
 
-The package helps answer questions such as:
+## Research Questions
+
+The package supports social scientists examining questions such as:
 
 - Where are the socially-homogenous districts in the city?
   - Have the composition of these districts or their location shifted over time?
