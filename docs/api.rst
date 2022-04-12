@@ -148,9 +148,9 @@ stores additional statistics, diagnostics, and plotting methods for inspection
    ModelResults.plot_silhouette
    ModelResults.plot_silhouette_map
    ModelResults.plot_path_silhouette
-   ModelResults.plot_timeseries
    ModelResults.plot_transition_matrix
    ModelResults.plot_transition_graphs
+   ModelResults.predict_markov_labels
 
 .. _harmonize_api:
 
@@ -177,11 +177,6 @@ Visualize Module
    visualize.explore
    visualize.gif_from_path
    visualize.indexplot_seq
-   visualize.plot_boundary_silhouette
-   visualize.plot_next_best_label
-   visualize.plot_silhouette
-   visualize.plot_silhouette_map
-   visualize.plot_path_silhouette
    visualize.plot_timeseries
    visualize.plot_transition_matrix
    visualize.plot_transition_graphs
@@ -204,13 +199,6 @@ The Community Class
 The Community class is an alternative object-oriented interface for
 interacting with geosnap. Rather than operating on geodataframes, the Community
 class manages data internally and exposes methods that operate on these data
-
-.. currentmodule:: geosnap
-
-.. autosummary::
-   :toctree: generated/
-   
-   Community
    
 Community Constructors
 ''''''''''''''''''''''''''''

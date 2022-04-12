@@ -78,10 +78,12 @@ class DataStore:
             "blocks_2010",
             "codebook",
             "counties",
+            "ejscreen",
             "ltdb",
             "msa_definitions",
             "msas",
             "ncdb",
+            "nces",
             "states",
             "show_data_dir",
             "tracts_1990",
@@ -125,6 +127,63 @@ class DataStore:
         msg = "Streaming data from S3. Use `geosnap.io.store_acs()` to store the data locally for better performance"
         t = _fetcher(local_path, remote_path, msg)
         t = t.reset_index().rename(columns={"GEOID": "geoid"})
+
+        if states:
+            t = t[t.geoid.str[:2].isin(states)]
+        t["year"] = year
+        return t
+
+    def nces(self, year=1516, dataset="sabs"):
+        """National Center for Education Statistics (NCES) Data.
+
+        Parameters
+        ----------
+        year : str
+            vingage of NCES release formatted as a 4-character string representing
+            the school year. For example the 2015-2016 academic year is '1516'
+        dataset : str
+            which dataset to query. Options include `sabs`, `school_districts`, and `schools`
+
+        Returns
+        -------
+        geopandas.GeoDataFrame
+            geodataframe of NCES data
+        """
+        if dataset == "school_districts":
+            selector = "districts"
+        else:
+            selector = dataset
+        local_path = pathlib.Path(
+            self.data_dir, "nces", f"{selector}_{year}.parquet"
+        )
+        remote_path = f"s3://spatial-ucr/nces/{selector}/{dataset}_{year}.parquet"
+        msg = "Streaming data from S3. Use `geosnap.io.store_nces()` to store the data locally for better performance"
+        t = _fetcher(local_path, remote_path, msg)
+        # t = t.reset_index().rename(columns={"GEOID": "geoid"})
+
+        t["year"] = year
+        return t
+
+    def ejscreen(self, year=2018, states=None):
+        """EPA EJScreen Data <https://www.epa.gov/ejscreen>.
+
+        Parameters
+        ----------
+        year : str
+            vingage of EJSCREEN release.
+        states : list, optional
+            subset of states (as 2-digit fips) to return
+
+        Returns
+        -------
+        geopandas.GeoDataFrame
+            geodataframe of EJSCREEN data
+        """
+        local_path = pathlib.Path(self.data_dir, "epa", f"ejscreen_{year}.parquet")
+        remote_path = f"s3://spatial-ucr/epa/ejscreen/ejscreen_{year}.parquet"
+        msg = "Streaming data from S3. Use `geosnap.io.store_ejscreen()` to store the data locally for better performance"
+        t = _fetcher(local_path, remote_path, msg)
+        t = t.rename(columns={"ID": "geoid"})
 
         if states:
             t = t[t.geoid.str[:2].isin(states)]

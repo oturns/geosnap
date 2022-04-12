@@ -196,6 +196,8 @@ def cluster(
             name=model_colname,
             temporal_index=temporal_index,
             unit_index=unit_index,
+            scaler=scaler,
+            pooling=pooling
         )
         if return_model:
             return gdf, results
@@ -241,6 +243,8 @@ def cluster(
                 name=model_colname,
                 temporal_index=temporal_index,
                 unit_index=unit_index,
+                scaler=scaler,
+                pooling=pooling
             )
             models[time] = results
         if return_model:
@@ -428,6 +432,8 @@ def regionalize(
             name=model_colname,
             temporal_index=temporal_index,
             unit_index=unit_index,
+            scaler=scaler,
+            pooling=None
         )
         models[time] = results
 

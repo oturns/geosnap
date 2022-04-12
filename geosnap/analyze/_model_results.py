@@ -38,7 +38,17 @@ class ModelResults:
     """
 
     def __init__(
-        self, df, columns, labels, instance, W, name, unit_index, temporal_index
+        self,
+        df,
+        columns,
+        labels,
+        instance,
+        W,
+        name,
+        unit_index,
+        temporal_index,
+        scaler,
+        pooling,
     ):
         """Initialize a new ModelResults instance.
 
@@ -69,14 +79,18 @@ class ModelResults:
         self.name = name
         self.unit_index = unit_index
         self.temporal_index = temporal_index
+        self.scaler = scaler
+        self.pooling = pooling
 
     @cached_property
     def lincs(self):
-        """Calculate silhouette scores for the current model.
+        """Calculate Local Indicators of Neighborhood Change (LINC) scores for each unit.
 
         Returns
         -------
-        silhouette scores stored in a dataframe accessible from `comm.models.['model_name'].silhouettes`
+        geopandas.GeoDataFrame
+            geodataframe with linc values available under the `linc` column
+
         """
         assert (
             self.model_type != "spatial"
@@ -94,14 +108,30 @@ class ModelResults:
 
     @cached_property
     def silhouette_scores(self):
-        """Calculate silhouette scores for the current model.
+        """Calculate silhouette scores for the each unit.
 
         Returns
         -------
-        silhouette scores stored in a dataframe accessible from `comm.models.['model_name'].silhouettes`
+        geopandas.GeoDataFrame
+            geodataframe with silhouette values available under the `silhouette_score` column
+
         """
         df = self.df.copy()
         df = df.dropna(subset=self.columns)
+        time_idx = self.temporal_index
+        if self.scaler:
+            if self.pooling in ["fixed", "unique"]:
+                # if fixed (or unique), scale within each time period
+                for time in df[time_idx].unique():
+                    df.loc[
+                        df[time_idx] == time, self.columns
+                    ] = self.scaler.fit_transform(
+                        df.loc[df[time_idx] == time, self.columns].values
+                    )
+
+            elif self.pooling == "pooled":
+                # if pooled, scale the whole series at once
+                df.loc[:, self.columns] = self.scaler.fit_transform(df.values)
         return gpd.GeoDataFrame(
             {
                 "silhouette_score": silhouette_samples(
@@ -117,12 +147,13 @@ class ModelResults:
 
     @cached_property
     def nearest_label(self):
-        """Calculate nearest_labels for the current model.
+        """Calculate next-best cluster labels for each unit.
 
         Returns
         -------
-        nearest_labels stored in a dataframe accessible from:
-        `comm.models.['model_name'].nearest_labels`
+        geopandas.GeoDataFrame
+            geodataframe with next-best label assignments available under the `nearest_label` column
+
         """
         df = self.df.copy()
         df = df.dropna(subset=self.columns)
@@ -141,13 +172,13 @@ class ModelResults:
 
     @cached_property
     def boundary_silhouette(self):
-        """
-        Calculate boundary silhouette scores for the current model.
+        """Calculate boundary silhouette scores for each unit.
 
         Returns
         -------
-        boundary silhouette scores stored in a dataframe accessible from:
-        `comm.models.['model_name'].boundary_silhouettes`
+        geopandas.GeoDataFrame
+            geodataframe withboundary silhouette scores available under the `boundary_silhouette` column
+
         """
         df = self.df.copy()
         df = df.dropna(subset=self.columns)
@@ -155,6 +186,20 @@ class ModelResults:
             "Model is aspatial (lacks a W object), but has been passed to a spatial diagnostic."
             " Try aspatial diagnostics like nearest_label() or sil_scores()"
         )
+        time_idx = self.temporal_index
+        if self.scaler:
+            if self.pooling in ["fixed", "unique"]:
+                # if fixed (or unique), scale within each time period
+                for time in df[time_idx].unique():
+                    df.loc[
+                        df[time_idx] == time, self.columns
+                    ] = self.scaler.fit_transform(
+                        df.loc[df[time_idx] == time, self.columns].values
+                    )
+
+            elif self.pooling == "pooled":
+                # if pooled, scale the whole series at once
+                df.loc[:, self.columns] = self.scaler.fit_transform(df.values)
         return gpd.GeoDataFrame(
             {
                 "boundary_silhouette": esda.boundary_silhouette(
@@ -170,16 +215,30 @@ class ModelResults:
 
     @cached_property
     def path_silhouette(self):
-        """
-        Calculate path silhouette scores for the current model.
+        """Calculate path silhouette scores for each unit.
 
         Returns
         -------
-        path silhouette scores stored in a dataframe accessible from:
-        `comm.models.['model_name'].path_silhouettes`
+        geopandas.GeoDataFrame
+            geodataframe with path-silhouette scores available under the `path_silhouette` column
+
         """
         df = self.df.copy()
         df = df.dropna(subset=self.columns)
+        time_idx = self.temporal_index
+        if self.scaler:
+            if self.pooling in ["fixed", "unique"]:
+                # if fixed (or unique), scale within each time period
+                for time in df[time_idx].unique():
+                    df.loc[
+                        df[time_idx] == time, self.columns
+                    ] = self.scaler.fit_transform(
+                        df.loc[df[time_idx] == time, self.columns].values
+                    )
+
+            elif self.pooling == "pooled":
+                # if pooled, scale the whole series at once
+                df.loc[:, self.columns] = self.scaler.fit_transform(df.values)
         assert self.model_type == "spatial", (
             "Model is aspatial(lacks a W object), but has been passed to a spatial diagnostic."
             " Try aspatial diagnostics like nearest_label() or sil_scores()"
@@ -198,7 +257,7 @@ class ModelResults:
         )
 
     def plot_silhouette(self, metric="euclidean", title="Silhouette Score"):
-        """Make silhouette plot of the Community model.
+        """Create a diagnostic plot of silhouette scores using scikit-plot.
 
         Parameters
         ----------
@@ -214,8 +273,23 @@ class ModelResults:
             silhouette plot created by scikit-plot.
 
         """
+        df = self.df.copy()
+        time_idx = self.temporal_index
+        if self.scaler:
+            if self.pooling in ["fixed", "unique"]:
+                # if fixed (or unique), scale within each time period
+                for time in df[time_idx].unique():
+                    df.loc[
+                        df[time_idx] == time, self.columns
+                    ] = self.scaler.fit_transform(
+                        df.loc[df[time_idx] == time, self.columns].values
+                    )
+
+            elif self.pooling == "pooled":
+                # if pooled, scale the whole series at once
+                df.loc[:, self.columns] = self.scaler.fit_transform(df.values)
         fig = skplt.metrics.plot_silhouette(
-            self.df[self.columns].values, self.labels, metric=metric, title=title
+            df[self.columns].values, self.labels, metric=metric, title=title
         )
 
         return fig
@@ -237,48 +311,48 @@ class ModelResults:
         plot_kwargs=None,
         web_mercator=True,
     ):
-        """Plot of the silhouette scores of a Community model.
+        """Plot the silhouette scores for each unit as a [series of] choropleth map(s).
 
-        Parameters
-        ----------
-        scheme : string,optional
-            matplotlib scheme to be used
-            default is 'quantiles'
-        k : int, optional
-            number of bins to graph. k may be ignored
-            or unnecessary for some schemes, like headtailbreaks, maxp, and maximum_breaks
-            Default is 6.
-        cmap : string, optional
-            matplotlib colormap used to shade polygons
-        title : string, optional
-            title of figure.
-        dpi : int, optional
-            dpi of the saved image if save_fig=True
-            default is 500
-        web_mercator : bool, optional
-            whether to reproject the data into web mercator (epsg 3857)
-            prior to plotting. Defaults to True
-        ncols : int, optional
-            number of columns in the figure
-            if passing ncols, nrows must also be passed
-            default is None
-        nrows : int, optional
-            number of rows in the figure
-            if passing nrows, ncols must also be passed
-            default is None
-        figsize : tuple, optional
-            the desired size of the matplotlib figure
-        save_fig : str, optional
-            path to save figure if desired.
-        ctxmap : contextily map provider, optional
-            contextily basemap. Set to False for no basemap.
-            Default is Stamen.TonerLite
-        alpha : int (optional)
-            Transparency parameter passed to matplotlib
+         Parameters
+         ----------
+         scheme : string,optional
+             matplotlib scheme to be used
+             default is 'quantiles'
+         k : int, optional
+             number of bins to graph. k may be ignored
+             or unnecessary for some schemes, like headtailbreaks, maxp, and maximum_breaks
+             Default is 6.
+         cmap : string, optional
+             matplotlib colormap used to shade polygons
+         title : string, optional
+             title of figure.
+         dpi : int, optional
+             dpi of the saved image if save_fig=True
+             default is 500
+         web_mercator : bool, optional
+             whether to reproject the data into web mercator (epsg 3857)
+             prior to plotting. Defaults to True
+         ncols : int, optional
+             number of columns in the figure
+             if passing ncols, nrows must also be passed
+             default is None
+         nrows : int, optional
+             number of rows in the figure
+             if passing nrows, ncols must also be passed
+             default is None
+         figsize : tuple, optional
+             the desired size of the matplotlib figure
+         save_fig : str, optional
+             path to save figure if desired.
+         ctxmap : contextily map provider, optional
+             contextily basemap. Set to False for no basemap.
+             Default is Stamen.TonerLite
+         alpha : int (optional)
+             Transparency parameter passed to matplotlib
 
-        Returns
-        -------
-        silhouette scores mapped onto community geography
+         Returns
+         -------
+        matplotlib.Axes
 
         """
         if not plot_kwargs:
@@ -322,17 +396,13 @@ class ModelResults:
         save_fig=None,
         alpha=0.5,
         cmap="set1",
-        scheme="quantiles",
-        k=8,
         title="Next-Best Label",
         dpi=500,
         plot_kwargs=None,
         web_mercator=True,
     ):
-        """Plot of the silhouette scores of a Community model.
+        """Plot the next-best cluster label for each unit as a choropleth map.
 
-        Parameters
-        ----------
         Parameters
         ----------
         cmap : string, optional
@@ -416,7 +486,7 @@ class ModelResults:
         plot_kwargs=None,
         web_mercator=True,
     ):
-        """Plot of the silhouette scores of a Community model.
+        """Plot the path silhouette scores for each unit as a choropleth map.
 
         Parameters
         ----------
@@ -481,6 +551,8 @@ class ModelResults:
             nrows=nrows,
             temporal_index=self.temporal_index,
             ctxmap=ctxmap,
+            scheme=scheme,
+            k=k,
             title=title,
             dpi=dpi,
             save_fig=save_fig,
@@ -507,7 +579,7 @@ class ModelResults:
         plot_kwargs=None,
         web_mercator=True,
     ):
-        """Plot of the silhouette scores of a Community model.
+        """Plot the boundary silhouette scores for each unit as a choropleth map.
 
         Parameters
         ----------
@@ -571,7 +643,9 @@ class ModelResults:
             ncols=ncols,
             nrows=nrows,
             temporal_index=self.temporal_index,
+            scheme=scheme,
             ctxmap=ctxmap,
+            k=k,
             title=title,
             dpi=dpi,
             save_fig=save_fig,
@@ -598,7 +672,7 @@ class ModelResults:
         plot_kwargs=None,
         web_mercator=True,
     ):
-        """Plot of the silhouette scores of a Community model.
+        """Plot the LINC statistics for each unit as a choropleth map.
 
         Parameters
         ----------
@@ -664,6 +738,8 @@ class ModelResults:
             temporal_index=self.temporal_index,
             ctxmap=ctxmap,
             title=title,
+            scheme=scheme,
+            k=k,
             dpi=dpi,
             save_fig=save_fig,
             web_mercator=web_mercator,
