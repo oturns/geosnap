@@ -736,8 +736,6 @@ class Community:
         save_fig=None,
         alpha=0.5,
         cmap="set1",
-        scheme="quantiles",
-        k=8,
         title="Next-Best Label",
         dpi=500,
         plot_kwargs=None,
