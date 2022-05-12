@@ -25,7 +25,7 @@ dependencies:
   - contextily
   - scikit-plot
   - mapclassify
-  - spopt >=0.1.1
+  - spopt >=0.3.0
   - s3fs
   - segregation >=2.0
   - versioneer
