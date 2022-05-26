@@ -33,6 +33,74 @@ def _make_data_dir(data_dir="auto"):
     return data_dir
 
 
+def store_seda(data_dir="auto", accept_eula=False):
+    """Collect data from the Stanford Educational Data Archive and store as local parquet files
+
+    Parameters
+    ----------
+    data_dir : str, optional
+        path to desired storage location. If "auto", geosnap will use its default data
+        directory provided by appdirs, by default "auto"
+    accept_eula : bool, optional
+        Whether the accept the EULA from SEDA, by default False
+    """
+
+    eula = """
+DATA USE AGREEMENT:
+
+You agree not to use the data sets for commercial advantage, or in the course of for-profit activities. Commercial entities wishing to use this Service should contact Stanford University’s Office of Technology Licensing (info@otlmail.stanford.edu).
+
+You agree that you will not use these data to identify or to otherwise infringe the privacy or confidentiality rights of individuals.
+
+THE DATA SETS ARE PROVIDED “AS IS” AND STANFORD MAKES NO REPRESENTATIONS AND EXTENDS NO WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED. STANFORD SHALL NOT BE LIABLE FOR ANY CLAIMS OR DAMAGES WITH RESPECT TO ANY LOSS OR OTHER CLAIM BY YOU OR ANY THIRD PARTY ON ACCOUNT OF, OR ARISING FROM THE USE OF THE DATA SETS.
+
+You agree that this Agreement and any dispute arising under it is governed by the laws of the State of California of the United States of America, applicable to agreements negotiated, executed, and performed within California.
+
+You agree to acknowledge the Stanford Education Data Archive as the source of these data. In publications, please cite the data as:
+
+Reardon, S. F., Ho, A. D., Shear, B. R., Fahle, E. M., Kalogrides, D., Jang, H., & Chavez, B. (2021). Stanford Education Data Archive (Version 4.1). Retrieved from http://purl.stanford.edu/db586ns4974.
+
+Subject to your compliance with the terms and conditions set forth in this Agreement, Stanford grants you a revocable, non-exclusive, non-transferable right to access and make use of the Data Sets.
+
+        """
+    assert accept_eula, (
+        "You must accept the EULA by passing `accept_eula=True` \n" f"{eula}"
+    )
+    pth = pathlib.Path(_make_data_dir(data_dir), "seda")
+    pathlib.Path(pth).mkdir(parents=True, exist_ok=True)
+
+    for std in ["cs", "gcs"]:
+
+        try:
+            fn = f"seda_school_pool_{std}_4.1"
+            print(f"Downloading {fn}")
+            t = pd.read_csv(
+                f"https://stacks.stanford.edu/file/druid:db586ns4974/{fn}.csv",
+                converters={"sedasch": str, "fips": str},
+            )
+            t.sedasch = t.sedasch.str.rjust(12, "0")
+            t.fips = t.fips.str.rjust(2, "0")
+        except FileNotFoundError:
+            raise FileNotFoundError("Unable to access remote SEDA data")
+
+        t.to_parquet(pathlib.Path(pth, f"{fn}.parquet"))
+
+        for pooling in ["long", "pool"]:
+            try:
+                fn = f"seda_geodist_{pooling}_{std}_4.1"
+                print(f"Downloading {fn}")
+                t = pd.read_csv(
+                    f"https://stacks.stanford.edu/file/druid:db586ns4974/{fn}.csv",
+                    converters={"sedalea": str, "fips": str},
+                )
+                t.sedalea = t.sedalea.str.rjust(7, "0")
+                t.fips = t.fips.str.rjust(2, "0")
+            except FileNotFoundError:
+                raise FileNotFoundError("Unable to access remote SEDA data")
+
+            t.to_parquet(pathlib.Path(pth, f"{fn}.parquet"))
+
+
 def store_census(data_dir="auto", verbose=True):
     """Save census data to the local quilt package storage.
 
@@ -155,13 +223,15 @@ def store_nces(years="all", dataset="all", data_dir="auto"):
                 p = quilt3.Package.browse(f"nces/{d}", "s3://spatial-ucr")
                 for year in years:
                     p[f"school_districts_{year}.parquet"].fetch(
-                        dest=pathlib.Path(pth, 'nces', f"school_districts_{year}.parquet")
+                        dest=pathlib.Path(
+                            pth, "nces", f"school_districts_{year}.parquet"
+                        )
                     )
             else:
                 p = quilt3.Package.browse(f"nces/{d}", "s3://spatial-ucr")
                 for year in years:
                     p[f"{d}_{year}.parquet"].fetch(
-                        dest=pathlib.Path(pth, 'nces' f"{d}_{year}.parquet")
+                        dest=pathlib.Path(pth, "nces" f"{d}_{year}.parquet")
                     )
 
 

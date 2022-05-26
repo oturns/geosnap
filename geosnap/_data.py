@@ -1,5 +1,6 @@
 """Tools for creating and manipulating neighborhood datasets."""
 
+from lib2to3.pytree import convert
 import os
 import pathlib
 from warnings import warn
@@ -52,11 +53,7 @@ class _Map(dict):
 
 
 class DataStore:
-    """Storage for geosnap data. Currently supports US Census data.
-
-    Unless otherwise noted, data are collected from the U.S. Census Bureau's TIGER/LINE Files
-    https://www.census.gov/cgi-bin/geo/shapefiles/index.php?year=2018 and converted to
-    parquet files.
+    """Storage for geosnap data. Currently supports data from several U.S. federal agencies and national research centers.
 
     """
 
@@ -69,6 +66,11 @@ class DataStore:
             self.data_dir = user_data_dir(appname, appauthor)
         else:
             self.data_dir = data_dir
+        warn(
+            "The geosnap data storage class is provided for convenience only. The geosnap developers make no promises "
+            "regarding data quality, consistency, or availability, nor are they responsible for any use/misuse of the data. "
+            "The end-user is responsible for any and all analyses or applications created with the package."
+        )
 
     def __dir__(self):
 
@@ -133,6 +135,99 @@ class DataStore:
         t["year"] = year
         return t
 
+    def seda(
+        self, level="school", pooling="pool", standardize="gcs", accept_eula=False
+    ):
+        """Acheievement data from the Stanford Education Data Archive (currently version 4.1).
+        
+        May be joined with geodataframes from NCES for spatial analysis
+
+        Parameters
+        ----------
+        level : str
+            aggregation level for achievement data. Options include `school` for school-level,
+            or `geodist` for geographic school district-level. By default "school"
+        pooling : str
+            option to return long-form or pooled data. Only applicable for geodist level
+            as long-form not available at the school level. By default "pool"
+        standardize : str,
+            which grouping method used to standardize the data. Options include
+            "gcs" for grade-cohort standarization or "cs" for cohort standardization,
+            by default "gcs"
+        accept_eula : bool, optional
+            pass True to accept the terms of the SEDA End User License Agreeement.
+            The data and its agreement can be viewed at <https://purl.stanford.edu/db586ns4974>            
+        """
+        eula = """
+DATA USE AGREEMENT:
+
+You agree not to use the data sets for commercial advantage, or in the course of for-profit activities. Commercial entities wishing to use this Service should contact Stanford University’s Office of Technology Licensing (info@otlmail.stanford.edu).
+
+You agree that you will not use these data to identify or to otherwise infringe the privacy or confidentiality rights of individuals.
+
+THE DATA SETS ARE PROVIDED “AS IS” AND STANFORD MAKES NO REPRESENTATIONS AND EXTENDS NO WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED. STANFORD SHALL NOT BE LIABLE FOR ANY CLAIMS OR DAMAGES WITH RESPECT TO ANY LOSS OR OTHER CLAIM BY YOU OR ANY THIRD PARTY ON ACCOUNT OF, OR ARISING FROM THE USE OF THE DATA SETS.
+
+You agree that this Agreement and any dispute arising under it is governed by the laws of the State of California of the United States of America, applicable to agreements negotiated, executed, and performed within California.
+
+You agree to acknowledge the Stanford Education Data Archive as the source of these data. In publications, please cite the data as:
+
+Reardon, S. F., Ho, A. D., Shear, B. R., Fahle, E. M., Kalogrides, D., Jang, H., & Chavez, B. (2021). Stanford Education Data Archive (Version 4.1). Retrieved from http://purl.stanford.edu/db586ns4974.
+
+Subject to your compliance with the terms and conditions set forth in this Agreement, Stanford grants you a revocable, non-exclusive, non-transferable right to access and make use of the Data Sets.
+
+        """
+        assert accept_eula, (
+            "You must accept the EULA by passing `accept_eula=True` \n" f"{eula}"
+        )
+        assert level in [
+            "school",
+            "geodist",
+        ], "Supported options for the `level` argument are 'school' and 'geodist'"
+        assert pooling in [
+            "pool",
+            "long",
+        ], "`pool` argument must be either 'pool' or 'long'"
+        assert standardize in [
+            "gcs",
+            "cs",
+        ], "`standardize` argument must be either 'cs' for cohort-standardized or 'gcs' for grade-cohort-standardized"
+        fn = f"seda_{level}_{pooling}_{standardize}_4.1"
+        local_path = pathlib.Path(self.data_dir, "seda", f"{fn}.parquet")
+        remote_path = f"https://stacks.stanford.edu/file/druid:db586ns4974/{fn}.csv"
+        msg = (
+            "Streaming data from SEDA archive at <https://exhibits.stanford.edu/data/catalog/db586ns4974>.\n"
+            "Use `geosnap.io.store_seda()` to store the data locally for better performance"
+        )
+        if level == "school":
+            assert pooling == "pool", "The school level only supports pooled data"
+        try:
+            t = pd.read_parquet(local_path)
+        except FileNotFoundError:
+            warn(msg)
+            if level == "school":
+                try:
+                    t = pd.read_csv(
+                        remote_path, converters={"sedasch": str, "fips": str}
+                    )
+                    t.sedasch = t.sedasch.str.rjust(12, "0")
+                except FileNotFoundError:
+                    raise FileNotFoundError(
+                        "Unable to access local or remote SEDA data"
+                    )
+            elif level == "geodist":
+                try:
+                    t = pd.read_csv(
+                        remote_path, converters={"sedalea": str, "fips": str}
+                    )
+                    t.sedalea = t.sedalea.str.rjust(7, "0")
+                except FileNotFoundError:
+                    raise FileNotFoundError(
+                        "Unable to access local or remote SEDA data"
+                    )
+                t.fips = t.fips.str.rjust(2, "0")
+
+        return t
+
     def nces(self, year=1516, dataset="sabs"):
         """National Center for Education Statistics (NCES) Data.
 
@@ -153,9 +248,7 @@ class DataStore:
             selector = "districts"
         else:
             selector = dataset
-        local_path = pathlib.Path(
-            self.data_dir, "nces", f"{dataset}_{year}.parquet"
-        )
+        local_path = pathlib.Path(self.data_dir, "nces", f"{dataset}_{year}.parquet")
         remote_path = f"s3://spatial-ucr/nces/{selector}/{dataset}_{year}.parquet"
         msg = "Streaming data from S3. Use `geosnap.io.store_nces()` to store the data locally for better performance"
         t = _fetcher(local_path, remote_path, msg)
@@ -317,8 +410,7 @@ class DataStore:
         return t
 
     def tracts_2010(
-        self,
-        states=None,
+        self, states=None,
     ):
         """Nationwide Census Tracts as drawn in 2010 (cartographic 500k).
 

@@ -2,7 +2,7 @@ name: test
 channels:
   - conda-forge
 dependencies:
-  - python=3.10
+  - python ==3.10
   - pandas
   - giddy >=2.2.1
   - libpysal
