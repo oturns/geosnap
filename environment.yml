@@ -13,9 +13,6 @@ dependencies:
   - seaborn
   - pyarrow >=0.14.1
   - appdirs
-  - dash
-  - dash-bootstrap-components
-  - palettable
   - pip
   - tqdm
   - quilt3 >=3.6
@@ -29,5 +26,4 @@ dependencies:
   - s3fs
   - segregation >=2.0
   - versioneer
-
-  
+  - pyproj >=3

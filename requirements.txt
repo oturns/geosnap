@@ -23,3 +23,4 @@ s3fs
 segregation>=2.1
 proplot>=0.9
 versioneer
+pyproj>=3

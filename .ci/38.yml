@@ -27,6 +27,7 @@ dependencies:
   - s3fs
   - segregation >=2.0
   - versioneer
+  - pyproj >=3
   # testing
   - jupyter
   - pytest
