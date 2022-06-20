@@ -31,11 +31,11 @@ def test_linc_from_gdf():
         "p_unemployment_rate",
     ]
     reno = get_census(DataStore(), msa_fips="39900")
-    rdf = harmonize(reno, target_year=1990, intensive_variables=columns)
+    rdf = harmonize(reno, target_year=1990, intensive_variables=columns, unit_index='geoid')
 
-    rdf = analyze.cluster(reno, columns=columns, method="ward")
+    rdf = analyze.cluster(reno, columns=columns, method="ward", unit_index='geoid')
     l = lincs_from_gdf(
-        rdf, unit_index="geoid", temporal_index="year", cluster_col="ward"
+        rdf.reset_index(), unit_index="geoid", temporal_index="year", cluster_col="ward"
     )
     assert_array_almost_equal(
         l.linc.values,
@@ -219,10 +219,10 @@ def test_linc_from_gdf_subset():
         "n_total_pop",
     ]
     reno = get_census(DataStore(), msa_fips="39900")
-    rdf = harmonize(reno, target_year=1990, intensive_variables=columns)
+    rdf = harmonize(reno, target_year=1990, intensive_variables=columns, unit_index='geoid')
 
     rdf = analyze.cluster(
-        rdf,
+        rdf.reset_index(),
         columns=columns,
         method="ward",
     )
@@ -310,9 +310,9 @@ def test_linc_method():
         "n_total_pop",
     ]
     reno = get_census(DataStore(), msa_fips="39900")
-    rdf = harmonize(reno, target_year=2010, intensive_variables=columns)
+    rdf = harmonize(reno, target_year=2010, intensive_variables=columns, unit_index='geoid')
 
-    _, model = analyze.cluster(rdf, columns=columns, method="ward", return_model=True)
+    _, model = analyze.cluster(rdf.reset_index(), columns=columns, method="ward", return_model=True)
 
     l = model.lincs.linc.values
 
