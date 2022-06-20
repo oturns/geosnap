@@ -1,6 +1,6 @@
 numpy
 pandas
-geopandas
+geopandas>=0.9
 matplotlib
 scikit-learn
 seaborn

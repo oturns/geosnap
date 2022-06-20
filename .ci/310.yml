@@ -7,7 +7,7 @@ dependencies:
   - giddy >=2.2.1
   - libpysal
   - cenpy
-  - geopandas
+  - geopandas  >=0.9
   - hdbscan
   - matplotlib <=3.3.4
   - scikit-learn
