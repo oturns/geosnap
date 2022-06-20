@@ -1,5 +1,7 @@
 """Use spatial interpolation to standardize neighborhood boundaries over time."""
 
+import warnings
+
 import geopandas as gpd
 import pandas as pd
 from tobler.area_weighted import area_interpolate
@@ -11,25 +13,36 @@ from tqdm.auto import tqdm
 def harmonize(
     gdf,
     target_year=None,
+    target_gdf=None,
     weights_method="area",
     extensive_variables=None,
     intensive_variables=None,
     allocate_total=True,
     raster=None,
-    codes=[21, 22, 23, 24],
+    pixel_values=None,
     temporal_index="year",
-    unit_index="geoid",
+    unit_index=None,
+    verbose=False,
 ):
     r"""
     Use spatial interpolation to standardize neighborhood boundaries over time.
 
     Parameters
     ----------
-    gdf : geopandas.GeoDataFrames
-        Long-form geodataframe with time periods represented by `temporal_index`
+    gdf : geopandas.GeoDataFrame
+        Long-form geodataframe with a column that holds unique time periods
+        represented by `temporal_index`
     target_year : string
-        The target year that represents the bondaries of all datasets generated
-        in the harmonization. Could be, for example '2010'.
+        The target time period whose boundaries form the target, i.e. the boundaries
+        in which all other time periods should be expressed (Optional).
+    unit_index : str, optional
+        the column on the geodataframe that identifies unique units in the timeseries. If None, the
+        geodataframe index will be used, and the unique identifier for each unit will be set to "id"
+    target_gdf: geopandas.GeoDataFrame
+        A geodataframe whose boundaries are the interpolation target for all time periods.
+        For example to convert all time periods to a set of hexgrids, generate a set of hexagonal
+        polygons using tobler <https://pysal.org/tobler/generated/tobler.util.h3fy.htm> and pass the
+        resulting geodataframe as this argument. (Optional).
     weights_method : string
         The method that the harmonization will be conducted. This can be set to:
             * "area"                      : harmonization using simple area-weighted interprolation.
@@ -63,9 +76,9 @@ def harmonize(
         reprojected to the CRS of the raster file. It is recommended to
         leave this argument True.
         Only taken into consideration for harmonization raster based.
-    unit_index : str
-        name of column in the Community gdf that denotes unique unit identifiers, default is "geoid"
-
+    verbose: bool
+        whether to print warnings (usually NaN replacement warnings) from tobler
+        default is False
 
 
     Notes
@@ -100,57 +113,102 @@ def harmonize(
         w_{i,j} = a_{i,j} / \sum_k a_{k,j}
 
     """
-    assert unit_index in gdf.columns, f"{unit_index} must be available"
-    assert target_year, "target_year is a required parameter"
+
+    if target_year and target_gdf:
+        raise ValueError(
+            "Either a target_year or a target_gdf may be specified, but not both"
+        )
+    assert target_year or isinstance(
+        target_gdf, gpd.GeoDataFrame
+    ), "must provide either a target year or a target geodataframe"
     if extensive_variables is None and intensive_variables is None:
         raise ValueError(
             "You must pass a set of extensive and/or intensive variables to interpolate"
         )
-    if not extensive_variables:
-        extensive_variables = []
-    if not intensive_variables:
-        intensive_variables = []
-    all_vars = extensive_variables + intensive_variables
 
     _check_presence_of_crs(gdf)
     crs = gdf.crs
     dfs = gdf.copy()
     times = dfs[temporal_index].unique().tolist()
-    times.remove(target_year)
+    interpolated_dfs = []
 
-    target_df = dfs[dfs[temporal_index] == target_year].reset_index()
+    if unit_index is not None:
+        dfs = dfs.set_index(unit_index)
 
-    interpolated_dfs = {}
-    interpolated_dfs[target_year] = target_df.copy()
+    if target_gdf is not None:
+        target_df = target_gdf
 
+    elif target_year:
+        times.remove(target_year)
+        target_df = dfs[dfs[temporal_index] == target_year]
+
+    if target_df.index.name:
+        unit_index = target_df.index.name
+    else:
+        unit_index = "id"
+    target_df[unit_index] = target_df.index.values
+
+    geom_name = target_df.geometry.name
+    allcols = [unit_index, temporal_index, geom_name]
+    if extensive_variables is not None:
+        for i in extensive_variables:
+            allcols.append(i)
+    if intensive_variables is not None:
+        for i in intensive_variables:
+            allcols.append(i)
+   
     with tqdm(total=len(times), desc=f"Converting {len(times)} time periods") as pbar:
         for i in times:
-            pbar.write(f"Harmonizing {i}")
+            pbar.set_description(f"Harmonizing {i}")
             source_df = dfs[dfs[temporal_index] == i]
 
             if weights_method == "area":
-
-                # In area_interpolate, the resulting variable has same lenght as target_df
-                interpolation = area_interpolate(
-                    source_df,
-                    target_df.copy(),
-                    extensive_variables=extensive_variables,
-                    intensive_variables=intensive_variables,
-                    allocate_total=allocate_total,
-                )
-
-            elif weights_method == "dasymetric":
-                try:
-                    # In area_interpolate, the resulting variable has same lenght as target_df
-                    interpolation = masked_area_interpolate(
+                if verbose:
+                    interpolation = area_interpolate(
                         source_df,
                         target_df.copy(),
                         extensive_variables=extensive_variables,
                         intensive_variables=intensive_variables,
                         allocate_total=allocate_total,
-                        pixel_values=codes,
-                        raster=raster,
                     )
+                else:
+                # if there are NaNs, tobler will raise lots of warnings, that it's filling
+                # with implicit 0s. Those warnings are superfluous most of the time
+                    with warnings.catch_warnings():
+                        warnings.simplefilter("ignore")                 
+                        interpolation = area_interpolate(
+                            source_df,
+                            target_df.copy(),
+                            extensive_variables=extensive_variables,
+                            intensive_variables=intensive_variables,
+                            allocate_total=allocate_total,
+                        )
+
+            elif weights_method == "dasymetric":
+                try:
+                    if verbose:
+                        interpolation = masked_area_interpolate(
+                            source_df,
+                            target_df.copy(),
+                            extensive_variables=extensive_variables,
+                            intensive_variables=intensive_variables,
+                            allocate_total=allocate_total,
+                            pixel_values=pixel_values,
+                            raster=raster,
+                        )
+                    else:
+                        # should probably do this with a decorator..
+                        with warnings.catch_warnings():
+                            warnings.simplefilter("ignore")
+                            interpolation = masked_area_interpolate(
+                                source_df,
+                                target_df.copy(),
+                                extensive_variables=extensive_variables,
+                                intensive_variables=intensive_variables,
+                                allocate_total=allocate_total,
+                                pixel_values=pixel_values,
+                                raster=raster,
+                            )
                 except IOError:
                     raise IOError(
                         "Unable to locate raster. If using the `dasymetric` or model-based methods. You"
@@ -159,21 +217,16 @@ def harmonize(
             else:
                 raise ValueError('weights_method must of one of ["area", "dasymetric"]')
 
-            profiles = []
-            profile = interpolation[all_vars]
-            profiles.append(profile)
+            interpolation[temporal_index] = i
+            interpolation[unit_index] = target_df[unit_index].values
+            interpolation = interpolation.set_index(unit_index)
+            interpolated_dfs.append(interpolation)
 
-            profile["geometry"] = target_df["geometry"]
-            profile[unit_index] = target_df[unit_index]
-            profile[temporal_index] = i
-
-            interpolated_dfs[i] = profile
             pbar.update(1)
         pbar.set_description("Complete")
         pbar.close()
+    interpolated_dfs.append(target_df[allcols].set_index(unit_index))
 
-    harmonized_df = gpd.GeoDataFrame(
-        pd.concat(list(interpolated_dfs.values()), sort=True), crs=crs
-    ).drop(columns=["index"])
+    harmonized_df = gpd.GeoDataFrame(pd.concat(interpolated_dfs), crs=crs)
 
-    return harmonized_df
+    return harmonized_df.dropna(how="all")

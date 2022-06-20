@@ -117,7 +117,7 @@ def get_acs(
     constant_dollars=True,
     currency_year=2019,
 ):
-    """_summary_
+    """Extract a subset of data from the American Community Survey (ACS).
 
     Parameters
     ----------
@@ -193,7 +193,7 @@ def get_acs(
                 df = adjust_inflation(df, inflate_cols, year, currency_year)
             except:
                 warn(
-                    "Currenct columns unavailable at this resolution; not adjusting for inflation"
+                    "Currency columns unavailable at this resolution; not adjusting for inflation"
                 )
         dflist.append(df)
     gdf = pd.concat(dflist)

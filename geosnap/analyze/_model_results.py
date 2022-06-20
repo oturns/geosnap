@@ -1,4 +1,14 @@
-from functools import cached_property
+try:
+    from functools import cached_property
+except ImportError:
+    try:
+        from backports.cached_property import cached_property
+    except ImportError:
+        raise ImportError(
+            "geosnap is only officially supported on the last three versions of Python. To use the package with "
+            "Python 3.7 or earlier, you must install the backports.cached-property package. "
+            "You can do so with `pip install backports.cached-property`."
+        )
 from warnings import warn
 
 import esda

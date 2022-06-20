@@ -1,6 +1,5 @@
 """Tools for creating and manipulating neighborhood datasets."""
 
-from lib2to3.pytree import convert
 import os
 import pathlib
 from warnings import warn
@@ -53,9 +52,7 @@ class _Map(dict):
 
 
 class DataStore:
-    """Storage for geosnap data. Currently supports data from several U.S. federal agencies and national research centers.
-
-    """
+    """Storage for geosnap data. Currently supports data from several U.S. federal agencies and national research centers."""
 
     def __init__(self, data_dir="auto"):
         self
@@ -86,6 +83,7 @@ class DataStore:
             "msas",
             "ncdb",
             "nces",
+            "seda",
             "states",
             "show_data_dir",
             "tracts_1990",
@@ -139,7 +137,7 @@ class DataStore:
         self, level="school", pooling="pool", standardize="gcs", accept_eula=False
     ):
         """Acheievement data from the Stanford Education Data Archive (currently version 4.1).
-        
+
         May be joined with geodataframes from NCES for spatial analysis
 
         Parameters
@@ -148,7 +146,7 @@ class DataStore:
             aggregation level for achievement data. Options include `school` for school-level,
             or `geodist` for geographic school district-level. By default "school"
         pooling : str
-            option to return long-form or pooled data. Only applicable for geodist level
+             option to return long-form or pooled data ("pool' or 'long"). Only applicable for geodist level
             as long-form not available at the school level. By default "pool"
         standardize : str,
             which grouping method used to standardize the data. Options include
@@ -156,7 +154,7 @@ class DataStore:
             by default "gcs"
         accept_eula : bool, optional
             pass True to accept the terms of the SEDA End User License Agreeement.
-            The data and its agreement can be viewed at <https://purl.stanford.edu/db586ns4974>            
+            The data and its agreement can be viewed at <https://purl.stanford.edu/db586ns4974>
         """
         eula = """
 DATA USE AGREEMENT:
@@ -410,7 +408,8 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         return t
 
     def tracts_2010(
-        self, states=None,
+        self,
+        states=None,
     ):
         """Nationwide Census Tracts as drawn in 2010 (cartographic 500k).
 

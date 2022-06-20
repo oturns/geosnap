@@ -283,7 +283,7 @@ def predict_markov_labels(
 
     assert (
         cluster_col and cluster_col in gdf.columns
-    ), "You must provide the name of a cluster model present on the Community gdf"
+    ), f"The input dataframe has no column named {cluster_col}"
 
     assert (
         base_year
