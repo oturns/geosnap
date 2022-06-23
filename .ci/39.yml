@@ -28,6 +28,7 @@ dependencies:
   - segregation >=2.0
   - versioneer
   - pyproj >=3
+  - pandana
 
   # testing
   - jupyter

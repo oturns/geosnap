@@ -127,6 +127,20 @@ Rapidly compute and compare changes in segregation measures over time and across
     analyze.segdyn.spacetime_dyn
 
 
+Network Analysis Methods
+'''''''''''''''''''''''''''''''''''''''''''''
+
+Compute shortest path distance along a network using pandana, and visualize travel time isochrones from local data
+
+.. currentmodule:: geosnap
+
+.. autosummary::
+   :toctree: generated/
+
+   analyze.compute_travel_cost_adjlist
+   analyze.isochrone
+   analyze.isocrones
+
 The ModelResults Class
 '''''''''''''''''''''''''''''''''''''''''''''
 

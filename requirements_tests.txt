@@ -9,3 +9,4 @@ twine
 jupyter
 descartes
 pygraphviz
+cenpy
