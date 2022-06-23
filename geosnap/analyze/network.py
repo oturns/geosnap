@@ -69,8 +69,8 @@ def compute_travel_cost_adjlist(
             pbar.update(1)
 
     combined = pd.concat(ods)
-
-    return combined
+    # reorder the columns
+    return combined[['origin', 'destination', 'cost']]
 
 
 def isochrone(origin, network, threshold):
