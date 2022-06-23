@@ -1,6 +1,6 @@
 numpy
 pandas
-geopandas
+geopandas>=0.9
 matplotlib
 scikit-learn
 seaborn
@@ -23,3 +23,5 @@ s3fs
 segregation>=2.1
 proplot>=0.9
 versioneer
+pyproj>=3
+pandana

@@ -95,7 +95,9 @@ class Community:
         intensive_variables=None,
         allocate_total=True,
         raster=None,
-        codes="developed",
+        pixel_values="developed",
+        temporal_index='year',
+        unit_index=None
     ):
         """Standardize inconsistent boundaries into time-static ones.
 
@@ -178,8 +180,8 @@ class Community:
             New data are added to the input Community
 
         """
-        if codes == "developed":
-            codes = [21, 22, 23, 24]
+        if pixel_values == "developed":
+            pixel_values = [21, 22, 23, 24]
         gdf = _harmonize(
             self.gdf,
             target_year=target_year,
@@ -188,9 +190,10 @@ class Community:
             intensive_variables=intensive_variables,
             allocate_total=allocate_total,
             raster=raster,
-            codes=codes,
+            pixel_values=pixel_values,
+            temporal_index=temporal_index,
         )
-        return Community(gdf, harmonized=True)
+        return Community(gdf.reset_index(), harmonized=True, unit_index='id')
 
     def cluster(
         self,

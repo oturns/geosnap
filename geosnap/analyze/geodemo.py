@@ -105,8 +105,8 @@ def cluster(
     )
 
     assert unit_index in gdf.columns, (
-        "The column given as unit_index:, "
-        f"{unit_index} was not found in the geodataframe. ",
+        "The column given as unit_index: "
+        f"({unit_index}) was not found in the geodataframe. ",
         "If you need only a single time period, you can pass " "`unit_index=gdf.index`",
     )
     if not cluster_kwargs:
@@ -197,7 +197,7 @@ def cluster(
             temporal_index=temporal_index,
             unit_index=unit_index,
             scaler=scaler,
-            pooling=pooling
+            pooling=pooling,
         )
         if return_model:
             return gdf, results
@@ -244,7 +244,7 @@ def cluster(
                 temporal_index=temporal_index,
                 unit_index=unit_index,
                 scaler=scaler,
-                pooling=pooling
+                pooling=pooling,
             )
             models[time] = results
         if return_model:
@@ -433,7 +433,7 @@ def regionalize(
             temporal_index=temporal_index,
             unit_index=unit_index,
             scaler=scaler,
-            pooling=None
+            pooling=None,
         )
         models[time] = results
 

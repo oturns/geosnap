@@ -7,15 +7,12 @@ dependencies:
   - giddy >=2.2.1
   - libpysal
   - cenpy
-  - geopandas
+  - geopandas  >=0.9
   - matplotlib
   - scikit-learn
   - seaborn
   - pyarrow >=0.14.1
   - appdirs
-  - dash
-  - dash-bootstrap-components
-  - palettable
   - pip
   - tqdm
   - quilt3 >=3.6
@@ -25,9 +22,9 @@ dependencies:
   - contextily
   - scikit-plot
   - mapclassify
-  - spopt >=0.1.1
+  - spopt >=0.3.0
   - s3fs
   - segregation >=2.0
   - versioneer
-
-  
+  - pyproj >=3
+  - pandana

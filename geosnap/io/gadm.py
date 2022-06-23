@@ -1,8 +1,7 @@
 """Utilities for fetching data from GADM."""
+
 import os
 import tempfile
-import time
-from warnings import warn
 
 import geopandas as gpd
 

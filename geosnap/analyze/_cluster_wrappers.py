@@ -3,8 +3,13 @@
 from warnings import warn
 
 import numpy as np
-from sklearn.cluster import (AffinityPropagation, AgglomerativeClustering,
-                             KMeans, MiniBatchKMeans, SpectralClustering)
+from sklearn.cluster import (
+    AffinityPropagation,
+    AgglomerativeClustering,
+    KMeans,
+    MiniBatchKMeans,
+    SpectralClustering,
+)
 from sklearn.mixture import GaussianMixture
 
 
@@ -21,7 +26,7 @@ def _import_tryer(package, func, name):
 # Sklearn a-spatial models
 
 
-def ward(X, n_clusters=5,  **kwargs):
+def ward(X, n_clusters=5, **kwargs):
     """Agglomerative clustering using Ward linkage.
 
     Parameters
@@ -124,7 +129,7 @@ def affinity_propagation(
     max_iter : int, optional, default: 1000
         Maximum number of iterations
     random_state : int, RandomState instance or None, default=None
-        Pseudo-random number generator to control the starting state. Use an int for reproducible results across function calls. 
+        Pseudo-random number generator to control the starting state. Use an int for reproducible results across function calls.
 
     Returns
     -------
@@ -139,7 +144,7 @@ def affinity_propagation(
         copy=copy,
         affinity=affinity,
         verbose=verbose,
-        random_state=random_state
+        random_state=random_state,
     )
     model.fit(X)
     return model
@@ -201,7 +206,7 @@ def spectral(
         The number of parallel jobs to run. None means 1 unless in a joblib.parallel_backend context.
         -1 means using all processors. See Glossary for more details.
     random_state : int, RandomState instance or None, default=None
-        Pseudo-random number generator to control the starting state. Use an int for reproducible results across function calls. 
+        Pseudo-random number generator to control the starting state. Use an int for reproducible results across function calls.
     **kwargs : dict
         additional wkargs.
 
@@ -255,7 +260,7 @@ def gaussian_mixture(
     max_clusters: int, optional, default:10
         The max number of clusters to test if using `best_model` option
     random_state : int, RandomState instance or None, default=None
-        Pseudo-random number generator to control the starting state. Use an int for reproducible results across function calls. 
+        Pseudo-random number generator to control the starting state. Use an int for reproducible results across function calls.
     kwargs
 
     Returns
