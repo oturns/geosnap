@@ -592,7 +592,7 @@ def get_lodes(
     out = pd.concat(dfs, sort=True)
     out = out.groupby(["geoid", "year"]).first().reset_index()
     out.crs = 4326
-    return out
+    return out.reset_index()
 
 
 def _msa_to_county(datastore, msa_fips):
