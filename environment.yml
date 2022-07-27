@@ -28,3 +28,6 @@ dependencies:
   - versioneer
   - pyproj >=3
   - pandana
+  - pip
+  - pip:
+      - -e .  # install local geosnap package in editable mode
