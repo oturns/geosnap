@@ -106,7 +106,7 @@ class DataStore:
         return self.data_dir
 
     def acs(self, year=2018, level="tract", states=None):
-        """American Community Survey Data.
+        """American Community Survey Data (5-year estimates).
 
         Parameters
         ----------

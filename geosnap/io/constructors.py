@@ -251,7 +251,7 @@ def get_ltdb(
         tracts = tracts[tracts.representative_point().intersects(boundary.unary_union)]
         gdf = ltdb[ltdb["geoid"].isin(tracts["geoid"])]
         gdf = gpd.GeoDataFrame(gdf.merge(tracts, on="geoid", how="left"), crs=4326)
-        gdf = gdf[gdf['year'].isin(years)]
+        gdf = gdf[gdf["year"].isin(years)]
 
     else:
         gdf = _from_db(
@@ -316,7 +316,7 @@ def get_ncdb(
         tracts = tracts[tracts.representative_point().intersects(boundary.unary_union)]
         gdf = ncdb[ncdb["geoid"].isin(tracts["geoid"])]
         gdf = gpd.GeoDataFrame(gdf.merge(tracts, on="geoid", how="left"), crs=4326)
-        gdf = gdf[gdf['year'].isin(years)]
+        gdf = gdf[gdf["year"].isin(years)]
 
     else:
         gdf = _from_db(
@@ -568,26 +568,30 @@ def get_lodes(
         names = [names]
 
     dfs = []
-    for name in names:
-        if name == "PR":
-            raise Exception("does not yet include built-in data for Puerto Rico")
-        for year in years:
+    for year in years:
+        for name in names:
+            merged_year = []
+            if name == "PR":
+                raise Exception("does not yet include built-in data for Puerto Rico")
             try:
                 df = get_lehd(dataset=dataset, year=year, state=name)
                 if year < 2010:
                     df = gdf00.merge(df, right_index=True, left_on="geoid", how="left")
                 else:
                     df = gdf.merge(df, right_index=True, left_on="geoid", how="left")
+
                 df["year"] = year
-                df = df.reset_index().set_index(["geoid", "year"])
-                dfs.append(df)
+                merged_year.append(df)
             except ValueError:
                 warn(f"{name.upper()} {year} not found!")
                 pass
+            try:
+                dfs.append(pd.concat(merged_year))
+            except ValueError:
+                pass  # we've already warned
     out = pd.concat(dfs, sort=True)
-    out = out[~out.index.duplicated(keep="first")]
-    out = out.reset_index()
-
+    out = out.groupby(["geoid", "year"]).first().reset_index()
+    out.crs = 4326
     return out
 
 
