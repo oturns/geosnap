@@ -13,7 +13,7 @@ naics_23,CNS04,Num ,Number of jobs in NAICS sector 23 (Construction)
 naics_31_33,CNS05,Num ,Number of jobs in NAICS sector 31-33 (Manufacturing) 
 naics_42,CNS06,Num ,Number of jobs in NAICS sector 42 (Wholesale Trade) 
 naics_44_45,CNS07,Num ,Number of jobs in NAICS sector 44-45 (Retail Trade) 
-naics_48_89,CNS08,Num ,Number of jobs in NAICS sector 48-49 (Transportation and Warehousing) 
+naics_48_49,CNS08,Num ,Number of jobs in NAICS sector 48-49 (Transportation and Warehousing) 
 naics_51,CNS09,Num ,Number of jobs in NAICS sector 51 (Information) 
 naics_52,CNS10,Num ,Number of jobs in NAICS sector 52 (Finance and Insurance) 
 naics_53,CNS11,Num ,Number of jobs in NAICS sector 53 (Real Estate and Rental and Leasing) 
@@ -25,7 +25,7 @@ naics_62,CNS16,Num ,Number of jobs in NAICS sector 62 (Health Care and Social As
 naics_71,CNS17,Num ,"Number of jobs in NAICS sector 71 (Arts, Entertainment, and Recreation) "
 naics_72,CNS18,Num ,Number of jobs in NAICS sector 72 (Accommodation and Food Services) 
 naics_81,CNS19,Num ,Number of jobs in NAICS sector 81 (Other Services [except Public Administration]) 
-naics_90,CNS20,Num ,Number of jobs in NAICS sector 92 (Public Administration) 
+naics_92,CNS20,Num ,Number of jobs in NAICS sector 92 (Public Administration) 
 employees_white,CR01,Num ,"Number of jobs for workers with Race: White, Alone15 "
 employees_black,CR02,Num ,"Number of jobs for workers with Race: Black or African American,  Alone"
 employees_native_american,CR03,Num ,Number of jobs for workers with Race: American Indian or Alaska Native Alone15 
