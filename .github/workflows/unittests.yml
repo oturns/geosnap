@@ -30,6 +30,9 @@
          with:
            environment-file: ${{ matrix.environment-file }}
            micromamba-version: 'latest'
+           mamba-version: "*"
+           channels: conda-forge
+           channel-priority: true
      
      
        - name: install geosnap - bash
