@@ -7,7 +7,7 @@ from libpysal.weights.contiguity import Queen, Rook, Voronoi
 from libpysal.weights.distance import KNN, DistanceBand
 from sklearn.preprocessing import StandardScaler
 from spopt.region.base import form_single_component
-
+from tqdm.auto import tqdm
 from .._data import _Map
 from ._cluster_wrappers import (
     affinity_propagation,
@@ -441,3 +441,58 @@ def regionalize(
         return gdf.reset_index(), models
 
     return gdf.reset_index()
+
+
+def find_optimal_k(
+    gdf,
+    method=None,
+    columns=None,
+    temporal_index="year",
+    unit_index="geoid",
+    scaler="std",
+    pooling="fixed",
+    random_state=None,
+    cluster_kwargs=None,
+    max_k=10,
+    return_table=False,
+):
+    assert method != "affinity_propagation", (
+        "Affinity propagation finds `k` endogenously, "
+        "and is incompatible with this function. To "
+        "change the number of clusters using affinity propagation "
+        "change the `damping` and `preference` arguments"
+    )
+
+    output = dict()
+
+    for i in tqdm(range(2, max_k + 1), total=max_k-1):
+        #  create a model_results class
+        results = cluster(
+            gdf,
+            n_clusters=i,
+            method=method,
+            best_model=False,
+            columns=columns,
+            verbose=False,
+            temporal_index=temporal_index,
+            unit_index=unit_index,
+            scaler=scaler,
+            pooling=pooling,
+            random_state=random_state,
+            cluster_kwargs=cluster_kwargs,
+            return_model=True,
+        )[1]
+
+        results = pd.Series(
+            {
+                "silhouette_score": results.silhouette_score,
+                "calinski_harabasz_score": results.calinski_harabasz_score,
+                "davies_bouldin_score": results.davies_bouldin_score,
+            },
+        )
+        output[i] = results
+    output = pd.DataFrame(output).T
+    if return_table:
+        return output
+    else:
+        return output.idxmax().to_frame(name="optimal_k")

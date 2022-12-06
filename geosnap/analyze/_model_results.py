@@ -14,7 +14,11 @@ from warnings import warn
 import esda
 import geopandas as gpd
 import scikitplot as skplt
-from sklearn.metrics import silhouette_samples
+from sklearn.metrics import (
+    silhouette_samples,
+    calinski_harabasz_score,
+    davies_bouldin_score,
+)
 
 from ..visualize.mapping import plot_timeseries
 from .dynamics import predict_markov_labels as _predict_markov_labels
@@ -154,6 +158,71 @@ class ModelResults:
             geometry=self.df.geometry,
             crs=self.df.crs,
         )
+
+    @property
+    def silhouette_score(self):
+        """Calculate silhouette_score the cluster solution.
+
+        Returns
+        -------
+        float
+
+        """
+        return self.silhouette_scores.silhouette_score.mean()
+
+    @cached_property
+    def calinski_harabasz_score(self):
+        """Calculate calinski_harabasz_score the cluster solution.
+
+        Returns
+        -------
+        float
+
+        """
+        df = self.df.copy()
+        df = df.dropna(subset=self.columns)
+        time_idx = self.temporal_index
+        if self.scaler:
+            if self.pooling in ["fixed", "unique"]:
+                # if fixed (or unique), scale within each time period
+                for time in df[time_idx].unique():
+                    df.loc[
+                        df[time_idx] == time, self.columns
+                    ] = self.scaler.fit_transform(
+                        df.loc[df[time_idx] == time, self.columns].values
+                    )
+
+            elif self.pooling == "pooled":
+                # if pooled, scale the whole series at once
+                df.loc[:, self.columns] = self.scaler.fit_transform(df.values)
+        return calinski_harabasz_score(df[self.columns].values, df[self.name])
+
+    @cached_property
+    def davies_bouldin_score(self):
+        """Calculate davies_bouldin_score for the cluster solution.
+
+        Returns
+        -------
+        float
+
+        """
+        df = self.df.copy()
+        df = df.dropna(subset=self.columns)
+        time_idx = self.temporal_index
+        if self.scaler:
+            if self.pooling in ["fixed", "unique"]:
+                # if fixed (or unique), scale within each time period
+                for time in df[time_idx].unique():
+                    df.loc[
+                        df[time_idx] == time, self.columns
+                    ] = self.scaler.fit_transform(
+                        df.loc[df[time_idx] == time, self.columns].values
+                    )
+
+            elif self.pooling == "pooled":
+                # if pooled, scale the whole series at once
+                df.loc[:, self.columns] = self.scaler.fit_transform(df.values)
+        return davies_bouldin_score(df[self.columns].values, df[self.name])
 
     @cached_property
     def nearest_label(self):
