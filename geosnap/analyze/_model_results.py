@@ -122,7 +122,7 @@ class ModelResults:
 
     @cached_property
     def silhouette_scores(self):
-        """Calculate silhouette scores for the each unit.
+        """Calculate silhouette scores for the each unit. See <https://scikit-learn.org/stable/modules/clustering.html#silhouette-coefficient> for more information
 
         Returns
         -------
@@ -161,18 +161,19 @@ class ModelResults:
 
     @property
     def silhouette_score(self):
-        """Calculate silhouette_score the cluster solution.
+        """Calculate Silhouette Score the cluster solution. See <https://scikit-learn.org/stable/modules/clustering.html#silhouette-coefficient> for more information
 
         Returns
         -------
         float
+            The mean silhouette score over all samples
 
         """
         return self.silhouette_scores.silhouette_score.mean()
 
     @cached_property
     def calinski_harabasz_score(self):
-        """Calculate calinski_harabasz_score the cluster solution.
+        """Calculate Calinski-Harabasz Score the cluster solution. See <https://scikit-learn.org/stable/modules/clustering.html#calinski-harabasz-index>
 
         Returns
         -------
@@ -199,7 +200,7 @@ class ModelResults:
 
     @cached_property
     def davies_bouldin_score(self):
-        """Calculate davies_bouldin_score for the cluster solution.
+        """Calculate Davies-Bouldin Score for the cluster solution. See <https://scikit-learn.org/stable/modules/clustering.html#davies-bouldin-index> for more information
 
         Returns
         -------

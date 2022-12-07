@@ -443,7 +443,7 @@ def regionalize(
     return gdf.reset_index()
 
 
-def find_optimal_k(
+def find_k(
     gdf,
     method=None,
     columns=None,
@@ -453,9 +453,46 @@ def find_optimal_k(
     pooling="fixed",
     random_state=None,
     cluster_kwargs=None,
+    min_k=2,
     max_k=10,
     return_table=False,
 ):
+    """Use cluster fit metrics to determine the optimal number of `k` clusters
+
+    Parameters
+    ----------
+    gdf : geopandas.GeoDataFrame
+        a long-form geodataframe
+    method : string, optional
+        the clustering method to use, by default None
+    columns : list, optional
+        a list of columns in `gdf` to use in the clustering algorithm, by default None
+    temporal_index : str, optional
+        column that uniquely identifies time periods, by default "year"
+    unit_index : str, optional
+        column that uniquely identifies geographic units, by default "geoid"
+    scaler : str, optional
+        _description_, by default "std"
+    pooling : str, optional
+        _description_, by default "fixed"
+    random_state : _type_, optional
+        _description_, by default None
+    cluster_kwargs : dict, optional
+        _description_, by default None
+    max_k : int, optional
+        maximum number of clusters to test, by default 10
+    return_table : bool, optional
+        if True, return the table of fit coefficients for each combination
+        of k and cluster method, by default False
+
+    Returns
+    -------
+    pandas.DataFrame
+        if return_table==False (default), returns a pandas dataframe with a single column that holds
+        the optimal number of clusters according to each fit metric (row index).
+
+        if return_table==True, returns a table of fit coefficients for each k between min_k and max_k
+    """
     assert method != "affinity_propagation", (
         "Affinity propagation finds `k` endogenously, "
         "and is incompatible with this function. To "
@@ -465,7 +502,7 @@ def find_optimal_k(
 
     output = dict()
 
-    for i in tqdm(range(2, max_k + 1), total=max_k-1):
+    for i in tqdm(range(min_k, max_k + 1), total=max_k - min_k + 1):
         #  create a model_results class
         results = cluster(
             gdf,
@@ -495,4 +532,110 @@ def find_optimal_k(
     if return_table:
         return output
     else:
-        return output.idxmax().to_frame(name="optimal_k")
+        return output.agg(
+            {
+                "silhouette_score": "idxmax",
+                "calinski_harabasz_score": "idxmax",
+                "davies_bouldin_score": "idxmin",  # min score is better here
+            }
+        ).to_frame(name="best_k")
+
+
+def find_region_k(
+    gdf,
+    method=None,
+    columns=None,
+    temporal_index="year",
+    unit_index="geoid",
+    scaler="std",
+    threshold_variable="count",
+    threshold=10,
+    weights_kwargs=None,
+    region_kwargs=None,
+    min_k=2,
+    max_k=10,
+    return_table=False,
+):
+    """Use cluster fit metrics to determine the optimal number of `k` clusters
+
+    Parameters
+    ----------
+    gdf : geopandas.GeoDataFrame
+        a long-form geodataframe
+    method : string, optional
+        the clustering method to use, by default None
+    columns : list, optional
+        a list of columns in `gdf` to use in the clustering algorithm, by default None
+    temporal_index : str, optional
+        column that uniquely identifies time periods, by default "year"
+    unit_index : str, optional
+        column that uniquely identifies geographic units, by default "geoid"
+    scaler : str, optional
+        _description_, by default "std"
+    pooling : str, optional
+        _description_, by default "fixed"
+    random_state : _type_, optional
+        _description_, by default None
+    cluster_kwargs : dict, optional
+        _description_, by default None
+    max_k : int, optional
+        maximum number of clusters to test, by default 10
+    return_table : bool, optional
+        if True, return the table of fit coefficients for each combination
+        of k and cluster method, by default False
+
+    Returns
+    -------
+    pandas.DataFrame
+        if return_table==False (default), returns a pandas dataframe with a single column that holds
+        the optimal number of clusters according to each fit metric (row index).
+
+        if return_table==True, returns a table of fit coefficients for each k between min_k and max_k
+    """
+
+    output = list()
+
+    for i in tqdm(range(min_k, max_k + 1), total=max_k - min_k + 1):
+        #  create a model_results class
+        _, results = regionalize(
+            gdf,
+            n_clusters=i,
+            method=method,
+            columns=columns,
+            temporal_index=temporal_index,
+            unit_index=unit_index,
+            scaler=scaler,
+            weights_kwargs=weights_kwargs,
+            region_kwargs=region_kwargs,
+            threshold=threshold,
+            threshold_variable=threshold_variable,
+            return_model=True,
+        )
+
+        times = list()
+        for time_period in results.keys():
+
+            res = pd.Series(
+                {
+                    "silhouette_score": results[time_period].silhouette_score,
+                    "calinski_harabasz_score": results[
+                        time_period
+                    ].calinski_harabasz_score,
+                    "davies_bouldin_score": results[time_period].davies_bouldin_score,
+                    "time_period": time_period,
+                    "k": i,
+                },
+            )
+            times.append(pd.DataFrame(res).T)
+        output.append(pd.concat(times).set_index("k"))
+    output = pd.concat(output)
+    if return_table:
+        return output
+    else:
+        return output.groupby("time_period").agg(
+            {
+                "silhouette_score": "idxmax",
+                "calinski_harabasz_score": "idxmax",
+                "davies_bouldin_score": "idxmin",  # min score is better here
+            }
+        )
