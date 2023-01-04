@@ -461,28 +461,36 @@ def find_k(
 
     Parameters
     ----------
-    gdf : geopandas.GeoDataFrame
-        a long-form geodataframe
-    method : string, optional
-        the clustering method to use, by default None
-    columns : list, optional
-        a list of columns in `gdf` to use in the clustering algorithm, by default None
+    gdf : geopandas.GeoDataFrame, required
+        long-form GeoDataFrame containing neighborhood attributes
+    method : str in ['kmeans', 'ward',  'spectral','gaussian_mixture'], required
+        the clustering algorithm used to identify neighborhood types
+    columns : list-like, required
+        subset of columns on which to apply the clustering
     temporal_index : str, optional
-        column that uniquely identifies time periods, by default "year"
+        which column on the dataframe defines time and or sequencing of the
+        long-form data. Default is "year"
     unit_index : str, optional
-        column that uniquely identifies geographic units, by default "geoid"
-    scaler : str, optional
-        _description_, by default "std"
-    pooling : str, optional
-        _description_, by default "fixed"
-    random_state : _type_, optional
-        _description_, by default None
+        which column on the long-form dataframe identifies the stable units
+        over time. In a wide-form dataset, this would be the unique index
+    scaler : None or scaler from sklearn.preprocessing, optional
+        a scikit-learn preprocessing class that will be used to rescale the
+        data. Defaults to sklearn.preprocessing.StandardScaler
+    pooling : ["fixed", "pooled", "unique"], optional (default='fixed')
+        How to treat temporal data when applying scaling. Options include:
+
+        * fixed : scaling is fixed to each time period
+        * pooled : data are pooled across all time periods
+        * unique : if scaling, apply the scaler to each time period, then generate
+          clusters unique to each time period.
     cluster_kwargs : dict, optional
         _description_, by default None
+    min_k : int, optional
+        minimum number of clusters to test, by default 2
     max_k : int, optional
         maximum number of clusters to test, by default 10
     return_table : bool, optional
-        if True, return the table of fit coefficients for each combination
+        if True, return the table of fit metrics for each combination
         of k and cluster method, by default False
 
     Returns
@@ -570,18 +578,15 @@ def find_region_k(
         column that uniquely identifies time periods, by default "year"
     unit_index : str, optional
         column that uniquely identifies geographic units, by default "geoid"
-    scaler : str, optional
-        _description_, by default "std"
-    pooling : str, optional
-        _description_, by default "fixed"
-    random_state : _type_, optional
-        _description_, by default None
+    scaler : None or scaler from sklearn.preprocessing, optional
+        a scikit-learn preprocessing class that will be used to rescale the
+        data. Defaults to sklearn.preprocessing.StandardScaler
     cluster_kwargs : dict, optional
-        _description_, by default None
+        additional kwargs passed to the clustering function in `geosnap.analyze.regionalize`
     max_k : int, optional
         maximum number of clusters to test, by default 10
     return_table : bool, optional
-        if True, return the table of fit coefficients for each combination
+        if True, return the table of fit metrics for each combination
         of k and cluster method, by default False
 
     Returns
@@ -622,6 +627,15 @@ def find_region_k(
                         time_period
                     ].calinski_harabasz_score,
                     "davies_bouldin_score": results[time_period].davies_bouldin_score,
+                    "path_silhouette": results[
+                        time_period
+                    ].path_silhouette.path_silhouette.mean(),
+                    "boundary_silhouette": results[time_period]
+                    .boundary_silhouette[
+                        results[time_period].boundary_silhouette.boundary_silhouette
+                        != 0
+                    ]
+                    .boundary_silhouette.mean(),  # average of non-zero boundary-silhouettes,
                     "time_period": time_period,
                     "k": i,
                 },
@@ -636,6 +650,8 @@ def find_region_k(
             {
                 "silhouette_score": "idxmax",
                 "calinski_harabasz_score": "idxmax",
+                "path_silhouette": "idxmax",
+                "boundary_silhouette": "idxmax",
                 "davies_bouldin_score": "idxmin",  # min score is better here
             }
         )
