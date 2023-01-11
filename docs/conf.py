@@ -166,7 +166,7 @@ html_theme_options = {
         ("Installation", "installation"),
         ("API", "api"),
         ("Data", "data"),
-        ("User Guide", "https://spatialucr.github.io/geosnap-guide/", True),
+        ("User Guide", "https://oturns.github.io/geosnap-guide/", True),
         ("References", "references"),
     ],
 }

@@ -1,22 +1,22 @@
 <p align="center">
-<img height=200 src="https://github.com/spatialucr/geosnap/raw/master/docs/figs/geosnap_long.png" alt="geosnap"/>
+<img height=200 src="https://github.com/oturns/geosnap/raw/main/docs/figs/geosnap_long.png" alt="geosnap"/>
 </p>
 
 <h2 align="center" style="margin-top:-10px">The Geospatial Neighborhood Analysis Package</h2> 
 
-[![Continuous Integration](https://github.com/spatialucr/geosnap/actions/workflows/unittests.yml/badge.svg)](https://github.com/spatialucr/geosnap/actions/workflows/unittests.yml)
-[![codecov](https://codecov.io/gh/spatialucr/geosnap/branch/master/graph/badge.svg)](https://codecov.io/gh/spatialucr/geosnap)
+[![Continuous Integration](https://github.com/oturns/geosnap/actions/workflows/unittests.yml/badge.svg)](https://github.com/oturns/geosnap/actions/workflows/unittests.yml)
+[![codecov](https://codecov.io/gh/oturns/geosnap/branch/main/graph/badge.svg)](https://codecov.io/gh/oturns/geosnap)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/geosnap)
 ![PyPI](https://img.shields.io/pypi/v/geosnap)
 ![Conda (channel only)](https://img.shields.io/conda/vn/conda-forge/geosnap)
 ![Conda](https://img.shields.io/conda/dn/conda-forge/geosnap)
-![GitHub commits since latest release (branch)](https://img.shields.io/github/commits-since/spatialucr/geosnap/latest)
+![GitHub commits since latest release (branch)](https://img.shields.io/github/commits-since/oturns/geosnap/latest)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3526163.svg)](https://doi.org/10.5281/zenodo.3526163)
 
 `geosnap` provides a suite of tools for exploring, modeling, and visualizing the social context and spatial extent of neighborhoods and regions over time. It brings together state-of-the-art techniques from [geodemographics](https://en.wikipedia.org/wiki/Geodemography), [regionalization](https://www.sciencedirect.com/topics/earth-and-planetary-sciences/regionalism), [spatial data science](https://geographicdata.science/book), and [segregation analysis](https://github.com/pysal/segregation) to support social science research, public policy analysis, and urban planning. It provides a simple interface tailored to formal analysis of spatiotemporal urban data.
 
 <p align="center">
-<img width='50%' src='https://github.com/spatialucr/geosnap/raw/master/docs/figs/Washington-Arlington-Alexandria_DC-VA-MD-WV.gif' alt='DC Transitions' style=' display: block; margin-left: auto; margin-right: auto; max-height: 540px'/>
+<img width='50%' src='https://github.com/oturns/geosnap/raw/main/docs/figs/Washington-Arlington-Alexandria_DC-VA-MD-WV.gif' alt='DC Transitions' style=' display: block; margin-left: auto; margin-right: auto; max-height: 540px'/>
 </p>
 
 
@@ -82,16 +82,16 @@ pip install geosnap
 
 ## User Guide
 
-See the [User Guide](https://spatialucr.github.io/geosnap-guide/) for a
+See the [User Guide](https://oturns.github.io/geosnap-guide/) for a
 gentle introduction to using `geosnap` for neighborhood research
 
 ## API Documentation
 
-See the [API docs](https://spatialucr.github.io/geosnap/api.html) for a thorough explanation of `geosnap`'s core functionality
+See the [API docs](https://oturns.github.io/geosnap/api.html) for a thorough explanation of `geosnap`'s core functionality
 
 ## Development
 
-geosnap development is hosted on [github](https://github.com/spatialucr/geosnap)
+geosnap development is hosted on [github](https://github.com/oturns/geosnap)
 
 To get started with the development version,
 clone this repository or download it manually then `cd` into the directory and run the
@@ -108,7 +108,7 @@ This will download the appropriate dependencies and install geosnap in its own c
 ## Bug reports
 
 To search for or report bugs, please see geosnap’s
-[issues](http://github.com/spatialucr/geosnap/issues)
+[issues](http://github.com/oturns/geosnap/issues)
 
 ## License information
 

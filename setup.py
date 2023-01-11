@@ -52,7 +52,7 @@ def setup_package():
         long_description_content_type="text/markdown",
         maintainer="geosnap Developers",
         maintainer_email="pysal-dev@googlegroups.com",
-        url="https://spatialucr.github.io/geosnap-guide",
+        url="https://oturns.github.io/geosnap-guide",
         download_url="https://pypi.python.org/pypi/geosnap",
         license="BSD",
         py_modules=["geosnap"],
