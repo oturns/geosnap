@@ -4,7 +4,7 @@
 
 `geosnap` uses [pytest](https://docs.pytest.org/en/latest/index.html) for its unittesting framework.
 Running the full test suite requires the
-[installation](https://github.com/spatialucr/geosnap/blob/master/examples/01_getting_started.ipynb)
+[installation](https://github.com/oturns/geosnap/blob/main/examples/01_getting_started.ipynb)
 of two proprietary datasets. It also requires four environment variables to be set:
 
 - `$NCDB`, `$LTDB_SAMPLE`, `$LTDB_FULLCOUNT` : these just need to be set. Any value will do. If these are not set, any tests dependent on LTDB or NCDB data will be skipped.
@@ -22,7 +22,7 @@ datasets but tests all other functionality.
 ## Example Testing
 
 In addition to unit tests, all functionality in `geosnap` should be documented in the
-[example notebooks](https://github.com/spatialucr/geosnap/tree/master/examples). To ensure these
+[example notebooks](https://github.com/oturns/geosnap/tree/main/examples). To ensure these
 examples execute faithfully, a CI suite should ensure that the notebooks are also run using
 `nbconvert`. Currently, TravisCI is set to run these notebooks only when the full test suite
 completes successfully (otherwise what's the point?)

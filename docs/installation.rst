@@ -28,13 +28,13 @@ $ conda env create -f environment.yml
 $ source activate geosnap 
 $ python setup.py develop
 
-You can  also `fork`_ the `spatialucr/geosnap`_ repo and create a local clone of
+You can  also `fork`_ the `oturns/geosnap`_ repo and create a local clone of
 your fork. By making changes
-to your local clone and submitting a pull request to `spatialucr/geosnap`_, you can
+to your local clone and submitting a pull request to `oturns/geosnap`_, you can
 contribute to the geosnap development.
 
 .. _3.5: https://docs.python.org/3.5/
 .. _3.6: https://docs.python.org/3.6/
-.. _spatialucr/geosnap: https://github.com/spatialucr/geosnap
+.. _oturns/geosnap: https://github.com/oturns/geosnap
 .. _fork: https://help.github.com/articles/fork-a-repo/
 .. _anaconda: https://www.anaconda.com/download/ 

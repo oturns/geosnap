@@ -141,7 +141,7 @@ def explore(data="census"):
                     dbc.DropdownMenuItem(divider=True),
                     dbc.DropdownMenuItem("Docs", href="http://geosnap.readthedocs.io"),
                     dbc.DropdownMenuItem(
-                        "Github", href="http://github.com/spatialucr/geosnap"
+                        "Github", href="http://github.com/oturns/geosnap"
                     ),
                 ],
             ),

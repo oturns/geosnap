@@ -22,8 +22,8 @@ But you’re not just limited to the data provided with the package. `geosnap`
 works with any data you provide, any place in the world.
 
 
-This site holds the `API documentation <https://spatialucr.github.io/geosnap/api.html>`_. For a more applied walkthrough focused on the use 
-of geosnap in practice, see the `User Guide <https://spatialucr.github.io/geosnap-guide>`_ instead
+This site holds the `API documentation <https://oturns.github.io/geosnap/api.html>`_. For a more applied walkthrough focused on the use 
+of geosnap in practice, see the `User Guide <https://oturns.github.io/geosnap-guide>`_ instead
 
 .. toctree::
    :hidden:

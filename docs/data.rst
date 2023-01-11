@@ -7,7 +7,7 @@ We host a variety of U.S. Census, landsat imagery, and OSM road network data in 
 and ``geosnap`` has convenience methods for building ``Community`` datasets from them. 
 
 
-All built-in datasets are available as methods on the ``geosnap.DataStore`` class. For more information, see the `Getting Started <https://spatialucr.github.io/geosnap-guide/notebooks/01_getting_started.html>`_ tutorial
+All built-in datasets are available as methods on the ``geosnap.DataStore`` class. For more information, see the `Getting Started <https://oturns.github.io/geosnap-guide/notebooks/01_getting_started.html>`_ tutorial
 
 To keep its slender profile, ``geosnap`` is conservative about storing these data locally. By default, when you use built-in data, it is streamed from s3 via ``quilt``.
 We store the data as efficient parquet files, and quilt provides access to them via Amazon's `open data cloud <https://registry.opendata.aws/spatial-ucr/>`_. 
@@ -15,14 +15,14 @@ This means that streaming data is relatively fast and efficient.
 
 
 If you plan to make repeated queries, or you need offline access to the data, ``geosnap`` also has functions
-for caching all the data locally (see the `Getting Started <https://spatialucr.github.io/geosnap-guide/notebooks/01_getting_started.html>`_ tutorial). 
+for caching all the data locally (see the `Getting Started <https://oturns.github.io/geosnap-guide/notebooks/01_getting_started.html>`_ tutorial). 
 Since we store everything in parquet, local storage is still highly efficient, and ``geosnap`` will use `appdirs <https://pypi.org/project/appdirs/>`_
 to determine the best place to store the data on your machine.
 
 
 Tabular Data
 --------------
-To view the `codebook <https://github.com/spatialucr/geosnap/blob/master/geosnap/io/variables.csv>`_ for geosnap's builtin datasets, use 
+To view the `codebook <https://github.com/oturns/geosnap/blob/main/geosnap/io/variables.csv>`_ for geosnap's builtin datasets, use 
 
 ``geosnap.datasets.codebook()``
 
