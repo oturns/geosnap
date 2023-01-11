@@ -7,6 +7,5 @@ pytest-cov
 hdbscan
 twine
 jupyter
-descartes
 pygraphviz
 cenpy
