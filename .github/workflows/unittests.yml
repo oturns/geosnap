@@ -15,7 +15,9 @@
      name: CI (${{ matrix.os }}-${{ matrix.environment-file }})
      runs-on: ${{ matrix.os }}
      continue-on-error: true
-     timeout-minutes: 90 
+     timeout-minutes: 90
+     env:
+       RUN_TEST: pytest geosnap -v -r a --cov geosnap --cov-config .coveragerc --cov-report xml --color yes --cov-append --cov-report term-missing
      strategy:
        matrix:
          os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
@@ -63,7 +65,7 @@
        
        - name: run tests - bash
          shell: bash -l {0}
-         run: pytest -v geosnap --cov=geosnap --cov-report=xml
+         run: ${{ env.RUN_TEST }}
          env:
            LTDB_SAMPLE: ${{ secrets.COMBO_DATA }} # check whether we can pull secrets
            LTDB_FULL: ${{ secrets.COMBO_DATA }}
@@ -72,7 +74,7 @@
        
        - name: run tests - powershell
          shell: powershell
-         run: pytest -v geosnap
+         run: ${{ env.RUN_TEST }}
          env:
            LTDB_SAMPLE: ${{ secrets.COMBO_DATA }} # check whether we can pull secrets
            LTDB_FULL: ${{ secrets.COMBO_DATA }}
