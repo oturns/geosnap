@@ -8,6 +8,7 @@ from libpysal.weights.distance import KNN, DistanceBand
 from sklearn.preprocessing import StandardScaler
 from spopt.region.base import form_single_component
 from tqdm.auto import tqdm
+
 from .._data import _Map
 from ._cluster_wrappers import (
     affinity_propagation,
@@ -457,7 +458,7 @@ def find_k(
     max_k=10,
     return_table=False,
 ):
-    """Use cluster fit metrics to determine the optimal number of `k` clusters
+    """Brute-forse search through cluster fit metrics to determine the optimal number of `k` clusters
 
     Parameters
     ----------
@@ -537,10 +538,7 @@ def find_k(
         )
         output[i] = results
     output = pd.DataFrame(output).T
-    if return_table:
-        return output
-    else:
-        return output.agg(
+    summary = output.agg(
             {
                 "silhouette_score": "idxmax",
                 "calinski_harabasz_score": "idxmax",
@@ -548,23 +546,26 @@ def find_k(
             }
         ).to_frame(name="best_k")
 
+    if return_table:
+        return summary, output
+    else:
+        return summary
 
 def find_region_k(
     gdf,
     method=None,
     columns=None,
+    spatial_weights="rook",
     temporal_index="year",
     unit_index="geoid",
     scaler="std",
-    threshold_variable="count",
-    threshold=10,
     weights_kwargs=None,
     region_kwargs=None,
     min_k=2,
     max_k=10,
     return_table=False,
 ):
-    """Use cluster fit metrics to determine the optimal number of `k` clusters
+    """Brute force through cluster fit metrics to determine the optimal number of `k` regions
 
     Parameters
     ----------
@@ -574,6 +575,10 @@ def find_region_k(
         the clustering method to use, by default None
     columns : list, optional
         a list of columns in `gdf` to use in the clustering algorithm, by default None
+    spatial_weights : ['queen', 'rook'] or libpysal.weights.W object
+        spatial weights matrix specification`. By default, geosnap will calculate Rook
+        weights, but you can also pass a libpysal.weights.W object for more control
+        over the specification.
     temporal_index : str, optional
         column that uniquely identifies time periods, by default "year"
     unit_index : str, optional
@@ -595,7 +600,7 @@ def find_region_k(
         if return_table==False (default), returns a pandas dataframe with a single column that holds
         the optimal number of clusters according to each fit metric (row index).
 
-        if return_table==True, returns a table of fit coefficients for each k between min_k and max_k
+        if return_table==True, also returns a table of fit coefficients for each k between min_k and max_k
     """
 
     output = list()
@@ -607,13 +612,12 @@ def find_region_k(
             n_clusters=i,
             method=method,
             columns=columns,
+            spatial_weights=spatial_weights,
             temporal_index=temporal_index,
             unit_index=unit_index,
             scaler=scaler,
             weights_kwargs=weights_kwargs,
             region_kwargs=region_kwargs,
-            threshold=threshold,
-            threshold_variable=threshold_variable,
             return_model=True,
         )
 
@@ -643,10 +647,8 @@ def find_region_k(
             times.append(pd.DataFrame(res).T)
         output.append(pd.concat(times).set_index("k"))
     output = pd.concat(output)
-    if return_table:
-        return output
-    else:
-        return output.groupby("time_period").agg(
+
+    summary = output.groupby("time_period").agg(
             {
                 "silhouette_score": "idxmax",
                 "calinski_harabasz_score": "idxmax",
@@ -655,3 +657,7 @@ def find_region_k(
                 "davies_bouldin_score": "idxmin",  # min score is better here
             }
         )
+    if return_table:
+        return summary, output
+    else:
+        return summary

@@ -94,6 +94,8 @@ Model neighborhood differentiation using multivariate clustering algorithms
    :toctree: generated/
    
     analyze.cluster
+    analyze.find_k
+    analyze.find_region_k
     analyze.regionalize
     
 Neighborhood Dynamics Methods
