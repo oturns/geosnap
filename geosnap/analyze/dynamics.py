@@ -106,11 +106,9 @@ def transition(
     ), f"The unit_index ({unit_index}) column is not in the geodataframe"
     gdf_temp = gdf.copy().reset_index()
     df = gdf_temp[[unit_index, temporal_index, cluster_col]]
-    df_wide = (
-        df.pivot(index=unit_index, columns=temporal_index, values=cluster_col)
-        .dropna()
-        .astype("int")
-    )
+    df_wide = df.pivot(
+        index=unit_index, columns=temporal_index, values=cluster_col
+    ).dropna()
     y = df_wide.values
     if w_type is None:
         mar = Markov(y)  # class markov modeling
@@ -330,20 +328,43 @@ def predict_markov_labels(
             predictions.append(predicted)
             current_time += increment
         gdf = gpd.GeoDataFrame(pd.concat(predictions), crs=crs)
-        gdf[cluster_col] = gdf[cluster_col].astype(int)
+        gdf[cluster_col] = gdf[cluster_col]
         if new_colname:
             gdf = gdf.rename(columns={cluster_col: new_colname})
         return gdf
 
 
 def _draw_labels(w, gdf, cluster_col, markov, unit_index):
+    """Draw a random class label from the spatially-conditioned transition rates.
+
+    Parameters
+    ----------
+    w : libpysal.weights.W
+        spatial weights object
+    gdf : geopandas.GeoDataFrame
+        geodataframe of observations with class/cluster labels as a column
+    cluster_col : string
+        the column on the dataframe that holds class labels
+    markov : giddy.Spatial_Markov
+        an instance of a Spatial_Markov class
+    unit_index : string
+        the column on the dataframe that identifies unique spatial units
+
+    Returns
+    -------
+    geopandas.GeoDataFrame
+        long-form geodataframe with predicted cluster labels stored in the `new_colname` column
+    """    
     gdf = gdf.copy()
     lags = lag_categorical(w, gdf[cluster_col].values)
-    lags = lags.astype(int)
+    clusters = gdf.reset_index()[cluster_col].astype(str).values
+    classes = pd.Series(markov.classes).astype(str).values
+    cluster_idx = dict(zip(classes, list(range(len(classes)))))
 
     labels = {}
-    for i, cluster in gdf[cluster_col].astype(int).iteritems():
-        probs = np.nan_to_num(markov.P)[lags[i]][cluster]
+    for i, lag in enumerate(lags):
+
+        probs = np.nan_to_num(markov.P)[cluster_idx[lag]]
         probs /= (
             probs.sum()
         )  # correct for tolerance, see https://stackoverflow.com/questions/25985120/numpy-1-9-0-valueerror-probabilities-do-not-sum-to-1
@@ -352,11 +373,10 @@ def _draw_labels(w, gdf, cluster_col, markov, unit_index):
             # (so all transition probs are 0)
             # fall back to the aspatial transition matrix
 
-            labels[i] = np.random.choice(markov.classes, p=probs)
+            labels[i] = np.random.choice(classes, p=probs)
         except:
-            labels[i] = np.random.choice(markov.classes, p=markov.p[cluster])
-    labels = pd.Series(labels, name=cluster_col)
-    labels = labels.astype(int)
+            labels[i] = np.random.choice(classes, p=markov.p[cluster_idx[clusters[i]]])
+    labels = pd.Series(labels, name=cluster_col, index=gdf.index)
     out = gdf[[unit_index, gdf.geometry.name]]
     predicted = gpd.GeoDataFrame(pd.concat([labels, out], axis=1))
     return predicted
