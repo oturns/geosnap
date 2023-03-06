@@ -69,6 +69,8 @@ def gif_from_path(
 
     plt.tight_layout()
     ani.save(filename, writer=writer, dpi=dpi)
+    plt.clf()
+
 
 
 def plot_timeseries(
@@ -349,11 +351,12 @@ def animate_timeseries(
                 )
             ctx.add_basemap(ax=ax, source=ctxmap)
             ax.axis("off")
-            ax.set_title(f"{time}", fontsize=subtitle_fontsize)
+            ax.set_title(f"{time}", fontsize=subtitle_fontsize, backgroundcolor='white')
             fig.suptitle(f"{title}", fontsize=title_fontsize)
 
             plt.tight_layout()
             plt.savefig(outpath, dpi=dpi)
+            plt.clf()
 
         gif_from_path(
             tmpdirname,
