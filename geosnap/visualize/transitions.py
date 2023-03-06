@@ -112,7 +112,6 @@ def plot_transition_matrix(
         square=True,
         xticklabels=ls,
         yticklabels=ls,
-        **kwargs,
     )
     axs[0].set_title("Global", fontsize=14)
     axs[0].tick_params(axis="x", which="minor", bottom=False)

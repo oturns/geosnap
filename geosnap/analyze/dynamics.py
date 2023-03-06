@@ -1,5 +1,7 @@
 """Transition and sequence analysis of neighborhood change."""
 
+from warnings import warn
+
 import geopandas as gpd
 import numpy as np
 import pandas as pd
@@ -238,6 +240,7 @@ def predict_markov_labels(
     time_steps=1,
     increment=None,
     seed=None,
+    verbose=True,
 ):
     """Predict neighborhood labels based on spatial Markov transition model
 
@@ -266,6 +269,8 @@ def predict_markov_labels(
         styled increment each time-step referrs to. For example, for a model fitted to decadal
         Census data, each time-step refers to a period of ten years, so an increment of 10 ensures
         that the temporal index aligns appropriately with the time steps being simulated
+    verbose: bool
+        if true, print warnings from the label sampling process
 
     Returns
     -------
@@ -302,7 +307,7 @@ def predict_markov_labels(
 
         gdf = gdf[gdf[temporal_index] == base_year].reset_index(drop=True)
         w = Ws[w_type].from_dataframe(gdf, **w_options)
-        predicted = _draw_labels(w, gdf, cluster_col, t, unit_index)
+        predicted = _draw_labels(w, gdf, cluster_col, t, unit_index, verbose)
         if new_colname:
             predicted = predicted.rename(columns={cluster_col: new_colname})
         return predicted
@@ -323,7 +328,7 @@ def predict_markov_labels(
             # use the last known set of labels  to get the spatial context for each geog unit
             gdf = predictions[step - 1].copy()
 
-            predicted = _draw_labels(w, gdf, cluster_col, t, unit_index)
+            predicted = _draw_labels(w, gdf, cluster_col, t, unit_index, verbose)
             predicted[temporal_index] = current_time
             predictions.append(predicted)
             current_time += increment
@@ -334,7 +339,7 @@ def predict_markov_labels(
         return gdf
 
 
-def _draw_labels(w, gdf, cluster_col, markov, unit_index):
+def _draw_labels(w, gdf, cluster_col, markov, unit_index, verbose):
     """Draw a random class label from the spatially-conditioned transition rates.
 
     Parameters
@@ -354,7 +359,7 @@ def _draw_labels(w, gdf, cluster_col, markov, unit_index):
     -------
     geopandas.GeoDataFrame
         long-form geodataframe with predicted cluster labels stored in the `new_colname` column
-    """    
+    """
     gdf = gdf.copy()
     lags = lag_categorical(w, gdf[cluster_col].values)
     clusters = gdf.reset_index()[cluster_col].astype(str).values
@@ -363,19 +368,28 @@ def _draw_labels(w, gdf, cluster_col, markov, unit_index):
 
     labels = {}
     for i, lag in enumerate(lags):
-
-        probs = np.nan_to_num(markov.P)[cluster_idx[lag]]
+        #  select the transition matrix using the label of unit's spatial lag
+        spatial_context = np.nan_to_num(markov.P, posinf=0.0, neginf=0.0)[
+            cluster_idx[lag]
+        ]
+        #  select the class's row from the transition matrix using the unit's label
+        probs = spatial_context[cluster_idx[clusters[i]]]
         probs /= (
             probs.sum()
         )  # correct for tolerance, see https://stackoverflow.com/questions/25985120/numpy-1-9-0-valueerror-probabilities-do-not-sum-to-1
-        try:
+        probs = np.nan_to_num(probs.flatten())
+        if sum(probs) == 0:
             # in case obs have a modal neighbor never before seen in the model
             # (so all transition probs are 0)
             # fall back to the aspatial transition matrix
+            if verbose:
+                warn(
+                    f"Falling back to aspatial transition rule for unit {gdf[unit_index][i]}"
+                )
+            probs = markov.p[cluster_idx[clusters[i]]].flatten()
 
-            labels[i] = np.random.choice(classes, p=probs)
-        except:
-            labels[i] = np.random.choice(classes, p=markov.p[cluster_idx[clusters[i]]])
+        labels[i] = np.random.choice(classes, p=probs)
+
     labels = pd.Series(labels, name=cluster_col, index=gdf.index)
     out = gdf[[unit_index, gdf.geometry.name]]
     predicted = gpd.GeoDataFrame(pd.concat([labels, out], axis=1))
