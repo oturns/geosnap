@@ -157,7 +157,7 @@ def plot_transition_matrix(
 def plot_transition_graphs(
     gdf,
     cluster_col=None,
-    filename=None,
+    output_dir=".",
     w_type="queen",
     w_options=None,
     temporal_index="year",
