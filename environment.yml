@@ -28,3 +28,4 @@ dependencies:
   - versioneer
   - pyproj >=3
   - pandana
+  - pooch
