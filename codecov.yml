@@ -17,8 +17,6 @@ coverage:
     - "tools/*"
     - "geosnap/tests/*"
     - "geosnap/util/*"
-    - "geosnap/visualize/commviz.py"
-    - "geosnap/visualize/viz.py"
     - "geosnap/io/util.py"
     - "geosnap/_version.py"
 comment:

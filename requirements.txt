@@ -24,3 +24,4 @@ proplot>=0.9
 versioneer
 pyproj>=3
 pandana
+pooch

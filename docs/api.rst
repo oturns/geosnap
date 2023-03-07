@@ -196,6 +196,7 @@ Visualize Module
    visualize.plot_timeseries
    visualize.plot_transition_matrix
    visualize.plot_transition_graphs
+   visualize.plot_violins_by_cluster
 
 .. _util_api:
 

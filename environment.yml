@@ -8,7 +8,7 @@ dependencies:
   - libpysal
   - cenpy
   - geopandas  >=0.9
-  - matplotlib
+  - matplotlib <=3.3.4  # workaround for proplot missing pin upstream
   - scikit-learn
   - seaborn
   - pyarrow >=0.14.1
@@ -28,6 +28,4 @@ dependencies:
   - versioneer
   - pyproj >=3
   - pandana
-  - pip
-  - pip:
-      - -e .  # install local geosnap package in editable mode
+  - pooch

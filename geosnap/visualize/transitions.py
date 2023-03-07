@@ -91,7 +91,7 @@ def plot_transition_matrix(
         )
     else:
         sm = transition_model
-    if not n_rows and not n_cols:
+    if n_rows is None and n_cols is None:
         sqcols = int(np.ceil(np.sqrt(len(sm.classes) + 1)))
         n_cols = sqcols
         n_rows = sqcols

@@ -1,5 +1,6 @@
 import os
 import pathlib
+import pooch
 from urllib.error import HTTPError
 from warnings import warn
 
@@ -40,9 +41,8 @@ def get_census_gdb(years=None, geom_level="blockgroup", output_dir="."):
             fn = f"{year}_ACS_5YR_{geom_level.capitalize()}.gdb.zip"
             out_fn = f"ACS_{year}_5YR_{levels[geom_level].upper()}.gdb.zip"
             pth = pathlib.PurePath(output_dir, out_fn)
-        url = f"ftp://ftp2.census.gov/geo/tiger/TIGER_DP/{year}ACS/{fn}"
-        download(url, pth)
-
+        url = f"https://www2.census.gov/geo/tiger/TIGER_DP/{year}ACS/{fn}"
+        pooch.retrieve(url, None, progressbar=True, path=pth)
 
 def reformat_acs_vars(col):
     """Convert variable names to the same format used by the Census Detailed Tables API.
