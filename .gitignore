@@ -21,3 +21,4 @@ snap/tests/.ipynb_checkpoints/
 **/build/
 **/dist/
 geosnap/tests/images
+docs/generated/*

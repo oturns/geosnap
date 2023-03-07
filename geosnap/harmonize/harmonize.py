@@ -49,10 +49,10 @@ def harmonize(
             * "dasymetric"                : harmonization using area-weighted interpolation with raster-based
                                             ancillary data to mask out uninhabited land.
     extensive_variables : list
-        The names of variables in each dataset of raw_community that contains
+        The names of variables in each dataset of gdf that contains
         extensive variables to be harmonized (see (2) in Notes).
     intensive_variables : list
-        The names of variables in each dataset of raw_community that contains
+        The names of variables in each dataset of gdf that contains
         intensive variables to be harmonized (see (2) in Notes).
     allocate_total : boolean
         True if total value of source area should be allocated.
