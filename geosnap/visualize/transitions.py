@@ -14,7 +14,7 @@ from ..analyze.dynamics import transition
 def plot_transition_matrix(
     gdf,
     cluster_col=None,
-    w_type="queen",
+    w_type="rook",
     w_options=None,
     temporal_index="year",
     unit_index="geoid",
@@ -213,7 +213,7 @@ def plot_transition_graphs(
         raise ImportError("You must have pygraphviz installed to use graph plotting")
     if transition_model is None:
         warn("Creating a transition model implicitly is deprecated and will be removed in future versions. "
-             "please pass a giddy.Spatial_Markov instance using `giddy` or `geosnap.analyze.transition`")
+             "please pass a giddy.Spatial_Markov instance created using `giddy` or `geosnap.analyze.transition`")
 
         sm = transition(
             gdf,

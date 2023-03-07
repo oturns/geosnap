@@ -744,6 +744,7 @@ class ModelResults:
         time_steps=1,
         increment=None,
         seed=None,
+        verbose=True,
     ):
         """Predict neighborhood labels from the model in future time periods using a spatial Markov transition model
 
@@ -771,13 +772,23 @@ class ModelResults:
             long-form geodataframe with predicted cluster labels stored in the `new_colname` column
         """
         if not base_year:
-            base_year = max(self.df[self.temporal_index].unique())
+            base_year = max(self.df[self.temporal_index].unique().tolist())
             warn(
                 f"No base_year provided. Using the last period for which labels are known:  {base_year} "
             )
-        inputs = locals()
-        del inputs["self"]
         output = _predict_markov_labels(
-            self.df, self.unit_index, self.temporal_index, self.name, **inputs
+            gdf=self.df,
+            unit_index=self.unit_index,
+            temporal_index=self.temporal_index,
+            cluster_col=self.name,
+            new_colname=new_colname,
+            w_type=w_type,
+            w_options=w_options,
+            base_year=base_year,
+            time_steps=time_steps,
+            increment=increment,
+            verbose=verbose,
+            seed=seed,
+            
         )
         return output

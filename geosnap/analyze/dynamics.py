@@ -233,7 +233,7 @@ def predict_markov_labels(
     unit_index="geoid",
     temporal_index="year",
     cluster_col=None,
-    w_type="queen",
+    w_type="rook",
     w_options=None,
     base_year=None,
     new_colname=None,
@@ -291,6 +291,9 @@ def predict_markov_labels(
     assert (
         base_year
     ), "Missing `base_year`. You must provide an initial time point with labels to begin simulation"
+    assert (
+        base_year in gdf[temporal_index].unique().tolist()
+    ), "A set of observations with `temporal_index`==`base_year` must be included in the gdf"
 
     gdf = gdf.copy()
     gdf = gdf.dropna(subset=[cluster_col]).reset_index(drop=True)
@@ -318,13 +321,13 @@ def predict_markov_labels(
         ), "You must set the `increment` argument to simulate multiple time steps"
         predictions = []
         gdf = gdf[gdf[temporal_index] == base_year]
-        gdf = gdf[[unit_index, cluster_col, temporal_index, "geometry"]]
+        gdf = gdf[[unit_index, cluster_col, temporal_index, gdf.geometry.name]]
         current_time = base_year + increment
         gdf = gdf.dropna(subset=[cluster_col]).reset_index(drop=True)
         w = Ws[w_type].from_dataframe(gdf, **w_options)
         predictions.append(gdf)
 
-        for step in range(time_steps):
+        for step in range(1, time_steps + 1):
             # use the last known set of labels  to get the spatial context for each geog unit
             gdf = predictions[step - 1].copy()
 
@@ -333,7 +336,6 @@ def predict_markov_labels(
             predictions.append(predicted)
             current_time += increment
         gdf = gpd.GeoDataFrame(pd.concat(predictions), crs=crs)
-        gdf[cluster_col] = gdf[cluster_col]
         if new_colname:
             gdf = gdf.rename(columns={cluster_col: new_colname})
         return gdf
@@ -361,6 +363,7 @@ def _draw_labels(w, gdf, cluster_col, markov, unit_index, verbose):
         long-form geodataframe with predicted cluster labels stored in the `new_colname` column
     """
     gdf = gdf.copy()
+    gdf = gdf.dropna(subset=[cluster_col])
     lags = lag_categorical(w, gdf[cluster_col].values)
     clusters = gdf.reset_index()[cluster_col].astype(str).values
     classes = pd.Series(markov.classes).astype(str).values
