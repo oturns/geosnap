@@ -4,7 +4,7 @@ Built-In Datasets
 ``geosnap`` has a lightweight installation footprint (the codebase clocks in at 174KB), but it also
 has access to several large, built-in datasets transparently, thanks to `quilt <https://quiltdata.com>`_.  
 We host a variety of U.S. Census, landsat imagery, and OSM road network data in our `public quilt bucket  <https://open.quiltdata.com/b/spatial-ucr/tree/>`_, 
-and ``geosnap`` has convenience methods for building ``Community`` datasets from them. 
+and ``geosnap`` has convenience methods for building datasets from them. 
 
 
 All built-in datasets are available as methods on the ``geosnap.DataStore`` class. For more information, see the `Getting Started <https://oturns.github.io/geosnap-guide/notebooks/01_getting_started.html>`_ tutorial

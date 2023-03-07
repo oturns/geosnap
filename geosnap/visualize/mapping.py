@@ -272,7 +272,7 @@ def animate_timeseries(
     figsize=(20, 20),
     ctxmap="default",
 ):
-    """Create an animated gif from a Community timeseries.
+    """Create an animated gif from a long-form geodataframe timeseries.
 
     Parameters
     ----------
@@ -283,7 +283,7 @@ def animate_timeseries(
     title        : str, optional
                     desired title of figure
     temporal_index     : str, required
-                    column on the Community.gdf that stores time periods
+                    column on the gdf that stores time periods
     time_periods:  list, optional
                     subset of time periods to include in the animation. If None, then all times will be used
     scheme       : string, optional

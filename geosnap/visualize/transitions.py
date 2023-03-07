@@ -35,7 +35,7 @@ def plot_transition_matrix(
     gdf : geopandas.GeoDataFrame
         a long-form geodataframe with columns for unit index, time index, and class value
     cluster_col : str
-        column on the Community.gdf containing neighborhood type labels
+        column on the gdf containing neighborhood type labels
     temporal_index : string, optional
         Column defining time and or sequencing of the long-form data.
         Default is "year".
@@ -180,7 +180,7 @@ def plot_transition_graphs(
         long-form geodataframe with a column holding labels appropriate 
         for using as input to `geosnap.analyze.transition`
     cluster_col : str
-        column on the Community.gdf containing neighborhood type labels
+        column on the gdf containing neighborhood type labels
     output_dir : str
         the location that output images will be placed
     temporal_index : string, optional
