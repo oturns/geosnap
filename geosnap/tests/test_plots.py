@@ -17,6 +17,7 @@ from geosnap.visualize import (
 
 
 try:
+    import pygraphviz
     NOGRAPHVIZ=False
 
 except ImportError:
