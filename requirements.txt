@@ -9,7 +9,7 @@ mapclassify
 giddy>=2.2.1
 xlrd
 cenpy
-appdirs
+platformdirs
 tqdm
 quilt3>=3.6
 pyarrow>=0.14.1

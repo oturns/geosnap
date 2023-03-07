@@ -16,7 +16,7 @@ This means that streaming data is relatively fast and efficient.
 
 If you plan to make repeated queries, or you need offline access to the data, ``geosnap`` also has functions
 for caching all the data locally (see the `Getting Started <https://oturns.github.io/geosnap-guide/notebooks/01_getting_started.html>`_ tutorial). 
-Since we store everything in parquet, local storage is still highly efficient, and ``geosnap`` will use `appdirs <https://pypi.org/project/appdirs/>`_
+Since we store everything in parquet, local storage is still highly efficient, and ``geosnap`` will use `platformdirs <https://pypi.org/project/platformdirs/>`_
 to determine the best place to store the data on your machine.
 
 
