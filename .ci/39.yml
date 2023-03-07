@@ -13,7 +13,7 @@ dependencies:
   - seaborn
   - hdbscan
   - pyarrow >=0.14.1
-  - appdirs
+  - platformdirs
   - dash
   - dash-bootstrap-components
   - palettable
@@ -29,6 +29,7 @@ dependencies:
   - versioneer
   - pyproj >=3
   - pandana
+  - pooch
 
   # testing
   - jupyter

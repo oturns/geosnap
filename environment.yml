@@ -12,7 +12,7 @@ dependencies:
   - scikit-learn
   - seaborn
   - pyarrow >=0.14.1
-  - appdirs
+  - platformdirs
   - pip
   - tqdm
   - quilt3 >=3.6

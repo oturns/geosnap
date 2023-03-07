@@ -8,7 +8,7 @@ from warnings import warn
 import geopandas as gpd
 import pandas as pd
 import quilt3
-from appdirs import user_data_dir
+from platformdirs import user_data_dir
 
 from .._data import DataStore
 from .util import adjust_inflation
@@ -40,7 +40,7 @@ def store_seda(data_dir="auto", accept_eula=False):
     ----------
     data_dir : str, optional
         path to desired storage location. If "auto", geosnap will use its default data
-        directory provided by appdirs, by default "auto"
+        directory provided by platformdirs, by default "auto"
     accept_eula : bool, optional
         Whether the accept the EULA from SEDA, by default False
     """
