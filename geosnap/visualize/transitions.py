@@ -1,36 +1,39 @@
 """plotting for spatial Markov transition matrices."""
 
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 import os
+from warnings import warn
+
+import matplotlib.pyplot as plt
 import networkx as nx
+import numpy as np
+import seaborn as sns
+
 from ..analyze.dynamics import transition
 
 
 def plot_transition_matrix(
-    gdf,
+    gdf=None,
     cluster_col=None,
-    w_type="queen",
+    w_type="rook",
     w_options=None,
     temporal_index="year",
     unit_index="geoid",
     permutations=0,
     figsize=(13, 12),
-    n_rows=3,
-    n_cols=3,
+    n_rows=None,
+    n_cols=None,
     suptitle=None,
     title_kwds=None,
     savefig=None,
     dpi=300,
-    **kwargs,
+    transition_model=None
 ):
     """Plot global and spatially-conditioned transition matrices as heatmaps.
 
     Parameters
     ----------
-    community : geosnap.Community
-        a geosnap Community instance
+    gdf : geopandas.GeoDataFrame
+        a long-form geodataframe with columns for unit index, time index, and class value
     cluster_col : str
         column on the Community.gdf containing neighborhood type labels
     temporal_index : string, optional
@@ -68,24 +71,30 @@ def plot_transition_matrix(
     matplotlib Axes
         the axes on which the plots are drawn
     """
-    if not n_rows and not n_cols:
-        n_cols = len(gdf[cluster_col].unique()) + 1
-        n_rows = 1
+
     if not title_kwds:
         title_kwds = {
             "fontsize": 20,
         }
+    if transition_model is None:
+        warn("Creating a transition model implicitly is deprecated and will be removed in future versions. "
+             "please pass a giddy.Spatial_Markov instance using `giddy` or `geosnap.analyze.transition`")
 
-    sm = transition(
-        gdf,
-        cluster_col=cluster_col,
-        temporal_index=temporal_index,
-        unit_index=unit_index,
-        w_type=w_type,
-        permutations=permutations,
-        w_options=w_options,
-    )
-
+        sm = transition(
+            gdf,
+            cluster_col=cluster_col,
+            temporal_index=temporal_index,
+            unit_index=unit_index,
+            w_type=w_type,
+            permutations=permutations,
+            w_options=w_options,
+        )
+    else:
+        sm = transition_model
+    if not n_rows and not n_cols:
+        sqcols = int(np.ceil(np.sqrt(len(sm.classes) + 1)))
+        n_cols = sqcols
+        n_rows = sqcols
     _, axs = plt.subplots(n_rows, n_cols, figsize=figsize)
     axs = axs.flatten()
 
@@ -103,7 +112,6 @@ def plot_transition_matrix(
         square=True,
         xticklabels=ls,
         yticklabels=ls,
-        **kwargs,
     )
     axs[0].set_title("Global", fontsize=14)
     axs[0].tick_params(axis="x", which="minor", bottom=False)
@@ -122,7 +130,8 @@ def plot_transition_matrix(
             vmin=0,
             vmax=1,
             square=True,
-            **kwargs,
+            xticklabels=ls,
+            yticklabels=ls,
         )
 
         axs[i + 1].set_title(lags_all[i], fontsize=14)
@@ -156,6 +165,7 @@ def plot_transition_graphs(
     permutations=0,
     layout="dot",
     args="-n -Groot=0 -Goverlap=false -Gnodesep=0.01 -Gfont_size=1 -Gmindist=3.5 -Gsize=30,30!",
+    transition_model=None
 ):
     """Plot a network graph representation of global and spatially-conditioned transition matrices.
 
@@ -166,8 +176,9 @@ def plot_transition_graphs(
 
     Parameters
     ----------
-    community : geosnap.Community
-        a geosnap Community instance
+    gdf : geopandas.GeoDataFrame
+        long-form geodataframe with a column holding labels appropriate 
+        for using as input to `geosnap.analyze.transition`
     cluster_col : str
         column on the Community.gdf containing neighborhood type labels
     output_dir : str
@@ -201,15 +212,22 @@ def plot_transition_graphs(
         import pygraphviz
     except ImportError:
         raise ImportError("You must have pygraphviz installed to use graph plotting")
-    sm = transition(
-        gdf,
-        cluster_col=cluster_col,
-        temporal_index=temporal_index,
-        unit_index=unit_index,
-        w_type=w_type,
-        permutations=permutations,
-        w_options=w_options,
-    )
+    if transition_model is None:
+        warn("Creating a transition model implicitly is deprecated and will be removed in future versions. "
+             "please pass a giddy.Spatial_Markov instance created using `giddy` or `geosnap.analyze.transition`")
+
+        sm = transition(
+            gdf,
+            cluster_col=cluster_col,
+            temporal_index=temporal_index,
+            unit_index=unit_index,
+            w_type=w_type,
+            permutations=permutations,
+            w_options=w_options,
+        )
+    else:
+        sm = transition_model
+
     # plot the global transition matrix
     p = sm.p
     graph = np.round(p, 2)

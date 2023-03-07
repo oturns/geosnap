@@ -1,6 +1,9 @@
-from geosnap import Community, datasets
+from geosnap import Community, DataStore
+
 import pytest
 import os
+
+datasets=DataStore()
 
 try:
     LTDB = os.environ["LTDB_SAMPLE"]

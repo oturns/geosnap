@@ -14,7 +14,11 @@ from warnings import warn
 import esda
 import geopandas as gpd
 import scikitplot as skplt
-from sklearn.metrics import silhouette_samples
+from sklearn.metrics import (
+    silhouette_samples,
+    calinski_harabasz_score,
+    davies_bouldin_score,
+)
 
 from ..visualize.mapping import plot_timeseries
 from .dynamics import predict_markov_labels as _predict_markov_labels
@@ -118,7 +122,7 @@ class ModelResults:
 
     @cached_property
     def silhouette_scores(self):
-        """Calculate silhouette scores for the each unit.
+        """Calculate silhouette scores for the each unit. See <https://scikit-learn.org/stable/modules/clustering.html#silhouette-coefficient> for more information
 
         Returns
         -------
@@ -154,6 +158,72 @@ class ModelResults:
             geometry=self.df.geometry,
             crs=self.df.crs,
         )
+
+    @property
+    def silhouette_score(self):
+        """Calculate Silhouette Score the cluster solution. See <https://scikit-learn.org/stable/modules/clustering.html#silhouette-coefficient> for more information
+
+        Returns
+        -------
+        float
+            The mean silhouette score over all samples
+
+        """
+        return self.silhouette_scores.silhouette_score.mean()
+
+    @cached_property
+    def calinski_harabasz_score(self):
+        """Calculate Calinski-Harabasz Score the cluster solution. See <https://scikit-learn.org/stable/modules/clustering.html#calinski-harabasz-index>
+
+        Returns
+        -------
+        float
+
+        """
+        df = self.df.copy()
+        df = df.dropna(subset=self.columns)
+        time_idx = self.temporal_index
+        if self.scaler:
+            if self.pooling in ["fixed", "unique"]:
+                # if fixed (or unique), scale within each time period
+                for time in df[time_idx].unique():
+                    df.loc[
+                        df[time_idx] == time, self.columns
+                    ] = self.scaler.fit_transform(
+                        df.loc[df[time_idx] == time, self.columns].values
+                    )
+
+            elif self.pooling == "pooled":
+                # if pooled, scale the whole series at once
+                df.loc[:, self.columns] = self.scaler.fit_transform(df.values)
+        return calinski_harabasz_score(df[self.columns].values, df[self.name])
+
+    @cached_property
+    def davies_bouldin_score(self):
+        """Calculate Davies-Bouldin Score for the cluster solution. See <https://scikit-learn.org/stable/modules/clustering.html#davies-bouldin-index> for more information
+
+        Returns
+        -------
+        float
+
+        """
+        df = self.df.copy()
+        df = df.dropna(subset=self.columns)
+        time_idx = self.temporal_index
+        if self.scaler:
+            if self.pooling in ["fixed", "unique"]:
+                # if fixed (or unique), scale within each time period
+                for time in df[time_idx].unique():
+                    df.loc[
+                        df[time_idx] == time, self.columns
+                    ] = self.scaler.fit_transform(
+                        df.loc[df[time_idx] == time, self.columns].values
+                    )
+
+            elif self.pooling == "pooled":
+                # if pooled, scale the whole series at once
+                df.loc[:, self.columns] = self.scaler.fit_transform(df.values)
+        return davies_bouldin_score(df[self.columns].values, df[self.name])
 
     @cached_property
     def nearest_label(self):
@@ -674,6 +744,7 @@ class ModelResults:
         time_steps=1,
         increment=None,
         seed=None,
+        verbose=True,
     ):
         """Predict neighborhood labels from the model in future time periods using a spatial Markov transition model
 
@@ -701,13 +772,23 @@ class ModelResults:
             long-form geodataframe with predicted cluster labels stored in the `new_colname` column
         """
         if not base_year:
-            base_year = max(self.df[self.temporal_index].unique())
+            base_year = max(self.df[self.temporal_index].unique().tolist())
             warn(
                 f"No base_year provided. Using the last period for which labels are known:  {base_year} "
             )
-        inputs = locals()
-        del inputs["self"]
         output = _predict_markov_labels(
-            self.df, self.unit_index, self.temporal_index, self.name, **inputs
+            gdf=self.df,
+            unit_index=self.unit_index,
+            temporal_index=self.temporal_index,
+            cluster_col=self.name,
+            new_colname=new_colname,
+            w_type=w_type,
+            w_options=w_options,
+            base_year=base_year,
+            time_steps=time_steps,
+            increment=increment,
+            verbose=verbose,
+            seed=seed,
+            
         )
         return output

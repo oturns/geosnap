@@ -1,18 +1,19 @@
-from geosnap import Community, DataStore
 import numpy as np
-from segregation.singlegroup import Entropy
 from numpy.testing import assert_array_almost_equal
+from segregation.singlegroup import Entropy
+
+from geosnap import DataStore
 from geosnap.analyze.segdyn import *
+from geosnap.io import get_census
 
-
-reno = Community.from_census(msa_fips="39900", datastore=DataStore())
+reno = get_census(msa_fips="39900", datastore=DataStore())
 groups = [
     "n_nonhisp_black_persons",
     "n_nonhisp_white_persons",
     "n_hispanic_persons",
     "n_asian_persons",
 ]
-gdf = reno.gdf.to_crs(reno.gdf.estimate_utm_crs())
+gdf = reno.to_crs(reno.estimate_utm_crs())
 gdf = gdf.fillna(0)
 
 

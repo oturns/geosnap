@@ -8,6 +8,7 @@ from pathlib import PurePath
 import contextily as ctx
 import mapclassify.classifiers as classifiers
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.animation import ArtistAnimation, PillowWriter
 
 schemes = {}
@@ -69,6 +70,7 @@ def gif_from_path(
 
     plt.tight_layout()
     ani.save(filename, writer=writer, dpi=dpi)
+    plt.clf()
 
 
 def plot_timeseries(
@@ -163,8 +165,10 @@ def plot_timeseries(
 
     df = gdf.copy()
     if web_mercator:
-        assert df.crs, ("Unable to reproject because geodataframe has no CRS "
-        "Please set a coordinate system or pass `web_mercator=False`")
+        assert df.crs, (
+            "Unable to reproject because geodataframe has no CRS "
+            "Please set a coordinate system or pass `web_mercator=False`"
+        )
         if not df.crs.equals(3857):
             df = df.to_crs(3857)
     if categorical and not cmap:
@@ -189,9 +193,10 @@ def plot_timeseries(
         classifier = schemes[scheme](df[column].dropna().values, k=k)
 
     if nrows is None and ncols is None:
-        f, axs = plot.subplots(ncols=len(time_subset), figsize=figsize,share=False)
-    else:
-        f, axs = plot.subplots(ncols=ncols, nrows=nrows, figsize=figsize,share=False)
+        sqcols = int(np.ceil(np.sqrt(len(time_subset))))
+        ncols = sqcols
+        nrows = sqcols
+    f, axs = plot.subplots(ncols=ncols, nrows=nrows, figsize=figsize, share=False)
 
     for i, time in enumerate(sorted(time_subset)):
         # sort to prevent graphing out of order
@@ -203,7 +208,7 @@ def plot_timeseries(
                 cmap=cmap,
                 legend=legend,
                 legend_kwds=legend_kwds,
-                #missing_kwds=missing_kwds,
+                # missing_kwds=missing_kwds,
                 alpha=alpha,
             )
         else:
@@ -349,11 +354,12 @@ def animate_timeseries(
                 )
             ctx.add_basemap(ax=ax, source=ctxmap)
             ax.axis("off")
-            ax.set_title(f"{time}", fontsize=subtitle_fontsize)
+            ax.set_title(f"{time}", fontsize=subtitle_fontsize, backgroundcolor="white")
             fig.suptitle(f"{title}", fontsize=title_fontsize)
 
             plt.tight_layout()
             plt.savefig(outpath, dpi=dpi)
+            plt.clf()
 
         gif_from_path(
             tmpdirname,
