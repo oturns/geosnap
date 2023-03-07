@@ -12,7 +12,7 @@ from ..analyze.dynamics import transition
 
 
 def plot_transition_matrix(
-    gdf,
+    gdf=None,
     cluster_col=None,
     w_type="rook",
     w_options=None,
@@ -71,10 +71,7 @@ def plot_transition_matrix(
     matplotlib Axes
         the axes on which the plots are drawn
     """
-    if not n_rows and not n_cols:
-        sqcols = int(np.ceil(np.sqrt(len(gdf[cluster_col].unique()) + 1)))
-        n_cols = sqcols
-        n_rows = sqcols
+
     if not title_kwds:
         title_kwds = {
             "fontsize": 20,
@@ -94,7 +91,10 @@ def plot_transition_matrix(
         )
     else:
         sm = transition_model
-
+    if not n_rows and not n_cols:
+        sqcols = int(np.ceil(np.sqrt(len(sm.classes) + 1)))
+        n_cols = sqcols
+        n_rows = sqcols
     _, axs = plt.subplots(n_rows, n_cols, figsize=figsize)
     axs = axs.flatten()
 
@@ -176,8 +176,9 @@ def plot_transition_graphs(
 
     Parameters
     ----------
-    community : geosnap.Community
-        a geosnap Community instance
+    gdf : geopandas.GeoDataFrame
+        long-form geodataframe with a column holding labels appropriate 
+        for using as input to `geosnap.analyze.transition`
     cluster_col : str
         column on the Community.gdf containing neighborhood type labels
     output_dir : str
