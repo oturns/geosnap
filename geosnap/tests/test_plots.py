@@ -13,6 +13,7 @@ from geosnap.visualize import (
     plot_timeseries,
     plot_transition_graphs,
     plot_transition_matrix,
+    plot_violins_by_cluster
 )
 
 
@@ -71,8 +72,14 @@ def test_graphs():
 def test_animation():
     if not os.path.exists('geosnap/tests/images'):
             os.mkdir('geosnap/tests/images')
-    animate_timeseries(dc_df, column='ward', categorical=True, filename='geosnap/tests/images/animation.gif')
+    animate_timeseries(dc_df, column='ward', categorical=True, filename='geosnap/tests/images/animation.gif', dpi=50)
     assert 'animation.gif' in os.listdir('geosnap/tests/images')
+
+def test_violins():
+    if not os.path.exists('geosnap/tests/images'):
+            os.mkdir('geosnap/tests/images')
+    plot_violins_by_cluster(dc_df, cluster_col='ward', columns=columns, savefig='geosnap/tests/images/violins.png', dpi=50)
+    assert 'violins.png' in os.listdir('geosnap/tests/images')
 
 def test_boundary_silplot():
     p = region_mod[1990].plot_boundary_silhouette(dpi=50,)
