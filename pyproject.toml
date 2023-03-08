@@ -61,9 +61,7 @@ Home = "https://github.com/oturns/geosnap/"
 Repository = "https://github.com/oturns/geosnap"
 
 [project.optional-dependencies]
-
-dev = ["pre-commit"]
-
+dev = ["pre-commit", "pyogrio"]
 docs = [
     "nbsphinx",
     "numpydoc",
@@ -73,8 +71,8 @@ docs = [
     "sphinx_bootstrap_theme",
 ]
 tests = [
-    "codecov", 
-    "coverage", 
+    "codecov",
+    "coverage",
     "pytest",
     "pytest-mpl",
     "pytest-cov",
@@ -83,7 +81,6 @@ tests = [
     "watermark",
     "pygraphviz",
     "hdbscan",
-
 ]
 
 [tool.setuptools.packages.find]

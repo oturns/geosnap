@@ -16,6 +16,13 @@ for classifier in classifiers.CLASSIFIERS:
     schemes[classifier.lower()] = getattr(classifiers, classifier)
 
 
+__all__ = [
+    "animate_timeseries",
+    "gif_from_path",
+    "plot_timeseries",
+]
+
+
 def gif_from_path(
     path=None,
     figsize=(10, 10),

@@ -10,6 +10,8 @@ import seaborn as sns
 
 from ..analyze.dynamics import transition
 
+__all__ = ["plot_transition_graphs", "plot_transition_matrix"]
+
 
 def plot_transition_matrix(
     gdf=None,
@@ -26,7 +28,7 @@ def plot_transition_matrix(
     title_kwds=None,
     savefig=None,
     dpi=300,
-    transition_model=None
+    transition_model=None,
 ):
     """Plot global and spatially-conditioned transition matrices as heatmaps.
 
@@ -77,8 +79,10 @@ def plot_transition_matrix(
             "fontsize": 20,
         }
     if transition_model is None:
-        warn("Creating a transition model implicitly is deprecated and will be removed in future versions. "
-             "please pass a giddy.Spatial_Markov instance using `giddy` or `geosnap.analyze.transition`")
+        warn(
+            "Creating a transition model implicitly is deprecated and will be removed in future versions. "
+            "please pass a giddy.Spatial_Markov instance using `giddy` or `geosnap.analyze.transition`"
+        )
 
         sm = transition(
             gdf,
@@ -165,7 +169,7 @@ def plot_transition_graphs(
     permutations=0,
     layout="dot",
     args="-n -Groot=0 -Goverlap=false -Gnodesep=0.01 -Gfont_size=1 -Gmindist=3.5 -Gsize=30,30!",
-    transition_model=None
+    transition_model=None,
 ):
     """Plot a network graph representation of global and spatially-conditioned transition matrices.
 
@@ -177,7 +181,7 @@ def plot_transition_graphs(
     Parameters
     ----------
     gdf : geopandas.GeoDataFrame
-        long-form geodataframe with a column holding labels appropriate 
+        long-form geodataframe with a column holding labels appropriate
         for using as input to `geosnap.analyze.transition`
     cluster_col : str
         column on the gdf containing neighborhood type labels
@@ -213,8 +217,10 @@ def plot_transition_graphs(
     except ImportError:
         raise ImportError("You must have pygraphviz installed to use graph plotting")
     if transition_model is None:
-        warn("Creating a transition model implicitly is deprecated and will be removed in future versions. "
-             "please pass a giddy.Spatial_Markov instance created using `giddy` or `geosnap.analyze.transition`")
+        warn(
+            "Creating a transition model implicitly is deprecated and will be removed in future versions. "
+            "please pass a giddy.Spatial_Markov instance created using `giddy` or `geosnap.analyze.transition`"
+        )
 
         sm = transition(
             gdf,
