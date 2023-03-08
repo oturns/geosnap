@@ -11,7 +11,7 @@
      strategy:
        matrix:
          os: ['ubuntu-latest']
-         environment-file: [.ci/38.yml]
+         environment-file: [.ci/39.yml]
 
      steps:
        - name: checkout repo
@@ -46,7 +46,7 @@
            git commit -m "Update documentation" -a || true
            # The above command will fail if no changes were present, so we ignore
            # the return code.
-  
+
        - name: Push changes
          uses: ad-m/github-push-action@master
          with:
