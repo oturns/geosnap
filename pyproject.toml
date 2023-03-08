@@ -1,0 +1,127 @@
+[build-system]
+requires = ["setuptools>=61.0", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+
+[project]
+name = "geosnap"
+dynamic = ["version"]
+authors = [
+    { name = "Eli Knaap", email = "ek@knaaptime.com" },
+    { name = "Serge Rey", email = "sjsrey@gmail.com" },
+]
+maintainers = [{ name = "geosnap contributors" }]
+license = { text = "BSD 3-Clause" }
+description = "The Geospatial Neighborhood Analysis Package"
+keywords = ["geodemographics, neighborhood dynamics"]
+readme = { text = """\
+geosnap provides a suite of tools for exploring, modeling, and visualizing the social context and spatial extent of neighborhoods and regions over time"
+
+""", content-type = "text/x-rst" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: GIS",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "numpy",
+    "pandas",
+    "geopandas>=0.9",
+    "matplotlib",
+    "scikit-learn",
+    "seaborn",
+    "libpysal",
+    "mapclassify",
+    "giddy>=2.2.1",
+    "xlrd",
+    "cenpy",
+    "platformdirs",
+    "tqdm",
+    "quilt3>=3.6",
+    "pyarrow>=0.14.1",
+    "contextily",
+    "scikit-plot",
+    "tobler>=0.8.2",
+    "spopt>=0.3.0",
+    "fsspec",
+    "s3fs",
+    "segregation>=2.1",
+    "proplot>=0.9",
+    "pyproj>=3",
+    "pandana",
+    "pooch"
+]
+
+[project.urls]
+Home = "https://github.com/oturns/geosnap/"
+Repository = "https://github.com/oturns/geosnap"
+
+[project.optional-dependencies]
+
+dev = ["pre-commit"]
+
+docs = [
+    "nbsphinx",
+    "numpydoc",
+    "pandoc",
+    "sphinx",
+    "sphinxcontrib-bibtex",
+    "sphinx_bootstrap_theme",
+]
+tests = [
+    "codecov", 
+    "coverage", 
+    "pytest",
+    "pytest-mpl",
+    "pytest-cov",
+    "matplotlib",
+    "matplotlib-scalebar",
+    "watermark",
+    "pygraphviz",
+    "hdbscan",
+
+]
+
+[tool.setuptools.packages.find]
+include = ["geosnap", "geosnap.*"]
+
+[tool.black]
+line-length = 88
+
+[tool.ruff]
+line-length = 88
+select = ["E", "F", "W", "I", "UP", "N", "B", "A", "C4", "SIM", "ARG"]
+target-version = "py38"
+ignore = [
+    "B006",
+    "B008",
+    "B009",
+    "B010",
+    "C408",
+    "E731",
+    "F401",
+    "F403",
+    "N803",
+    "N806",
+    "N999",
+    "UP007"
+]
+exclude = ["geosnap/tests/*", "docs/*"]
+
+[tool.coverage.run]
+source = ["./geosnap"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "if self.debug:",
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "except ModuleNotFoundError:",
+    "except ImportError",
+]
+ignore_errors = true
+omit = ["geosnap/tests/*", "docs/conf.py"]

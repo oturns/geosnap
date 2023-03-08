@@ -7,6 +7,7 @@ from libpysal.weights.contiguity import Queen, Rook, Voronoi
 from libpysal.weights.distance import KNN, DistanceBand
 from sklearn.preprocessing import StandardScaler
 from spopt.region.base import form_single_component
+from tqdm.auto import tqdm
 
 from .._data import _Map
 from ._cluster_wrappers import (
@@ -64,10 +65,10 @@ def cluster(
         subset of columns on which to apply the clustering
     verbose : bool, optional
         whether to print warning messages (the default is False).
-    temporal_index : str, optional
+    temporal_index : str, required
         which column on the dataframe defines time and or sequencing of the
         long-form data. Default is "year"
-    unit_index : str, optional
+    unit_index : str, required
         which column on the long-form dataframe identifies the stable units
         over time. In a wide-form dataset, this would be the unique index
     scaler : None or scaler from sklearn.preprocessing, optional
@@ -80,10 +81,14 @@ def cluster(
         * pooled : data are pooled across all time periods
         * unique : if scaling, apply the scaler to each time period, then generate
           clusters unique to each time period.
+    cluster_kwargs: dict
+        additional keyword arguments passed to the clustering instance
     model_colname : str
         column name for storing cluster labels on the output dataframe. If no name is provided,
         the colun will be named after the clustering method. If there is already a column
         named after the clustering method, the name will be incremented with a number
+    return_model: bool
+        if True, return the clustering model for further inspection (default is False)
 
     Returns
     -------
@@ -139,6 +144,8 @@ def cluster(
 
     if not columns:
         raise ValueError("You must provide a subset of columns as input")
+    
+    gdf = gdf.copy()
 
     times = gdf[temporal_index].unique()
     gdf = gdf.set_index([temporal_index, unit_index])
@@ -282,7 +289,7 @@ def regionalize(
         spatial weights matrix specification`. By default, geosnap will calculate Rook
         weights, but you can also pass a libpysal.weights.W object for more control
         over the specification.
-    method : str in ['ward_spatial', 'spenc', 'skater', 'azp', 'max_p']
+    method : str in ['ward_spatial', 'kmeans_spatial', 'spenc', 'skater', 'azp', 'max_p']
         the clustering algorithm used to identify neighborhood types
     columns : array-like
         subset of columns on which to apply the clustering
@@ -301,6 +308,8 @@ def regionalize(
     weights_kwargs : dict
         If passing a libpysal.weights.W instance to spatial_weights, these additional
         keyword arguments that will be passed to the weights constructor
+    region_kwargs: dict
+        additional keyword arguments passed to the regionalization algorithm
     scaler : None or scaler class from sklearn.preprocessing
         a scikit-learn preprocessing class that will be used to rescale the
         data. Defaults to sklearn.preprocessing.StandardScaler
@@ -308,6 +317,8 @@ def regionalize(
         column name for storing cluster labels on the output dataframe. If no name is provided,
         the colun will be named after the clustering method. If there is already a column
         named after the clustering method, the name will be incremented with a number
+    return_model: bool
+        If True, also retun a dictional of fitted classes from the regionalization provider
 
     Returns
     -------
@@ -316,7 +327,7 @@ def regionalize(
         appended as a new column. If cluster method exists as a column on the DataFrame
         then the column will be incremented.
 
-    models : dict of named tuples
+    models : dict of named tuples (only returned if `return_model` is True)
         tab-completable dictionary of named tuples keyed on the Community's time variable
         (e.g. year). The tuples store model results and have attributes X, columns, labels,
         instance, W, which store the input matrix, column labels, fitted model instance,
@@ -366,7 +377,7 @@ def regionalize(
         scaler = StandardScaler()
     if not weights_kwargs:
         weights_kwargs = {}
-
+    gdf = gdf.copy()
     times = gdf[temporal_index].unique()
     gdf = gdf.set_index([temporal_index, unit_index])
 
@@ -441,3 +452,220 @@ def regionalize(
         return gdf.reset_index(), models
 
     return gdf.reset_index()
+
+
+def find_k(
+    gdf,
+    method=None,
+    columns=None,
+    temporal_index="year",
+    unit_index="geoid",
+    scaler="std",
+    pooling="fixed",
+    random_state=None,
+    cluster_kwargs=None,
+    min_k=2,
+    max_k=10,
+    return_table=False,
+):
+    """Brute-forse search through cluster fit metrics to determine the optimal number of `k` clusters
+
+    Parameters
+    ----------
+    gdf : geopandas.GeoDataFrame, required
+        long-form GeoDataFrame containing neighborhood attributes
+    method : str in ['kmeans', 'ward',  'spectral','gaussian_mixture'], required
+        the clustering algorithm used to identify neighborhood types
+    columns : list-like, required
+        subset of columns on which to apply the clustering
+    temporal_index : str, optional
+        which column on the dataframe defines time and or sequencing of the
+        long-form data. Default is "year"
+    unit_index : str, optional
+        which column on the long-form dataframe identifies the stable units
+        over time. In a wide-form dataset, this would be the unique index
+    scaler : None or scaler from sklearn.preprocessing, optional
+        a scikit-learn preprocessing class that will be used to rescale the
+        data. Defaults to sklearn.preprocessing.StandardScaler
+    pooling : ["fixed", "pooled", "unique"], optional (default='fixed')
+        How to treat temporal data when applying scaling. Options include:
+
+        * fixed : scaling is fixed to each time period
+        * pooled : data are pooled across all time periods
+        * unique : if scaling, apply the scaler to each time period, then generate
+          clusters unique to each time period.
+    cluster_kwargs : dict, optional
+        additional keyword arguments passed to the clustering algorithm
+    min_k : int, optional
+        minimum number of clusters to test, by default 2
+    max_k : int, optional
+        maximum number of clusters to test, by default 10
+    return_table : bool, optional
+        if True, return the table of fit metrics for each combination
+        of k and cluster method, by default False
+
+    Returns
+    -------
+    pandas.DataFrame
+        if return_table==False (default), returns a pandas dataframe with a single column that holds
+        the optimal number of clusters according to each fit metric (row index).
+
+        if return_table==True, returns a table of fit coefficients for each k between min_k and max_k
+    """
+    assert method != "affinity_propagation", (
+        "Affinity propagation finds `k` endogenously, "
+        "and is incompatible with this function. To "
+        "change the number of clusters using affinity propagation "
+        "change the `damping` and `preference` arguments"
+    )
+
+    output = dict()
+
+    for i in tqdm(range(min_k, max_k + 1), total=max_k - min_k + 1):
+        #  create a model_results class
+        results = cluster(
+            gdf.copy(),
+            n_clusters=i,
+            method=method,
+            best_model=False,
+            columns=columns,
+            verbose=False,
+            temporal_index=temporal_index,
+            unit_index=unit_index,
+            scaler=scaler,
+            pooling=pooling,
+            random_state=random_state,
+            cluster_kwargs=cluster_kwargs,
+            return_model=True,
+        )[1]
+
+        results = pd.Series(
+            {
+                "silhouette_score": results.silhouette_score,
+                "calinski_harabasz_score": results.calinski_harabasz_score,
+                "davies_bouldin_score": results.davies_bouldin_score,
+            },
+        )
+        output[i] = results
+    output = pd.DataFrame(output).T
+    summary = output.agg(
+            {
+                "silhouette_score": "idxmax",
+                "calinski_harabasz_score": "idxmax",
+                "davies_bouldin_score": "idxmin",  # min score is better here
+            }
+        ).to_frame(name="best_k")
+
+    if return_table:
+        return summary, output
+    return summary
+
+def find_region_k(
+    gdf,
+    method=None,
+    columns=None,
+    spatial_weights="rook",
+    temporal_index="year",
+    unit_index="geoid",
+    scaler="std",
+    weights_kwargs=None,
+    region_kwargs=None,
+    min_k=2,
+    max_k=10,
+    return_table=False,
+):
+    """Brute force through cluster fit metrics to determine the optimal number of `k` regions
+
+    Parameters
+    ----------
+    gdf : geopandas.GeoDataFrame
+        a long-form geodataframe
+    method : string, optional
+        the clustering method to use, by default None
+    columns : list, optional
+        a list of columns in `gdf` to use in the clustering algorithm, by default None
+    spatial_weights : ['queen', 'rook'] or libpysal.weights.W object
+        spatial weights matrix specification`. By default, geosnap will calculate Rook
+        weights, but you can also pass a libpysal.weights.W object for more control
+        over the specification.
+    temporal_index : str, optional
+        column that uniquely identifies time periods, by default "year"
+    unit_index : str, optional
+        column that uniquely identifies geographic units, by default "geoid"
+    scaler : None or scaler from sklearn.preprocessing, optional
+        a scikit-learn preprocessing class that will be used to rescale the
+        data. Defaults to sklearn.preprocessing.StandardScaler
+    cluster_kwargs : dict, optional
+        additional kwargs passed to the clustering function in `geosnap.analyze.regionalize`
+    max_k : int, optional
+        maximum number of clusters to test, by default 10
+    return_table : bool, optional
+        if True, return the table of fit metrics for each combination
+        of k and cluster method, by default False
+
+    Returns
+    -------
+    pandas.DataFrame
+        if return_table==False (default), returns a pandas dataframe with a single column that holds
+        the optimal number of clusters according to each fit metric (row index).
+
+        if return_table==True, also returns a table of fit coefficients for each k between min_k and max_k
+    """
+
+    output = list()
+
+    for i in tqdm(range(min_k, max_k + 1), total=max_k - min_k + 1):
+        #  create a model_results class
+        _, results = regionalize(
+            gdf.copy(),
+            n_clusters=i,
+            method=method,
+            columns=columns,
+            spatial_weights=spatial_weights,
+            temporal_index=temporal_index,
+            unit_index=unit_index,
+            scaler=scaler,
+            weights_kwargs=weights_kwargs,
+            region_kwargs=region_kwargs,
+            return_model=True,
+        )
+
+        times = list()
+        for time_period in results.keys():
+
+            res = pd.Series(
+                {
+                    "silhouette_score": results[time_period].silhouette_score,
+                    "calinski_harabasz_score": results[
+                        time_period
+                    ].calinski_harabasz_score,
+                    "davies_bouldin_score": results[time_period].davies_bouldin_score,
+                    "path_silhouette": results[
+                        time_period
+                    ].path_silhouette.path_silhouette.mean(),
+                    "boundary_silhouette": results[time_period]
+                    .boundary_silhouette[
+                        results[time_period].boundary_silhouette.boundary_silhouette
+                        != 0
+                    ]
+                    .boundary_silhouette.mean(),  # average of non-zero boundary-silhouettes,
+                    "time_period": time_period,
+                    "k": i,
+                },
+            )
+            times.append(pd.DataFrame(res).T)
+        output.append(pd.concat(times).set_index("k"))
+    output = pd.concat(output)
+
+    summary = output.groupby("time_period").agg(
+            {
+                "silhouette_score": "idxmax",
+                "calinski_harabasz_score": "idxmax",
+                "path_silhouette": "idxmax",
+                "boundary_silhouette": "idxmax",
+                "davies_bouldin_score": "idxmin",  # min score is better here
+            }
+        )
+    if return_table:
+        return summary, output
+    return summary

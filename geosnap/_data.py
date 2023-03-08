@@ -6,7 +6,7 @@ from warnings import warn
 
 import geopandas as gpd
 import pandas as pd
-from appdirs import user_data_dir
+from platformdirs import user_data_dir
 
 
 def _fetcher(local_path, remote_path, warning_msg):
@@ -565,4 +565,3 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         )
 
 
-datasets = DataStore()

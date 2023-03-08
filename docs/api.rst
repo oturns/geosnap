@@ -94,6 +94,8 @@ Model neighborhood differentiation using multivariate clustering algorithms
    :toctree: generated/
    
     analyze.cluster
+    analyze.find_k
+    analyze.find_region_k
     analyze.regionalize
     
 Neighborhood Dynamics Methods
@@ -188,12 +190,12 @@ Visualize Module
    :toctree: generated/
 
    visualize.animate_timeseries
-   visualize.explore
    visualize.gif_from_path
    visualize.indexplot_seq
    visualize.plot_timeseries
    visualize.plot_transition_matrix
    visualize.plot_transition_graphs
+   visualize.plot_violins_by_cluster
 
 .. _util_api:
 
@@ -205,60 +207,3 @@ Util Module
    util.fetch_acs
    util.process_acs
 
-
-
-The Community Class
------------------------
-
-The Community class is an alternative object-oriented interface for
-interacting with geosnap. Rather than operating on geodataframes, the Community
-class manages data internally and exposes methods that operate on these data
-   
-Community Constructors
-''''''''''''''''''''''''''''
-.. currentmodule:: geosnap
-
-.. autosummary::
-   :toctree: generated/
-  
-   Community.from_census
-   Community.from_geodataframes
-   Community.from_lodes
-   Community.from_ltdb
-   Community.from_ncdb
-  
-.. _analyze_api:
-
-
-Community Analytics
-'''''''''''''''''''''''''
-.. currentmodule:: geosnap
-
-.. autosummary::
-   :toctree: generated/
-   
-   Community.cluster
-   Community.harmonize
-   Community.regionalize
-   Community.sequence
-   Community.simulate
-   Community.transition
-
-Community Visualization
-'''''''''''''''''''''''''
-.. currentmodule:: geosnap
-
-.. autosummary::
-   :toctree: generated/
-
-   Community.animate_timeseries
-   Community.plot_boundary_silhouette
-   Community.plot_next_best_label
-   Community.plot_silhouette
-   Community.plot_silhouette_map
-   Community.plot_path_silhouette
-   Community.plot_timeseries
-   Community.plot_transition_matrix
-   Community.plot_transition_graphs
-
-   
