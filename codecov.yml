@@ -18,7 +18,6 @@ coverage:
     - "geosnap/tests/*"
     - "geosnap/util/*"
     - "geosnap/io/util.py"
-    - "geosnap/_version.py"
 comment:
   layout: "reach, diff, files"
   behavior: once
