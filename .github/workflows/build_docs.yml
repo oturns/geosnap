@@ -8,34 +8,33 @@
    docs:
      name: CI (${{ matrix.os }}-${{ matrix.environment-file }})
      runs-on: ${{ matrix.os }}
-     continue-on-error: ${{ matrix.experimental }}
-     timeout-minutes: 90
      strategy:
        matrix:
          os: ['ubuntu-latest']
-         environment-file: [.ci/39.yml]
-         experimental: [false]
+         environment-file: [.ci/38.yml]
+
      steps:
-       - uses: actions/checkout@v2
-       - uses: conda-incubator/setup-miniconda@v2
+       - name: checkout repo
+         uses: actions/checkout@v2
+
+       - name: setup micromamba
+         uses: mamba-org/provision-with-micromamba@main
          with:
-            miniconda-version: 'latest'
-            auto-update-conda: true
-            auto-activate-base: false
-            environment-file: ${{ matrix.environment-file }}
-            activate-environment: test
-       - shell: bash -l {0}
-         run: conda info --all
-       - shell: bash -l {0}
-         run: conda list
-       - shell: bash -l {0}
-         run: conda config --show-sources
-       - shell: bash -l {0}
-         run: conda config --show
-       - shell: bash -l {0}
+           environment-file: ${{ matrix.environment-file }}
+           micromamba-version: 'latest'
+           mamba-version: "*"
+           channels: conda-forge
+           channel-priority: true
+
+       - name: install geosnap - bash
+         shell: bash -l {0}
          run: pip install -e . --no-deps --force-reinstall
-       - shell: bash -l {0}
+         if: matrix.os != 'windows-latest'
+
+       - name: build docs
+         shell: bash -l {0}
          run: cd docs; make html
+
        - name: Commit documentation changes
          run: |
            git clone https://github.com/ammaraskar/sphinx-action-test.git --branch gh-pages --single-branch gh-pages
@@ -47,6 +46,7 @@
            git commit -m "Update documentation" -a || true
            # The above command will fail if no changes were present, so we ignore
            # the return code.
+  
        - name: Push changes
          uses: ad-m/github-push-action@master
          with:
