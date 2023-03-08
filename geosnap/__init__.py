@@ -22,8 +22,8 @@ io
     ingest, store, and manipulate spatiotemporal neighborhood data
 
 """
-
-# __version__ has to be define in the first line
+import contextlib
+from importlib.metadata import PackageNotFoundError, version
 
 from . import analyze
 from . import io
@@ -32,5 +32,5 @@ from . import visualize
 from . import harmonize
 from ._data import _Map, DataStore
 
-from . import _version
-__version__ = _version.get_versions()['version']
+with contextlib.suppress(PackageNotFoundError):
+    __version__ = version("geosnap")
