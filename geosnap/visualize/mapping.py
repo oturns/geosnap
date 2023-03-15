@@ -1,9 +1,9 @@
 """functions for choropleth mapping timeseries data."""
-
 import os
 import re
 import tempfile
 from pathlib import PurePath
+from warnings import warn
 
 import contextily as ctx
 import mapclassify.classifiers as classifiers
@@ -102,7 +102,6 @@ def plot_timeseries(
     ctxmap="default",
     alpha=0.7,
     web_mercator=True,
-    **kwargs,
 ):
     """Plot an attribute from a geodataframe arranged as a timeseries with consistent colorscaling.
 
@@ -278,6 +277,8 @@ def animate_timeseries(
     subtitle_fontsize=38,
     figsize=(20, 20),
     ctxmap="default",
+    plot_kwargs=None,
+    color_col=None,
 ):
     """Create an animated gif from a long-form geodataframe timeseries.
 
@@ -321,43 +322,71 @@ def animate_timeseries(
                     interval between frames in miliseconds, default 500
     repeat_delay : int, optional
                     time before animation repeats in miliseconds, default 1000
+    plot_kwargs: dict, optional
+        additional keyword arguments passed to geopandas.DataFrame.plot
+    color_col: str, optional
+        A column on the geodataframe holding hex coodes used to color each
+        observation. I.e. to create a categorical color-mapping manually
     """
+    if plot_kwargs is None:
+        plot_kwargs = dict()
+
     if ctxmap == "default":
         ctxmap = ctx.providers.Stamen.TonerLite
+
+    if color_col is not None and categorical is True:
+        raise ValueError("When passing a color column, use `categorical=False`")
+
+    if color_col is not None and cmap is not None:
+        raise ValueError('Only `color_col` or `cmap` can be used, but not both')
+
     gdf = gdf.copy()
-    if categorical and not cmap:
-        cmap = "Accent"
-    elif not cmap:
-        cmap = "Blues"
-    if not gdf.crs == 3857:
+    if not gdf.crs.equals(3857):
         gdf = gdf.to_crs(3857)
+
     if not time_periods:
         time_periods = list(gdf[temporal_index].unique())
     time_periods = sorted(time_periods)
+
     with tempfile.TemporaryDirectory() as tmpdirname:
         for i, time in enumerate(time_periods):
             fig, ax = plt.subplots(figsize=figsize)
             outpath = PurePath(tmpdirname, f"file_{i}.png")
+
+            temp = gdf[gdf[temporal_index] == time]
+            colors = temp[color_col] if color_col is not None else None
+
             if categorical:
-                gdf[gdf[temporal_index] == time].plot(
+
+                temp.plot(
                     column,
                     categorical=True,
                     ax=ax,
                     alpha=alpha,
                     legend=legend,
                     cmap=cmap,
+                    **plot_kwargs,
                 )
             else:
-                classifier = schemes[scheme](gdf[column].dropna().values, k=k)
-                gdf[gdf[temporal_index] == time].plot(
+                if colors is not None:
+                    classification_kwds = None
+                    scheme = None
+                    k = None
+                else:
+                    classifier = schemes[scheme](gdf[column].dropna().values, k=k)
+                    classification_kwds = {"bins": classifier.bins}
+                    scheme = "user_defined"
+                temp.plot(
                     column,
-                    scheme="user_defined",
-                    classification_kwds={"bins": classifier.bins},
+                    scheme=scheme,
+                    classification_kwds=classification_kwds,
                     k=k,
                     ax=ax,
                     alpha=alpha,
                     legend=legend,
                     cmap=cmap,
+                    color=colors,
+                    **plot_kwargs,
                 )
             ctx.add_basemap(ax=ax, source=ctxmap)
             ax.axis("off")
