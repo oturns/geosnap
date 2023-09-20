@@ -2,9 +2,9 @@ import os
 import shutil
 
 import numpy
-import proplot
+#import proplot
 import pytest
-
+import matplotlib
 from geosnap import DataStore
 from geosnap.analyze import cluster, regionalize, transition
 from geosnap.io import get_census
@@ -39,28 +39,28 @@ dc_df = dc_df.dropna(subset=['ward'])
 
 def test_cont_timeseries_pooled():
     p = plot_timeseries(dc_df, column='median_household_income', temporal_index='year', time_subset=[2010], dpi=50)
-    assert isinstance(p, proplot.gridspec.SubplotGrid)
+    assert isinstance(p[0], matplotlib.axes.SubplotBase)
 
 def test_cont_timeseries_unpooled():
     p = plot_timeseries(dc_df, column='median_household_income', temporal_index='year', time_subset=[2010], dpi=50, pooled=False)
-    assert isinstance(p, proplot.gridspec.SubplotGrid)
+    assert isinstance(p[0], matplotlib.axes.SubplotBase  )
 
 def test_cont_timeseries_unpooled_layout():
     p = plot_timeseries(dc_df, column='median_household_income', temporal_index='year', time_subset=[2000,2010], dpi=50, pooled=False)
-    assert isinstance(p, proplot.gridspec.SubplotGrid)
+    assert isinstance(p[0], matplotlib.axes.SubplotBase)
 
 def test_cat_timeseries():
     p = plot_timeseries(dc_df,column='ward', categorical=True, temporal_index='year', time_subset=[2010],dpi=50)
-    assert isinstance(p, proplot.gridspec.SubplotGrid)
+    assert isinstance(p[0], matplotlib.axes.SubplotBase)
 
 def test_heatmaps():
     t = transition(dc_df, cluster_col='ward')
     p = plot_transition_matrix(dc_df, cluster_col='ward', figsize=(5,5), transition_model=t)
-    assert isinstance(p, numpy.ndarray)
+    assert isinstance(p[0], matplotlib.axes.SubplotBase)
 
 def test_heatmaps_no_model():
     p = plot_transition_matrix(dc_df, cluster_col='ward', figsize=(5,5))
-    assert isinstance(p, numpy.ndarray)
+    assert isinstance(p[0], matplotlib.axes.SubplotBase)
 
 
 @pytest.mark.skipif(NOGRAPHVIZ, reason="pygraphviz couldn't be imported.")
@@ -83,20 +83,20 @@ def test_violins():
 
 def test_boundary_silplot():
     p = region_mod[1990].plot_boundary_silhouette(dpi=50,)
-    assert isinstance(p, proplot.gridspec.SubplotGrid
+    assert isinstance(p[0], matplotlib.axes.SubplotBase
 )
 
 def test_path_silplot():
     p = region_mod[1990].plot_path_silhouette(dpi=50,)
-    assert isinstance(p, proplot.gridspec.SubplotGrid
+    assert isinstance(p[0], matplotlib.axes.SubplotBase
 )
 
 def test_next_label_plot():
     p = cluster_mod.plot_next_best_label()
-    assert isinstance(p, proplot.gridspec.SubplotGrid
+    assert isinstance(p, numpy.ndarray
 )
 
 def test_silmap_plot():
     p = cluster_mod.plot_silhouette_map(dpi=50, )
-    assert isinstance(p, proplot.gridspec.SubplotGrid
+    assert isinstance(p, numpy.ndarray
 )

@@ -16,11 +16,11 @@ from sklearn.mixture import GaussianMixture
 def _import_tryer(package, func, name):
     try:
         return exec(f"from {package} import {func}", globals(), globals())
-    except ImportError:
+    except ImportError as e:
         raise ImportError(
             f"You must have the {name} package installed to use this clusterer "
             "but it could not be imported."
-        )
+        ) from e
 
 
 # Sklearn a-spatial models

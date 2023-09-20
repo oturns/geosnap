@@ -37,7 +37,7 @@ def gif_from_path(
 
     Parameters
     ----------
-    path :str, required
+    path : str, required
         path to directory of images
     figsize : tuple, optional
         output figure size passed to matplotlib.pyplot
@@ -160,9 +160,20 @@ def plot_timeseries(
     web_mercator : bool, optional
         whether to reproject the data into web mercator (epsg 3857)
     """
+    try:
+        import proplot as plot
+
+        HAS_PROPLOT = True
+        f, axs = plot.subplots(ncols=ncols, nrows=nrows, figsize=figsize, share=False)
+
+    except ImportError:
+        warn("`proplot` is not installed.  Falling back to matplotlib")
+        import matplotlib.pyplot as plot
+
+        HAS_PROPLOT = False
+
     # proplot needs to be used as a function-level import,
     # as it influences all figures when imported at the top of the file
-    import proplot as plot
 
     if ctxmap == "default":
         ctxmap = ctx.providers.Stamen.TonerLite
@@ -182,7 +193,7 @@ def plot_timeseries(
     elif not cmap:
         cmap = "Blues"
     if legend_kwds == "default":
-        legend_kwds = {"ncols": 1, "loc": "b"}
+        legend_kwds = {"ncols": 1, "loc": "b"} if HAS_PROPLOT else None
     if missing_kwds == "default":
         missing_kwds = {
             "color": "lightgrey",
@@ -202,7 +213,12 @@ def plot_timeseries(
         sqcols = int(np.ceil(np.sqrt(len(time_subset))))
         ncols = sqcols
         nrows = sqcols
-    f, axs = plot.subplots(ncols=ncols, nrows=nrows, figsize=figsize, share=False)
+
+    if HAS_PROPLOT is True:
+        f, axs = plot.subplots(ncols=ncols, nrows=nrows, figsize=figsize, share=False)
+    else:
+        f, axs = plot.subplots(ncols=ncols, nrows=nrows, figsize=figsize)
+        axs = [axs] if not hasattr(axs, "shape") else axs.flatten()
 
     for i, time in enumerate(sorted(time_subset)):
         # sort to prevent graphing out of order
@@ -222,7 +238,7 @@ def plot_timeseries(
                 df.query(f"{temporal_index}=={time}").plot(
                     column=column,
                     ax=axs[i],
-                    scheme="user_defined",
+                    scheme="userdefined",
                     classification_kwds={"bins": classifier.bins},
                     k=k,
                     cmap=cmap,
@@ -245,11 +261,11 @@ def plot_timeseries(
             ctx.add_basemap(axs[i], source=ctxmap, crs=df.crs.to_string())
         axs[i].set_title(time)
         axs[i].axis("off")
-
-    if not title:  # only use title when passed
-        axs.format(suptitle=column)
-    else:
-        axs.format(suptitle=title)
+    if HAS_PROPLOT:
+        if not title:  # only use title when passed
+            axs.format(suptitle=column)
+        else:
+            axs.format(suptitle=title)
 
     if save_fig:
         f.savefig(save_fig, dpi=dpi, bbox_inches="tight")
@@ -284,50 +300,52 @@ def animate_timeseries(
 
     Parameters
     ----------
-    column       : str
-                    column to be graphed in a time series
-    filename     : str, required
-                    output file name
-    title        : str, optional
-                    desired title of figure
-    temporal_index     : str, required
-                    column on the gdf that stores time periods
+    column : str
+        column to be graphed in a time series
+    filename : str, required
+        output file name
+    title : str, optional
+        desired title of figure
+    temporal_index : str, required
+        column on the gdf that stores time periods
     time_periods:  list, optional
-                    subset of time periods to include in the animation. If None, then all times will be used
-    scheme       : string, optional
-                    matplotlib scheme to be used
-                    default is 'quantiles'
-    k            : int, optional
-                    number of bins to graph. k may be ignored
-                    or unnecessary for some schemes, like headtailbreaks, maxp, and maximum_breaks
-                    Default is 5.
-    legend       : bool, optional
-                    whether to display a legend on the plot
-    categorical  : bool, optional
-                    whether the data should be plotted as categorical as opposed to continuous
-    alpha:       : float, optional
-                    transparency parameter passed to matplotlib
-    dpi          : int, optional
-                    dpi of the saved image if save_fig=True
-                    default is 500
-    figsize      : tuple, optional
-                    the desired size of the matplotlib figure
-    ctxmap       : contextily map provider, optional
-                    contextily basemap. Set to False for no basemap.
-    figsize      : tuple, optional
-                    output figure size passed to matplotlib.pyplot
-    fps          : float, optional
-                    frames per second, used to speed up or slow down animation
-    interval     : int, optional
-                    interval between frames in miliseconds, default 500
+        subset of time periods to include in the animation. If None, then all
+        times will be used
+    scheme : string, optional
+        matplotlib scheme to be used
+        default is 'quantiles'
+    k : int, optional
+        number of bins to graph. k may be ignored
+        or unnecessary for some schemes, like headtailbreaks, maxp, and maximum_breaks
+        Default is 5.
+    legend : bool, optional
+        whether to display a legend on the plot
+    categorical : bool, optional
+        whether the data should be plotted as categorical as opposed to continuous
+    alpha : float, optional
+        transparency parameter passed to matplotlib
+    dpi : int, optional
+        dpi of the saved image if save_fig=True
+        default is 500
+    figsize : tuple, optional
+        the desired size of the matplotlib figure
+    ctxmap : contextily map provider, optional
+        contextily basemap. Set to False for no basemap.
+    figsize : tuple, optional
+        output figure size passed to matplotlib.pyplot
+    fps : float, optional
+        frames per second, used to speed up or slow down animation
+    interval : int, optional
+        interval between frames in miliseconds, default 500
     repeat_delay : int, optional
-                    time before animation repeats in miliseconds, default 1000
+        time before animation repeats in miliseconds, default 1000
     plot_kwargs: dict, optional
         additional keyword arguments passed to geopandas.DataFrame.plot
     color_col: str, optional
         A column on the geodataframe holding hex coodes used to color each
         observation. I.e. to create a categorical color-mapping manually
     """
+    classification_kwds = {}
     if plot_kwargs is None:
         plot_kwargs = dict()
 
@@ -338,7 +356,7 @@ def animate_timeseries(
         raise ValueError("When passing a color column, use `categorical=False`")
 
     if color_col is not None and cmap is not None:
-        raise ValueError('Only `color_col` or `cmap` can be used, but not both')
+        raise ValueError("Only `color_col` or `cmap` can be used, but not both")
 
     gdf = gdf.copy()
     if not gdf.crs.equals(3857):
@@ -373,9 +391,15 @@ def animate_timeseries(
                     scheme = None
                     k = None
                 else:
-                    classifier = schemes[scheme](gdf[column].dropna().values, k=k)
+                    if scheme == "userdefined":
+                        classifier = schemes[scheme](
+                            gdf[column].dropna().values,
+                            bins=classification_kwds["bins"],
+                        )
+                    else:
+                        classifier = schemes[scheme](gdf[column].dropna().values, k=k)
                     classification_kwds = {"bins": classifier.bins}
-                    scheme = "user_defined"
+                    scheme = "userdefined"
                 temp.plot(
                     column,
                     scheme=scheme,

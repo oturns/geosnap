@@ -8,33 +8,42 @@
    docs:
      name: CI (${{ matrix.os }}-${{ matrix.environment-file }})
      runs-on: ${{ matrix.os }}
+     continue-on-error: ${{ matrix.experimental }}
+     timeout-minutes: 20
      strategy:
        matrix:
          os: ['ubuntu-latest']
          environment-file: [.ci/39.yml]
-
+         experimental: [false]
+     defaults:
+       run:
+         shell: bash -l {0}
      steps:
-       - name: checkout repo
-         uses: actions/checkout@v2
-
-       - name: setup micromamba
-         uses: mamba-org/provision-with-micromamba@main
+       - uses: actions/checkout@v2
+       - uses: actions/cache@v2
+         env:
+           CACHE_NUMBER: 0
          with:
-           environment-file: ${{ matrix.environment-file }}
-           micromamba-version: 'latest'
-           mamba-version: "*"
-           channels: conda-forge
-           channel-priority: true
-
-       - name: install geosnap - bash
-         shell: bash -l {0}
-         run: pip install -e . --no-deps --force-reinstall
-         if: matrix.os != 'windows-latest'
-
-       - name: build docs
-         shell: bash -l {0}
-         run: cd docs; make html
-
+           path: ~/conda_pkgs_dir
+           key: ${{ matrix.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles(matrix.environment-file) }}
+       - uses: conda-incubator/setup-miniconda@v2
+         with:
+            miniconda-version: 'latest'
+            channels: conda-forge
+            channel-priority: true
+            auto-update-conda: true
+            auto-activate-base: false
+            environment-file: ${{ matrix.environment-file }}
+            activate-environment: test
+            use-only-tar-bz2: true
+       - run: conda info --all
+       - run: conda list
+       - run: conda config --show-sources
+       - run: conda config --show
+       - run: pip install -e . --no-deps --force-reinstall
+       - run: |
+           cd docs
+           make html       
        - name: Commit documentation changes
          run: |
            git clone https://github.com/ammaraskar/sphinx-action-test.git --branch gh-pages --single-branch gh-pages
@@ -46,7 +55,6 @@
            git commit -m "Update documentation" -a || true
            # The above command will fail if no changes were present, so we ignore
            # the return code.
-
        - name: Push changes
          uses: ad-m/github-push-action@master
          with:

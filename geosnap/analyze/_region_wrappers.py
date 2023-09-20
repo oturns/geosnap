@@ -1,5 +1,4 @@
 import numpy as np
-
 from spopt.region import (
     AZP,
     MaxPHeuristic,
@@ -150,6 +149,7 @@ def skater(
         w=w,
         attrs_name=columns,
         floor=floor,
+        islands=islands,
         spanning_forest_kwds=cluster_args,
     )
     model.solve()

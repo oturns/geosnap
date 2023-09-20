@@ -2,7 +2,7 @@ name: test
 channels:
   - conda-forge
 dependencies:
-  - python =3.8
+  - python =3.11
   - pandas
   - giddy >=2.2.1
   - libpysal
@@ -14,8 +14,6 @@ dependencies:
   - seaborn
   - pyarrow >=0.14.1
   - platformdirs
-  - dash
-  - dash-bootstrap-components
   - palettable
   - pip
   - tqdm
@@ -26,7 +24,6 @@ dependencies:
   - fsspec
   - s3fs
   - segregation >=2.0
-  - versioneer
   - pyproj >=3
   - pandana
   - pooch
@@ -39,7 +36,6 @@ dependencies:
   - coverage
   - coveralls
   - python-wget
-  - proplot
   - contextily
   - scikit-plot
   - python-graphviz

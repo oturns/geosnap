@@ -476,7 +476,7 @@ class ModelResults:
         ncols=None,
         save_fig=None,
         alpha=0.5,
-        cmap="set1",
+        cmap="Set1",
         title="Next-Best Label",
         dpi=500,
         plot_kwargs=None,

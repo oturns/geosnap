@@ -564,7 +564,7 @@ def _draw_labels_from_probs(classes, probs, seed):
 
 
 def _conditional_probs_from_smk(labels, lags, smk, fill_null_probs=True):
-    """Given a set of existing labels and associated lags, return a vetor of
+    """Given a set of existing labels and associated lags, return a vector of
     transition probabilities from a giddy.Spatial_Markov model
 
     Parameters

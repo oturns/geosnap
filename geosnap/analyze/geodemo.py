@@ -129,7 +129,7 @@ def cluster(
     if scaler == "std":
         scaler = StandardScaler()
 
-    if method not in specification.keys():
+    if method not in specification:
         raise ValueError(
             "`method` must of one of ['kmeans', 'ward', 'affinity_propagation', 'spectral', 'gaussian_mixture', 'hdbscan']"
         )
@@ -144,7 +144,7 @@ def cluster(
 
     if not columns:
         raise ValueError("You must provide a subset of columns as input")
-    
+
     gdf = gdf.copy()
 
     times = gdf[temporal_index].unique()
@@ -358,7 +358,7 @@ def regionalize(
         "kmeans_spatial": kmeans_spatial,
     }
 
-    if method not in specification.keys():
+    if method not in specification:
         raise ValueError(f"`method` must be one of {specification.keys()}")
     if model_colname is None:
         if method in gdf.columns.tolist():
@@ -389,10 +389,7 @@ def regionalize(
 
     contiguity_weights = {"queen": Queen, "rook": Rook}
 
-    if spatial_weights in contiguity_weights.keys():
-        W = contiguity_weights[spatial_weights]
-    else:
-        W = spatial_weights
+    W = contiguity_weights.get(spatial_weights, spatial_weights)
 
     models = _Map()
     clusters = []
@@ -549,16 +546,17 @@ def find_k(
         output[i] = results
     output = pd.DataFrame(output).T
     summary = output.agg(
-            {
-                "silhouette_score": "idxmax",
-                "calinski_harabasz_score": "idxmax",
-                "davies_bouldin_score": "idxmin",  # min score is better here
-            }
-        ).to_frame(name="best_k")
+        {
+            "silhouette_score": "idxmax",
+            "calinski_harabasz_score": "idxmax",
+            "davies_bouldin_score": "idxmin",  # min score is better here
+        }
+    ).to_frame(name="best_k")
 
     if return_table:
         return summary, output
     return summary
+
 
 def find_region_k(
     gdf,
@@ -631,7 +629,7 @@ def find_region_k(
         )
 
         times = list()
-        for time_period in results.keys():
+        for time_period in results:
 
             res = pd.Series(
                 {
@@ -658,14 +656,14 @@ def find_region_k(
     output = pd.concat(output)
 
     summary = output.groupby("time_period").agg(
-            {
-                "silhouette_score": "idxmax",
-                "calinski_harabasz_score": "idxmax",
-                "path_silhouette": "idxmax",
-                "boundary_silhouette": "idxmax",
-                "davies_bouldin_score": "idxmin",  # min score is better here
-            }
-        )
+        {
+            "silhouette_score": "idxmax",
+            "calinski_harabasz_score": "idxmax",
+            "path_silhouette": "idxmax",
+            "boundary_silhouette": "idxmax",
+            "davies_bouldin_score": "idxmin",  # min score is better here
+        }
+    )
     if return_table:
         return summary, output
     return summary
