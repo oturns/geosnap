@@ -8,7 +8,7 @@ dependencies:
   - libpysal
   - cenpy
   - geopandas  >=0.9
-  - matplotlib <=3.3.4  # workaround for proplot missing pin upstream
+  - matplotlib
   - scikit-learn
   - seaborn
   - pyarrow >=0.14.1
@@ -18,7 +18,6 @@ dependencies:
   - quilt3 >=3.6
   - xlrd
   - tobler >=0.8.2
-  - proplot >=0.9
   - contextily
   - scikit-plot
   - mapclassify
