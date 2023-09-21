@@ -68,10 +68,10 @@ The package supports social scientists examining questions such as:
 ## Installation
 
 The recommended method for installing geosnap is with
-[anaconda](https://www.anaconda.com/download/).
+[anaconda](https://www.anaconda.com/download/). In particular, we recommend the [mambaforge distribution](https://github.com/conda-forge/miniforge#mambaforge)
 
 ```bash
-conda install -c conda-forge geosnap
+mamba install -c conda-forge geosnap
 ```
 
 `geosnap` is alaso available on PyPI and can be install with pip via
@@ -100,7 +100,7 @@ following commands:
 ```bash
 conda env create -f environment.yml
 conda activate geosnap 
-python setup.py develop
+pip install -e . --no-deps
 ```
 
 This will download the appropriate dependencies and install geosnap in its own conda environment.

@@ -38,9 +38,25 @@ extensions = [  #'sphinx_gallery.gen_gallery',
     "sphinx.ext.intersphinx",
     "numpydoc",
     "matplotlib.sphinxext.plot_directive",
+    "myst-parser"
 ]
 
-
+myst_enable_extensions = [
+    "amsmath",
+    "attrs_inline",
+    "colon_fence",
+    "deflist",
+    "dollarmath",
+    "fieldlist",
+    "html_admonition",
+    "html_image",
+    "linkify",
+    "replacements",
+    "smartquotes",
+    "strikethrough",
+    "substitution",
+    "tasklist",
+]
 
 # sphinx_gallery_conf = {
 #      # path to your examples scripts

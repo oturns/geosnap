@@ -361,8 +361,8 @@ def test_random_state():
 
     # no seeds
     reno = get_census(msa_fips="39900", datastore=DataStore())
-    r1 = cluster(reno, columns=columns, method="kmeans", n_clusters=5)
-    r2 = cluster(reno, columns=columns, method="kmeans", n_clusters=5)
+    r1 = cluster(reno, columns=columns, method="kmeans", n_clusters=7)
+    r2 = cluster(reno, columns=columns, method="kmeans", n_clusters=7)
     card1 = r1.groupby("kmeans").count()["geoid"].values
     card1.sort()
     card2 = r2.groupby("kmeans").count()["geoid"].values

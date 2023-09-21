@@ -26,11 +26,11 @@ class _Map(dict):
         super(_Map, self).__init__(*args, **kwargs)
         for arg in args:
             if isinstance(arg, dict):
-                for k, v in arg.iteritems():
+                for k, v in arg.items():
                     self[k] = v
 
         if kwargs:
-            for k, v in kwargs.iteritems():
+            for k, v in kwargs.items():
                 self[k] = v
 
     def __getattr__(self, attr):
@@ -184,7 +184,8 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         assert pooling in [
             "pool",
             "long",
-        ], "`pool` argument must be either 'pool' or 'long'"
+            "poolsub"
+        ], "`pool` argument must be either 'pool', 'long', or 'poolsub'"
         assert standardize in [
             "gcs",
             "cs",

@@ -9,14 +9,11 @@ dependencies:
   - cenpy
   - geopandas  >=0.9
   - hdbscan
-  - matplotlib <=3.3.4
+  - matplotlib 
   - scikit-learn
   - seaborn
   - pyarrow >=0.14.1
   - platformdirs
-  - dash
-  - dash-bootstrap-components
-  - palettable
   - pip
   - tqdm
   - quilt3 >=3.6
@@ -26,7 +23,6 @@ dependencies:
   - fsspec
   - s3fs
   - segregation >=2.0
-  - versioneer
   - pyproj >=3
   - pandana
   - pooch
@@ -39,7 +35,6 @@ dependencies:
   - coverage
   - coveralls
   - python-wget
-  - proplot
   - contextily
   - scikit-plot
   - python-graphviz

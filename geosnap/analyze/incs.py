@@ -3,8 +3,9 @@ Indicators of Neighborhood Change
 """
 
 from collections import defaultdict
-import numpy as np
+
 import geopandas as gpd
+import numpy as np
 
 
 def _labels_to_neighborhoods(labels):
@@ -151,7 +152,6 @@ def lincs_from_gdf(gdf, unit_index, temporal_index, cluster_col, periods="all"):
         gdf.pivot(index=unit_index, columns=temporal_index, values=cluster_col)
         .dropna()
         .astype("int"),
-        
     )
     gdf = geoms.join(df)
 

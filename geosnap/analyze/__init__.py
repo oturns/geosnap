@@ -1,5 +1,5 @@
-from .geodemo import cluster, regionalize, ModelResults, find_k, find_region_k
-from .dynamics import sequence, transition, predict_markov_labels
-from .incs import linc, lincs_from_gdf
 from . import segdyn
+from .dynamics import predict_markov_labels, sequence, transition
+from .geodemo import ModelResults, cluster, find_k, find_region_k, regionalize
+from .incs import linc, lincs_from_gdf
 from .network import compute_travel_cost_adjlist, isochrone, isochrones

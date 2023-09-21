@@ -3,11 +3,12 @@ try:
 except ImportError:
     try:
         from backports.cached_property import cached_property
-    except ImportError:
-        raise ImportError(
-            "geosnap is only officially supported on the last three versions of Python. To use the package with "
-            "Python 3.7 or earlier, you must install the backports.cached-property package. "
-            "You can do so with `pip install backports.cached-property`."
+    except ImportError as e:
+        raise Exception from e(
+            "geosnap is only officially supported on the last three versions of Python. "
+            "To use the package with Python 3.7 or earlier, you must install the "
+            "backports.cached-property package. You can do so with `pip install "
+            "backports.cached-property`."
         )
 from warnings import warn
 
@@ -15,9 +16,9 @@ import esda
 import geopandas as gpd
 import scikitplot as skplt
 from sklearn.metrics import (
-    silhouette_samples,
     calinski_harabasz_score,
     davies_bouldin_score,
+    silhouette_samples,
 )
 
 from ..visualize.mapping import plot_timeseries
@@ -475,7 +476,7 @@ class ModelResults:
         ncols=None,
         save_fig=None,
         alpha=0.5,
-        cmap="set1",
+        cmap="Set1",
         title="Next-Best Label",
         dpi=500,
         plot_kwargs=None,
@@ -789,6 +790,5 @@ class ModelResults:
             increment=increment,
             verbose=verbose,
             seed=seed,
-            
         )
         return output

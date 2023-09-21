@@ -80,8 +80,8 @@ Subject to your compliance with the terms and conditions set forth in this Agree
             )
             t.sedasch = t.sedasch.str.rjust(12, "0")
             t.fips = t.fips.str.rjust(2, "0")
-        except FileNotFoundError:
-            raise FileNotFoundError("Unable to access remote SEDA data")
+        except FileNotFoundError as e:
+            raise FileNotFoundError("Unable to access remote SEDA data") from e
 
         t.to_parquet(pathlib.Path(pth, f"{fn}.parquet"))
 
@@ -95,8 +95,8 @@ Subject to your compliance with the terms and conditions set forth in this Agree
                 )
                 t.sedalea = t.sedalea.str.rjust(7, "0")
                 t.fips = t.fips.str.rjust(2, "0")
-            except FileNotFoundError:
-                raise FileNotFoundError("Unable to access remote SEDA data")
+            except FileNotFoundError as e:
+                raise FileNotFoundError("Unable to access remote SEDA data") from e
 
             t.to_parquet(pathlib.Path(pth, f"{fn}.parquet"))
 
@@ -204,10 +204,7 @@ def store_nces(years="all", dataset="all", data_dir="auto"):
 
     """
 
-    if dataset == "all":
-        datasets = ["sabs", "districts", "schools"]
-    else:
-        datasets = [dataset]
+    datasets = ["sabs", "districts", "schools"] if dataset == "all" else [dataset]
 
     pth = pathlib.Path(_make_data_dir(data_dir), "nces")
     pathlib.Path(pth).mkdir(parents=True, exist_ok=True)
@@ -242,8 +239,8 @@ def store_acs(years="all", level="tract", data_dir="auto"):
      Parameters
     ----------
     years : list (optional)
-        subset of years to collect. Currently 2012-2018 vintages
-        are available. Pass 'all' (default) to fetch every available vintage.
+        subset of years to collect. Default is 'all' to fetch every available vintage.
+        Currently 2012-2021 vintages are available
     level : str (optional)
         geography level to fetch. Options: {'tract', 'bg'} for tract
         or blockgroup
