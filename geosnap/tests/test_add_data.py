@@ -40,13 +40,22 @@ def test_store_ncdb():
     assert datasets.ncdb().shape == (328633, 76)
 
 
-def test_get_lehd():
+def test_get_lehd_v7():
 
-    wac = io.get_lehd()
-    rac = io.get_lehd("rac")
+    wac = io.get_lehd(version=7)
+    rac = io.get_lehd("rac", version=7)
 
     assert wac.shape == (3074, 52)
     assert rac.shape == (4382, 42)
+
+def test_get_lehd_v8():
+
+    wac = io.get_lehd(version=8)
+    rac = io.get_lehd("rac", version=8)
+
+    assert wac.shape == (3269, 52)
+    assert rac.shape == (4553, 42)
+
 
 
 def test_store_acs():
