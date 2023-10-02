@@ -19,7 +19,7 @@
      strategy:
        matrix:
          os: ['ubuntu-latest']
-         environment-file: [.ci/envs/310.yml]
+         environment-file: [.ci/310.yml]
          experimental: [false]
      defaults:
        run:
