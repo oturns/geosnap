@@ -10,6 +10,7 @@ except:
     LTDB = None
     NCDB = None
 
+import sys
 
 store = DataStore()
 
@@ -23,12 +24,12 @@ def test_nces_school_dists():
     dists = io.get_nces(store, dataset="school_districts")
     assert dists.shape == (13352, 18)
 
-
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="skipping test on windows due to mem failure")
 def test_ejscreen():
     ej = io.get_ejscreen(store, years=[2018], fips=["11"])
     assert ej.shape == (450, 369)
 
-
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="skipping test on windows due to mem failure")
 def test_nces_sabs():
     sabs = io.get_nces(store, dataset="sabs")
     assert sabs.shape == (75128, 15)
