@@ -6,7 +6,6 @@ dependencies:
   - pandas
   - giddy >=2.2.1
   - libpysal
-  - cenpy
   - geopandas  >=0.9
   - hdbscan
   - matplotlib 
