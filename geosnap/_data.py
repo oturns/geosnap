@@ -433,9 +433,8 @@ Subject to your compliance with the terms and conditions set forth in this Agree
 
         Returns
         -------
-        pandas.DataFrame or geopandas.GeoDataFrame
-            2000 tracts as a geodataframe or as a dataframe with geometry
-            stored as well-known binary on the 'wkb' column.
+        geopandas.GeoDataFrame
+            2000 tracts as a geodataframe
 
         """
         local = pathlib.Path(self.data_dir, "tracts_2000_500k.parquet")
@@ -461,9 +460,8 @@ Subject to your compliance with the terms and conditions set forth in this Agree
 
         Returns
         -------
-        pandas.DataFrame or geopandas.GeoDataFrame
-            2010 tracts as a geodataframe or as a dataframe with geometry
-            stored as well-known binary on the 'wkb' column.
+        geopandas.GeoDataFrame
+            2010 tracts as a geodataframe
 
         """
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
@@ -480,7 +478,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         self,
         states=None,
     ):
-        """Nationwide Census Tracts as drawn in 2010 (cartographic 500k).
+        """Nationwide Census Tracts as drawn in 2020 (cartographic 500k).
 
         Parameters
         ----------
@@ -489,9 +487,8 @@ Subject to your compliance with the terms and conditions set forth in this Agree
 
         Returns
         -------
-        pandas.DataFrame or geopandas.GeoDataFrame
-            2010 tracts as a geodataframe or as a dataframe with geometry
-            stored as well-known binary on the 'wkb' column.
+        geopandas.GeoDataFrame
+            2020 tracts as a geodataframe
 
         """
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
@@ -513,9 +510,8 @@ Subject to your compliance with the terms and conditions set forth in this Agree
 
         Returns
         -------
-        pandas.DataFrame or geopandas.GeoDataFrame
-            2010 MSAs as a geodataframe or as a dataframe with geometry
-            stored as well-known binary on the 'wkb' column.
+        geopandas.GeoDataFrame
+            2010 MSAs as a geodataframe
 
         """
         local = pathlib.Path(self.data_dir, "msas.parquet")
@@ -530,9 +526,8 @@ Subject to your compliance with the terms and conditions set forth in this Agree
 
         Returns
         -------
-        pandas.DataFrame or geopandas.GeoDataFrame
-            US States as a geodataframe or as a dataframe with geometry
-            stored as well-known binary on the 'wkb' column.
+        geopandas.GeoDataFrame
+            US States as a geodataframe
 
         """
         local = pathlib.Path(self.data_dir, "states.parquet")
@@ -545,16 +540,10 @@ Subject to your compliance with the terms and conditions set forth in this Agree
     def counties(self):
         """Nationwide counties as drawn in 2010.
 
-        Parameters
-        ----------
-        convert : bool
-            if True, return geodataframe, else return dataframe (the default is True).
-
         Returns
         -------
         geopandas.GeoDataFrame
-            2010 counties as a geodataframe or as a dataframe with geometry
-            stored as well-known binary on the 'wkb' column.
+            2010 counties as a geodataframe.
 
         """
         local = pathlib.Path(self.data_dir, "counties.parquet")
