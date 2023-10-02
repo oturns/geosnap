@@ -11,6 +11,9 @@ changelog:
     - title: Enhancements
       labels:
         - enhancement
+    - title: Maintenance
+      labels:
+        - maintenance
     - title: Other Changes
       labels:
         - "*"

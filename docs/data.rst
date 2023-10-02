@@ -41,6 +41,9 @@ Geo Data
 | Blocks  | https://www2.census.gov/geo/tiger/TIGER2018/TABBLOCK/      |
 | 2010    |                                                            |
 +---------+------------------------------------------------------------+
+| Blocks  | https://www2.census.gov/geo/tiger/TIGER2021/TABBLOCK/      |
+| 2020    |                                                            |
++---------+------------------------------------------------------------+
 | Tracts  | https://github.co                                          |
 | 1990    | m/loganpowell/census-geojson/tree/master/GeoJSON/500k/1990 |
 +---------+------------------------------------------------------------+

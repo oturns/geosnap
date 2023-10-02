@@ -152,6 +152,21 @@ def store_blocks_2010(data_dir="auto"):
     quilt3.Package.install("census/blocks_2010", "s3://spatial-ucr", dest=pth)
 
 
+def store_blocks_2020(data_dir="auto"):
+    """Save census 2020 census block data to the local quilt package storage.
+
+    Returns
+    -------
+    None
+        Data will be available in the geosnap.data.datasets and will be used
+        in place of streaming data for all census queries.
+
+    """
+    pth = pathlib.Path(_make_data_dir(data_dir), "blocks_2020")
+    pathlib.Path(pth).mkdir(parents=True, exist_ok=True)
+    quilt3.Package.install("census/blocks_2020", "s3://spatial-ucr", dest=pth)
+
+
 def store_ejscreen(years="all", data_dir="auto"):
     """Save EPA EJScreen data to the local geosnap storage.
        Each year is about 1GB.

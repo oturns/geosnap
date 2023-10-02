@@ -27,6 +27,7 @@ available quickly with no configuration by accessing methods on the class.
     DataStore.acs
     DataStore.blocks_2000
     DataStore.blocks_2010
+    DataStore.blocks_2020
     DataStore.codebook
     DataStore.counties
     DataStore.ejscreen
@@ -59,6 +60,7 @@ files instead of streaming over the web.
     io.store_census
     io.store_blocks_2000
     io.store_blocks_2010
+    io.store_blocks_2020
     io.store_ejscreen
     io.store_ltdb
     io.store_ncdb
@@ -108,9 +110,9 @@ Model neighborhood change using optimal-matching algorithms or spatial discrete 
 .. autosummary::
    :toctree: generated/
    
+   analyze.draw_sequence_from_gdf
    analyze.linc
    analyze.lincs_from_gdf
-   analyze.predict_markov_labels
    analyze.sequence
    analyze.transition
 
@@ -141,7 +143,7 @@ Compute shortest path distance along a network using pandana, and visualize trav
 
    analyze.compute_travel_cost_adjlist
    analyze.isochrone
-   analyze.isocrones
+   analyze.isochrones
 
 The ModelResults Class
 '''''''''''''''''''''''''''''''''''''''''''''
