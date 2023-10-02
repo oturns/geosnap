@@ -41,9 +41,7 @@
        - run: conda config --show-sources
        - run: conda config --show
        - run: pip install -e . --no-deps --force-reinstall
-       - run: |
-           cd docs
-           make html       
+       - run: cd docs; make html
        - name: Commit documentation changes
          run: |
            git clone https://github.com/ammaraskar/sphinx-action-test.git --branch gh-pages --single-branch gh-pages
