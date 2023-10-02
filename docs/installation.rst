@@ -3,7 +3,7 @@
 Installation
 ===============
 
-``geosnap`` supports python >`3.5`_. Please make sure that you are
+``geosnap`` supports python >`3.8`_. Please make sure that you are
 operating in a python 3 environment.
 
 Installing a released version
@@ -26,7 +26,7 @@ The recommended method for installing geosnap is with `anaconda`_. To get starte
 
 $ conda env create -f environment.yml
 $ source activate geosnap 
-$ python setup.py develop
+$ pip install -e . 
 
 You can  also `fork`_ the `oturns/geosnap`_ repo and create a local clone of
 your fork. By making changes
