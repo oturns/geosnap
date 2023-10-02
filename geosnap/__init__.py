@@ -1,4 +1,3 @@
-
 r"""
 
 geosnap: Geospatial Neighborhood Analysis Package.
@@ -25,12 +24,8 @@ io
 import contextlib
 from importlib.metadata import PackageNotFoundError, version
 
-from . import analyze
-from . import io
-from . import util
-from . import visualize
-from . import harmonize
-from ._data import _Map, DataStore
+from . import analyze, harmonize, io, util, visualize
+from ._data import DataStore, _Map
 
 with contextlib.suppress(PackageNotFoundError):
     __version__ = version("geosnap")

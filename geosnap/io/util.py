@@ -188,7 +188,7 @@ def convert_census_gdb(
         )
 
 
-def get_lehd(dataset="wac", state="dc", year=2015):
+def get_lehd(dataset="wac", state="dc", year=2015, version=8):
     """Grab data from the LODES FTP server as a pandas DataFrame.
 
     Parameters
@@ -202,6 +202,9 @@ def get_lehd(dataset="wac", state="dc", year=2015):
     year : str
         which year to collect. First year avaialable for most states is 2002.
         Consult the LODES documentation for more details. The default is 2015.
+    version : int
+        which version of LODES to query. Options include 5,7 and 8, which are keyed
+        to census 2000, 2010, and 2020 blocks respectively
 
     Returns
     -------
@@ -216,8 +219,8 @@ def get_lehd(dataset="wac", state="dc", year=2015):
     renamer = dict(zip(lodes_vars["variable"].tolist(), lodes_vars["name"].tolist()))
 
     state = state.lower()
-    url = "https://lehd.ces.census.gov/data/lodes/LODES7/{state}/{dataset}/{state}_{dataset}_S000_JT00_{year}.csv.gz".format(
-        dataset=dataset, state=state, year=year
+    url = "https://lehd.ces.census.gov/data/lodes/LODES{version}/{state}/{dataset}/{state}_{dataset}_S000_JT00_{year}.csv.gz".format(
+        dataset=dataset, state=state, year=year, version=version
     )
     try:
         df = pd.read_csv(url, converters={"w_geocode": str, "h_geocode": str})

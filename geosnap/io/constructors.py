@@ -175,7 +175,7 @@ def get_acs(
     ]
 
     if years == "all":
-        years = list(range(2012, 2020))
+        years = list(range(2012, 2022))
 
     elif isinstance(years, (str,)):
         years = [int(years)]
@@ -483,6 +483,7 @@ def get_lodes(
     boundary=None,
     years=2015,
     dataset="wac",
+    version=8,
 ):
     """Extract a subset of data from Census LEHD/LODES .
 
@@ -531,29 +532,16 @@ def get_lodes(
     msa_counties = _msa_to_county(datastore, msa_fips)
 
     states, allfips = _fips_to_states(state_fips, county_fips, msa_counties, fips)
-    if boundary:
-        if not boundary.crs.equals(4326):
-            boundary = boundary.copy().to_crs(4326)
+    if boundary and not boundary.crs.equals(4326):
+        boundary = boundary.copy().to_crs(4326)
 
-    if any(year < 2010 for year in years):
-        gdf00 = datastore.blocks_2000(states=states, fips=(tuple(allfips)))
-        gdf00 = gdf00.drop(columns=["year"])
-        gdf00 = _fips_filter(
-            state_fips=state_fips,
-            county_fips=county_fips,
-            msa_fips=msa_fips,
-            fips=fips,
-            data=gdf00,
-        )
-        if isinstance(boundary, gpd.GeoDataFrame):
-            if boundary.crs != gdf00.crs:
-                warn(
-                    "Unable to determine whether boundary CRS is WGS84 "
-                    "if this produces unexpected results, try reprojecting"
-                )
-            gdf00 = gdf00[gdf00.representative_point().intersects(boundary.unary_union)]
+    if version == 5:
+        gdf = datastore.blocks_2000(states=states, fips=(tuple(allfips)))
+    elif version == 7:
+        gdf = datastore.blocks_2010(states=states, fips=(tuple(allfips)))
+    elif version == 8:
+        gdf = datastore.blocks_2020(states=states, fips=(tuple(allfips)))
 
-    gdf = datastore.blocks_2010(states=states, fips=(tuple(allfips)))
     gdf = gdf.drop(columns=["year"])
     gdf = _fips_filter(
         state_fips=state_fips,
@@ -586,12 +574,8 @@ def get_lodes(
             if name == "PR":
                 raise Exception("does not yet include built-in data for Puerto Rico")
             try:
-                df = get_lehd(dataset=dataset, year=year, state=name)
-                if year < 2010:
-                    df = gdf00.merge(df, right_index=True, left_on="geoid", how="left")
-                else:
-                    df = gdf.merge(df, right_index=True, left_on="geoid", how="left")
-
+                df = get_lehd(dataset=dataset, year=year, state=name, version=version)
+                df = gdf.merge(df, right_index=True, left_on="geoid", how="left")
                 df["year"] = year
                 merged_year.append(df)
             except ValueError:
@@ -604,7 +588,7 @@ def get_lodes(
     out = pd.concat(dfs, sort=True)
     out = out.groupby(["geoid", "year"]).first().reset_index()
     out.crs = 4326
-    return out.reset_index()
+    return out
 
 
 def _msa_to_county(datastore, msa_fips):

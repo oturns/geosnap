@@ -358,6 +358,44 @@ Subject to your compliance with the terms and conditions set forth in this Agree
 
         return blocks
 
+    def blocks_2020(self, states=None, fips=None):
+        """Census blocks for 2020.
+
+        Parameters
+        ----------
+        states : list-like
+            list of state fips codes to return as a datafrrame.
+
+        Returns
+        -------
+        type
+        pandas.DataFrame or geopandas.GeoDataFrame
+            2010 blocks as a geodataframe or as a dataframe with geometry
+            stored as well-known binary on the 'wkb' column.
+
+        """
+        msg = (
+            "Unable to locate local census 2020 block data. Streaming instead.\n"
+            "If you plan to use census data repeatedly you can store it locally "
+            "with the io.store_blocks_2010 function for better performance"
+        )
+        if isinstance(states, (str, int)):
+            states = [states]
+        blks = {}
+        for state in states:
+            local = pathlib.Path(self.data_dir, "blocks_2020", f"{state}.parquet")
+            remote = f"s3://spatial-ucr/census/blocks_2020/{state}.parquet"
+            blks[state] = _fetcher(local, remote, msg)
+
+            if fips:
+                blks[state] = blks[state][blks[state]["geoid"].str.startswith(fips)]
+
+            blks[state]["year"] = 2020
+        blocks = list(blks.values())
+        blocks = gpd.GeoDataFrame(pd.concat(blocks, sort=True))
+
+        return blocks
+
     def tracts_1990(self, states=None):
         """Nationwide Census Tracts as drawn in 1990 (cartographic 500k).
 
