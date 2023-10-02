@@ -38,7 +38,7 @@ extensions = [  #'sphinx_gallery.gen_gallery',
     "sphinx.ext.intersphinx",
     "numpydoc",
     "matplotlib.sphinxext.plot_directive",
-    "myst-parser"
+    "myst_parser"
 ]
 
 myst_enable_extensions = [
@@ -80,7 +80,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "geosnap"
-copyright = "2020, geosnap developers"
+copyright = "2023, geosnap developers"
 author = "geosnap developers"
 
 # The version info for the project you're documenting, acts as replacement for
