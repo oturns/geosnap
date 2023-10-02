@@ -26,6 +26,10 @@ def test_tracts10():
     df = datasets.tracts_2010(states=["11"])
     assert df.shape == (179, 194)
 
+def test_tracts20():
+    df = datasets.tracts_2020(states=["11"])
+    assert df.shape == (206, 15)
+
 
 def test_counties():
     assert datasets.counties().shape == (3233, 2)

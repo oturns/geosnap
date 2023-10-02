@@ -54,8 +54,7 @@ class _Map(dict):
 class DataStore:
     """Storage for geosnap data. Currently supports data from several U.S. federal agencies and national research centers."""
 
-    def __init__(self, data_dir="auto"):
-        self
+    def __init__(self, data_dir="auto", disclaimer=False):
         appname = "geosnap"
         appauthor = "geosnap"
 
@@ -63,11 +62,12 @@ class DataStore:
             self.data_dir = user_data_dir(appname, appauthor)
         else:
             self.data_dir = data_dir
-        warn(
-            "The geosnap data storage class is provided for convenience only. The geosnap developers make no promises "
-            "regarding data quality, consistency, or availability, nor are they responsible for any use/misuse of the data. "
-            "The end-user is responsible for any and all analyses or applications created with the package."
-        )
+        if disclaimer:
+            warn(
+                "The geosnap data storage class is provided for convenience only. The geosnap developers make no promises "
+                "regarding data quality, consistency, or availability, nor are they responsible for any use/misuse of the data. "
+                "The end-user is responsible for any and all analyses or applications created with the package."
+            )
 
     def __dir__(self):
 
@@ -75,6 +75,7 @@ class DataStore:
             "acs",
             "blocks_2000",
             "blocks_2010",
+            "blocks_2020",
             "codebook",
             "counties",
             "ejscreen",
@@ -89,6 +90,7 @@ class DataStore:
             "tracts_1990",
             "tracts_2000",
             "tracts_2010",
+            "tracts_2020"
         ]
 
         return atts
@@ -472,6 +474,34 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         if states:
             t = t[t.geoid.str[:2].isin(states)]
         t["year"] = 2010
+        return t
+
+    def tracts_2020(
+        self,
+        states=None,
+    ):
+        """Nationwide Census Tracts as drawn in 2010 (cartographic 500k).
+
+        Parameters
+        ----------
+        states : list-like
+            list of state fips to subset the national dataframe
+
+        Returns
+        -------
+        pandas.DataFrame or geopandas.GeoDataFrame
+            2010 tracts as a geodataframe or as a dataframe with geometry
+            stored as well-known binary on the 'wkb' column.
+
+        """
+        msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
+        local = pathlib.Path(self.data_dir, "tracts_2020_500k.parquet")
+        remote = "s3://spatial-ucr/census/tracts_cartographic/tracts_2020_500k.parquet"
+        t = _fetcher(local, remote, msg)
+
+        if states:
+            t = t[t.geoid.str[:2].isin(states)]
+        t["year"] = 2020
         return t
 
     def msas(self):
