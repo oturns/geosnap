@@ -15,10 +15,7 @@ maintainers = [{ name = "geosnap contributors" }]
 license = { text = "BSD 3-Clause" }
 description = "The Geospatial Neighborhood Analysis Package"
 keywords = ["geodemographics, neighborhood dynamics, urban data science, spatial analysis"]
-readme = { text = """\
-A suite of tools for exploring, modeling, and visualizing the social context and spatial extent of neighborhoods and regions over time"
-
-""", content-type = "text/x-rst" }
+readme = "README.md"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: BSD License",
