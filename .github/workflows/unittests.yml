@@ -1,91 +1,61 @@
- name: Continuous Integration
- 
- on:
-   push:
-     branches:
-       - '*'
-   pull_request:
-     branches:
-       - '*'
-   schedule:
-     - cron: "0 0 * * 1,4"
+name: Tests
 
- jobs:
-   unittests:
-     name: CI (${{ matrix.os }}-${{ matrix.environment-file }})
-     runs-on: ${{ matrix.os }}
-     continue-on-error: true
-     timeout-minutes: 90 
-     strategy:
-       matrix:
-         os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
-         environment-file: [.ci/39.yml, .ci/310.yml, .ci/311.yml]
-   
-     steps:
-       - name: checkout repo
-         uses: actions/checkout@v2
-       
-       - name: setup micromamba
-         uses: mamba-org/provision-with-micromamba@main
-         with:
-           environment-file: ${{ matrix.environment-file }}
-           micromamba-version: 'latest'
-           mamba-version: "*"
-           channels: conda-forge
-           channel-priority: true
-     
-     
-       - name: install geosnap - bash
-         shell: bash -l {0}
-         run: pip install -e . --no-deps --force-reinstall
-         if: matrix.os != 'windows-latest'
-       
-       - name: install geosnap - powershell
-         shell: powershell
-         run: pip install -e . --no-deps --force-reinstall
-         if: matrix.os == 'windows-latest'
-      
-      
-       - name: download data - bash
-         shell: bash -l {0}
-         run: python geosnap/tests/_dl_data.py
-         env:
-           COMBO_DATA: ${{ secrets.COMBO_DATA }}
-         if: matrix.os != 'windows-latest'
-      
-       - name: download data - powershell
-         shell: powershell
-         run: python geosnap/tests/_dl_data.py
-         env:
-           COMBO_DATA: ${{ secrets.COMBO_DATA }}
-         if: matrix.os == 'windows-latest'
-       
-       
-       - name: run tests - bash
-         shell: bash -l {0}
-         run: pytest -v geosnap --cov=geosnap --cov-report=xml
-         env:
-           LTDB_SAMPLE: ${{ secrets.COMBO_DATA }} # check whether we can pull secrets
-           LTDB_FULL: ${{ secrets.COMBO_DATA }}
-           NCDB: ${{ secrets.COMBO_DATA }}
-         if: matrix.os != 'windows-latest'
-       
-       - name: run tests - powershell
-         shell: powershell
-         run: pytest -v geosnap
-         env:
-           LTDB_SAMPLE: ${{ secrets.COMBO_DATA }} # check whether we can pull secrets
-           LTDB_FULL: ${{ secrets.COMBO_DATA }}
-           NCDB: ${{ secrets.COMBO_DATA }}
-         if: matrix.os == 'windows-latest'
-       
-       
-       - name: codecov
-         uses: codecov/codecov-action@v2
-         with:
-           token: ${{ secrets.CODECOV_TOKEN }}
-           file: ./coverage.xml
-           flags: unittests # optional
-           name: geosnap-codecov
-           verbose: true 
-         if: matrix.os != 'windows-latest'
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches:
+      - "*"
+  schedule:
+    - cron: "0 0 * * 1,4"
+
+jobs:
+  Test:
+    name: ${{ matrix.os }}, ${{ matrix.environment-file }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        environment-file:
+          - ci/39.yaml
+          - ci/310.yaml
+          - ci/311.yaml
+        include:
+          - environment-file: ci/310.yaml
+            os: macos-latest
+          - environment-file: ci/310.yaml
+            os: windows-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: setup micromamba
+        uses: mamba-org/provision-with-micromamba@main
+        with:
+          environment-file: ${{ matrix.environment-file }}
+          micromamba-version: "latest"
+
+      - name: Install geosnap
+        run: python geosnap/tests/_dl_data.py;
+        env:
+          COMBO_DATA: ${{ secrets.COMBO_DATA }}
+  
+      - name: Test geosnap
+        run: |
+          pytest -v --color yes --cov geosnap --cov-append --cov-report term-missing --cov-report xml .
+
+      - uses: codecov/codecov-action@v3
+
+      - name: Generate and publish the report
+        if: |
+          failure()
+          && steps.status.outcome == 'failure'
+          && github.event_name == 'schedule'
+          && github.repository_owner == 'pysal'
+        uses: xarray-contrib/issue-from-pytest-log@v1
+        with:
+          log-path: pytest-log.jsonl
