@@ -48,14 +48,9 @@ jobs:
         run: |
           pytest -v --color yes --cov geosnap/tests --cov-append --cov-report term-missing --cov-report xml .
 
-      - uses: codecov/codecov-action@v3
-
-      - name: Generate and publish the report
-        if: |
-          failure()
-          && steps.status.outcome == 'failure'
-          && github.event_name == 'schedule'
-          && github.repository_owner == 'pysal'
-        uses: xarray-contrib/issue-from-pytest-log@v1
+      - name: codecov
+        uses: codecov/codecov-action@v3
         with:
-          log-path: pytest-log.jsonl
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage.xml
+          name: geosnap-codecov
