@@ -18,13 +18,13 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         environment-file:
-          - .ci/39.yaml
-          - .ci/310.yaml
-          - .ci/311.yaml
+          - .ci/39.yml
+          - .ci/310.yml
+          - .ci/311.yml
         include:
-          - environment-file: .ci/310.yaml
+          - environment-file: .ci/310.yml
             os: macos-latest
-          - environment-file: .ci/310.yaml
+          - environment-file: .ci/310.yml
             os: windows-latest
     defaults:
       run:
