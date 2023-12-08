@@ -236,7 +236,7 @@ def get_lehd(dataset="wac", state="dc", year=2015, version=8):
     return df
 
 
-def adjust_inflation(df, columns, given_year, base_year=2015):
+def adjust_inflation(df, columns, given_year, base_year):
     """
     Adjust currency data for inflation.
 
@@ -262,7 +262,6 @@ def adjust_inflation(df, columns, given_year, base_year=2015):
     """
     # get inflation adjustment table from BLS
     try:
-
         inflation = pd.read_csv(
             os.path.join(os.path.dirname(os.path.abspath(__file__)), "inflation.csv")
         )

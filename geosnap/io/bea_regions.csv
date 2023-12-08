@@ -1,0 +1,111 @@
+,geoid,metro,state,bea_region
+0,10420,Akron,OH,Great Lakes
+1,10580,Albany-Schenectady-Troy,NY,Mideast
+2,10740,Albuquerque,NM,Southwest
+3,10900,Allentown-Bethlehem-Easton,PA-NJ,Mideast
+4,12060,Atlanta-Sandy Springs-Alpharetta,GA,Southeast
+5,12260,Augusta-Richmond County,GA-SC,Southeast
+6,12420,Austin-Round Rock-Georgetown,TX,Southwest
+7,12540,Bakersfield,CA,Far West
+8,12580,Baltimore-Columbia-Towson,MD,Mideast
+9,12940,Baton Rouge,LA,Southeast
+10,13820,Birmingham-Hoover,AL,Southeast
+11,14260,Boise City,ID,Rocky Mountain
+12,14460,Boston-Cambridge-Newton,MA-NH,New England
+13,14860,Bridgeport-Stamford-Norwalk,CT,New England
+14,15380,Buffalo-Cheektowaga,NY,Mideast
+15,15980,Cape Coral-Fort Myers,FL,Southeast
+16,16700,Charleston-North Charleston,SC,Southeast
+17,16740,Charlotte-Concord-Gastonia,NC-SC,Southeast
+18,16860,Chattanooga,TN-GA,Southeast
+19,16980,Chicago-Naperville-Elgin,IL-IN-WI,Great Lakes
+20,17140,Cincinnati,OH-KY-IN,Great Lakes
+21,17460,Cleveland-Elyria,OH,Great Lakes
+22,17820,Colorado Springs,CO,Rocky Mountain
+23,17900,Columbia,SC,Southeast
+24,18140,Columbus,OH,Great Lakes
+25,19100,Dallas-Fort Worth-Arlington,TX,Southwest
+26,19430,Dayton-Kettering,OH,Great Lakes
+27,19660,Deltona-Daytona Beach-Ormond Beach,FL,Southeast
+28,19740,Denver-Aurora-Lakewood,CO,Rocky Mountain
+29,19780,Des Moines-West Des Moines,IA,Plains
+30,19820,Detroit-Warren-Dearborn,MI,Great Lakes
+31,20500,Durham-Chapel Hill,NC,Southeast
+32,21340,El Paso,TX,Southwest
+33,22180,Fayetteville,NC,Southeast
+34,22220,Fayetteville-Springdale-Rogers,AR,Southeast
+35,23420,Fresno,CA,Far West
+36,24340,Grand Rapids-Kentwood,MI,Great Lakes
+37,24660,Greensboro-High Point,NC,Southeast
+38,24860,Greenville-Anderson,SC,Southeast
+39,25420,Harrisburg-Carlisle,PA,Mideast
+40,25540,Hartford-East Hartford-Middletown,CT,New England
+41,26420,Houston-The Woodlands-Sugar Land,TX,Southwest
+42,26900,Indianapolis-Carmel-Anderson,IN,Great Lakes
+43,27140,Jackson,MS,Southeast
+44,27260,Jacksonville,FL,Southeast
+45,28140,Kansas City,MO-KS,Plains
+46,28940,Knoxville,TN,Southeast
+47,29460,Lakeland-Winter Haven,FL,Southeast
+48,29540,Lancaster,PA,Mideast
+49,29620,Lansing-East Lansing,MI,Great Lakes
+50,29820,Las Vegas-Henderson-Paradise,NV,Far West
+51,30460,Lexington-Fayette,KY,Southeast
+52,30780,Little Rock-North Little Rock-Conway,AR,Southeast
+53,31080,Los Angeles-Long Beach-Anaheim,CA,Far West
+54,31140,Louisville/Jefferson County,KY-IN,Southeast
+55,31540,Madison,WI,Great Lakes
+56,32580,McAllen-Edinburg-Mission,TX,Southwest
+57,32820,Memphis,TN-MS-AR,Southeast
+58,33100,Miami-Fort Lauderdale-Pompano Beach,FL,Southeast
+59,33340,Milwaukee-Waukesha,WI,Great Lakes
+60,33460,Minneapolis-St. Paul-Bloomington,MN-WI,Plains
+61,33700,Modesto,CA,Far West
+62,34980,Nashville-Davidson--Murfreesboro--Franklin,TN,Southeast
+63,35300,New Haven-Milford,CT,New England
+64,35380,New Orleans-Metairie,LA,Southeast
+65,35620,New York-Newark-Jersey City,NY-NJ-PA,Mideast
+66,35840,North Port-Sarasota-Bradenton,FL,Southeast
+67,36260,Ogden-Clearfield,UT,Rocky Mountain
+68,36420,Oklahoma City,OK,Southwest
+69,36540,Omaha-Council Bluffs,NE-IA,Plains
+70,36740,Orlando-Kissimmee-Sanford,FL,Southeast
+71,37100,Oxnard-Thousand Oaks-Ventura,CA,Far West
+72,37340,Palm Bay-Melbourne-Titusville,FL,Southeast
+73,37980,Philadelphia-Camden-Wilmington,PA-NJ-DE-MD,Mideast
+74,38060,Phoenix-Mesa-Chandler,AZ,Southwest
+75,38300,Pittsburgh,PA,Mideast
+76,38860,Portland-South Portland,ME,New England
+77,38900,Portland-Vancouver-Hillsboro,OR-WA,Far West
+78,39100,Poughkeepsie-Newburgh-Middletown,NY,Mideast
+79,39300,Providence-Warwick,RI-MA,New England
+80,39340,Provo-Orem,UT,Rocky Mountain
+81,39580,Raleigh-Cary,NC,Southeast
+82,40060,Richmond,VA,Southeast
+83,40140,Riverside-San Bernardino-Ontario,CA,Far West
+84,40380,Rochester,NY,Mideast
+85,40900,Sacramento-Roseville-Folsom,CA,Far West
+86,41620,Salt Lake City,UT,Rocky Mountain
+87,41700,San Antonio-New Braunfels,TX,Southwest
+88,41740,San Diego-Chula Vista-Carlsbad,CA,Far West
+89,41860,San Francisco-Oakland-Berkeley,CA,Far West
+90,41940,San Jose-Sunnyvale-Santa Clara,CA,Far West
+91,42220,Santa Rosa-Petaluma,CA,Far West
+92,42540,Scranton--Wilkes-Barre,PA,Mideast
+93,42660,Seattle-Tacoma-Bellevue,WA,Far West
+94,44060,Spokane-Spokane Valley,WA,Far West
+95,44140,Springfield,MA,New England
+96,41180,St. Louis,MO-IL,Plains
+97,44700,Stockton,CA,Far West
+98,45060,Syracuse,NY,Mideast
+99,45300,Tampa-St. Petersburg-Clearwater,FL,Southeast
+100,45780,Toledo,OH,Great Lakes
+101,46060,Tucson,AZ,Southwest
+102,46140,Tulsa,OK,Southwest
+103,46520,Urban Honolulu,HI,Far West
+104,47260,Virginia Beach-Norfolk-Newport News,VA-NC,Southeast
+105,47900,Washington-Arlington-Alexandria,DC-VA-MD-WV,Mideast
+106,48620,Wichita,KS,Plains
+107,49180,Winston-Salem,NC,Southeast
+108,49340,Worcester,MA-CT,New England
+109,49660,Youngstown-Warren-Boardman,OH-PA,Great Lakes

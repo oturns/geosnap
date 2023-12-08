@@ -3,6 +3,7 @@
 import os
 import pathlib
 import zipfile
+from pathlib import Path
 from warnings import warn
 
 import geopandas as gpd
@@ -10,10 +11,9 @@ import pandas as pd
 import quilt3
 from platformdirs import user_data_dir
 
-from .._data import DataStore
 from .util import adjust_inflation
 
-datasets = DataStore()
+script_dir = os.path.dirname(__file__)
 
 _fipstable = pd.read_csv(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), "stfipstable.csv"),
@@ -70,7 +70,6 @@ Subject to your compliance with the terms and conditions set forth in this Agree
     pathlib.Path(pth).mkdir(parents=True, exist_ok=True)
 
     for std in ["cs", "gcs"]:
-
         try:
             fn = f"seda_school_pool_{std}_4.1"
             print(f"Downloading {fn}")
@@ -304,11 +303,12 @@ def store_ltdb(sample, fullcount, data_dir="auto"):
     None
 
     """
+    codebook = pd.read_csv(Path(script_dir, "variables.csv"))
+
     sample_zip = zipfile.ZipFile(sample)
     fullcount_zip = zipfile.ZipFile(fullcount)
 
     def _ltdb_reader(path, file, year, dropcols=None):
-
         df = pd.read_csv(
             path.open(file),
             na_values=["", " ", 99999, -999],
@@ -415,20 +415,18 @@ def store_ltdb(sample, fullcount, data_dir="auto"):
 
     renamer = dict(
         zip(
-            datasets.codebook()["ltdb"].tolist(),
-            datasets.codebook()["variable"].tolist(),
+            codebook["ltdb"].tolist(),
+            codebook["variable"].tolist(),
         )
     )
 
     df.rename(renamer, axis="columns", inplace=True)
 
     # compute additional variables from lookup table
-    for row in datasets.codebook()["formula"].dropna().tolist():
+    for row in codebook["formula"].dropna().tolist():
         df.eval(row, inplace=True)
 
-    keeps = df.columns[
-        df.columns.isin(datasets.codebook()["variable"].tolist() + ["year"])
-    ]
+    keeps = df.columns[df.columns.isin(codebook["variable"].tolist() + ["year"])]
     df = df[keeps]
 
     df.to_parquet(
@@ -446,7 +444,8 @@ def store_ncdb(filepath, data_dir="auto"):
         location of the input CSV file extracted from your Geolytics DVD
 
     """
-    ncdb_vars = datasets.codebook()["ncdb"].dropna()[1:].values
+    codebook = pd.read_csv(Path(script_dir, "variables.csv"))
+    ncdb_vars = codebook["ncdb"].dropna()[1:].values
 
     names = []
     for name in ncdb_vars:
@@ -511,7 +510,7 @@ def store_ncdb(filepath, data_dir="auto"):
     )
     df = df.groupby(["GEO2010", "year"]).first()
 
-    mapper = dict(zip(datasets.codebook().ncdb, datasets.codebook().variable))
+    mapper = dict(zip(codebook().ncdb, codebook().variable))
 
     df.reset_index(inplace=True)
 
@@ -519,15 +518,13 @@ def store_ncdb(filepath, data_dir="auto"):
 
     df = df.set_index("geoid")
 
-    for row in datasets.codebook()["formula"].dropna().tolist():
+    for row in codebook["formula"].dropna().tolist():
         try:
             df.eval(row, inplace=True)
         except:
             warn("Unable to compute " + str(row))
 
-    keeps = df.columns[
-        df.columns.isin(datasets.codebook()["variable"].tolist() + ["year"])
-    ]
+    keeps = df.columns[df.columns.isin(codebook["variable"].tolist() + ["year"])]
 
     df = df[keeps]
 
@@ -542,6 +539,10 @@ def _fips_filter(
     state_fips=None, county_fips=None, msa_fips=None, fips=None, data=None
 ):
     data = data.copy()
+    msa_definitions = pd.read_csv(
+        Path(script_dir, "msa_definitions.csv"),
+        converters={"stcofips": str, "CBSA Code": str},
+    )
 
     fips_list = []
     for each in [state_fips, county_fips, fips]:
@@ -555,17 +556,17 @@ def _fips_filter(
             )
     if msa_fips:
         pr_metros = set(
-            datasets.msa_definitions()[
-                datasets.msa_definitions()["CBSA Title"].str.contains("PR")
-            ]["CBSA Code"].tolist()
+            msa_definitions[msa_definitions["CBSA Title"].str.contains("PR")][
+                "CBSA Code"
+            ].tolist()
         )
         if msa_fips in pr_metros:
             raise Exception(
                 "geosnap does not yet include built-in data for Puerto Rico"
             )
-        fips_list += datasets.msa_definitions()[
-            datasets.msa_definitions()["CBSA Code"] == msa_fips
-        ]["stcofips"].tolist()
+        fips_list += msa_definitions[msa_definitions["CBSA Code"] == msa_fips][
+            "stcofips"
+        ].tolist()
 
     df = data[data.geoid.str.startswith(tuple(fips_list))]
 
@@ -573,9 +574,14 @@ def _fips_filter(
 
 
 def _from_db(
-    data, state_fips=None, county_fips=None, msa_fips=None, fips=None, years=None
+    datastore,
+    data,
+    state_fips=None,
+    county_fips=None,
+    msa_fips=None,
+    fips=None,
+    years=None,
 ):
-
     data = data[data.year.isin(years)]
     data = data.reset_index()
 
@@ -588,7 +594,7 @@ def _from_db(
     )
 
     # we know we're using 2010, need to drop the year column so no conficts
-    tracts = datasets.tracts_2010()
+    tracts = datastore.tracts_2010()
     tracts = tracts[["geoid", "geometry"]]
     tracts = tracts[tracts.geoid.isin(df.geoid)]
 
