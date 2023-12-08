@@ -127,7 +127,7 @@ def get_acs(
     fips=None,
     years="all",
     constant_dollars=True,
-    currency_year=2019,
+    currency_year=None,
 ):
     """Extract a subset of data from the American Community Survey (ACS).
 
@@ -182,6 +182,14 @@ def get_acs(
     elif isinstance(years, (int,)):
         years = [years]
 
+    if currency_year is None:
+        currency_year = max(years)
+        if len(years) > 1:  # if there's only one year, then no adjustment happens
+            warn(
+                "`constant_dollars` is True, but no `currency_year` was specified. "
+                f"Resorting to max value of {currency_year}",
+                stacklevel=1,
+            )
     msa_counties = _msa_to_county(datastore, msa_fips)
 
     states, allfips = _fips_to_states(state_fips, county_fips, msa_counties, fips)
@@ -266,7 +274,8 @@ def get_ltdb(
         gdf = gdf[gdf["year"].isin(years)]
 
     else:
-        gdf = _from_db(datastore,
+        gdf = _from_db(
+            datastore,
             data=datastore.ltdb(),
             state_fips=state_fips,
             county_fips=county_fips,
@@ -331,7 +340,8 @@ def get_ncdb(
         gdf = gdf[gdf["year"].isin(years)]
 
     else:
-        gdf = _from_db(datastore,
+        gdf = _from_db(
+            datastore,
             data=datastore.ncdb(),
             state_fips=state_fips,
             county_fips=county_fips,
@@ -352,7 +362,7 @@ def get_census(
     boundary=None,
     years="all",
     constant_dollars=True,
-    currency_year=2015,
+    currency_year=None,
 ):
     """Extract a subset of data from the decennial U.S. Census as a long-form geodataframe.
 
@@ -393,11 +403,18 @@ def get_census(
         long-form geodataframe with 'year' column representing each time period
 
     """
+
     if years == "all":
         years = [1990, 2000, 2010]
     if isinstance(years, (str, int)):
         years = [years]
-
+    if currency_year is None:
+        currency_year = max(years)
+        if len(years) > 1:  # if there's only one year, then no adjustment happens
+            warn(
+                "`constant_dollars` is True, but no `currency_year` was specified. "
+                f"Resorting to max value of {currency_year}"
+            )
     msa_states = []
     if msa_fips:
         pr_metros = set(
@@ -446,7 +463,6 @@ def get_census(
         gdf = tracts.copy()
 
     else:
-
         gdf = _fips_filter(
             state_fips=state_fips,
             county_fips=county_fips,
