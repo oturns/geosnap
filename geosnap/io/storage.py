@@ -58,7 +58,7 @@ You agree that this Agreement and any dispute arising under it is governed by th
 
 You agree to acknowledge the Stanford Education Data Archive as the source of these data. In publications, please cite the data as:
 
-Reardon, S. F., Ho, A. D., Shear, B. R., Fahle, E. M., Kalogrides, D., Jang, H., & Chavez, B. (2021). Stanford Education Data Archive (Version 4.1). Retrieved from http://purl.stanford.edu/db586ns4974.
+Reardon, S. F., Ho, A. D., Shear, B. R., Fahle, E. M., Kalogrides, D., Jang, H., & Chavez, B. (2021). Stanford Education Data Archive (Version 4.1). Retrieved from http://purl.stanford.edu/xv742vh9296.
 
 Subject to your compliance with the terms and conditions set forth in this Agreement, Stanford grants you a revocable, non-exclusive, non-transferable right to access and make use of the Data Sets.
 
@@ -74,7 +74,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
             fn = f"seda_school_pool_{std}_4.1"
             print(f"Downloading {fn}")
             t = pd.read_csv(
-                f"https://stacks.stanford.edu/file/druid:db586ns4974/{fn}.csv",
+                f"https://stacks.stanford.edu/file/druid:xv742vh9296/{fn}.csv",
                 converters={"sedasch": str, "fips": str},
             )
             t.sedasch = t.sedasch.str.rjust(12, "0")
@@ -89,7 +89,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
                 fn = f"seda_geodist_{pooling}_{std}_4.1"
                 print(f"Downloading {fn}")
                 t = pd.read_csv(
-                    f"https://stacks.stanford.edu/file/druid:db586ns4974/{fn}.csv",
+                    f"https://stacks.stanford.edu/file/druid:xv742vh9296/{fn}.csv",
                     converters={"sedalea": str, "fips": str},
                 )
                 t.sedalea = t.sedalea.str.rjust(7, "0")
