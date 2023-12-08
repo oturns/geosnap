@@ -154,7 +154,7 @@ def plot_timeseries(
         the desired size of the matplotlib figure
     ctxmap : contextily map provider, optional
         contextily basemap. Set to False for no basemap.
-        Default is Stamen.TonerLite
+        Default is CartoDB.Positron
     alpha : int (optional)
         Transparency parameter passed to matplotlib
     web_mercator : bool, optional
@@ -176,7 +176,7 @@ def plot_timeseries(
     # as it influences all figures when imported at the top of the file
 
     if ctxmap == "default":
-        ctxmap = ctx.providers.Stamen.TonerLite
+        ctxmap = ctx.providers.CartoDB.Positron
     if categorical:  # there's no pooled classification for categorical
         pooled = False
 
@@ -350,7 +350,7 @@ def animate_timeseries(
         plot_kwargs = dict()
 
     if ctxmap == "default":
-        ctxmap = ctx.providers.Stamen.TonerLite
+        ctxmap = ctx.providers.CartoDB.Positron
 
     if color_col is not None and categorical is True:
         raise ValueError("When passing a color column, use `categorical=False`")
