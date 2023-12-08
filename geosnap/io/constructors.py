@@ -266,7 +266,7 @@ def get_ltdb(
         gdf = gdf[gdf["year"].isin(years)]
 
     else:
-        gdf = _from_db(
+        gdf = _from_db(datastore,
             data=datastore.ltdb(),
             state_fips=state_fips,
             county_fips=county_fips,
@@ -331,7 +331,7 @@ def get_ncdb(
         gdf = gdf[gdf["year"].isin(years)]
 
     else:
-        gdf = _from_db(
+        gdf = _from_db(datastore,
             data=datastore.ncdb(),
             state_fips=state_fips,
             county_fips=county_fips,
