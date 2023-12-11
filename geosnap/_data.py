@@ -156,7 +156,8 @@ class DataStore:
             by default "gcs"
         accept_eula : bool, optional
             pass True to accept the terms of the SEDA End User License Agreeement.
-            The data and its agreement can be viewed at <https://purl.stanford.edu/db586ns4974>
+            The data and its agreement can be viewed at
+            <https://exhibits.stanford.edu/data/catalog/db586ns4974>
         """
         eula = """
 DATA USE AGREEMENT:
@@ -379,7 +380,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         msg = (
             "Unable to locate local census 2020 block data. Streaming instead.\n"
             "If you plan to use census data repeatedly you can store it locally "
-            "with the io.store_blocks_2010 function for better performance"
+            "with the io.store_blocks_2020 function for better performance"
         )
         if isinstance(states, (str, int)):
             states = [states]
