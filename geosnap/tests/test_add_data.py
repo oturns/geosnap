@@ -40,23 +40,23 @@ def test_store_ncdb():
     assert datasets.ncdb().shape == (328633, 76)
 
 
-def test_get_lehd_v7():
+def test_get_lodes_wac_v7():
+    wac = io.get_lodes(datasets, state_fips=['11'], years=[2015], version=7)
+    assert wac.shape == (6507, 57)
 
-    wac = io.get_lehd(version=7)
-    rac = io.get_lehd("rac", version=7)
+def test_get_lodes_rac_v7():
+    rac = io.get_lodes(datasets, dataset="rac", state_fips=['11'], years=[2015], version=7)
+    assert rac.shape == (6507, 47)
 
-    assert wac.shape == (3074, 52)
-    assert rac.shape == (4382, 42)
+def test_get_lodes_wac_v8():
+    wac = io.get_lodes(datasets, state_fips=['11'], years=[2015], version=7)
+    assert wac.shape == (6507, 57)
 
-def test_get_lehd_v8():
-
-    wac = io.get_lehd(version=8)
-    rac = io.get_lehd("rac", version=8)
-
-    assert wac.shape == (3269, 52)
-    assert rac.shape == (4553, 42)
-
+def test_get_lodes_rac_v8():
+    rac = io.get_lodes(datasets, dataset="rac", state_fips=['11'], years=[2015], version=8)
+    assert rac.shape == (6012, 49)
 
 
 def test_store_acs():
     io.store_acs(2012)
+    assert os.path.exists(PurePath(datasets.show_data_dir(), "acs", "acs_2012_tract.parquet"))
