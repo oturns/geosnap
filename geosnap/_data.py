@@ -193,7 +193,11 @@ Subject to your compliance with the terms and conditions set forth in this Agree
             "gcs",
             "cs",
         ], "`standardize` argument must be either 'cs' for cohort-standardized or 'gcs' for grade-cohort-standardized"
-        fn = f"seda_{level}_{pooling}_{standardize}_4.1"
+        if pooling=='poolsub':
+            fn = f"seda_{level}_{pooling}_{standardize}_4.1_corrected"
+        else:
+            fn = f"seda_{level}_{pooling}_{standardize}_4.1"
+
         local_path = pathlib.Path(self.data_dir, "seda", f"{fn}.parquet")
         remote_path = f"https://stacks.stanford.edu/file/druid:xv742vh9296/{fn}.csv"
         msg = (

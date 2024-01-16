@@ -266,6 +266,9 @@ def plot_timeseries(
             axs.format(suptitle=column)
         else:
             axs.format(suptitle=title)
+    else:
+        if title:
+            plt.suptitle(title)
 
     if save_fig:
         f.savefig(save_fig, dpi=dpi, bbox_inches="tight")
