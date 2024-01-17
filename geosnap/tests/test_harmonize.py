@@ -7,12 +7,6 @@ from geosnap import DataStore
 from geosnap.harmonize import harmonize
 from geosnap.io import get_census
 
-local_raster = os.path.join(os.getcwd(), "nlcd_2011.tif")  # portability
-if not os.path.exists(local_raster):
-    p = quilt3.Package.browse("rasters/nlcd", "s3://spatial-ucr")
-    p["nlcd_2011.tif"].fetch()
-
-
 def test_harmonize_area():
     la = get_census(county_fips="06037", datastore=DataStore())
 
@@ -49,11 +43,27 @@ def test_harmonize_area_weighted():
         extensive_variables=["n_total_housing_units"],
         intensive_variables=["p_vacant_housing_units"],
         weights_method="dasymetric",
-        raster=local_raster,
+        raster='https://spatial-ucr.s3.amazonaws.com/nlcd/landcover/nlcd_landcover_2011.tif',
     )
     assert harmonized_nlcd_weighted.n_total_housing_units.sum().round(0) == 900620.0
     assert_allclose(
         harmonized_nlcd_weighted.p_vacant_housing_units.sum(),
+        8832.8796,
+        rtol=1e-03,
+    )
+
+def test_harmonize_target_gdf():
+
+    balt = get_census(county_fips="24510", datastore=DataStore())
+    tgt_gdf = balt[balt.year==2000][['geometry']]
+    gdf = harmonize(balt,
+        target_gdf=tgt_gdf,
+        extensive_variables=["n_total_housing_units"],
+        intensive_variables=["p_vacant_housing_units"],
+    )
+    assert gdf.n_total_housing_units.sum().round(0) == 900620.0
+    assert_allclose(
+        gdf.p_vacant_housing_units.sum(),
         8832.8796,
         rtol=1e-03,
     )
