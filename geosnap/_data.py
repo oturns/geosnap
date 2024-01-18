@@ -70,7 +70,6 @@ class DataStore:
             )
 
     def __dir__(self):
-
         atts = [
             "acs",
             "blocks_2000",
@@ -90,7 +89,7 @@ class DataStore:
             "tracts_1990",
             "tracts_2000",
             "tracts_2010",
-            "tracts_2020"
+            "tracts_2020",
         ]
 
         return atts
@@ -106,6 +105,14 @@ class DataStore:
         if verbose:
             print(self.data_dir)
         return self.data_dir
+
+    def bea_regions(self):
+        return pd.read_csv(
+            os.path.join(
+                os.path.dirname(os.path.abspath(__file__)), "io/bea_regions.csv"
+            ),
+            converters={'stfips':str}
+        )
 
     def acs(self, year=2018, level="tract", states=None):
         """American Community Survey Data (5-year estimates).
@@ -187,12 +194,15 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         assert pooling in [
             "pool",
             "long",
-            "poolsub"
+            "poolsub",
         ], "`pool` argument must be either 'pool', 'long', or 'poolsub'"
-        assert standardize in [
-            "gcs",
-            "cs",
-        ], "`standardize` argument must be either 'cs' for cohort-standardized or 'gcs' for grade-cohort-standardized"
+        assert (
+            standardize
+            in [
+                "gcs",
+                "cs",
+            ]
+        ), "`standardize` argument must be either 'cs' for cohort-standardized or 'gcs' for grade-cohort-standardized"
         fn = f"seda_{level}_{pooling}_{standardize}_4.1"
         local_path = pathlib.Path(self.data_dir, "seda", f"{fn}.parquet")
         remote_path = f"https://stacks.stanford.edu/file/druid:xv742vh9296/{fn}.csv"
@@ -565,16 +575,11 @@ Subject to your compliance with the terms and conditions set forth in this Agree
             dataframe that stores state/county --> MSA crosswalk definitions.
 
         """
-        local = pathlib.Path(self.data_dir, "msa_definitions.parquet")
-        remote = "s3://spatial-ucr/census/administrative/msa_definitions.parquet"
-        msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
-        try:
-            t = pd.read_parquet(local)
-        except FileNotFoundError:
-            warn(msg)
-            t = pd.read_parquet(remote, storage_options={"anon": True})
-
-        return t
+        return pd.read_csv(
+            os.path.join(
+                os.path.dirname(os.path.abspath(__file__)), "io/msa_definitions.csv"
+            )
+        )
 
     def ltdb(self):
         """Longitudinal Tract Database (LTDB).
@@ -622,5 +627,3 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         return pd.read_csv(
             os.path.join(os.path.dirname(os.path.abspath(__file__)), "io/variables.csv")
         )
-
-
