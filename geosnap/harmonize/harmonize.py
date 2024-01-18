@@ -156,7 +156,7 @@ def harmonize(
     if intensive_variables is not None:
         for i in intensive_variables:
             allcols.append(i)
-   
+
     with tqdm(total=len(times), desc=f"Converting {len(times)} time periods") as pbar:
         for i in times:
             pbar.set_description(f"Harmonizing {i}")
@@ -172,10 +172,10 @@ def harmonize(
                         allocate_total=allocate_total,
                     )
                 else:
-                # if there are NaNs, tobler will raise lots of warnings, that it's filling
-                # with implicit 0s. Those warnings are superfluous most of the time
+                    # if there are NaNs, tobler will raise lots of warnings, that it's filling
+                    # with implicit 0s. Those warnings are superfluous most of the time
                     with warnings.catch_warnings():
-                        warnings.simplefilter("ignore")                 
+                        warnings.simplefilter("ignore")
                         interpolation = area_interpolate(
                             source_df,
                             target_df.copy(),
@@ -225,7 +225,8 @@ def harmonize(
             pbar.update(1)
         pbar.set_description("Complete")
         pbar.close()
-    interpolated_dfs.append(target_df[allcols].set_index(unit_index))
+    if target_year is not None:
+        interpolated_dfs.append(target_df[allcols].set_index(unit_index))
 
     harmonized_df = gpd.GeoDataFrame(pd.concat(interpolated_dfs), crs=crs)
 
