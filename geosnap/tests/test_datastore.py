@@ -52,3 +52,35 @@ def test_msa_defs():
 def test_codebook():
     df = datasets.codebook()
     assert df.shape == (194, 12)
+
+def test_bea():
+    df = datasets.bea_regions()
+    assert df.shape == (51, 4)
+
+def test_blocks_2000():
+    df = datasets.blocks_2000(states=['11'])
+    assert df.shape == (5674, 3)
+
+def test_blocks_2010():
+    df = datasets.blocks_2010(states=['11'])
+    assert df.shape == (6507, 5)
+
+def test_blocks_2020():
+    df = datasets.blocks_2020(states=['11'])
+    assert df.shape == (6012, 7)
+
+def test_ejscreen():
+    df = datasets.ejscreen(states=['11'], year=2019)
+    assert df.shape==(450, 368)
+
+def test_nces_schools():
+    d = datasets.nces(dataset='schools', year='1516')
+    assert d.shape == (102209, 26)
+
+def test_nces_districts():
+    d =  datasets.nces(dataset='school_districts')
+    assert d.shape == (13352, 18)
+
+def test_nces_sabs():
+    df = datasets.nces(dataset='sabs')
+    assert df.shape == (75128, 15)

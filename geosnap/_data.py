@@ -72,6 +72,7 @@ class DataStore:
     def __dir__(self):
         atts = [
             "acs",
+            "bea_regions",
             "blocks_2000",
             "blocks_2010",
             "blocks_2020",
@@ -107,6 +108,13 @@ class DataStore:
         return self.data_dir
 
     def bea_regions(self):
+        """Table that maps states to their respective BEA regions
+
+        Returns
+        -------
+        pandas.DataFrame
+            BEA region table
+        """
         return pd.read_csv(
             os.path.join(
                 os.path.dirname(os.path.abspath(__file__)), "io/bea_regions.csv"
