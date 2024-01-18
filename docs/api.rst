@@ -25,6 +25,7 @@ available quickly with no configuration by accessing methods on the class.
    
     DataStore
     DataStore.acs
+    DataStore.bea_regions
     DataStore.blocks_2000
     DataStore.blocks_2010
     DataStore.blocks_2020
