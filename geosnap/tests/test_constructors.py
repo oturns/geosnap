@@ -35,10 +35,13 @@ def test_nces_sabs():
     assert sabs.shape == (75128, 15)
 
 
-def test_acs():
+def test_acs_tract():
     acs = io.get_acs(store, fips="11", years=[2018], level="tract")
     assert acs.shape == (179, 157)
 
+def test_acs_blockgroup():
+    acs = io.get_acs(store, fips="11", years=[2018], level="bg")
+    assert acs.shape == (450, 38)
 
 @pytest.mark.skipif(not LTDB, reason="unable to locate LTDB data")
 def test_ltdb_from_boundary():

@@ -230,8 +230,8 @@ Subject to your compliance with the terms and conditions set forth in this Agree
                         remote_path, converters={"sedasch": str, "fips": str}
                     )
                     t.sedasch = t.sedasch.str.rjust(12, "0")
-                except FileNotFoundError:
-                    raise FileNotFoundError(
+                except FileNotFoundError as e:
+                    raise FileNotFoundError from e(
                         "Unable to access local or remote SEDA data"
                     )
             elif level == "geodist":
@@ -240,8 +240,8 @@ Subject to your compliance with the terms and conditions set forth in this Agree
                         remote_path, converters={"sedalea": str, "fips": str}
                     )
                     t.sedalea = t.sedalea.str.rjust(7, "0")
-                except FileNotFoundError:
-                    raise FileNotFoundError(
+                except FileNotFoundError as e:
+                    raise FileNotFoundError from e(
                         "Unable to access local or remote SEDA data"
                     )
                 t.fips = t.fips.str.rjust(2, "0")
@@ -264,10 +264,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         geopandas.GeoDataFrame
             geodataframe of NCES data
         """
-        if dataset == "school_districts":
-            selector = "districts"
-        else:
-            selector = dataset
+        selector = "districts" if dataset == "school_districts" else dataset
         local_path = pathlib.Path(self.data_dir, "nces", f"{dataset}_{year}.parquet")
         remote_path = f"s3://spatial-ucr/nces/{selector}/{dataset}_{year}.parquet"
         msg = "Streaming data from S3. Use `geosnap.io.store_nces()` to store the data locally for better performance"
