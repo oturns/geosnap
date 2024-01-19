@@ -142,9 +142,9 @@ Compute shortest path distance along a network using pandana, and visualize trav
 .. autosummary::
    :toctree: generated/
 
-   analyze.compute_travel_cost_adjlist
-   analyze.isochrone
-   analyze.isochrones
+   analyze.pdna_to_adj
+   analyze.isochrones_from_gdf
+   analyze.isochrones_from_ids
 
 The ModelResults Class
 '''''''''''''''''''''''''''''''''''''''''''''

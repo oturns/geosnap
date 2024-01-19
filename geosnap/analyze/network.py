@@ -50,24 +50,27 @@ def pdna_to_adj(origins, network, threshold, reindex=True, drop_nonorigins=True)
     return adj
 
 
-def isochrone(origin, network, threshold):
+def isochrones_from_id(origin, network, threshold):
     """Create travel isochrone(s) from a single origin using a pandana network.
 
     Parameters
     ----------
     origin : int or list
-        A single or list of node id(s) from a `pandana.Network.nodes_df` to serve as isochrone origins
+        A single or list of node id(s) from a `pandana.Network.nodes_df`
+        to serve as isochrone origins
     network : pandana.Network
         A pandana network object
     threshold : int or list
-        A single or list of threshold distances for which isochrones will be computed. These are in the
+        A single or list of threshold distances for which isochrones will be
+        computed. These are in the
         same units as edges from the pandana.Network.edge_df
 
     Returns
     -------
     geopandas.GeoDataFrame
-        A geodataframe with a single attribute (distance) and a polygon geometry representing
-        a travel time isochrone, with a row for each threshold distance
+        A geodataframe with a single attribute (distance) and a polygon
+        geometry representing a travel time isochrone, with a row for each
+        threshold distance
     """
     dfs = []
 
@@ -109,7 +112,7 @@ def isochrone(origin, network, threshold):
     return alpha
 
 
-def isochrones(origins, threshold, network, network_crs=4326, reindex=True):
+def isochrones_from_gdf(origins, threshold, network, network_crs=4326, reindex=True):
     """Create travel isochrones for several origins simultaneously
 
     Parameters
