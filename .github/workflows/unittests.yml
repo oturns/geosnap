@@ -60,7 +60,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.xml
-          name: spopt-codecov
+          name: geosnap-codecov
 
       - name: Generate and publish the report
         if: |

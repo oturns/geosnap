@@ -30,9 +30,9 @@ dependencies:
   - jupyter
   - pytest
   - pytest-cov
+  - pytest-xdist
   - codecov
   - coverage
-  - coveralls
   - python-wget
   - contextily
   - scikit-plot
