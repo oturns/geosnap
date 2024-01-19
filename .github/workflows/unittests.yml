@@ -67,7 +67,7 @@ jobs:
           failure()
           && steps.status.outcome == 'failure'
           && github.event_name == 'schedule'
-          && github.repository_owner == 'pysal'
+          && github.repository_owner == 'oturns'
         uses: xarray-contrib/issue-from-pytest-log@v1
         with:
           log-path: pytest-log.jsonl
