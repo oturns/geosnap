@@ -1,76 +1,53 @@
 import geopandas as gpd
 import numpy as np
 import pandas as pd
-from libpysal.cg import alpha_shape_auto, alpha_shape
+from libpysal.cg import alpha_shape_auto
 from tqdm.auto import tqdm
 
 
-def compute_travel_cost_adjlist(
-    origins, destinations, network, index_orig=None, index_dest=None
-):
-    """Generate travel cost adjacency list.
+def pdna_to_adj(origins, network, threshold, reindex=True, drop_nonorigins=True):
+    """Create an adjacency list of shortest network-based travel between origins
+       and destinations in a pandana.Network.
 
     Parameters
     ----------
     origins : geopandas.GeoDataFrame
-        a geodataframe containing the locations of origin features
-    destinations : geopandas.GeoDataFrame
-        a geodataframe containing the locations of destination features
+        Geodataframe of origin geometries to begin routing. If geometries are polygons,
+        they will be collapsed to centroids
     network : pandana.Network
-        pandana Network instance for calculating the shortest path between origins and destinations
-    index_orig : str, optional
-        Column on the origins dataframe the defines unique units to be used as the origins id
-        on the resulting dataframe. If not set, each unit will be assigned the index from its
-        associated node_id on the network
-    index_dest : str, optional
-        Column on the destinations dataframe the defines unique units to be used as the destinations id
-        on the resulting dataframe. If not set, each unit will be assigned the index from its
-        associated node_id on the network
+        pandana.Network instance that stores the local travel network
+    threshold : int
+        maximum travel distance (inclusive)
+    reindex : bool, optional
+        if True, use geodataframe index to identify observations in the adjlist.
+        If False, the node_id from the OSM node nearest each observation will be used.
+        by default True
+    drop_nonorigins : bool, optional
+        If True, drop any destination nodes that are not also origins,
+        by default True
 
     Returns
     -------
     pandas.DataFrame
-        pandas DataFrame containing the shortest-cost distance from each origin feature to each destination feature
+        adjacency list with columns 'origin', 'destination', and 'cost'
     """
+    node_ids = network.get_node_ids(origins.centroid.x, origins.centroid.y).astype(int)
 
-    # NOTE: need to add an option/check for symmetric networks so we only need half the routing calls
+    # map node ids in the network to index in the gdf
+    mapper = dict(zip(node_ids, origins.index.values))
 
-    origins = origins.copy()
-    destinations = destinations.copy()
+    namer = {"source": "origin", "distance": "cost"}
 
-    origins["osm_ids"] = network.get_node_ids(
-        origins.centroid.x, origins.centroid.y
-    ).astype(int)
-    destinations["osm_ids"] = network.get_node_ids(
-        destinations.centroid.x, destinations.centroid.y
-    ).astype(int)
+    adj = network.nodes_in_range(node_ids, threshold)
+    adj = adj.rename(columns=namer)
+    # swap osm ids for gdf index
+    if reindex:
+        adj = adj.set_index("destination").rename(index=mapper).reset_index()
+        adj = adj.set_index("origin").rename(index=mapper).reset_index()
+    if drop_nonorigins:
+        adj = adj[adj.destination.isin(origins.index.values)]
 
-    ods = []
-
-    if not index_orig:
-        origins["idx"] = origins.index.values
-        index_orig = "idx"
-    if not index_dest:
-        destinations["idx"] = destinations.index.values
-        index_dest = "idx"
-
-    # I dont think there's a way to do this in parallel, so we can at least show a progress bar
-    with tqdm(total=len(origins["osm_ids"])) as pbar:
-        for origin in origins["osm_ids"]:
-            df = pd.DataFrame()
-            df["cost"] = network.shortest_path_lengths(
-                [origin for d in destinations["osm_ids"]],
-                [d for d in destinations["osm_ids"]],
-            )
-            df["destination"] = destinations[index_dest].values
-            df["origin"] = origins[origins.osm_ids == origin][index_orig].values[0]
-
-            ods.append(df)
-            pbar.update(1)
-
-    combined = pd.concat(ods)
-    # reorder the columns
-    return combined[['origin', 'destination', 'cost']]
+    return adj
 
 
 def isochrone(origin, network, threshold):
@@ -100,17 +77,22 @@ def isochrone(origin, network, threshold):
         geometry=gpd.points_from_xy(network.nodes_df.x, network.nodes_df.y),
         crs=4326,
     )
-    matrix = compute_travel_cost_adjlist(
+
+    maxdist = max(threshold) if isinstance(threshold, list) else threshold
+
+    matrix = pdna_to_adj(
         origins=node_df[node_df.index == origin],
-        destinations=node_df,
         network=network,
+        threshold=maxdist,
+        reindex=False,
+        drop_nonorigins=False,
     )
+
     if not isinstance(threshold, list):
         threshold = [threshold]
     threshold.sort(reverse=True)
 
     for distance in threshold:
-
         # select the nodes within each threshold distance and take their alpha shape
         df = matrix[matrix.cost <= distance]
         nodes = node_df[node_df.index.isin(df.destination.tolist())]
@@ -127,8 +109,8 @@ def isochrone(origin, network, threshold):
     return alpha
 
 
-def isochrones(origins, threshold, network, matrix=None, network_crs=4326):
-    """ Create travel isochrones for several origins simultaneously
+def isochrones(origins, threshold, network, network_crs=4326, reindex=True):
+    """Create travel isochrones for several origins simultaneously
 
     Parameters
     ----------
@@ -152,14 +134,23 @@ def isochrones(origins, threshold, network, matrix=None, network_crs=4326):
         polygon geometries with the isochrones for each origin point feature
 
     """
+    node_ids = network.get_node_ids(origins.centroid.x, origins.centroid.y).astype(int)
+
+    # map node ids in the network to index in the gdf
+    mapper = dict(zip(node_ids, origins.index.values))
+
     destinations = gpd.GeoDataFrame(
         network.nodes_df,
         geometry=gpd.points_from_xy(network.nodes_df.x, network.nodes_df.y),
         crs=network_crs,
     )
-    if matrix is None:
-        matrix = compute_travel_cost_adjlist(origins, destinations, network=network)
-    matrix = matrix[matrix.cost <= threshold]
+    matrix = pdna_to_adj(
+        origins,
+        network=network,
+        threshold=threshold,
+        reindex=False,
+        drop_nonorigins=False,
+    )
     alphas = []
     for origin in matrix.origin.unique():
         do = matrix[matrix.origin == origin]
@@ -175,4 +166,8 @@ def isochrones(origins, threshold, network, matrix=None, network_crs=4326):
         alpha["distance"] = threshold
         alpha["origin"] = origin
         alphas.append(alpha)
-    return gpd.GeoDataFrame(pd.concat(alphas, ignore_index=True), crs=network_crs)
+        df = pd.concat(alphas, ignore_index=True)
+        df = df.set_index("origin")
+        if reindex:
+            df = df.rename(index=mapper)
+    return gpd.GeoDataFrame(df, crs=network_crs)
