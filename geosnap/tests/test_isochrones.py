@@ -17,7 +17,7 @@ if not os.path.exists("41740.h5"):
 
 datasets = DataStore()
 sd_tracts = get_acs(datasets, county_fips="06073", years=[2018])
-sd_network = pdna.Network.from_hdf5("41740.h5")
+sd_network = pdna.Network.from_hdf5("./41740.h5")
 example_origin = 1985327805
 
 
