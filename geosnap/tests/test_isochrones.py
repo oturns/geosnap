@@ -9,7 +9,7 @@ import pandana as pdna
 import geopandas as gpd
 import os
 
-if not os.path.exists("41740.h5"):
+if not os.path.exists("./41740.h5"):
     import quilt3 as q3
 
     b = q3.Bucket("s3://spatial-ucr")
@@ -17,7 +17,7 @@ if not os.path.exists("41740.h5"):
 
 datasets = DataStore()
 sd_tracts = get_acs(datasets, county_fips="06073", years=[2018])
-sd_network = pdna.Network.from_hdf5("./41740.h5")
+sd_network = pdna.Network.from_hdf5("41740.h5")
 example_origin = 1985327805
 
 
