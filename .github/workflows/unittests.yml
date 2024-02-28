@@ -40,7 +40,7 @@ jobs:
           micromamba-version: 'latest'
 
       - name: Install geosnap
-        run: pip install . ;python geosnap/tests/_dl_data.py;
+        run: pip install . --no-deps ;python geosnap/tests/_dl_data.py;
         env:
           COMBO_DATA: ${{ secrets.COMBO_DATA }}
   
