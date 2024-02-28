@@ -2,13 +2,13 @@ from geosnap.analyze import (
     isochrones_from_id,
     isochrones_from_gdf,
 )
-from geosnap.io import get_acs
-from geosnap import DataStore
 
 import pandana as pdna
 import geopandas as gpd
 import os
 import pytest
+from numpy.testing import assert_almost_equal
+
 
 def get_data():
     if not os.path.exists("./41740.h5"):
@@ -18,7 +18,7 @@ def get_data():
         b.fetch("osm/metro_networks_8k/41740.h5", "./41740.h5")
     sd_network = pdna.Network.from_hdf5("41740.h5")
     example_origin = 1985327805
-    
+
     return example_origin, sd_network
 
 
@@ -26,7 +26,8 @@ def get_data():
 def test_isos_from_ids():
     example_origin, sd_network = get_data()
     iso = isochrones_from_id(example_origin, sd_network, threshold=1600)
-    assert iso.area.round(6).tolist()[0] == 0.000128
+    assert_almost_equal(iso.area.round(6).astype(float).tolist()[0], 0.000128)
+
 
 @pytest.mark.xdist_group(name="group1")
 def test_isos_from_gdf():
@@ -43,4 +44,4 @@ def test_isos_from_gdf():
         network=sd_network,
         threshold=1600,
     )
-    assert t.area.round(8).tolist()[0] == 0.00012821
+    assert_almost_equal(t.area.astype(float).round(8).tolist()[0], 0.00012821)
