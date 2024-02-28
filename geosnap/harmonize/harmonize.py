@@ -142,10 +142,7 @@ def harmonize(
         times.remove(target_year)
         target_df = dfs[dfs[temporal_index] == target_year]
 
-    if target_df.index.name:
-        unit_index = target_df.index.name
-    else:
-        unit_index = "id"
+    unit_index = target_df.index.name if target_df.index.name else "id"
     target_df[unit_index] = target_df.index.values
 
     geom_name = target_df.geometry.name
@@ -209,10 +206,11 @@ def harmonize(
                                 pixel_values=pixel_values,
                                 raster=raster,
                             )
-                except IOError:
-                    raise IOError(
-                        "Unable to locate raster. If using the `dasymetric` or model-based methods. You"
-                        "must provide a raster file and indicate which pixel values contain developed land"
+                except OSError as e:
+                    raise OSError from e(
+                        "Unable to locate raster. If using the `dasymetric` or model-based "
+                        "methods. You must provide a raster file and indicate which pixel "
+                        "values contain developed land"
                     )
             else:
                 raise ValueError('weights_method must of one of ["area", "dasymetric"]')

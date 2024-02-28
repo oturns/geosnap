@@ -14,7 +14,6 @@ from warnings import warn
 
 import esda
 import geopandas as gpd
-import scikitplot as skplt
 from sklearn.metrics import (
     calinski_harabasz_score,
     davies_bouldin_score,
@@ -22,6 +21,7 @@ from sklearn.metrics import (
 )
 
 from ..visualize.mapping import plot_timeseries
+from ..visualize.skplt import plot_silhouette as _plot_silhouette
 from .dynamics import predict_markov_labels as _predict_markov_labels
 from .incs import lincs_from_gdf
 
@@ -369,7 +369,7 @@ class ModelResults:
             elif self.pooling == "pooled":
                 # if pooled, scale the whole series at once
                 df.loc[:, self.columns] = self.scaler.fit_transform(df.values)
-        fig = skplt.metrics.plot_silhouette(
+        fig = _plot_silhouette(
             df[self.columns].values, self.labels, metric=metric, title=title
         )
 

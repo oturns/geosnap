@@ -71,7 +71,9 @@ def kmeans_spatial(data, columns, w, n_clusters=5, **kwargs):
     return model
 
 
-def spenc(data, w, columns, n_clusters=5, gamma=500, random_state=None, **kwargs):
+def spenc(
+    data, w, columns, n_clusters=5, gamma=1, random_state=None, n_jobs=-1, **kwargs
+):
     """Spatially encouraged spectral clustering.
 
     :cite:`wolf2018`
@@ -101,6 +103,7 @@ def spenc(data, w, columns, n_clusters=5, gamma=500, random_state=None, **kwargs
         attrs_name=columns,
         gamma=gamma,
         random_state=random_state,
+        n_jobs=n_jobs,
     )
 
     model.solve()
@@ -115,7 +118,7 @@ def skater(
     floor=-np.inf,
     islands="increase",
     cluster_args=None,
-    **kwargs
+    **kwargs,
 ):
     """SKATER spatial clustering algorithm.
 
@@ -193,7 +196,7 @@ def max_p(
     threshold=10,
     max_iterations_construction=99,
     top_n=2,
-    **kwargs
+    **kwargs,
 ):
     """Max-p clustering algorithm :cite:`Duque2012`.
 

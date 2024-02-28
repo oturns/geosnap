@@ -40,7 +40,6 @@ dependencies = [
     "quilt3>=3.6",
     "pyarrow>=0.14.1",
     "contextily",
-    "scikit-plot",
     "tobler>=0.8.2",
     "spopt>=0.3.0",
     "fsspec",
