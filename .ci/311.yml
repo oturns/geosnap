@@ -35,5 +35,4 @@ dependencies:
   - coverage
   - python-wget
   - contextily
-  - scikit-plot
   - python-graphviz

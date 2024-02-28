@@ -36,7 +36,6 @@ dependencies:
 
   - python-wget
   - contextily
-  - scikit-plot
   - python-graphviz
   - sphinx>=1.4.3
   - sphinxcontrib-bibtex==1

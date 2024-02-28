@@ -36,7 +36,6 @@ dependencies:
   
   - python-wget
   - contextily
-  - scikit-plot
   - python-graphviz
   - nbsphinx
   - numpydoc
