@@ -57,7 +57,7 @@ def kmeans(
     verbose=0,
     random_state=None,
     copy_x=True,
-    algorithm="auto",
+    algorithm="lloyd",
     **kwargs,
 ):
     """K-Means clustering.
