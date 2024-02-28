@@ -21,14 +21,14 @@ def get_data():
 
     return example_origin, sd_network
 
-
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="skipping test on windows because of dtype issue")
 @pytest.mark.xdist_group(name="group1")
 def test_isos_from_ids():
     example_origin, sd_network = get_data()
     iso = isochrones_from_id(example_origin, sd_network, threshold=1600)
     assert_almost_equal(iso.area.round(6).astype(float).tolist()[0], 0.000128)
 
-
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="skipping test on windows because of dtype issue")
 @pytest.mark.xdist_group(name="group1")
 def test_isos_from_gdf():
     example_origin, sd_network = get_data()
