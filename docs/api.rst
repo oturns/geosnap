@@ -32,6 +32,7 @@ available quickly with no configuration by accessing methods on the class.
     DataStore.codebook
     DataStore.counties
     DataStore.ejscreen
+    DataStore.lodes_codebook
     DataStore.ltdb
     DataStore.msa_definitions
     DataStore.msas
