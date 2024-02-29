@@ -79,6 +79,7 @@ class DataStore:
             "codebook",
             "counties",
             "ejscreen",
+            "lodes_codebook",
             "ltdb",
             "msa_definitions",
             "msas",
@@ -107,6 +108,18 @@ class DataStore:
             print(self.data_dir)
         return self.data_dir
 
+    def lodes_codebook(self):
+        """_summary_
+
+        Returns
+        -------
+        pandas.DataFrame
+            decription of variables returned with LODES/LEHD data.
+        """
+        return pd.read_csv(
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), "io/lodes.csv")
+        )
+
     def bea_regions(self):
         """Table that maps states to their respective BEA regions
 
@@ -119,7 +132,7 @@ class DataStore:
             os.path.join(
                 os.path.dirname(os.path.abspath(__file__)), "io/bea_regions.csv"
             ),
-            converters={'stfips':str}
+            converters={"stfips": str},
         )
 
     def acs(self, year=2018, level="tract", states=None):
@@ -208,7 +221,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
             "gcs",
             "cs",
         ], "`standardize` argument must be either 'cs' for cohort-standardized or 'gcs' for grade-cohort-standardized"
-        if pooling=='poolsub':
+        if pooling == "poolsub":
             fn = f"seda_{level}_{pooling}_{standardize}_4.1_corrected"
         else:
             fn = f"seda_{level}_{pooling}_{standardize}_4.1"
