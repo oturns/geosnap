@@ -1,5 +1,4 @@
 import geopandas as gpd
-import numpy as np
 import pandas as pd
 from libpysal.cg import alpha_shape_auto
 from shapely import concave_hull
@@ -14,44 +13,37 @@ def _geom_to_alpha(geom):
     return alpha_shape_auto(geom.get_coordinates()[["x", "y"]].values)
 
 
-def _points_to_poly(df, column, algorithm="alpha", ratio=0.3, allow_holes=False):
-    df = df.copy()
-    if column is None:
-        df
-
+def _points_to_poly(df, column, algorithm="alpha", ratio=0.2, allow_holes=False):
     if algorithm == "alpha":
-        output = df.groupby(column)["geometry"].apply(
-            lambda x: _geom_to_alpha(x, ratio, allow_holes)
-        )
-
+        output = df.groupby(column)["geometry"].apply(_geom_to_alpha)
     elif algorithm == "hull":
-        output = df.groupby(column)["geometry"].apply(lambda x: _geom_tol_hull)
-
+        output = df.groupby(column)["geometry"].apply(
+            lambda x: _geom_to_hull(x, ratio, allow_holes)
+        )
     else:
         raise ValueError(
             f"`algorithm must be either 'alpha' or 'hull' but {algorithm} was passed"
         )
-
     return output
 
 
 def pdna_to_adj(origins, network, threshold, reindex=True, drop_nonorigins=True):
-    """Create an adjacency list of shortest network-based travel between origins
-       and destinations in a pandana.Network.
+    """Create an adjacency list of shortest network-based travel between
+       origins and destinations in a pandana.Network.
 
     Parameters
     ----------
     origins : geopandas.GeoDataFrame
-        Geodataframe of origin geometries to begin routing. If geometries are polygons,
-        they will be collapsed to centroids
+        Geodataframe of origin geometries to begin routing. If geometries are
+        polygons, they will be collapsed to centroids
     network : pandana.Network
         pandana.Network instance that stores the local travel network
     threshold : int
         maximum travel distance (inclusive)
     reindex : bool, optional
-        if True, use geodataframe index to identify observations in the adjlist.
-        If False, the node_id from the OSM node nearest each observation will be used.
-        by default True
+        if True, use geodataframe index to identify observations in the
+        adjlist. If False, the node_id from the OSM node nearest each
+        observation will be used. by default True
     drop_nonorigins : bool, optional
         If True, drop any destination nodes that are not also origins,
         by default True
@@ -96,6 +88,17 @@ def isochrones_from_id(
         A single or list of threshold distances for which isochrones will be
         computed. These are in the
         same units as edges from the pandana.Network.edge_df
+    algorithm : str, {'alpha', 'hull'}
+        Which method to generate container polygons for destination points: if
+        'alpha', use the alpha_shapes algorithm from libpysal, else if 'hull'
+        use the concave_hull implementation in shapely. Default is
+    ratio : float
+        ratio keyword passed to `shapely.concave_hull`. Only used if
+        `algorithm='hull'`. Default is 0.3
+    allow_holes : bool
+        keyword passed to `shapely.concave_hull` governing  whether holes are
+        allowed in the resulting polygon. Only used if `algorithm='hull'`.
+        Default is False.
 
     Returns
     -------
@@ -166,17 +169,33 @@ def isochrones_from_gdf(
     ----------
     origins : geopandas.GeoDataFrame
         a geodataframe containing the locations of origin point features
-    network : pandana.Network
-        pandana Network instance for calculating the shortest path isochrone for each origin feature
     threshold: float
-        maximum travel distance to define the isochrone, measured in the same units as edges_df
-        in the pandana.Network object. If the network was created with pandana this is usually meters;
-        if it was created with urbanaccess this is usually travel time in minutes.
-    matrix: pandas dataframe (optional)
-        precalculated adjacency list dataframe created with `compute_travel_adjlist`
+        maximum travel distance to define the isochrone, measured in the same
+        units as edges_df in the pandana.Network object. If the network was
+        created with pandana this is usually meters; if it was created with
+        urbanaccess this is usually travel time in minutes.
+    network : pandana.Network
+        pandana Network instance for calculating the shortest path isochrone
+        for each origin feature
     network_crs : str, int, pyproj.CRS (optional)
-        the coordinate system used to store x and y coordinates in the passed pandana network.
-        If the network was created with pandana or urbanaccess this is nearly always 4326.
+        the coordinate system used to store x and y coordinates in the passed
+        pandana network. If the network was created with pandana or urbanaccess
+        this is nearly always 4326.
+    reindex : bool
+        if True, use the dataframe index as the origin and destination IDs
+        (rather than the node_ids of the pandana.Network). Default is True
+    algorithm : str, {'alpha', 'hull'}
+        Which method to generate container polygons for destination points: if
+        'alpha', use the alpha_shapes algorithm from libpysal, else if 'hull'
+        use the concave_hull implementation in shapely. Default is
+    ratio : float
+        ratio keyword passed to `shapely.concave_hull`. Only used if
+        `algorithm='hull'`. Default is 0.3
+    allow_holes : bool
+        keyword passed to `shapely.concave_hull` governing  whether holes are
+        allowed in the resulting polygon. Only used if `algorithm='hull'`.
+        Default is False.
+
 
     Returns
     -------
