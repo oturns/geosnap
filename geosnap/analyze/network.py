@@ -2,7 +2,37 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 from libpysal.cg import alpha_shape_auto
-from tqdm.auto import tqdm
+from shapely import concave_hull
+from shapely.geometry import MultiPoint
+
+
+def _geom_to_hull(geom, ratio, allow_holes):
+    return concave_hull(MultiPoint(geom.tolist()), ratio=ratio, allow_holes=allow_holes)
+
+
+def _geom_to_alpha(geom):
+    return alpha_shape_auto(geom.get_coordinates()[["x", "y"]].values)
+
+
+def _points_to_poly(df, column, algorithm="alpha", ratio=0.3, allow_holes=False):
+    df = df.copy()
+    if column is None:
+        df
+
+    if algorithm == "alpha":
+        output = df.groupby(column)["geometry"].apply(
+            lambda x: _geom_to_alpha(x, ratio, allow_holes)
+        )
+
+    elif algorithm == "hull":
+        output = df.groupby(column)["geometry"].apply(lambda x: _geom_tol_hull)
+
+    else:
+        raise ValueError(
+            f"`algorithm must be either 'alpha' or 'hull' but {algorithm} was passed"
+        )
+
+    return output
 
 
 def pdna_to_adj(origins, network, threshold, reindex=True, drop_nonorigins=True):
@@ -50,7 +80,9 @@ def pdna_to_adj(origins, network, threshold, reindex=True, drop_nonorigins=True)
     return adj
 
 
-def isochrones_from_id(origin, network, threshold):
+def isochrones_from_id(
+    origin, network, threshold, algorithm="alpha", ratio=0.3, allow_holes=False
+):
     """Create travel isochrone(s) from a single origin using a pandana network.
 
     Parameters
@@ -99,9 +131,15 @@ def isochrones_from_id(origin, network, threshold):
         # select the nodes within each threshold distance and take their alpha shape
         df = matrix[matrix.cost <= distance]
         nodes = node_df[node_df.index.isin(df.destination.tolist())]
-        alpha = alpha_shape_auto(
-            np.array([(nodes.loc[i].x, nodes.loc[i].y) for i in nodes.index.tolist()])
-        )
+        if algorithm == "alpha":
+            alpha = _geom_to_alpha(nodes.geometry)
+        elif algorithm == "hull":
+            alpha = _geom_to_hull(nodes.geometry, ratio=ratio, allow_holes=allow_holes)
+        else:
+            raise ValueError(
+                f"`algorithm must be either 'alpha' or 'hull' but {algorithm} was passed"
+            )
+
         alpha = gpd.GeoDataFrame(geometry=pd.Series(alpha), crs=4326)
         alpha["distance"] = distance
 
@@ -112,7 +150,16 @@ def isochrones_from_id(origin, network, threshold):
     return alpha
 
 
-def isochrones_from_gdf(origins, threshold, network, network_crs=4326, reindex=True):
+def isochrones_from_gdf(
+    origins,
+    threshold,
+    network,
+    network_crs=4326,
+    reindex=True,
+    algorithm="alpha",
+    ratio=0.3,
+    allow_holes=False,
+):
     """Create travel isochrones for several origins simultaneously
 
     Parameters
@@ -157,14 +204,18 @@ def isochrones_from_gdf(origins, threshold, network, network_crs=4326, reindex=T
     alphas = []
     for origin in matrix.origin.unique():
         do = matrix[matrix.origin == origin]
-        alpha = alpha_shape_auto(
-            np.array(
-                [
-                    (destinations.loc[i].x, destinations.loc[i].y)
-                    for i in do.destination.values
-                ]
+        dest_pts = destinations.loc[do["destination"]]
+        if algorithm == "alpha":
+            alpha = _geom_to_alpha(dest_pts.geometry)
+        elif algorithm == "hull":
+            alpha = _geom_to_hull(
+                dest_pts.geometry, ratio=ratio, allow_holes=allow_holes
             )
-        )
+        else:
+            raise ValueError(
+                f"`algorithm must be either 'alpha' or 'hull' but {algorithm} was passed"
+            )
+
         alpha = gpd.GeoDataFrame(geometry=pd.Series(alpha), crs=network_crs)
         alpha["distance"] = threshold
         alpha["origin"] = origin
