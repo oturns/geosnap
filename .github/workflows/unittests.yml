@@ -46,7 +46,7 @@ jobs:
   
       - name: Test geosnap
         run: |
-          pytest \
+          coverage run -m pytest \
            -v \
            -r a \
            -n auto \
@@ -55,7 +55,7 @@ jobs:
            --cov-append \
            --cov-report term-missing \
            --cov-report xml \
-           geosnap/tests
+           geosnap
       - name: codecov
         uses: codecov/codecov-action@v3
         with:
