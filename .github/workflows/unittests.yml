@@ -25,6 +25,8 @@ jobs:
           - environment-file: .ci/311.yml
             os: macos-latest
           - environment-file: .ci/311.yml
+            os: macos-14  # Apple Silicon
+          - environment-file: .ci/311.yml
             os: windows-latest
     defaults:
       run:
