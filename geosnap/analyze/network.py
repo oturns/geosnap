@@ -9,21 +9,19 @@ from shapely.geometry import MultiPoint
 def _geom_to_hull(geom, ratio, allow_holes):
     return concave_hull(MultiPoint(geom.tolist()), ratio=ratio, allow_holes=allow_holes)
 
-
 def _geom_to_alpha(geom):
     return alpha_shape_auto(geom.get_coordinates()[["x", "y"]].values)
 
-
-def _points_to_poly(df, column, algorithm="alpha", ratio=0.2, allow_holes=False):
-    if algorithm == "alpha":
+def _points_to_poly(df, column, hull="shapely", ratio=0.2, allow_holes=False):
+    if hull == "libpysal":
         output = df.groupby(column)["geometry"].apply(_geom_to_alpha)
-    elif algorithm == "hull":
+    elif hull == "shapely":
         output = df.groupby(column)["geometry"].apply(
             lambda x: _geom_to_hull(x, ratio, allow_holes)
         )
     else:
         raise ValueError(
-            f"`algorithm must be either 'alpha' or 'hull' but {algorithm} was passed"
+            f"`algorithm must be either 'shapely' or 'libpysal' but {hull} was passed"
         )
     return output
 
@@ -74,7 +72,7 @@ def pdna_to_adj(origins, network, threshold, reindex=True, drop_nonorigins=True)
 
 
 def isochrones_from_id(
-    origin, network, threshold, algorithm="alpha", ratio=0.3, allow_holes=False
+    origin, network, threshold, algorithm="shapely", ratio=0.2, allow_holes=False
 ):
     """Create travel isochrone(s) from a single origin using a pandana network.
 
@@ -89,10 +87,11 @@ def isochrones_from_id(
         A single or list of threshold distances for which isochrones will be
         computed. These are in the
         same units as edges from the pandana.Network.edge_df
-    algorithm : str, {'alpha', 'hull'}
-        Which method to generate container polygons for destination points: if
-        'alpha', use the alpha_shapes algorithm from libpysal, else if 'hull'
-        use the concave_hull implementation in shapely. Default is
+    hull : str, {'libpysal', 'shapely'}
+        Which method to generate container polygons (concave hulls) for destination
+        points. If 'libpysal', use `libpysal.cg.alpha_shape_auto` to create the
+        concave hull, else if 'shapely', use  `shapely.concave_hull`.
+        Default is libpysal
     ratio : float
         ratio keyword passed to `shapely.concave_hull`. Only used if
         `algorithm='hull'`. Default is 0.3
@@ -160,48 +159,48 @@ def isochrones_from_gdf(
     network,
     network_crs=4326,
     reindex=True,
-    algorithm="alpha",
+    hull="shapely",
     ratio=0.2,
     allow_holes=False,
 ):
     """Create travel isochrones for several origins simultaneously
 
-    Parameters
-    ----------
-    origins : geopandas.GeoDataFrame
-        a geodataframe containing the locations of origin point features
-    threshold: float
-        maximum travel distance to define the isochrone, measured in the same
-        units as edges_df in the pandana.Network object. If the network was
-        created with pandana this is usually meters; if it was created with
-        urbanaccess this is usually travel time in minutes.
-    network : pandana.Network
-        pandana Network instance for calculating the shortest path isochrone
-        for each origin feature
-    network_crs : str, int, pyproj.CRS (optional)
-        the coordinate system used to store x and y coordinates in the passed
-        pandana network. If the network was created with pandana or urbanaccess
-        this is nearly always 4326.
-    reindex : bool
-        if True, use the dataframe index as the origin and destination IDs
-        (rather than the node_ids of the pandana.Network). Default is True
-    algorithm : str, {'alpha', 'hull'}
-        Which method to generate container polygons for destination points: if
-        'alpha', use the alpha_shapes algorithm from libpysal, else if 'hull'
-        use the concave_hull implementation in shapely. Default is
-    ratio : float
-        ratio keyword passed to `shapely.concave_hull`. Only used if
-        `algorithm='hull'`. Default is 0.3
-    allow_holes : bool
-        keyword passed to `shapely.concave_hull` governing  whether holes are
-        allowed in the resulting polygon. Only used if `algorithm='hull'`.
-        Default is False.
+        Parameters
+        ----------
+        origins : geopandas.GeoDataFrame
+            a geodataframe containing the locations of origin point features
+        threshold: float
+            maximum travel distance to define the isochrone, measured in the same
+            units as edges_df in the pandana.Network object. If the network was
+            created with pandana this is usually meters; if it was created with
+            urbanaccess this is usually travel time in minutes.
+        network : pandana.Network
+            pandana Network instance for calculating the shortest path isochrone
+            for each origin feature
+        network_crs : str, int, pyproj.CRS (optional)
+            the coordinate system used to store x and y coordinates in the passed
+            pandana network. If the network was created with pandana, urbanaccess,
+            or geosnap, this is nearly always 4326.
+        reindex : bool
+            if True, use the dataframe index as the origin and destination IDs
+            (rather than the node_ids of the pandana.Network). Default is True
+        hull : str, {'libpysal', 'shapely'}
+            Which method to generate container polygons (concave hulls) for destination
+            points. If 'libpysal', use `libpysal.cg.alpha_shape_auto` to create the
+            concave hull, else if 'shapely', use  `shapely.concave_hull`.
+            Default is libpysal
+        ratio : float
+            ratio keyword passed to `shapely.concave_hull`. Only used if
+            `hull='shapely'`. Default is 0.3
+        allow_holes : bool
+            keyword passed to `shapely.concave_hull` governing  whether holes are
+            allowed in the resulting polygon. Only used if `hull='shapely'`.
+            Default is False.
 
-
-    Returns
-    -------
-    GeoPandas.DataFrame
-        polygon geometries with the isochrones for each origin point feature
+        Returns
+        -------
+        GeoPandas.DataFrame
+            polygon geometries with the isochrones for each origin point feature
 
     """
     node_ids = network.get_node_ids(origins.centroid.x, origins.centroid.y).astype(int)
@@ -225,15 +224,15 @@ def isochrones_from_gdf(
     for origin in matrix.origin.unique():
         do = matrix[matrix.origin == origin]
         dest_pts = destinations.loc[do["destination"]]
-        if algorithm == "alpha":
+        if hull == "libpysal":
             alpha = _geom_to_alpha(dest_pts.geometry)
-        elif algorithm == "hull":
+        elif hull == "shapely":
             alpha = _geom_to_hull(
                 dest_pts.geometry, ratio=ratio, allow_holes=allow_holes
             )
         else:
             raise ValueError(
-                f"`algorithm must be either 'alpha' or 'hull' but {algorithm} was passed"
+                f"`algorithm must be either 'alpha' or 'hull' but {hull} was passed"
             )
 
         alpha = gpd.GeoDataFrame(geometry=pd.Series(alpha), crs=network_crs)
