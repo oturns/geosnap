@@ -2,7 +2,8 @@ from geosnap.analyze import (
     isochrones_from_id,
     isochrones_from_gdf,
 )
-
+from geosnap import DataStore
+from geosnap.io import get_acs, get_network_from_gdf
 import pandana as pdna
 import geopandas as gpd
 import os
@@ -30,7 +31,7 @@ def get_data():
 @pytest.mark.xdist_group(name="group1")
 def test_isos_from_ids():
     example_origin, sd_network = get_data()
-    iso = isochrones_from_id(example_origin, sd_network, threshold=1600)
+    iso = isochrones_from_id(example_origin, sd_network, threshold=1600, hull='libpysal')
     assert_almost_equal(iso.area.round(6).astype(float).tolist()[0], 0.000128)
 
 
@@ -39,18 +40,47 @@ def test_isos_from_ids():
     reason="skipping test on windows because of dtype issue",
 )
 @pytest.mark.xdist_group(name="group1")
-def test_isos_from_gdf():
+def test_isos_from_gdf_pysal():
     example_origin, sd_network = get_data()
     sd_network.nodes_df["geometry"] = gpd.points_from_xy(
         sd_network.nodes_df.x, sd_network.nodes_df.y
     )
     example_point = gpd.GeoDataFrame(
-        sd_network.nodes_df.loc[example_origin]
-    ).T.set_geometry("geometry")
+        sd_network.nodes_df.loc[[example_origin]]
+    )
+    example_point = example_point.set_crs(4326)
+    t = isochrones_from_gdf(
+        origins=example_point,
+        network=sd_network,
+        threshold=1600,
+        hull='libpysal'
+    )
+    assert_almost_equal(t.area.astype(float).round(8).tolist()[0], 0.00012821)
+
+@pytest.mark.skipif(
+    sys.platform.startswith("win"),
+    reason="skipping test on windows because of dtype issue",
+)
+@pytest.mark.xdist_group(name="group1")
+def test_isos_from_gdf_shapely():
+    example_origin, sd_network = get_data()
+    sd_network.nodes_df["geometry"] = gpd.points_from_xy(
+        sd_network.nodes_df.x, sd_network.nodes_df.y
+    )
+    example_point = gpd.GeoDataFrame(
+        sd_network.nodes_df.loc[[example_origin]]
+    )
     example_point = example_point.set_crs(4326)
     t = isochrones_from_gdf(
         origins=example_point,
         network=sd_network,
         threshold=1600,
     )
-    assert_almost_equal(t.area.astype(float).round(8).tolist()[0], 0.00012821)
+    assert_almost_equal(t.area.astype(float).round(8).tolist()[0], 0.00012474)
+
+
+def test_network_constructor():
+    tracts = get_acs(DataStore(), county_fips='48301', level='tract', years=2015)
+    walk_net = get_network_from_gdf(tracts)
+    # this will grow depending on the size of the OSM network when tested...
+    assert walk_net.edges_df.shape[0] > 6000

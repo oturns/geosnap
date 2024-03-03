@@ -1,5 +1,4 @@
 import geopandas as gpd
-import pandana as pdna
 import pandas as pd
 from libpysal.cg import alpha_shape_auto
 from shapely import concave_hull
@@ -72,7 +71,7 @@ def pdna_to_adj(origins, network, threshold, reindex=True, drop_nonorigins=True)
 
 
 def isochrones_from_id(
-    origin, network, threshold, algorithm="shapely", ratio=0.2, allow_holes=False
+    origin, network, threshold, hull="shapely", ratio=0.2, allow_holes=False
 ):
     """Create travel isochrone(s) from a single origin using a pandana network.
 
@@ -134,13 +133,13 @@ def isochrones_from_id(
         # select the nodes within each threshold distance and take their alpha shape
         df = matrix[matrix.cost <= distance]
         nodes = node_df[node_df.index.isin(df.destination.tolist())]
-        if algorithm == "alpha":
+        if hull == "libpysal":
             alpha = _geom_to_alpha(nodes.geometry)
-        elif algorithm == "hull":
+        elif hull == "shapely":
             alpha = _geom_to_hull(nodes.geometry, ratio=ratio, allow_holes=allow_holes)
         else:
             raise ValueError(
-                f"`algorithm must be either 'alpha' or 'hull' but {algorithm} was passed"
+                f"`algorithm must be either 'alpha' or 'hull' but {hull} was passed"
             )
 
         alpha = gpd.GeoDataFrame(geometry=pd.Series(alpha), crs=4326)
@@ -157,7 +156,7 @@ def isochrones_from_gdf(
     origins,
     threshold,
     network,
-    network_crs=4326,
+    network_crs=None,
     reindex=True,
     hull="shapely",
     ratio=0.2,
@@ -179,8 +178,8 @@ def isochrones_from_gdf(
             for each origin feature
         network_crs : str, int, pyproj.CRS (optional)
             the coordinate system used to store x and y coordinates in the passed
-            pandana network. If the network was created with pandana, urbanaccess,
-            or geosnap, this is nearly always 4326.
+            pandana network. If None, the network is assumed to be stored in the 
+            same CRS as the origins geodataframe
         reindex : bool
             if True, use the dataframe index as the origin and destination IDs
             (rather than the node_ids of the pandana.Network). Default is True
@@ -203,6 +202,8 @@ def isochrones_from_gdf(
             polygon geometries with the isochrones for each origin point feature
 
     """
+    if network_crs is None:
+        network_crs = origins.crs
     node_ids = network.get_node_ids(origins.centroid.x, origins.centroid.y).astype(int)
 
     # map node ids in the network to index in the gdf
@@ -246,75 +247,3 @@ def isochrones_from_gdf(
     return gpd.GeoDataFrame(df, crs=network_crs)
 
 
-def pdna_network_from_gdf(
-    gdf, network_type="walk", twoway=False, add_travel_times=False, default_speeds=None
-):
-    """Create a pandana.Network object from a geodataframe (via OSMnx graph).
-
-    Parameters
-    ----------
-    gdf : geopandas.GeoDataFrame
-        _description_
-    network_type : str, {"all_private", "all", "bike", "drive", "drive_service", "walk"}
-        the type of network to collect from OSM (passed to `osmnx.graph_from_polygon`)
-        by default "walk"
-    twoway : bool, optional
-        Whether to treat the pandana.Network as directed or undirected. For a directed network,
-        use `twoway=False` (which is the default). For an undirected network (e.g. a
-        walk network) where travel can flow in both directions, the network is more
-        efficient when twoway=True. This has implications for drive networks or multimodal
-        networks where impedance is different depending on travel direction.
-    add_travel_times : bool, default=False
-        whether to use posted travel times from OSM as the impedance measure (rather
-        than network-distance). Speeds are based on max drive speeds, see
-        <https://osmnx.readthedocs.io/en/stable/internals-reference.html#osmnx-speed-module>
-        for more information.
-    default_speeds : dict, optional
-        default speeds passed assumed when no data available on the OSM edge. Defaults
-        to  {"residential": 35, "secondary": 50, "tertiary": 60}. Only considered if
-        add_travel_times is True
-
-    Returns
-    -------
-    pandana.Network
-        a pandana Network object
-
-    Raises
-    ------
-    ImportError
-        requires `osmnx`, raises if module not available
-    """
-    try:
-        import osmnx as ox
-    except ImportError as e:
-        raise ImportError("this functions requires the osmnx module") from e
-    assert gdf.crs.is_geographic, (
-        "The input gdf should be stored using lat/long "
-        f"(as WGS 84), but the input crs is {gdf.crs}. Please reproject using "
-        "`gdf.to_crs(4326)` or similar"
-    )
-    if default_speeds is None:
-        default_speeds = {
-            "residential": 35,
-            "secondary": 50,
-            "tertiary": 60,
-        }
-
-    impedance = "length"
-    graph = ox.graph_from_polygon(gdf.unary_union, network_type=network_type)
-    if add_travel_times:
-        graph = ox.add_edge_speeds(graph, default_speeds)
-        graph = ox.add_edge_travel_times(graph)
-        impedance = "travel_time"
-
-    n, e = ox.utils_graph.graph_to_gdfs(graph)
-    e = e.reset_index()
-
-    return pdna.Network(
-        edge_from=e["u"],
-        edge_to=e["v"],
-        edge_weights=e[[impedance]],
-        node_x=n["x"],
-        node_y=n["y"],
-        twoway=twoway,
-    )

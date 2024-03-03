@@ -10,6 +10,5 @@ from .incs import linc, lincs_from_gdf
 from .network import (
     isochrones_from_gdf,
     isochrones_from_id,
-    pdna_network_from_gdf,
     pdna_to_adj,
 )

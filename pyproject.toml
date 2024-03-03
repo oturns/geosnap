@@ -78,6 +78,7 @@ tests = [
     "watermark",
     "pygraphviz",
     "hdbscan",
+    'osmnx'
 ]
 
 [tool.setuptools.packages.find]

@@ -25,6 +25,7 @@ dependencies:
   - pyproj >=3
   - pandana
   - pooch
+  - osmnx
 
   # testing
   - jupyter
