@@ -1,5 +1,6 @@
 from .constructors import *
 from .gadm import get_gadm
+from .networkio import get_network_from_gdf, project_network
 from .storage import (
     _fips_filter,
     _fipstable,

@@ -82,6 +82,8 @@ Querying datasets
     io.get_ltdb
     io.get_nces
     io.get_ncdb
+    io.get_network_from_gdf
+    io.project_network
 
 
 Analyze Module

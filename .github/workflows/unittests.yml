@@ -25,6 +25,8 @@ jobs:
           - environment-file: .ci/311.yml
             os: macos-latest
           - environment-file: .ci/311.yml
+            os: macos-14  # Apple Silicon
+          - environment-file: .ci/311.yml
             os: windows-latest
     defaults:
       run:
@@ -46,7 +48,7 @@ jobs:
   
       - name: Test geosnap
         run: |
-          pytest geosnap \
+          coverage run -m pytest \
            -v \
            -r a \
            -n auto \
@@ -54,7 +56,8 @@ jobs:
            --cov geosnap \
            --cov-append \
            --cov-report term-missing \
-           --cov-report xml
+           --cov-report xml \
+           geosnap
       - name: codecov
         uses: codecov/codecov-action@v3
         with:
