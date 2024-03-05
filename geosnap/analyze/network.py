@@ -19,6 +19,9 @@ def _geom_to_hull(geom, ratio, allow_holes):
 
 
 def _geom_to_alpha(geom):
+    if isinstance(geom, list):
+        return alpha_shape_auto(gpd.GeoSeries(geom).get_coordinates()[["x", "y"]].values)
+
     return alpha_shape_auto(geom.get_coordinates()[["x", "y"]].values)
 
 
@@ -67,7 +70,7 @@ def pdna_to_adj(origins, network, threshold, reindex=True, drop_nonorigins=True)
     # map node ids in the network to index in the gdf
     mapper = dict(zip(node_ids, origins.index.values))
 
-    namer = {"source": "origin", "distance": "cost"}
+    namer = {"source": "origin", network.impedance_names[0]: "cost"}
 
     adj = network.nodes_in_range(node_ids, threshold)
     adj = adj.rename(columns=namer)
@@ -248,15 +251,16 @@ def isochrones_from_gdf(
     for origin in matrix.origin.unique():
         do = matrix[matrix.origin == origin]
         dest_pts = gpd.GeoDataFrame(destinations.loc[do["destination"]])
-        if use_edges is False:
-            dest_pts = dest_pts.geometry.tolist()
-        else:
-            edges = network.edges_df.copy()
-            roads = edges[
-                (edges["to"].isin(dest_pts.index.values))
-                & (edges["from"].isin(dest_pts.index.values))
-            ]
-            dest_pts = roads
+        if use_edges is True:
+            if "geometry" not in network.edges_df.columns:
+                pass
+            else:
+                edges = network.edges_df.copy()
+                roads = edges[
+                    (edges["to"].isin(dest_pts.index.values))
+                    & (edges["from"].isin(dest_pts.index.values))
+                ]
+                dest_pts = roads
 
         if hull == "libpysal":
             alpha = _geom_to_alpha(dest_pts)
@@ -271,8 +275,8 @@ def isochrones_from_gdf(
         alpha["distance"] = threshold
         alpha["origin"] = origin
         alphas.append(alpha)
-        df = pd.concat(alphas, ignore_index=True)
-        df = df.set_index("origin")
-        if reindex:
-            df = df.rename(index=mapper)
+    df = pd.concat(alphas, ignore_index=True)
+    df = df.set_index("origin")
+    if reindex:
+        df = df.rename(index=mapper, errors='raise')
     return gpd.GeoDataFrame(df, crs=network_crs)
