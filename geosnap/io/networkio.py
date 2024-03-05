@@ -89,9 +89,10 @@ def get_network_from_gdf(
     n, e = ox.utils_graph.graph_to_gdfs(graph)
     if output_crs is not None:
         n = _reproject_osm_nodes(n, input_crs=4326, output_crs=output_crs)
+        e = e.to_crs(output_crs)
     e = e.reset_index()
 
-    return pdna.Network(
+    net= pdna.Network(
         edge_from=e["u"],
         edge_to=e["v"],
         edge_weights=e[[impedance]],
@@ -99,7 +100,10 @@ def get_network_from_gdf(
         node_y=n["y"],
         twoway=twoway,
     )
+    # keep the geometries on hand, since we have them already
+    net.edges_df = gpd.GeoDataFrame(net.edges_df, geometry=e.geometry, crs=output_crs)
 
+    return net
 
 def project_network(network, output_crs=None, input_crs=4326):
     """Reproject a pandana.Network object into another coordinate system.
@@ -128,14 +132,17 @@ def project_network(network, output_crs=None, input_crs=4326):
 
     #  take original x,y coordinates and convert into geopandas.Series, then reproject
     nodes = _reproject_osm_nodes(network.nodes_df, input_crs, output_crs)
+    edges = network.edges_df.copy()
+    if 'geometry' in edges:
+        edges = edges.to_crs(output_crs)
 
     #  reinstantiate the network (needs to rebuild the tree)
     net = pdna.Network(
         node_x=nodes["x"],
         node_y=nodes["y"],
-        edge_from=network.edges_df["from"],
-        edge_to=network.edges_df["to"],
-        edge_weights=network.edges_df[network.impedance_names],
+        edge_from=edges["from"],
+        edge_to=network.edges["to"],
+        edge_weights=network.edges[network.impedance_names],
         twoway=network._twoway,
     )
     return net

@@ -1,3 +1,5 @@
+from warnings import warn
+
 import geopandas as gpd
 import pandas as pd
 from libpysal.cg import alpha_shape_auto
@@ -6,10 +8,19 @@ from shapely.geometry import MultiPoint
 
 
 def _geom_to_hull(geom, ratio, allow_holes):
-    return concave_hull(MultiPoint(geom.tolist()), ratio=ratio, allow_holes=allow_holes)
+    if isinstance(geom, list):
+        return concave_hull(MultiPoint(geom), ratio=ratio, allow_holes=allow_holes)
+    elif isinstance(geom, gpd.GeoDataFrame):
+        return concave_hull(
+            MultiPoint(geom.geometry.get_coordinates().values),
+            ratio=ratio,
+            allow_holes=allow_holes,
+        )
+
 
 def _geom_to_alpha(geom):
     return alpha_shape_auto(geom.get_coordinates()[["x", "y"]].values)
+
 
 def _points_to_poly(df, column, hull="shapely", ratio=0.2, allow_holes=False):
     if hull == "libpysal":
@@ -134,9 +145,9 @@ def isochrones_from_id(
         df = matrix[matrix.cost <= distance]
         nodes = node_df[node_df.index.isin(df.destination.tolist())]
         if hull == "libpysal":
-            alpha = _geom_to_alpha(nodes.geometry)
+            alpha = _geom_to_alpha(nodes.geometry.tolist())
         elif hull == "shapely":
-            alpha = _geom_to_hull(nodes.geometry, ratio=ratio, allow_holes=allow_holes)
+            alpha = _geom_to_hull(nodes.geometry.tolist(), ratio=ratio, allow_holes=allow_holes)
         else:
             raise ValueError(
                 f"`algorithm must be either 'alpha' or 'hull' but {hull} was passed"
@@ -161,45 +172,51 @@ def isochrones_from_gdf(
     hull="shapely",
     ratio=0.2,
     allow_holes=False,
+    use_edges=True,
 ):
     """Create travel isochrones for several origins simultaneously
 
-        Parameters
-        ----------
-        origins : geopandas.GeoDataFrame
-            a geodataframe containing the locations of origin point features
-        threshold: float
-            maximum travel distance to define the isochrone, measured in the same
-            units as edges_df in the pandana.Network object. If the network was
-            created with pandana this is usually meters; if it was created with
-            urbanaccess this is usually travel time in minutes.
-        network : pandana.Network
-            pandana Network instance for calculating the shortest path isochrone
-            for each origin feature
-        network_crs : str, int, pyproj.CRS (optional)
-            the coordinate system used to store x and y coordinates in the passed
-            pandana network. If None, the network is assumed to be stored in the 
-            same CRS as the origins geodataframe
-        reindex : bool
-            if True, use the dataframe index as the origin and destination IDs
-            (rather than the node_ids of the pandana.Network). Default is True
-        hull : str, {'libpysal', 'shapely'}
-            Which method to generate container polygons (concave hulls) for destination
-            points. If 'libpysal', use `libpysal.cg.alpha_shape_auto` to create the
-            concave hull, else if 'shapely', use  `shapely.concave_hull`.
-            Default is libpysal
-        ratio : float
-            ratio keyword passed to `shapely.concave_hull`. Only used if
-            `hull='shapely'`. Default is 0.3
-        allow_holes : bool
-            keyword passed to `shapely.concave_hull` governing  whether holes are
-            allowed in the resulting polygon. Only used if `hull='shapely'`.
-            Default is False.
+    Parameters
+    ----------
+    origins : geopandas.GeoDataFrame
+        a geodataframe containing the locations of origin point features
+    threshold: float
+        maximum travel distance to define the isochrone, measured in the same
+        units as edges_df in the pandana.Network object. If the network was
+        created with pandana this is usually meters; if it was created with
+        urbanaccess this is usually travel time in minutes.
+    network : pandana.Network
+        pandana Network instance for calculating the shortest path isochrone
+        for each origin feature
+    network_crs : str, int, pyproj.CRS (optional)
+        the coordinate system used to store x and y coordinates in the passed
+        pandana network. If None, the network is assumed to be stored in the
+        same CRS as the origins geodataframe
+    reindex : bool
+        if True, use the dataframe index as the origin and destination IDs
+        (rather than the node_ids of the pandana.Network). Default is True
+    hull : str, {'libpysal', 'shapely'}
+        Which method to generate container polygons (concave hulls) for destination
+        points. If 'libpysal', use `libpysal.cg.alpha_shape_auto` to create the
+        concave hull, else if 'shapely', use  `shapely.concave_hull`.
+        Default is libpysal
+    ratio : float
+        ratio keyword passed to `shapely.concave_hull`. Only used if
+        `hull='shapely'`. Default is 0.3
+    allow_holes : bool
+        keyword passed to `shapely.concave_hull` governing  whether holes are
+        allowed in the resulting polygon. Only used if `hull='shapely'`.
+        Default is False.
+    use_edges: bool
+        If true, use vertices from the Network.edge_df to make the polygon more
+        accurate by adhering to roadways. Requires that the 'geometry' column be
+        available on the Network.edges_df, most commonly by using
+        `geosnap.io.get_network_from_gdf`
 
-        Returns
-        -------
-        GeoPandas.DataFrame
-            polygon geometries with the isochrones for each origin point feature
+    Returns
+    -------
+    GeoPandas.DataFrame
+        polygon geometries with the isochrones for each origin point feature
 
     """
     if network_crs is None:
@@ -221,16 +238,30 @@ def isochrones_from_gdf(
         reindex=False,
         drop_nonorigins=False,
     )
+    if (use_edges) and ("geometry" not in network.edges_df.columns):
+        warn(
+            "use_edges is True, but edge geometries are not available "
+            "in the Network object. Try recreating with "
+            "geosnap.io.get_network_from_gdf"
+        )
     alphas = []
     for origin in matrix.origin.unique():
         do = matrix[matrix.origin == origin]
-        dest_pts = destinations.loc[do["destination"]]
+        dest_pts = gpd.GeoDataFrame(destinations.loc[do["destination"]])
+        if use_edges:
+            dest_pts = dest_pts.geometry.tolist()
+        else:
+            edges = network.edges_df.copy()
+            roads = edges[
+                (edges["to"].isin(dest_pts.index.values))
+                & (edges["from"].isin(dest_pts.index.values))
+            ]
+            dest_pts = roads
+
         if hull == "libpysal":
-            alpha = _geom_to_alpha(dest_pts.geometry)
+            alpha = _geom_to_alpha(dest_pts)
         elif hull == "shapely":
-            alpha = _geom_to_hull(
-                dest_pts.geometry, ratio=ratio, allow_holes=allow_holes
-            )
+            alpha = _geom_to_hull(dest_pts, ratio=ratio, allow_holes=allow_holes)
         else:
             raise ValueError(
                 f"`algorithm must be either 'alpha' or 'hull' but {hull} was passed"
@@ -245,5 +276,3 @@ def isochrones_from_gdf(
         if reindex:
             df = df.rename(index=mapper)
     return gpd.GeoDataFrame(df, crs=network_crs)
-
-
