@@ -20,7 +20,9 @@ def _geom_to_hull(geom, ratio, allow_holes):
 
 def _geom_to_alpha(geom):
     if isinstance(geom, list):
-        return alpha_shape_auto(gpd.GeoSeries(geom).get_coordinates()[["x", "y"]].values)
+        return alpha_shape_auto(
+            gpd.GeoSeries(geom).get_coordinates()[["x", "y"]].values
+        )
 
     return alpha_shape_auto(geom.get_coordinates()[["x", "y"]].values)
 
@@ -85,7 +87,14 @@ def pdna_to_adj(origins, network, threshold, reindex=True, drop_nonorigins=True)
 
 
 def isochrones_from_id(
-    origin, network, threshold, hull="shapely", ratio=0.2, allow_holes=False, use_edges=True
+    origin,
+    network,
+    threshold,
+    hull="shapely",
+    ratio=0.2,
+    allow_holes=False,
+    use_edges=True,
+    network_crs=4326
 ):
     """Create travel isochrone(s) from a single origin using a pandana network.
 
@@ -95,11 +104,12 @@ def isochrones_from_id(
         A single or list of node id(s) from a `pandana.Network.nodes_df`
         to serve as isochrone origins
     network : pandana.Network
-        A pandana network object
+        A pandana network object (preferably created with
+        geosnap.io.get_network_from_gdf)
     threshold : int or list
         A single or list of threshold distances for which isochrones will be
-        computed. These are in the
-        same units as edges from the pandana.Network.edge_df
+        computed. These are in the same impedance units as edges from the 
+        pandana.Network.edge_df
     hull : str, {'libpysal', 'shapely'}
         Which method to generate container polygons (concave hulls) for destination
         points. If 'libpysal', use `libpysal.cg.alpha_shape_auto` to create the
@@ -112,6 +122,9 @@ def isochrones_from_id(
         keyword passed to `shapely.concave_hull` governing  whether holes are
         allowed in the resulting polygon. Only used if `algorithm='hull'`.
         Default is False.
+    network_crs : int or pyproj.CRS
+        which coordinate system the pandana.Network node coordinates are stored in.
+        Default is 4326
 
     Returns
     -------
@@ -126,7 +139,7 @@ def isochrones_from_id(
     node_df = gpd.GeoDataFrame(
         network.nodes_df,
         geometry=gpd.points_from_xy(network.nodes_df.x, network.nodes_df.y),
-        crs=4326,
+        crs=network_crs,
     )
 
     maxdist = max(threshold) if isinstance(threshold, list) else threshold
@@ -166,7 +179,7 @@ def isochrones_from_id(
                 f"`algorithm must be either 'alpha' or 'hull' but {hull} was passed"
             )
 
-        alpha = gpd.GeoDataFrame(geometry=pd.Series(alpha), crs=4326)
+        alpha = gpd.GeoDataFrame(geometry=pd.Series(alpha), crs=network_crs)
         alpha["distance"] = distance
 
         dfs.append(alpha)
@@ -194,10 +207,8 @@ def isochrones_from_gdf(
     origins : geopandas.GeoDataFrame
         a geodataframe containing the locations of origin point features
     threshold: float
-        maximum travel distance to define the isochrone, measured in the same
-        units as edges_df in the pandana.Network object. If the network was
-        created with pandana this is usually meters; if it was created with
-        urbanaccess this is usually travel time in minutes.
+        maximum travel cost to define the isochrone, measured in the same
+        impedance units as edges_df in the pandana.Network object.
     network : pandana.Network
         pandana Network instance for calculating the shortest path isochrone
         for each origin feature
@@ -288,5 +299,5 @@ def isochrones_from_gdf(
     df = pd.concat(alphas, ignore_index=True)
     df = df.set_index("origin")
     if reindex:
-        df = df.rename(index=mapper, errors='raise')
+        df = df.rename(index=mapper, errors="raise")
     return gpd.GeoDataFrame(df, crs=network_crs)
