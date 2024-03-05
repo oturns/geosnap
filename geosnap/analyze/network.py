@@ -248,7 +248,7 @@ def isochrones_from_gdf(
     for origin in matrix.origin.unique():
         do = matrix[matrix.origin == origin]
         dest_pts = gpd.GeoDataFrame(destinations.loc[do["destination"]])
-        if use_edges:
+        if use_edges is False:
             dest_pts = dest_pts.geometry.tolist()
         else:
             edges = network.edges_df.copy()
