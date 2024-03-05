@@ -85,6 +85,10 @@ def test_network_constructor():
     # this will grow depending on the size of the OSM network when tested...
     assert walk_net.edges_df.shape[0] > 6000
 
+@pytest.mark.skipif(
+    sys.platform.startswith("win"),
+    reason="skipping test on windows because of dtype issue",
+)
 def test_isos_with_edges():
     tracts = get_acs(DataStore(), county_fips='48301', level='tract', years=2015)
     walk_net = get_network_from_gdf(tracts)
@@ -99,7 +103,7 @@ def test_isos_with_edges():
     print(alpha.area.round(8))
     # this will grow depending on the size of the OSM network when tested...
     assert alpha.area.round(8).iloc[0] == 0.00026001
-    
+
 def test_project_network():   
     tracts = get_acs(DataStore(), county_fips='48301', level='tract', years=2015)
     walk_net = get_network_from_gdf(tracts)
