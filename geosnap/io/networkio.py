@@ -24,9 +24,9 @@ def get_network_from_gdf(
     Parameters
     ----------
     gdf : geopandas.GeoDataFrame
-        dataframe covering the study area of interest; this should be stored in lat/long
-        (epsg 4326). Note the first step is to take the unary union of this dataframe,
-        which is expensive, so large dataframes may be time-consuming
+        dataframe covering the study area of interest; Note the first step is to take
+        the unary union of this dataframe, which is expensive, so large dataframes may
+        be time-consuming. The network will inherit the CRS from this dataframe
     network_type : str, {"all_private", "all", "bike", "drive", "drive_service", "walk"}
         the type of network to collect from OSM (passed to `osmnx.graph_from_polygon`)
         by default "walk"
@@ -34,11 +34,12 @@ def get_network_from_gdf(
         Whether to treat the pandana.Network as directed or undirected. For a directed network,
         use `twoway=False` (which is the default). For an undirected network (e.g. a
         walk network) where travel can flow in both directions, the network is more
-        efficient when twoway=True. This has implications for drive networks or multimodal
-        networks where impedance is different depending on travel direction.
+        efficient when twoway=True but forces the impedance to be equal in both
+        directions. This has implications for auto or multimodal
+        networks where impedance is generally different depending on travel direction.
     add_travel_times : bool, default=False
         whether to use posted travel times from OSM as the impedance measure (rather
-        than network-distance). Speeds are based on max drive speeds, see
+        than network-distance). Speeds are based on max posted drive speeds, see
         <https://osmnx.readthedocs.io/en/stable/internals-reference.html#osmnx-speed-module>
         for more information.
     default_speeds : dict, optional
@@ -50,7 +51,9 @@ def get_network_from_gdf(
     -------
     pandana.Network
         a pandana.Network object with node coordinates stored in the same system as the
-        input geodataframe
+        input geodataframe. If add_travel_times is True, the network impedance
+        is travel time measured in seconds (assuming automobile travel speeds); else 
+        the impedance is travel distance measured in meters
 
     Raises
     ------
@@ -89,9 +92,10 @@ def get_network_from_gdf(
     n, e = ox.utils_graph.graph_to_gdfs(graph)
     if output_crs is not None:
         n = _reproject_osm_nodes(n, input_crs=4326, output_crs=output_crs)
+        e = e.to_crs(output_crs)
     e = e.reset_index()
 
-    return pdna.Network(
+    net = pdna.Network(
         edge_from=e["u"],
         edge_to=e["v"],
         edge_weights=e[[impedance]],
@@ -99,7 +103,10 @@ def get_network_from_gdf(
         node_y=n["y"],
         twoway=twoway,
     )
+    # keep the geometries on hand, since we have them already
+    net.edges_df = gpd.GeoDataFrame(net.edges_df, geometry=e.geometry, crs=output_crs)
 
+    return net
 
 def project_network(network, output_crs=None, input_crs=4326):
     """Reproject a pandana.Network object into another coordinate system.
@@ -128,14 +135,17 @@ def project_network(network, output_crs=None, input_crs=4326):
 
     #  take original x,y coordinates and convert into geopandas.Series, then reproject
     nodes = _reproject_osm_nodes(network.nodes_df, input_crs, output_crs)
+    edges = network.edges_df.copy()
+    if "geometry" in edges.columns:
+        edges = edges.to_crs(output_crs)
 
     #  reinstantiate the network (needs to rebuild the tree)
     net = pdna.Network(
         node_x=nodes["x"],
         node_y=nodes["y"],
-        edge_from=network.edges_df["from"],
-        edge_to=network.edges_df["to"],
-        edge_weights=network.edges_df[network.impedance_names],
+        edge_from=edges["from"],
+        edge_to=edges["to"],
+        edge_weights=edges[[network.impedance_names[0]]],
         twoway=network._twoway,
     )
     return net
