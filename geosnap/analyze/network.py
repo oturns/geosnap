@@ -85,7 +85,7 @@ def pdna_to_adj(origins, network, threshold, reindex=True, drop_nonorigins=True)
 
 
 def isochrones_from_id(
-    origin, network, threshold, hull="shapely", ratio=0.2, allow_holes=False
+    origin, network, threshold, hull="shapely", ratio=0.2, allow_holes=False, use_edges=True
 ):
     """Create travel isochrone(s) from a single origin using a pandana network.
 
@@ -147,10 +147,20 @@ def isochrones_from_id(
         # select the nodes within each threshold distance and take their alpha shape
         df = matrix[matrix.cost <= distance]
         nodes = node_df[node_df.index.isin(df.destination.tolist())]
+        if use_edges is True:
+            if "geometry" not in network.edges_df.columns:
+                pass
+            else:
+                edges = network.edges_df.copy()
+                roads = edges[
+                    (edges["to"].isin(nodes.index.values))
+                    & (edges["from"].isin(nodes.index.values))
+                ]
+                nodes = roads
         if hull == "libpysal":
-            alpha = _geom_to_alpha(nodes.geometry.tolist())
+            alpha = _geom_to_alpha(nodes)
         elif hull == "shapely":
-            alpha = _geom_to_hull(nodes.geometry.tolist(), ratio=ratio, allow_holes=allow_holes)
+            alpha = _geom_to_hull(nodes, ratio=ratio, allow_holes=allow_holes)
         else:
             raise ValueError(
                 f"`algorithm must be either 'alpha' or 'hull' but {hull} was passed"
