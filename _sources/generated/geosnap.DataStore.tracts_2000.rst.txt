@@ -1,0 +1,6 @@
+﻿geosnap.DataStore.tracts\_2000
+==============================
+
+.. currentmodule:: geosnap
+
+.. automethod:: DataStore.tracts_2000

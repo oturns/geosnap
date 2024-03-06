@@ -1,0 +1,6 @@
+﻿geosnap.DataStore.codebook
+==========================
+
+.. currentmodule:: geosnap
+
+.. automethod:: DataStore.codebook

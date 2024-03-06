@@ -1,0 +1,6 @@
+﻿geosnap.analyze.segdyn.singlegroup\_tempdyn
+===========================================
+
+.. currentmodule:: geosnap.analyze.segdyn
+
+.. autofunction:: singlegroup_tempdyn

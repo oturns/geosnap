@@ -1,0 +1,6 @@
+﻿geosnap.visualize.plot\_violins\_by\_cluster
+============================================
+
+.. currentmodule:: geosnap.visualize
+
+.. autofunction:: plot_violins_by_cluster

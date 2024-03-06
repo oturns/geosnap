@@ -1,0 +1,6 @@
+﻿geosnap.io.get\_ltdb
+====================
+
+.. currentmodule:: geosnap.io
+
+.. autofunction:: get_ltdb

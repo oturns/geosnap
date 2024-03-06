@@ -1,0 +1,6 @@
+﻿geosnap.analyze.ModelResults.plot\_silhouette\_map
+==================================================
+
+.. currentmodule:: geosnap.analyze
+
+.. automethod:: ModelResults.plot_silhouette_map

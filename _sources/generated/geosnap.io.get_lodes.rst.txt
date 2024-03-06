@@ -1,0 +1,6 @@
+﻿geosnap.io.get\_lodes
+=====================
+
+.. currentmodule:: geosnap.io
+
+.. autofunction:: get_lodes
