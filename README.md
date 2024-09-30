@@ -74,10 +74,24 @@ The recommended method for installing geosnap is with
 mamba install -c conda-forge geosnap
 ```
 
+ Installation via `pixi` is supported, excluding `pixi global install`:
+
+```bash
+pixi init name_of_my_project
+cd name_of_my_project
+pixi add geosnap
+```
+
 `geosnap` is alaso available on PyPI and can be install with pip via
 
 ```bash
 pip install geosnap
+```
+
+Installation via `uv` is supported:
+
+```bash
+uv pip install geosnap
 ```
 
 ## User Guide
