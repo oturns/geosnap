@@ -67,12 +67,15 @@ The package supports social scientists examining questions such as:
 
 ## Installation
 
-The recommended method for installing geosnap is with
-[anaconda](https://www.anaconda.com/download/). In particular, we recommend the [mambaforge distribution](https://github.com/conda-forge/miniforge#mambaforge)
+We recommend installing `geosnap` via a package manager that supports installing conda packages from [conda-forge](https://conda-forge.org/). Installing directly from the Python Package Index (PyPI) is also supported.
+
+### Installation via [Miniforge](https://github.com/conda-forge/miniforge)
 
 ```bash
 mamba install -c conda-forge geosnap
 ```
+
+### Installation via [Pixi](https://pixi.sh/latest/)
 
  Installation via `pixi` is supported, excluding `pixi global install`:
 
@@ -82,13 +85,13 @@ cd name_of_my_project
 pixi add geosnap
 ```
 
-`geosnap` is alaso available on PyPI and can be install with pip via
+### Installation via pip
 
 ```bash
 pip install geosnap
 ```
 
-Installation via `uv` is supported:
+### Installation via [uv](https://docs.astral.sh/uv/)
 
 ```bash
 uv pip install geosnap
