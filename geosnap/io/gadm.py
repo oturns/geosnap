@@ -15,14 +15,6 @@ def get_gadm(code, level=0, use_fsspec=True, gpkg=True, n_retries=3):
         three character ISO code for a country
     level : int, optional
         which geometry level to collect, by default 0
-    use_fsspec : bool
-        whether to use the `fsspec` library
-    gpkg : bool
-        whether to read from a geopackage or shapefile. If True,
-        geopackage will be read; shapefile if False. Ignored if using fsspec
-    n_retries : int optional
-        number of retries in case read fails from direct stream from GADM.
-        Ignored if using fsspec.
 
     Returns
     -------
@@ -46,13 +38,9 @@ def get_gadm(code, level=0, use_fsspec=True, gpkg=True, n_retries=3):
     code = code.upper()
     import fsspec
 
-    with tempfile.TemporaryDirectory() as temp_path:
-        with fsspec.open(
-            f"simplecache::zip://*.gpkg::https://biogeo.ucdavis.edu/data/gadm3.6/gpkg/gadm36_{code}_gpkg.zip",
-            simplecache={"cache_storage": temp_path},
-        ):
-            gdf = gpd.read_file(
-                os.path.join(temp_path, os.listdir(temp_path)[0]),
-                layer=f"gadm36_{code}_{level}",
+
+    gdf = gpd.read_file(
+                f"https://geodata.ucdavis.edu/gadm/gadm4.1/gpkg/gadm41_{code}.gpkg",
+                layer=f"ADM_ADM_{level}",
             )
-            return gdf
+    return gdf

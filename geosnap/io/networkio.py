@@ -83,13 +83,13 @@ def get_network_from_gdf(
         }
 
     impedance = "length"
-    graph = ox.graph_from_polygon(gdf.unary_union, network_type=network_type)
+    graph = ox.graph_from_polygon(gdf.union_all(), network_type=network_type)
     if add_travel_times:
         graph = ox.add_edge_speeds(graph, default_speeds)
         graph = ox.add_edge_travel_times(graph)
         impedance = "travel_time"
 
-    n, e = ox.utils_graph.graph_to_gdfs(graph)
+    n, e = ox.graph_to_gdfs(graph)
     if output_crs is not None:
         n = _reproject_osm_nodes(n, input_crs=4326, output_crs=output_crs)
         e = e.to_crs(output_crs)

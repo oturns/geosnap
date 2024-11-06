@@ -563,7 +563,7 @@ def get_lodes(
         state_fips=state_fips,
         county_fips=county_fips,
         msa_fips=msa_fips,
-        fips=fips,
+        fips=allfips,
         data=gdf,
     )
     if isinstance(boundary, gpd.GeoDataFrame):
@@ -608,19 +608,16 @@ def get_lodes(
 
 
 def _msa_to_county(datastore, msa_fips):
+    msa_defs = datastore.msa_definitions()
     if msa_fips:
         pr_metros = set(
-            datastore.msa_definitions()[
-                datastore.msa_definitions()["CBSA Title"].str.contains("PR")
-            ]["CBSA Code"].tolist()
+            msa_defs[msa_defs["CBSA Title"].str.contains("PR")]["CBSA Code"].tolist()
         )
         if msa_fips in pr_metros:
             raise Exception(
                 "geosnap does not yet include built-in data for Puerto Rico"
             )
-        msa_counties = datastore.msa_definitions()[
-            datastore.msa_definitions()["CBSA Code"] == msa_fips
-        ]["stcofips"].tolist()
+        msa_counties = msa_defs[msa_defs["CBSA Code"] == msa_fips]["stcofips"].tolist()
 
     else:
         msa_counties = None

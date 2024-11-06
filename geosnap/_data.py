@@ -83,8 +83,10 @@ class DataStore:
             "ltdb",
             "msa_definitions",
             "msas",
+            "naics_definitions",
             "ncdb",
             "nces",
+            "nlcd_definitions",
             "seda",
             "states",
             "show_data_dir",
@@ -109,7 +111,7 @@ class DataStore:
         return self.data_dir
 
     def lodes_codebook(self):
-        """_summary_
+        """Return a table of descriptive variable names for the LODES data
 
         Returns
         -------
@@ -121,7 +123,7 @@ class DataStore:
         )
 
     def bea_regions(self):
-        """Table that maps states to their respective BEA regions
+        """Return a table that maps states to their respective BEA regions
 
         Returns
         -------
@@ -217,10 +219,13 @@ Subject to your compliance with the terms and conditions set forth in this Agree
             "long",
             "poolsub",
         ], "`pool` argument must be either 'pool', 'long', or 'poolsub'"
-        assert standardize in [
-            "gcs",
-            "cs",
-        ], "`standardize` argument must be either 'cs' for cohort-standardized or 'gcs' for grade-cohort-standardized"
+        assert (
+            standardize
+            in [
+                "gcs",
+                "cs",
+            ]
+        ), "`standardize` argument must be either 'cs' for cohort-standardized or 'gcs' for grade-cohort-standardized"
         if pooling == "poolsub":
             fn = f"seda_{level}_{pooling}_{standardize}_4.1_corrected"
         else:
@@ -596,7 +601,8 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         return pd.read_csv(
             os.path.join(
                 os.path.dirname(os.path.abspath(__file__)), "io/msa_definitions.csv"
-            )
+            ),
+            converters={"stcofips": str},
         )
 
     def ltdb(self):
@@ -644,4 +650,34 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         """
         return pd.read_csv(
             os.path.join(os.path.dirname(os.path.abspath(__file__)), "io/variables.csv")
+        )
+
+    def naics_definitions(self):
+        """Table of NAICS 2-digit industry classification system definitions.
+
+        Returns
+        -------
+        pandas.DataFrame
+            table that stores variable names, definitions, and formulas.
+
+        """
+        return pd.read_csv(
+            os.path.join(
+                os.path.dirname(os.path.abspath(__file__)), "io/naics2_definitions.csv"
+            )
+        )
+
+    def nlcd_definitions(self):
+        """Table of NLCD land classification system definitions.
+
+        Returns
+        -------
+        pandas.DataFrame
+            table that stores variable names, definitions, and formulas.
+
+        """
+        return pd.read_csv(
+            os.path.join(
+                os.path.dirname(os.path.abspath(__file__)), "io/nlcd_definitions.csv"
+            )
         )
