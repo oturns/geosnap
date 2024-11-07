@@ -102,7 +102,7 @@ def test_isos_with_edges():
 )
     print(alpha.area.round(8))
     # this will grow depending on the size of the OSM network when tested...
-    assert alpha.area.round(8).iloc[0] == 0.00026001
+    assert alpha.area.round(8).iloc[0] >= 0.00036433
 
 def test_project_network():   
     tracts = get_acs(DataStore(), county_fips='48301', level='tract', years=2015)

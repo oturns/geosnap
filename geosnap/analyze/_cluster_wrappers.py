@@ -279,7 +279,7 @@ def gaussian_mixture(
 
         # selection routine from
         # https://plot.ly/scikit-learn/plot-gmm-selection/
-        lowest_bic = np.infty
+        lowest_bic = np.inf
         bic = []
         maxn = max_clusters + 1
         n_components_range = range(1, maxn)
