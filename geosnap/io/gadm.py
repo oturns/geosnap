@@ -1,12 +1,9 @@
 """Utilities for fetching data from GADM."""
 
-import os
-import tempfile
-
 import geopandas as gpd
 
 
-def get_gadm(code, level=0, use_fsspec=True, gpkg=True, n_retries=3):
+def get_gadm(code, level=0):
     """Collect data from GADM as a geodataframe.
 
     Parameters
@@ -36,11 +33,9 @@ def get_gadm(code, level=0, use_fsspec=True, gpkg=True, n_retries=3):
     with this method would always returns the layer with index 0 in the geopackage file).
     """
     code = code.upper()
-    import fsspec
-
 
     gdf = gpd.read_file(
-                f"https://geodata.ucdavis.edu/gadm/gadm4.1/gpkg/gadm41_{code}.gpkg",
-                layer=f"ADM_ADM_{level}",
-            )
+        f"https://geodata.ucdavis.edu/gadm/gadm4.1/gpkg/gadm41_{code}.gpkg",
+        layer=f"ADM_ADM_{level}",
+    )
     return gdf
