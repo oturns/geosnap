@@ -226,12 +226,13 @@ Subject to your compliance with the terms and conditions set forth in this Agree
                 "cs",
             ]
         ), "`standardize` argument must be either 'cs' for cohort-standardized or 'gcs' for grade-cohort-standardized"
+
         if pooling == "poolsub":
-            fn = f"seda_{level}_{pooling}_{standardize}_4.1_corrected"
+            fn = f"seda_{level}_{pooling}_{standardize}_5.0"
         else:
-            fn = f"seda_{level}_{pooling}_{standardize}_4.1"
+            fn = f"seda_{level}_{pooling}_{standardize}_5.0"
         local_path = pathlib.Path(self.data_dir, "seda", f"{fn}.parquet")
-        remote_path = f"https://stacks.stanford.edu/file/druid:xv742vh9296/{fn}.csv"
+        remote_path = f"https://stacks.stanford.edu/file/druid:cs829jn7849/{fn}.csv"
         msg = (
             "Streaming data from SEDA archive at <https://exhibits.stanford.edu/data/catalog/db586ns4974>.\n"
             "Use `geosnap.io.store_seda()` to store the data locally for better performance"
