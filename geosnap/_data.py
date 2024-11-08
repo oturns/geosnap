@@ -653,21 +653,6 @@ Subject to your compliance with the terms and conditions set forth in this Agree
             os.path.join(os.path.dirname(os.path.abspath(__file__)), "io/variables.csv")
         )
 
-    def naics_definitions(self):
-        """Table of NAICS 2-digit industry classification system definitions.
-
-        Returns
-        -------
-        pandas.DataFrame
-            table that stores variable names, definitions, and formulas.
-
-        """
-        return pd.read_csv(
-            os.path.join(
-                os.path.dirname(os.path.abspath(__file__)), "io/naics2_definitions.csv"
-            )
-        )
-
     def nlcd_definitions(self):
         """Table of NLCD land classification system definitions.
 
