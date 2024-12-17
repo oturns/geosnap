@@ -79,3 +79,7 @@ def test_blocks_2020():
 def test_lodes_codebook():
     df = datasets.lodes_codebook()
     assert df.shape == (42, 4)
+
+def test_ej_codebook():
+    df = datasets.ejscreen_codebook()
+    assert df.shape == (142, 2)
