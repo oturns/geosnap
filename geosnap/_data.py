@@ -79,6 +79,7 @@ class DataStore:
             "codebook",
             "counties",
             "ejscreen",
+            "ejscreen_codebook"
             "lodes_codebook",
             "ltdb",
             "msa_definitions",
@@ -318,6 +319,21 @@ Subject to your compliance with the terms and conditions set forth in this Agree
             t = t[t.geoid.str[:2].isin(states)]
         t["year"] = year
         return t
+
+    def ejscreen_codebook(self):
+        """Table of variable definitions used in the EPE Environmental Justice Screening dataset
+
+        Returns
+        -------
+        pandas.DataFrame
+            table that stores variable names and definitions.
+
+        """
+        return pd.read_csv(
+            os.path.join(
+                os.path.dirname(os.path.abspath(__file__)), "io/ejscreen_codebook.csv"
+            )
+        )
 
     def blocks_2000(self, states=None, fips=None):
         """Census blocks for 2000.
@@ -667,3 +683,5 @@ Subject to your compliance with the terms and conditions set forth in this Agree
                 os.path.dirname(os.path.abspath(__file__)), "io/nlcd_definitions.csv"
             )
         )
+
+
