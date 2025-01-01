@@ -1,4 +1,5 @@
 """functions for choropleth mapping timeseries data."""
+
 import os
 import re
 import tempfile
@@ -9,6 +10,8 @@ import contextily as ctx
 import mapclassify.classifiers as classifiers
 import matplotlib.pyplot as plt
 import numpy as np
+from mapclassify.util import get_color_array
+from matplotlib import colormaps
 from matplotlib.animation import ArtistAnimation, PillowWriter
 
 schemes = {}
@@ -16,11 +19,165 @@ for classifier in classifiers.CLASSIFIERS:
     schemes[classifier.lower()] = getattr(classifiers, classifier)
 
 
-__all__ = [
-    "animate_timeseries",
-    "gif_from_path",
-    "plot_timeseries",
-]
+__all__ = ["animate_timeseries", "gif_from_path", "plot_timeseries", "dexplore"]
+
+
+def dexplore(
+    gdf,
+    column=None,
+    cmap=None,
+    scheme=None,
+    k=6,
+    categorical=False,
+    elevation=None,
+    extruded=False,
+    elevation_scale=1,
+    alpha=1,
+    layer_kwargs=None,
+    map_kwargs=None,
+    classify_kwargs=None,
+    nan_color=[255, 255, 255, 255],
+    color=None,
+    wireframe=False,
+):
+    """explore a dataframe using lonboard and deckgl
+
+    Parameters
+    ----------
+    gdf : geopandas.GeoDataFrame
+        dataframe to visualize
+    column : str, optional
+        name of column on dataframe to visualize on map, by default None
+    cmap : str, optional
+        name of matplotlib colormap to , by default None
+    scheme : str, optional
+        name of a classification scheme defined by mapclassify.Classifier, by default
+        None
+    k : int, optional
+        number of classes to generate, by default 6
+    categorical : bool, optional
+        whether the data should be treated as categorical or continuous, by default
+        False
+    elevation : str or array, optional
+        name of column on the dataframe used to extrude each geometry or  an array-like
+        in the same order as observations, by default None
+    extruded : bool, optional
+        whether to extrude geometries using the z-dimension, by default False
+    elevation_scale : int, optional
+        constant scaler multiplied by elevation valuer, by default 1
+    alpha : float, optional
+        alpha (opacity) parameter in the range (0,1) passed to
+        mapclassify.util.get_color_array, by default 1
+    layer_kwargs : dict, optional
+        additional keyword arguments passed to lonboard.viz layer arguments (either
+        polygon_kwargs, scatterplot_kwargs, or path_kwargs, depending on input
+        geometry type), by default None
+    map_kwargs : dict, optional
+        additional keyword arguments passed to lonboard.viz map_kwargs, by default None
+    classify_kwargs : dict, optional
+        additional keyword arguments passed to `mapclassify.classify`, by default None
+    nan_color : list-like, optional
+        color used to shade NaN observations formatted as an RGBA list, by
+        default [255, 255, 255, 255]
+    color : str or array-like, optional
+        _description_, by default None
+    wireframe : bool, optional
+        whether to use wireframe styling in deckgl, by default False
+
+    Returns
+    -------
+    lonboard.Map
+        a lonboard map with geodataframe included as a Layer object.
+
+    """
+    try:
+        from lonboard import viz
+        from lonboard.colormap import apply_categorical_cmap, apply_continuous_cmap
+    except ImportError as e:
+        raise ImportError from e('you must have the lonboard package installed to use this function')
+    if cmap is None:
+        cmap = "Set1" if categorical else "viridis"
+    if map_kwargs is None:
+        map_kwargs = dict()
+    if classify_kwargs is None:
+        classify_kwargs = dict()
+    if layer_kwargs is None:
+        layer_kwargs = dict()
+    if isinstance(elevation, str):
+        if elevation in gdf.columns:
+            elevation = gdf[elevation]
+        else:
+            raise ValueError(
+                f"the designated height column {elevation} is not in the dataframe"
+            )
+
+    # only polygons have z
+    if ["Polygon", "MultiPolygon"] in gdf.geometry.geom_type.unique():
+        layer_kwargs["get_elevation"] = elevation
+        layer_kwargs["extruded"] = extruded
+        layer_kwargs["elevation_scale"] = elevation_scale
+        layer_kwargs["wireframe"] = wireframe
+
+    LINE = False  # set color of lines, not fill_color
+    if ["LineString", "MultiLineString"] in gdf.geometry.geom_type.unique():
+        LINE = True
+    if color:
+        if LINE:
+            layer_kwargs["get_color"] = color
+        else:
+            layer_kwargs["get_fill_color"] = color
+    if column is not None:
+        if column not in gdf.columns:
+            raise ValueError(f"the designated column {column} is not in the dataframe")
+        if categorical:
+            color_array = _get_categorical_cmap(gdf[column].values, cmap)
+        elif scheme is None:
+            color_array = apply_continuous_cmap(
+                values=gdf[column], cmap=colormaps[cmap], alpha=alpha
+            )
+        else:
+            color_array = get_color_array(
+                gdf[column],
+                scheme=scheme,
+                k=k,
+                cmap=cmap,
+                alpha=alpha,
+                nan_color=nan_color,
+                **classify_kwargs,
+            )
+
+        if LINE:
+            layer_kwargs["get_color"] = color_array
+
+        else:
+            layer_kwargs["get_fill_color"] = color_array
+    m = viz(
+        gdf,
+        polygon_kwargs=layer_kwargs,
+        scatterplot_kwargs=layer_kwargs,
+        path_kwargs=layer_kwargs,
+        map_kwargs=map_kwargs,
+    )
+
+    return m
+
+
+def _get_categorical_cmap(categories, cmap):
+    colors = colormaps[cmap].colors
+    colors = (np.array(colors) * 255).astype(int)
+    unique_cats = np.unique(categories)
+    n_cats = len(unique_cats)
+    n_colors = colors.shape[0]
+    if n_cats > n_colors:
+        warn(
+            "the number of unique categories exceeds the number of available colors",
+            stacklevel=3,
+        )
+        floor = (n_cats // n_colors) + 1
+        colors = np.vstack([colors] * floor)
+    temp_cmap = dict(zip(unique_cats, colors))
+    fill_color = apply_categorical_cmap(categories, temp_cmap)
+    return fill_color
 
 
 def gif_from_path(
@@ -378,7 +535,6 @@ def animate_timeseries(
             colors = temp[color_col] if color_col is not None else None
 
             if categorical:
-
                 temp.plot(
                     column,
                     categorical=True,
