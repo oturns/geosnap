@@ -51,7 +51,7 @@ class GeosnapAccessor:
         column : str, optional
             name of column on dataframe to visualize on map, by default None
         cmap : str, optional
-            name of matplotlib colormap to , by default None
+            name of matplotlib colormap to use, by default None
         scheme : str, optional
             name of a classification scheme defined by mapclassify.Classifier, by default
             None
@@ -308,7 +308,6 @@ def _get_categorical_cmap(categories, cmap, nan_color):
         )
         floor = (n_cats // n_colors) + 1
         colors = np.vstack([colors] * floor)
-        print(colors.shape)
     cat_ints.append(nan_place)
     temp_cmap = dict(zip(cat_ints, colors))
     fill_color = apply_categorical_cmap(categories, temp_cmap)
