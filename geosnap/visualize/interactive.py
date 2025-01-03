@@ -41,6 +41,7 @@ class GeosnapAccessor:
         color=None,
         wireframe=False,
         tiles="CartoDB Darkmatter",
+        m=None
     ):
         """explore a dataframe using lonboard and deckgl
 
@@ -117,6 +118,7 @@ class GeosnapAccessor:
             color,
             wireframe,
             tiles,
+            m
         )
 
 
@@ -138,6 +140,7 @@ def _dexplore(
     color=None,
     wireframe=False,
     tiles="CartoDB Darkmatter",
+    m=None
 ):
     """explore a dataframe using lonboard and deckgl
 
@@ -182,6 +185,9 @@ def _dexplore(
         _description_, by default None
     wireframe : bool, optional
         whether to use wireframe styling in deckgl, by default False
+    m : lonboard.Map
+        a lonboard.Map instance to render the new layer on. If None (default), a new Map
+        will be generated.
 
     Returns
     -------
@@ -266,15 +272,17 @@ def _dexplore(
             layer_kwargs["get_fill_color"] = color_array
     if tiles:
         map_kwargs["basemap_style"] = providers[tiles]
-    m = viz(
+    new_m = viz(
         gdf,
         polygon_kwargs=layer_kwargs,
         scatterplot_kwargs=layer_kwargs,
         path_kwargs=layer_kwargs,
         map_kwargs=map_kwargs,
     )
+    if m is not None:
+        new_m = m.add_layer(new_m)
 
-    return m
+    return new_m
 
 
 def _get_categorical_cmap(categories, cmap, nan_color):
