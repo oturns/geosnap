@@ -234,7 +234,7 @@ def _dexplore(
         if column not in gdf.columns:
             raise ValueError(f"the designated column {column} is not in the dataframe")
         if categorical:
-            color_array = _get_categorical_cmap(gdf[column].values, cmap)
+            color_array = _get_categorical_cmap(gdf[column], cmap, nan_color)
         elif scheme is None:
             # minmax scale the column first, matplotlib needs 0-1
             transformed = (gdf[column] - np.nanmin(gdf[column])) / (
@@ -270,15 +270,28 @@ def _dexplore(
     return m
 
 
-def _get_categorical_cmap(categories, cmap):
-    # this already sits inside a conditional import from lonboard
-    from lonboard.colormap import apply_categorical_cmap
+def _get_categorical_cmap(categories, cmap, nan_color):
+    try:
+        from lonboard.colormap import apply_categorical_cmap
+    except ImportError as e:
+        raise ImportError(
+            "this function requres the lonboard package to be installed"
+        ) from e
 
-    colors = colormaps[cmap].colors
-    colors = (np.array(colors) * 255).astype(int)
-    unique_cats = np.unique(categories)
+    categories = categories.copy()
+    unique_cats = categories.dropna().unique()
     n_cats = len(unique_cats)
+
+    colors = colormaps[cmap].resampled(n_cats).colors
+    colors = (np.array(colors) * 255).astype(int)
+    colors = np.vstack([colors, nan_color])
+
+    cat_ints = list(range(1, n_cats + 1))
     n_colors = colors.shape[0]
+    nan_place = n_cats + 1
+    cat_to_int = dict(zip(unique_cats, cat_ints))
+    categories = categories.fillna(nan_place)
+    categories = categories.replace(cat_to_int).astype(int)
     if n_cats > n_colors:
         warn(
             "the number of unique categories exceeds the number of available colors",
@@ -286,7 +299,9 @@ def _get_categorical_cmap(categories, cmap):
         )
         floor = (n_cats // n_colors) + 1
         colors = np.vstack([colors] * floor)
-    temp_cmap = dict(zip(unique_cats, colors))
+        print(colors.shape)
+    cat_ints.append(nan_place)
+    temp_cmap = dict(zip(cat_ints, colors))
     fill_color = apply_categorical_cmap(categories, temp_cmap)
     return fill_color
 
