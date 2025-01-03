@@ -10,7 +10,8 @@ from matplotlib.colors import LinearSegmentedColormap
 __all__ = ["GeosnapAccessor"]
 
 
-# these methods
+# not sure what this namespace should be. I usually alias
+# the visualize module as gvz
 @pd.api.extensions.register_dataframe_accessor("gvz")
 class GeosnapAccessor:
     def __init__(self, pandas_obj):
@@ -19,7 +20,6 @@ class GeosnapAccessor:
 
     @staticmethod
     def _validate(obj):
-        # verify there is a column latitude and a column longitude
         if not isinstance(obj, gpd.GeoDataFrame):
             raise AttributeError("must be a geodataframe")
 
