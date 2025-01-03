@@ -1,7 +1,6 @@
 name: geosnap
 channels:
   - conda-forge
-  - defaults
 dependencies:
   - pandas
   - giddy >=2.2.1
@@ -20,8 +19,9 @@ dependencies:
   - contextily
   - mapclassify
   - spopt >=0.3.0
-  - s3fs
   - segregation >=2.0
   - pyproj >=3
   - pandana
   - pooch
+  - lonboard
+  - osmnx >=2.0

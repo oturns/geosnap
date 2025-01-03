@@ -1,4 +1,5 @@
 """functions for choropleth mapping timeseries data."""
+
 import os
 import re
 import tempfile
@@ -16,11 +17,7 @@ for classifier in classifiers.CLASSIFIERS:
     schemes[classifier.lower()] = getattr(classifiers, classifier)
 
 
-__all__ = [
-    "animate_timeseries",
-    "gif_from_path",
-    "plot_timeseries",
-]
+__all__ = ["animate_timeseries", "gif_from_path", "plot_timeseries"]
 
 
 def gif_from_path(
@@ -378,7 +375,6 @@ def animate_timeseries(
             colors = temp[color_col] if color_col is not None else None
 
             if categorical:
-
                 temp.plot(
                     column,
                     categorical=True,
