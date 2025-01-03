@@ -5,7 +5,6 @@ import numpy as np
 import pandas as pd
 from mapclassify.util import get_color_array
 from matplotlib import colormaps
-from matplotlib.colors import LinearSegmentedColormap
 
 __all__ = ["GeosnapAccessor"]
 
@@ -41,7 +40,7 @@ class GeosnapAccessor:
         color=None,
         wireframe=False,
         tiles="CartoDB Darkmatter",
-        m=None
+        m=None,
     ):
         """explore a dataframe using lonboard and deckgl
 
@@ -118,7 +117,7 @@ class GeosnapAccessor:
             color,
             wireframe,
             tiles,
-            m
+            m,
         )
 
 
@@ -140,7 +139,7 @@ def _dexplore(
     color=None,
     wireframe=False,
     tiles="CartoDB Darkmatter",
-    m=None
+    m=None,
 ):
     """explore a dataframe using lonboard and deckgl
 
@@ -245,7 +244,7 @@ def _dexplore(
         if column not in gdf.columns:
             raise ValueError(f"the designated column {column} is not in the dataframe")
         if categorical:
-            color_array = _get_categorical_cmap(gdf[column], cmap, nan_color)
+            color_array = _get_categorical_cmap(gdf[column], cmap, nan_color, alpha)
         elif scheme is None:
             # minmax scale the column first, matplotlib needs 0-1
             transformed = (gdf[column] - np.nanmin(gdf[column])) / (
@@ -285,7 +284,7 @@ def _dexplore(
     return new_m
 
 
-def _get_categorical_cmap(categories, cmap, nan_color):
+def _get_categorical_cmap(categories, cmap, nan_color, alpha):
     try:
         from lonboard.colormap import apply_categorical_cmap
     except ImportError as e:
@@ -296,10 +295,8 @@ def _get_categorical_cmap(categories, cmap, nan_color):
     categories = categories.copy()
     unique_cats = categories.dropna().unique()
     n_cats = len(unique_cats)
-    if isinstance(colormaps[cmap], LinearSegmentedColormap):
-        colors = colormaps[cmap].resampled(n_cats)(list(range(n_cats)))
-    else:
-        colors = colormaps[cmap].resampled(n_cats).colors
+
+    colors = colormaps[cmap].resampled(n_cats)(list(range(n_cats)), alpha)
     colors = (np.array(colors) * 255).astype(int)
     colors = np.vstack([colors, nan_color])
 
