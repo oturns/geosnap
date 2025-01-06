@@ -236,10 +236,7 @@ def _dexplore(
             nan_color = np.append(nan_color, [255])
         else:
             raise ValueError("nan_color must be an iterable of 3 or 4 values")
-    if cmap not in colormaps:
-        raise ValueError(
-            f"`cmap` must be one of {list(colormaps.keys())} but {cmap} was passed"
-        )
+
     # only polygons have z
     if ["Polygon", "MultiPolygon"] in gdf.geometry.geom_type.unique():
         layer_kwargs["get_elevation"] = elevation
@@ -260,6 +257,10 @@ def _dexplore(
             raise ValueError(f"the designated column {column} is not in the dataframe")
         if gdf[column].dtype in ["O", "category"]:
             categorical = True
+        if cmap is not None and cmap not in colormaps:
+            raise ValueError(
+            f"`cmap` must be one of {list(colormaps.keys())} but {cmap} was passed"
+        )
         if cmap is None:
             cmap = "Set1" if categorical else "viridis"
         if categorical:
@@ -312,7 +313,6 @@ def _get_categorical_cmap(categories, cmap, nan_color, alpha):
         ) from e
 
     cat_codes = pd.Series(pd.Categorical(categories).codes, dtype="category")
-    BOTTOM = False if -1 in cat_codes else True
 
     # nans are encoded as -1 OR largest category depending on input type
     # re-encode to always be last category
@@ -323,10 +323,8 @@ def _get_categorical_cmap(categories, cmap, nan_color, alpha):
 
     colors = colormaps[cmap].resampled(n_cats)(list(range(n_cats)), alpha)
     colors = (np.array(colors) * 255).astype(int)
-    if BOTTOM:
-        colors = np.vstack([colors, nan_color])
-    else:
-        colors = np.vstack([nan_color, colors])
+    colors = np.vstack([colors, nan_color])
+
 
     n_colors = colors.shape[0]
 
