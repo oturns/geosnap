@@ -65,7 +65,7 @@ class GeosnapAccessor:
             in the same order as observations, by default None
         extruded : bool, optional
             whether to extrude geometries using the z-dimension, by default False
-        elevation_scale : int, optional
+        elevation_scale : float, optional
             constant scaler multiplied by elevation valuer, by default 1
         alpha : float, optional
             alpha (opacity) parameter in the range (0,1) passed to
@@ -321,14 +321,6 @@ def _get_categorical_cmap(categories, cmap, nan_color, alpha):
     colors = colormaps[cmap].resampled(n_cats)(list(range(n_cats)), alpha)
     colors = (np.array(colors) * 255).astype(int)
     colors = np.vstack([colors, nan_color])
-    n_colors = colors.shape[0]
-    if n_cats > n_colors:
-        warn(
-            "the number of unique categories exceeds the number of available colors",
-            stacklevel=3,
-        )
-        floor = (n_cats // n_colors) + 1
-        colors = np.vstack([colors] * floor)
     temp_cmap = dict(zip(range(n_cats + 1), colors))
     fill_color = apply_categorical_cmap(cat_codes, temp_cmap)
     return fill_color
