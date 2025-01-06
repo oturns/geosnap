@@ -262,7 +262,7 @@ def _dexplore(
             f"`cmap` must be one of {list(colormaps.keys())} but {cmap} was passed"
         )
         if cmap is None:
-            cmap = "Set1" if categorical else "viridis"
+            cmap = "tab20" if categorical else "viridis"
         if categorical:
             color_array = _get_categorical_cmap(gdf[column], cmap, nan_color, alpha)
         elif scheme is None:
@@ -313,21 +313,15 @@ def _get_categorical_cmap(categories, cmap, nan_color, alpha):
         ) from e
 
     cat_codes = pd.Series(pd.Categorical(categories).codes, dtype="category")
-
     # nans are encoded as -1 OR largest category depending on input type
     # re-encode to always be last category
     cat_codes = cat_codes.cat.rename_categories({-1: len(cat_codes.unique()) - 1})
-
     unique_cats = categories.dropna().unique()
     n_cats = len(unique_cats)
-
     colors = colormaps[cmap].resampled(n_cats)(list(range(n_cats)), alpha)
     colors = (np.array(colors) * 255).astype(int)
     colors = np.vstack([colors, nan_color])
-
-
     n_colors = colors.shape[0]
-
     if n_cats > n_colors:
         warn(
             "the number of unique categories exceeds the number of available colors",
@@ -335,7 +329,6 @@ def _get_categorical_cmap(categories, cmap, nan_color, alpha):
         )
         floor = (n_cats // n_colors) + 1
         colors = np.vstack([colors] * floor)
-
     temp_cmap = dict(zip(range(n_cats + 1), colors))
     fill_color = apply_categorical_cmap(cat_codes, temp_cmap)
     return fill_color
