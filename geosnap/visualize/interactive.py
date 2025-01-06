@@ -82,7 +82,8 @@ class GeosnapAccessor:
             None
         nan_color : list-like, optional
             color used to shade NaN observations formatted as an RGBA list, by
-            default [255, 255, 255, 255]
+            default [255, 255, 255, 255]. If no alpha channel is passed it is assumed to
+            be 255.
         color : str or array-like, optional
             single or array of colors passed to `lonboard.Layer` object (get_color if
             input dataframe is linestring, or get_fill_color otherwise. By default None
@@ -160,7 +161,7 @@ def _dexplore(
         whether the data should be treated as categorical or continuous, by default
         False
     elevation : str or array, optional
-        name of column on the dataframe used to extrude each geometry or  an array-like
+        name of column on the dataframe used to extrude each geometry or an array-like
         in the same order as observations, by default None
     extruded : bool, optional
         whether to extrude geometries using the z-dimension, by default False
@@ -179,7 +180,8 @@ def _dexplore(
         additional keyword arguments passed to `mapclassify.classify`, by default None
     nan_color : list-like, optional
         color used to shade NaN observations formatted as an RGBA list, by
-        default [255, 255, 255, 255]
+        default [255, 255, 255, 255]. If no alpha channel is passed it is assumed to be
+        255.
     color : str or array-like, optional
         _description_, by default None
     wireframe : bool, optional
@@ -223,7 +225,21 @@ def _dexplore(
             raise ValueError(
                 f"the designated height column {elevation} is not in the dataframe"
             )
+        if not pd.api.types.is_numeric_dtype(elevation):
+            raise ValueError("elevation must be a numeric data type")
 
+    if not pd.api.types.is_list_like(nan_color):
+        raise ValueError("nan_color must be an iterable of 3 or 4 values")
+
+    if len(nan_color) != 4:
+        if len(nan_color) == 3:
+            nan_color = np.append(nan_color, [255])
+        else:
+            raise ValueError("nan_color must be an iterable of 3 or 4 values")
+    if cmap not in colormaps:
+        raise ValueError(
+            f"`cmap` must be one of {list(colormaps.keys())} but {cmap} was passed"
+        )
     # only polygons have z
     if ["Polygon", "MultiPolygon"] in gdf.geometry.geom_type.unique():
         layer_kwargs["get_elevation"] = elevation
