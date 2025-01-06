@@ -195,7 +195,7 @@ def _dexplore(
 
     """
     try:
-        from lonboard import basemap, viz
+        from lonboard import Map, basemap, viz
         from lonboard.colormap import apply_continuous_cmap
     except ImportError as e:
         raise ImportError(
@@ -209,8 +209,7 @@ def _dexplore(
         "CartoDB Voyager": basemap.CartoBasemap.Voyager,
         "CartoDB Voyager No Label": basemap.CartoBasemap.VoyagerNoLabels,
     }
-    if cmap is None:
-        cmap = "Set1" if categorical else "viridis"
+
     if map_kwargs is None:
         map_kwargs = dict()
     if classify_kwargs is None:
@@ -243,6 +242,10 @@ def _dexplore(
     if column is not None:
         if column not in gdf.columns:
             raise ValueError(f"the designated column {column} is not in the dataframe")
+        if gdf[column].dtype in ["O", "category"]:
+            categorical = True
+        if cmap is None:
+            cmap = "Set1" if categorical else "viridis"
         if categorical:
             color_array = _get_categorical_cmap(gdf[column], cmap, nan_color, alpha)
         elif scheme is None:
@@ -292,20 +295,25 @@ def _get_categorical_cmap(categories, cmap, nan_color, alpha):
             "this function requres the lonboard package to be installed"
         ) from e
 
-    categories = categories.copy()
+    cat_codes = pd.Series(pd.Categorical(categories).codes, dtype="category")
+    BOTTOM = False if -1 in cat_codes else True
+
+    # nans are encoded as -1 OR largest category depending on input type
+    # re-encode to always be last category
+    cat_codes = cat_codes.cat.rename_categories({-1: len(cat_codes.unique()) - 1})
+
     unique_cats = categories.dropna().unique()
     n_cats = len(unique_cats)
 
     colors = colormaps[cmap].resampled(n_cats)(list(range(n_cats)), alpha)
     colors = (np.array(colors) * 255).astype(int)
-    colors = np.vstack([colors, nan_color])
+    if BOTTOM:
+        colors = np.vstack([colors, nan_color])
+    else:
+        colors = np.vstack([nan_color, colors])
 
-    cat_ints = list(range(1, n_cats + 1))
     n_colors = colors.shape[0]
-    nan_place = n_cats + 1
-    cat_to_int = dict(zip(unique_cats, cat_ints))
-    categories = categories.fillna(nan_place)
-    categories = categories.replace(cat_to_int).astype(int)
+
     if n_cats > n_colors:
         warn(
             "the number of unique categories exceeds the number of available colors",
@@ -313,7 +321,7 @@ def _get_categorical_cmap(categories, cmap, nan_color, alpha):
         )
         floor = (n_cats // n_colors) + 1
         colors = np.vstack([colors] * floor)
-    cat_ints.append(nan_place)
-    temp_cmap = dict(zip(cat_ints, colors))
-    fill_color = apply_categorical_cmap(categories, temp_cmap)
+
+    temp_cmap = dict(zip(range(n_cats + 1), colors))
+    fill_color = apply_categorical_cmap(cat_codes, temp_cmap)
     return fill_color
