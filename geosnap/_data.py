@@ -79,7 +79,7 @@ class DataStore:
             "codebook",
             "counties",
             "ejscreen",
-            "ejscreen_codebook,
+            "ejscreen_codebook",
             "lodes_codebook",
             "ltdb",
             "msa_definitions",
