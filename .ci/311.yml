@@ -26,6 +26,7 @@ dependencies:
   - pandana
   - pooch
   - osmnx
+  - pygraphviz
 
   # testing
   - jupyter
