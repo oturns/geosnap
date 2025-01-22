@@ -79,7 +79,7 @@ class DataStore:
             "codebook",
             "counties",
             "ejscreen",
-            "ejscreen_codebook"
+            "ejscreen_codebook",
             "lodes_codebook",
             "ltdb",
             "msa_definitions",
@@ -208,38 +208,47 @@ Reardon, S. F., Ho, A. D., Shear, B. R., Fahle, E. M., Kalogrides, D., Jang, H.,
 Subject to your compliance with the terms and conditions set forth in this Agreement, Stanford grants you a revocable, non-exclusive, non-transferable right to access and make use of the Data Sets.
 
         """
-        assert accept_eula, (
-            "You must accept the EULA by passing `accept_eula=True` \n" f"{eula}"
-        )
-        assert level in [
+        if not accept_eula:
+            raise ValueError(
+                f"You must accept the EULA by passing `accept_eula=True` \n{eula}"
+            )
+        if level not in [
             "school",
             "geodist",
-        ], "Supported options for the `level` argument are 'school' and 'geodist'"
-        assert pooling in [
+        ]:
+            raise ValueError(
+                "Supported options for the `level` argument are 'school' and 'geodist'"
+            )
+        if pooling not in [
             "pool",
             "long",
             "poolsub",
-        ], "`pool` argument must be either 'pool', 'long', or 'poolsub'"
-        assert (
-            standardize
-            in [
-                "gcs",
-                "cs",
-            ]
-        ), "`standardize` argument must be either 'cs' for cohort-standardized or 'gcs' for grade-cohort-standardized"
+        ]:
+            raise ValueError(
+                "`pool` argument must be either 'pool', 'long', or 'poolsub'"
+            )
+        if standardize not in [
+            "gcs",
+            "cs",
+        ]:
+            raise ValueError(
+                "`standardize` argument must be either 'cs' for cohort-standardized or 'gcs' for grade-cohort-standardized"
+            )
 
         if pooling == "poolsub":
             fn = f"seda_{level}_{pooling}_{standardize}_5.0"
         else:
             fn = f"seda_{level}_{pooling}_{standardize}_5.0"
+        if level == "geodist":
+            fn += "_updated_20240319"
         local_path = pathlib.Path(self.data_dir, "seda", f"{fn}.parquet")
         remote_path = f"https://stacks.stanford.edu/file/druid:cs829jn7849/{fn}.csv"
         msg = (
             "Streaming data from SEDA archive at <https://exhibits.stanford.edu/data/catalog/db586ns4974>.\n"
             "Use `geosnap.io.store_seda()` to store the data locally for better performance"
         )
-        if level == "school":
-            assert pooling == "pool", "The school level only supports pooled data"
+        if level == "school" and not pooling == "pool":
+            raise ValueError("The school level only supports pooled data")
         try:
             t = pd.read_parquet(local_path)
         except FileNotFoundError:
@@ -683,5 +692,3 @@ Subject to your compliance with the terms and conditions set forth in this Agree
                 os.path.dirname(os.path.abspath(__file__)), "io/nlcd_definitions.csv"
             )
         )
-
-
