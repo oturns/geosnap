@@ -1,0 +1,6 @@
+﻿geosnap.analyze.ModelResults.plot\_next\_best\_label
+====================================================
+
+.. currentmodule:: geosnap.analyze
+
+.. automethod:: ModelResults.plot_next_best_label

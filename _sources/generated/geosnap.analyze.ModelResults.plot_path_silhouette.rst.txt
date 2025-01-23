@@ -1,0 +1,6 @@
+﻿geosnap.analyze.ModelResults.plot\_path\_silhouette
+===================================================
+
+.. currentmodule:: geosnap.analyze
+
+.. automethod:: ModelResults.plot_path_silhouette

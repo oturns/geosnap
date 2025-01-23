@@ -1,0 +1,6 @@
+﻿geosnap.io.get\_gadm
+====================
+
+.. currentmodule:: geosnap.io
+
+.. autofunction:: get_gadm

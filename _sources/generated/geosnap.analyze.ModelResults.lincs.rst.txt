@@ -1,0 +1,6 @@
+﻿geosnap.analyze.ModelResults.lincs
+==================================
+
+.. currentmodule:: geosnap.analyze
+
+.. autoproperty:: ModelResults.lincs

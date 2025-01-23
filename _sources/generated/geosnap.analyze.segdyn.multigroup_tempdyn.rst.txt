@@ -1,0 +1,6 @@
+﻿geosnap.analyze.segdyn.multigroup\_tempdyn
+==========================================
+
+.. currentmodule:: geosnap.analyze.segdyn
+
+.. autofunction:: multigroup_tempdyn

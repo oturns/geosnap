@@ -1,0 +1,6 @@
+﻿geosnap.DataStore.show\_data\_dir
+=================================
+
+.. currentmodule:: geosnap
+
+.. automethod:: DataStore.show_data_dir

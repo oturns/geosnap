@@ -1,0 +1,6 @@
+﻿geosnap.visualize.gif\_from\_path
+=================================
+
+.. currentmodule:: geosnap.visualize
+
+.. autofunction:: gif_from_path

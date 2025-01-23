@@ -1,0 +1,6 @@
+﻿geosnap.io.get\_census
+======================
+
+.. currentmodule:: geosnap.io
+
+.. autofunction:: get_census

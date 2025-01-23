@@ -1,0 +1,6 @@
+﻿geosnap.analyze.find\_k
+=======================
+
+.. currentmodule:: geosnap.analyze
+
+.. autofunction:: find_k

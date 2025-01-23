@@ -1,0 +1,6 @@
+﻿geosnap.analyze.isochrones\_from\_gdf
+=====================================
+
+.. currentmodule:: geosnap.analyze
+
+.. autofunction:: isochrones_from_gdf

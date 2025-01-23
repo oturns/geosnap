@@ -1,0 +1,6 @@
+﻿geosnap.analyze.draw\_sequence\_from\_gdf
+=========================================
+
+.. currentmodule:: geosnap.analyze
+
+.. autofunction:: draw_sequence_from_gdf

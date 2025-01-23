@@ -1,0 +1,6 @@
+﻿geosnap.DataStore.msas
+======================
+
+.. currentmodule:: geosnap
+
+.. automethod:: DataStore.msas
