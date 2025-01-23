@@ -85,7 +85,7 @@ def get_network_from_gdf(
     impedance = "length"
     graph = ox.graph_from_polygon(gdf.union_all(), network_type=network_type)
     if add_travel_times:
-        graph = ox.add_edge_speeds(graph, default_speeds)
+        graph = ox.add_edge_speeds(graph, hwy_speeds=default_speeds)
         graph = ox.add_edge_travel_times(graph)
         impedance = "travel_time"
 
