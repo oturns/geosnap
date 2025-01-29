@@ -282,7 +282,7 @@ def store_acs(years="all", level="tract", data_dir="auto"):
             )
 
 
-def store_ltdb(sample, fullcount, data_dir="auto"):
+def store_ltdb(sample, fullcount, data_dir="auto", currency_year=2010):
     """
     Read & store data from Brown's Longitudinal Tract Database (LTDB).
 
@@ -350,7 +350,7 @@ def store_ltdb(sample, fullcount, data_dir="auto"):
         inflate_available = list(set(df.columns).intersection(set(inflate_cols)))
 
         if len(inflate_available):
-            df = adjust_inflation(df, inflate_available, year)
+            df = adjust_inflation(df, inflate_available, year, base_year=currency_year)
         return df
 
     # read in Brown's LTDB data, both the sample and fullcount files for each
@@ -359,42 +359,60 @@ def store_ltdb(sample, fullcount, data_dir="auto"):
 
     sample70 = _ltdb_reader(
         sample_zip,
-        "ltdb_std_all_sample/ltdb_std_1970_sample.csv",
+        "ltdb_std_all_sample/ltdb_std_all_sample/ltdb_std_1970_sample.csv",
         dropcols=["POP70SP1", "HU70SP", "OHU70SP"],
         year=1970,
     )
 
-    fullcount70 = _ltdb_reader(fullcount_zip, "LTDB_Std_1970_fullcount.csv", year=1970)
+    fullcount70 = _ltdb_reader(
+        fullcount_zip,
+        "ltdb_std_all_fullcount/ltdb_std_all_fullcount/LTDB_Std_1970_fullcount.csv",
+        year=1970,
+    )
 
     sample80 = _ltdb_reader(
         sample_zip,
-        "ltdb_std_all_sample/ltdb_std_1980_sample.csv",
+        "ltdb_std_all_sample/ltdb_std_all_sample/ltdb_std_1980_sample.csv",
         dropcols=["pop80sf3", "pop80sf4", "hu80sp", "ohu80sp"],
         year=1980,
     )
 
-    fullcount80 = _ltdb_reader(fullcount_zip, "LTDB_Std_1980_fullcount.csv", year=1980)
+    fullcount80 = _ltdb_reader(
+        fullcount_zip,
+        "ltdb_std_all_fullcount/ltdb_std_all_fullcount/LTDB_Std_1980_fullcount.csv",
+        year=1980,
+    )
 
     sample90 = _ltdb_reader(
         sample_zip,
-        "ltdb_std_all_sample/ltdb_std_1990_sample.csv",
+        "ltdb_std_all_sample/ltdb_std_all_sample/ltdb_std_1990_sample.csv",
         dropcols=["POP90SF3", "POP90SF4", "HU90SP", "OHU90SP"],
         year=1990,
     )
 
-    fullcount90 = _ltdb_reader(fullcount_zip, "LTDB_Std_1990_fullcount.csv", year=1990)
+    fullcount90 = _ltdb_reader(
+        fullcount_zip,
+        "ltdb_std_all_fullcount/ltdb_std_all_fullcount/LTDB_Std_1990_fullcount.csv",
+        year=1990,
+    )
 
     sample00 = _ltdb_reader(
         sample_zip,
-        "ltdb_std_all_sample/ltdb_std_2000_sample.csv",
+        "ltdb_std_all_sample/ltdb_std_all_sample/LTDB_Std_ 2000_ Sample.csv",
         dropcols=["POP00SF3", "HU00SP", "OHU00SP"],
         year=2000,
     )
 
-    fullcount00 = _ltdb_reader(fullcount_zip, "LTDB_Std_2000_fullcount.csv", year=2000)
+    fullcount00 = _ltdb_reader(
+        fullcount_zip,
+        "ltdb_std_all_fullcount/ltdb_std_all_fullcount/LTDB_Std_2000_fullcount.csv",
+        year=2000,
+    )
 
     sample10 = _ltdb_reader(
-        sample_zip, "ltdb_std_all_sample/ltdb_std_2010_sample.csv", year=2010
+        sample_zip,
+        "ltdb_std_all_sample/ltdb_std_all_sample/LTDB_std_200812_Sample.csv",
+        year=2010,
     )
     # join the sample and fullcount variables into a single df for the year
     ltdb_1970 = sample70.drop(columns=["year"]).join(
