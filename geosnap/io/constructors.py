@@ -135,6 +135,9 @@ def get_acs(
     ----------
     datastore : geosnap.DataStore
         an instantiated DataStore object
+    level : str
+        string denoting which geographic level of data to collect: `bg` for
+        census blockgroups or `tract` for census tracts
     state_fips : list or str, optional
         string or list of strings of two-digit fips codes defining states
         to include in the study area.
@@ -147,11 +150,6 @@ def get_acs(
     fips : list or str, optional
         string or list of strings of five-digit fips codes defining
         counties to include in the study area.
-    boundary : geopandas.GeoDataFrame, optional
-        geodataframe that defines the total extent of the study area.
-        This will be used to clip tracts lazily by selecting all
-        `GeoDataFrame.representative_point()`s that intersect the
-        boundary gdf
     years : list of ints, required
         list of years to include in the study data
         (the default is [1990, 2000, 2010]).
@@ -173,7 +171,11 @@ def get_acs(
         "per_capita_income",
         "median_household_income",
     ]
-
+    _levs = ["bg", "tract"]
+    if level not in _levs:
+        raise ValueError(
+            f"the `level` parameter must be one of {_levs}but {{level}} was passed"
+        )
     if years == "all":
         years = list(range(2012, 2022))
 
