@@ -64,7 +64,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
 
         """
     assert accept_eula, (
-        "You must accept the EULA by passing `accept_eula=True` \n" f"{eula}"
+        f"You must accept the EULA by passing `accept_eula=True` \n{eula}"
     )
     pth = pathlib.Path(_make_data_dir(data_dir), "seda")
     pathlib.Path(pth).mkdir(parents=True, exist_ok=True)
@@ -242,7 +242,7 @@ def store_nces(years="all", dataset="all", data_dir="auto"):
                 p = quilt3.Package.browse(f"nces/{d}", "s3://spatial-ucr")
                 for year in years:
                     p[f"{d}_{year}.parquet"].fetch(
-                        dest=pathlib.Path(pth, "nces" f"{d}_{year}.parquet")
+                        dest=pathlib.Path(pth, f"nces{d}_{year}.parquet")
                     )
 
 
@@ -282,21 +282,87 @@ def store_acs(years="all", level="tract", data_dir="auto"):
             )
 
 
-def store_ltdb(sample, fullcount, data_dir="auto"):
+def _ltdb_reader(path, year, dropcols=None, currency_year=None):
+    df = pd.read_csv(
+        path,
+        na_values=["", " ", 99999, -999],
+        converters={0: str, "placefp10": str},
+        low_memory=False,
+        encoding="latin1",
+    )
+
+    if dropcols:
+        df.drop(dropcols, axis=1, inplace=True)
+    df.columns = df.columns.str.lower()
+    names = df.columns.values.tolist()
+    names[0] = "geoid"
+    newlist = []
+
+    # ignoring the first 4 columns, remove year suffix from column names
+    for name in names[4:]:
+        newlist.append(name[:-2])
+    colnames = names[:4] + newlist
+    df.columns = colnames
+
+    # prepend a 0 when FIPS is too short
+    df["geoid"] = df["geoid"].str.rjust(11, "0")
+    df.set_index("geoid", inplace=True)
+
+    df["year"] = year
+
+    inflate_cols = [
+        "mhmval",
+        "mrent",
+        "incpc",
+        "hinc",
+        "hincw",
+        "hincb",
+        "hinch",
+        "hinca",
+    ]
+
+    inflate_available = list(set(df.columns).intersection(set(inflate_cols)))
+
+    if len(inflate_available):
+        df = adjust_inflation(df, inflate_available, year, base_year=currency_year)
+    return df
+
+
+def store_ltdb(
+    sample_zip=None,
+    fullcount_zip=None,
+    sample_paths=None,
+    fullcount_paths=None,
+    data_dir="auto",
+    currency_year=2010,
+):
     """
     Read & store data from Brown's Longitudinal Tract Database (LTDB).
 
     Parameters
     ----------
-    sample : str
+    sample_zip : str
         file path of the zip file containing the standard Sample CSV files
         downloaded from
         https://s4.ad.brown.edu/projects/diversity/Researcher/LTBDDload/Default.aspx
-
-    fullcount: str
+    fullcount_zip: str
         file path of the zip file containing the standard Fullcount CSV files
         downloaded from
         https://s4.ad.brown.edu/projects/diversity/Researcher/LTBDDload/Default.aspx
+    sample_paths: dict
+        dictionary of CSV files (e.g. if manually unzipping the archive from LTDB). The
+        dict should be formatted using `sample_{year}` as the key, with the value storing
+        the path to the given csv, as in {'sample_1970': 'path/to/sample_1970.csv',}
+    fullcount_paths: dict
+        dictionary of CSV files (e.g. if manually unzipping the archive from LTDB). The
+        dict should be formatted using `fullcount_{year}` as the key, with the value storing
+        the path to the given csv, as in {'fullcount_1970': 'path/to/fullcount_1970.csv',}
+    data_dir: str
+        directory to store the resulting parquet file. If 'auto' (default) the default
+        geosnap data directory will be used (via the `platformdirs` package)
+    currency_year : int
+        year used to express common dollar values. Default is 2010 meaning all currency
+        variables (e.g. median income) will be expressed in real 2010 values.
 
     Returns
     -------
@@ -305,97 +371,94 @@ def store_ltdb(sample, fullcount, data_dir="auto"):
     """
     codebook = pd.read_csv(Path(script_dir, "variables.csv"))
 
-    sample_zip = zipfile.ZipFile(sample)
-    fullcount_zip = zipfile.ZipFile(fullcount)
-
-    def _ltdb_reader(path, file, year, dropcols=None):
-        df = pd.read_csv(
-            path.open(file),
-            na_values=["", " ", 99999, -999],
-            converters={0: str, "placefp10": str},
-            low_memory=False,
-            encoding="latin1",
+    if sample_zip is None and sample_paths is None:
+        raise ValueError(
+            "No Sample Data Found. You must pass either a zip archive of "
+            "LTDB data or a dict of csv paths from the unpacked archive "
+            "using `sample_{year}` format for the dictionary keys"
         )
+    elif sample_paths is None:
+        sample_base = "ltdb_std_all_sample/ltdb_std_all_sample/"
+        sample_zip = zipfile.ZipFile(sample_zip)
+        sample_paths = {
+            "sample_1970": sample_zip.open(f"{sample_base}ltdb_std_1970_sample.csv"),
+            "sample_1980": sample_zip.open(f"{sample_base}ltdb_std_1980_sample.csv"),
+            "sample_1990": sample_zip.open(f"{sample_base}ltdb_std_1990_sample.csv"),
+            "sample_2000": sample_zip.open(f"{sample_base}LTDB_Std_ 2000_ Sample.csv"),
+            "sample_2010": sample_zip.open(f"{sample_base}LTDB_std_200812_Sample.csv"),
+        }
 
-        if dropcols:
-            df.drop(dropcols, axis=1, inplace=True)
-        df.columns = df.columns.str.lower()
-        names = df.columns.values.tolist()
-        names[0] = "geoid"
-        newlist = []
-
-        # ignoring the first 4 columns, remove year suffix from column names
-        for name in names[4:]:
-            newlist.append(name[:-2])
-        colnames = names[:4] + newlist
-        df.columns = colnames
-
-        # prepend a 0 when FIPS is too short
-        df["geoid"] = df["geoid"].str.rjust(11, "0")
-        df.set_index("geoid", inplace=True)
-
-        df["year"] = year
-
-        inflate_cols = [
-            "mhmval",
-            "mrent",
-            "incpc",
-            "hinc",
-            "hincw",
-            "hincb",
-            "hinch",
-            "hinca",
-        ]
-
-        inflate_available = list(set(df.columns).intersection(set(inflate_cols)))
-
-        if len(inflate_available):
-            df = adjust_inflation(df, inflate_available, year)
-        return df
+    if fullcount_zip is None and fullcount_paths is None:
+        raise ValueError(
+            "No Fullcount Data Found. You must pass either a zip archive of "
+            "LTDB data or a dict of csv paths from the unpacked archive "
+            "using `fullcount_{year}` format for the dictionary keys"
+        )
+    elif fullcount_paths is None:
+        fullcount_base = "ltdb_std_all_fullcount/ltdb_std_all_fullcount/"
+        fullcount_zip = zipfile.ZipFile(fullcount_zip)
+        fullcount_paths = {
+            "fullcount_1970": fullcount_zip.open(
+                f"{fullcount_base}LTDB_Std_1970_fullcount.csv"
+            ),
+            "fullcount_1980": fullcount_zip.open(
+                f"{fullcount_base}LTDB_Std_1980_fullcount.csv"
+            ),
+            "fullcount_1990": fullcount_zip.open(
+                f"{fullcount_base}LTDB_Std_1990_fullcount.csv"
+            ),
+            "fullcount_2000": fullcount_zip.open(
+                f"{fullcount_base}LTDB_Std_2000_fullcount.csv"
+            ),
+        }
 
     # read in Brown's LTDB data, both the sample and fullcount files for each
     # year population, housing units & occupied housing units appear in both
     # "sample" and "fullcount" files-- currently drop sample and keep fullcount
 
+    # read all samples
     sample70 = _ltdb_reader(
-        sample_zip,
-        "ltdb_std_all_sample/ltdb_std_1970_sample.csv",
+        sample_paths["sample_1970"],
         dropcols=["POP70SP1", "HU70SP", "OHU70SP"],
         year=1970,
+        currency_year=currency_year,
     )
-
-    fullcount70 = _ltdb_reader(fullcount_zip, "LTDB_Std_1970_fullcount.csv", year=1970)
-
     sample80 = _ltdb_reader(
-        sample_zip,
-        "ltdb_std_all_sample/ltdb_std_1980_sample.csv",
+        sample_paths["sample_1980"],
         dropcols=["pop80sf3", "pop80sf4", "hu80sp", "ohu80sp"],
         year=1980,
+        currency_year=currency_year,
     )
-
-    fullcount80 = _ltdb_reader(fullcount_zip, "LTDB_Std_1980_fullcount.csv", year=1980)
-
     sample90 = _ltdb_reader(
-        sample_zip,
-        "ltdb_std_all_sample/ltdb_std_1990_sample.csv",
+        sample_paths["sample_1990"],
         dropcols=["POP90SF3", "POP90SF4", "HU90SP", "OHU90SP"],
         year=1990,
+        currency_year=currency_year,
     )
-
-    fullcount90 = _ltdb_reader(fullcount_zip, "LTDB_Std_1990_fullcount.csv", year=1990)
-
     sample00 = _ltdb_reader(
-        sample_zip,
-        "ltdb_std_all_sample/ltdb_std_2000_sample.csv",
+        sample_paths["sample_2000"],
         dropcols=["POP00SF3", "HU00SP", "OHU00SP"],
         year=2000,
+        currency_year=currency_year,
     )
-
-    fullcount00 = _ltdb_reader(fullcount_zip, "LTDB_Std_2000_fullcount.csv", year=2000)
-
     sample10 = _ltdb_reader(
-        sample_zip, "ltdb_std_all_sample/ltdb_std_2010_sample.csv", year=2010
+        sample_paths["sample_2010"], year=2010, currency_year=currency_year
     )
+
+    # read all fullcount files
+    fullcount70 = _ltdb_reader(
+        fullcount_paths["fullcount_1970"], year=1970, currency_year=currency_year
+    )
+    fullcount80 = _ltdb_reader(
+        fullcount_paths["fullcount_1980"], year=1980, currency_year=currency_year
+    )
+    fullcount90 = _ltdb_reader(
+        fullcount_paths["fullcount_1990"], year=1990, currency_year=currency_year
+    )
+    fullcount00 = _ltdb_reader(
+        fullcount_paths["fullcount_2000"], year=2000, currency_year=currency_year
+    )
+
     # join the sample and fullcount variables into a single df for the year
     ltdb_1970 = sample70.drop(columns=["year"]).join(
         fullcount70.iloc[:, 7:], how="left"
@@ -489,11 +552,7 @@ def store_ncdb(filepath, data_dir="auto"):
 
     orig = []
     for col in cols:
-        if col.endswith("D"):
-            orig.append(col)
-        elif col.endswith("N"):
-            orig.append(col)
-        elif col.endswith("1A"):
+        if col.endswith("D") or col.endswith("N") or col.endswith("1A"):
             orig.append(col)
 
     renamer = dict(zip(orig, fixed))
@@ -521,8 +580,8 @@ def store_ncdb(filepath, data_dir="auto"):
     for row in codebook["formula"].dropna().tolist():
         try:
             df.eval(row, inplace=True)
-        except:
-            warn("Unable to compute " + str(row))
+        except Exception as e:
+            warn(f"Unable to compute {row} with {e}", stacklevel=2)
 
     keeps = df.columns[df.columns.isin(codebook["variable"].tolist() + ["year"])]
 
