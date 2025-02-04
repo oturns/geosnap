@@ -174,7 +174,7 @@ def get_acs(
     _levs = ["bg", "tract"]
     if level not in _levs:
         raise ValueError(
-            f"the `level` parameter must be one of {_levs}but {{level}} was passed"
+            f"the `level` parameter must be one of {_levs} but {level} was passed"
         )
     if years == "all":
         years = list(range(2012, 2022))
