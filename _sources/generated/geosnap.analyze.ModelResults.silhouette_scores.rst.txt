@@ -1,0 +1,6 @@
+﻿geosnap.analyze.ModelResults.silhouette\_scores
+===============================================
+
+.. currentmodule:: geosnap.analyze
+
+.. autoproperty:: ModelResults.silhouette_scores

@@ -1,0 +1,6 @@
+﻿geosnap.visualize.plot\_transition\_graphs
+==========================================
+
+.. currentmodule:: geosnap.visualize
+
+.. autofunction:: plot_transition_graphs

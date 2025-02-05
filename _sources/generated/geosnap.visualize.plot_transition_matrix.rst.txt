@@ -1,0 +1,6 @@
+﻿geosnap.visualize.plot\_transition\_matrix
+==========================================
+
+.. currentmodule:: geosnap.visualize
+
+.. autofunction:: plot_transition_matrix

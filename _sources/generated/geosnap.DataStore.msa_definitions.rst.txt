@@ -1,0 +1,6 @@
+﻿geosnap.DataStore.msa\_definitions
+==================================
+
+.. currentmodule:: geosnap
+
+.. automethod:: DataStore.msa_definitions

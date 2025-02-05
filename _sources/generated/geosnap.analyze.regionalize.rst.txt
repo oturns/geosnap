@@ -1,0 +1,6 @@
+﻿geosnap.analyze.regionalize
+===========================
+
+.. currentmodule:: geosnap.analyze
+
+.. autofunction:: regionalize

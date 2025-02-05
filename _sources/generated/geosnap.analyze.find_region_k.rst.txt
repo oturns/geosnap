@@ -1,0 +1,6 @@
+﻿geosnap.analyze.find\_region\_k
+===============================
+
+.. currentmodule:: geosnap.analyze
+
+.. autofunction:: find_region_k

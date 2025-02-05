@@ -1,0 +1,6 @@
+﻿geosnap.DataStore.nlcd\_definitions
+===================================
+
+.. currentmodule:: geosnap
+
+.. automethod:: DataStore.nlcd_definitions

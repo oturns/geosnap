@@ -1,0 +1,6 @@
+﻿geosnap.DataStore.seda
+======================
+
+.. currentmodule:: geosnap
+
+.. automethod:: DataStore.seda
