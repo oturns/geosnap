@@ -273,7 +273,7 @@ def store_acs(years="all", level="tract", data_dir="auto"):
         quilt3.Package.install("census/acs", "s3://spatial-ucr", dest=pth)
 
     else:
-        if isinstance("years", (str, int)):
+        if isinstance(years, (str, int)):
             years = [years]
         p = quilt3.Package.browse("census/acs", "s3://spatial-ucr")
         for year in years:
