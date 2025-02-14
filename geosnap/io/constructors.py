@@ -534,6 +534,9 @@ def get_lodes(
         which LODES dataset should be used to create the Community.
         Options are 'wac' for workplace area characteristics or 'rac' for
         residence area characteristics. The default is "wac" for workplace.
+    version : int
+        which version of LODES to query. Options include 5, 7 and 8, which
+        are keyed to census 2000, 2010, and 2020 blocks respectively
 
     Returns
     -------
