@@ -612,6 +612,8 @@ def get_lodes(
 
 
 def _msa_to_county(datastore, msa_fips):
+    if msa_fips is None:
+        return None
     msa_defs = datastore.msa_definitions()
     pr_metros = set(
         msa_defs[msa_defs["CBSA Title"].str.contains("PR")]["CBSA Code"].tolist()
