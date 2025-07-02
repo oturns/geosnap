@@ -575,7 +575,8 @@ def get_lodes(
         if boundary.crs != gdf.crs:
             warn(
                 "Unable to determine whether boundary CRS is WGS84 "
-                "if this produces unexpected results, try reprojecting"
+                "if this produces unexpected results, try reprojecting",
+                stacklevel=2,
             )
         gdf = gdf[gdf.representative_point().intersects(boundary.unary_union)]
 

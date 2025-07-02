@@ -106,9 +106,9 @@ def transition(
     """
     if not w_options:
         w_options = {}
-    assert (
-        unit_index in gdf.columns
-    ), f"The unit_index ({unit_index}) column is not in the geodataframe"
+    assert unit_index in gdf.columns, (
+        f"The unit_index ({unit_index}) column is not in the geodataframe"
+    )
     gdf_temp = gdf.copy().reset_index()
     df = gdf_temp[[unit_index, temporal_index, cluster_col]]
     df_wide = df.pivot(
@@ -208,9 +208,9 @@ def sequence(
            [5., 3., 2., 0., 0.]])
 
     """
-    assert (
-        unit_index in gdf.columns
-    ), f"The unit_index ({unit_index}) column is not in the geodataframe"
+    assert unit_index in gdf.columns, (
+        f"The unit_index ({unit_index}) column is not in the geodataframe"
+    )
     gdf_temp = gdf.copy().reset_index()
     df = gdf_temp[[unit_index, temporal_index, cluster_col]]
     df_wide = (
@@ -287,16 +287,16 @@ def predict_markov_labels(
     if not w_options:
         w_options = {}
 
-    assert (
-        cluster_col and cluster_col in gdf.columns
-    ), f"The input dataframe has no column named {cluster_col}"
+    assert cluster_col and cluster_col in gdf.columns, (
+        f"The input dataframe has no column named {cluster_col}"
+    )
 
-    assert (
-        base_year
-    ), "Missing `base_year`. You must provide an initial time point with labels to begin simulation"
-    assert (
-        base_year in gdf[temporal_index].unique().tolist()
-    ), "A set of observations with `temporal_index`==`base_year` must be included in the gdf"
+    assert base_year, (
+        "Missing `base_year`. You must provide an initial time point with labels to begin simulation"
+    )
+    assert base_year in gdf[temporal_index].unique().tolist(), (
+        "A set of observations with `temporal_index`==`base_year` must be included in the gdf"
+    )
 
     gdf = gdf.copy()
     gdf = gdf.dropna(subset=[cluster_col]).reset_index(drop=True)
@@ -310,7 +310,6 @@ def predict_markov_labels(
     )
 
     if time_steps == 1:
-
         gdf = gdf[gdf[temporal_index] == base_year].reset_index(drop=True)
         w = Ws[w_type].from_dataframe(gdf, **w_options)
         predicted = _draw_labels(w, gdf, cluster_col, t, unit_index, verbose)
@@ -319,9 +318,9 @@ def predict_markov_labels(
         return predicted
 
     else:
-        assert (
-            increment
-        ), "You must set the `increment` argument to simulate multiple time steps"
+        assert increment, (
+            "You must set the `increment` argument to simulate multiple time steps"
+        )
         predictions = []
         gdf = gdf[gdf[temporal_index] == base_year]
         gdf = gdf[[unit_index, cluster_col, temporal_index, gdf.geometry.name]]
@@ -368,8 +367,8 @@ def _draw_labels(w, gdf, cluster_col, markov, unit_index, verbose):
     gdf = gdf.copy()
     gdf = gdf.dropna(subset=[cluster_col])
     lags = lag_categorical(w, gdf[cluster_col].values)
-    clusters = gdf.reset_index()[cluster_col].astype(str).values
-    classes = markov.classes.astype(str)
+    clusters = gdf.reset_index()[cluster_col].values
+    classes = markov.classes
     cluster_idx = dict(zip(classes, list(range(len(classes)))))
 
     labels = {}
@@ -380,9 +379,7 @@ def _draw_labels(w, gdf, cluster_col, markov, unit_index, verbose):
         ]
         #  select the class row from the transition matrix using the unit's label
         probs = spatial_context[cluster_idx[clusters[i]]]
-        probs /= (
-            probs.sum()
-        )  # correct for tolerance, see https://stackoverflow.com/questions/25985120/numpy-1-9-0-valueerror-probabilities-do-not-sum-to-1
+        probs /= probs.sum()  # correct for tolerance, see https://stackoverflow.com/questions/25985120/numpy-1-9-0-valueerror-probabilities-do-not-sum-to-1
         probs = np.nan_to_num(probs.flatten())
         if sum(probs) == 0:
             # in case obs have a modal neighbor never before seen in the model
@@ -391,7 +388,8 @@ def _draw_labels(w, gdf, cluster_col, markov, unit_index, verbose):
             if verbose:
                 warn(
                     f"Falling back to aspatial transition rule for unit "
-                    f"{gdf[unit_index][i]}"
+                    f"{gdf[unit_index][i]}",
+                    stacklevel=2,
                 )
             probs = markov.p[cluster_idx[clusters[i]]].flatten()
 
@@ -413,6 +411,7 @@ def draw_sequence_from_gdf(
     time_steps=1,
     increment=None,
     seed=None,
+    aspatial=False,
 ):
     """Draw a set of class labels for each unit in a geodataframe using transition
     probabilities defined by a giddy.Spatial_Markov model and the spatial lag of each
@@ -463,7 +462,7 @@ def draw_sequence_from_gdf(
 
     dfs = list()
 
-    current_df = gdf[gdf[time_column] == start_time]
+    current_df = gdf[gdf[time_column] == start_time].reset_index()
 
     if seed is None:
         seed = int(time())
@@ -478,9 +477,9 @@ def draw_sequence_from_gdf(
         # `steps` and `dfs` are off by one so the ith in dfs is the previous time period
         current_df = dfs[i].copy()
         predicted_labels = _draw_labels_from_gdf(
-            current_df, w, label_column, smk, generators[i]
+            current_df, w, label_column, smk, generators[i], aspatial=aspatial
         )
-        predicted_df = gdf[gdf[time_column] == start_time]
+        predicted_df = gdf[gdf[time_column] == start_time].copy().reset_index()
         # overwrite labels with predictions for the new time period
         predicted_df[label_column] = predicted_labels
         predicted_df[time_column] = step
@@ -491,7 +490,7 @@ def draw_sequence_from_gdf(
     return simulated
 
 
-def _draw_labels_from_gdf(gdf, w, label_column, smk, seed):
+def _draw_labels_from_gdf(gdf, w, label_column, smk, seed, aspatial=False):
     """Draw set of new labels given a geodataframe and a spatial Markov transition model
 
     Parameters
@@ -515,16 +514,16 @@ def _draw_labels_from_gdf(gdf, w, label_column, smk, seed):
         an array of simulated class labels drawn from the conditional probabilities
         provided in the Spatial_Markov object
     """
-
-    labels = gdf[label_column].astype(str).values
+    classes = smk.classes
+    labels = gdf[label_column].values
     lags = lag_categorical(w, labels)
-    probs = _conditional_probs_from_smk(labels, lags, smk)
-    assert len(lags) == len(
-        probs
-    ), "Lag values and probability vectors are different lengths"
-    simulated_labels = _draw_labels_from_probs(
-        smk.classes.astype(str), probs=probs, seed=seed
+    probs = _conditional_probs_from_smk(
+        labels, lags, smk, fill_null_probs=True, aspatial=aspatial
     )
+    assert len(lags) == len(probs), (
+        "Lag values and probability vectors are different lengths"
+    )
+    simulated_labels = _draw_labels_from_probs(classes, probs=probs, seed=seed)
 
     return simulated_labels
 
@@ -549,21 +548,19 @@ def _draw_labels_from_probs(classes, probs, seed):
     list
         list of labels drawn from `classes` with size n_probs
     """
-    labels = list()
     rng = default_rng(seed=seed)
+    probs = pd.Series(probs)
     # for each set of probabilities in the array, draw a label
     # this could also be done in parallel. We could also take multiple draws per
     # unit by passing a `size` argument to rng.choice
-    for p in probs:
-        try:
-            label = rng.choice(classes, p=p)
-        except ValueError as e:
-            raise ValueError from e
-        labels.append(label)
-    return np.array(labels)
+    probs = probs.apply(lambda x: rng.choice(classes, p=x))
+
+    return probs.values
 
 
-def _conditional_probs_from_smk(labels, lags, smk, fill_null_probs=True):
+def _conditional_probs_from_smk(
+    labels, lags, smk, fill_null_probs=True, aspatial=False
+):
     """Given a set of existing labels and associated lags, return a vector of
     transition probabilities from a giddy.Spatial_Markov model
 
@@ -583,38 +580,47 @@ def _conditional_probs_from_smk(labels, lags, smk, fill_null_probs=True):
         a set of transition probabilities, and each element of the innerr
         list(s) is the probability of transitioning into class with index i
     """
-    classes = smk.classes.astype(str)
+    # classes = pd.Categorical(smk.classes)
+    class_idx = dict(zip(smk.classes, range(len(smk.classes))))
 
     # mapping back to the order each class is given in the smk object
-    class_idx = dict(zip(classes, list(range(len(classes)))))
+    # class_idx = dict(zip(classes, list(range(len(classes)))))
+
+    # print(class_idx)
 
     probs = list()
     # this piece could be parallelized as long as it gets concatenated back in order
-    for i in range(len(labels)):
+    for i, _ in enumerate(labels):
         current_label = labels[i]
         current_class_idx = class_idx[current_label]
+        # print(current_class_idx)
+
         aspatial_p = np.nan_to_num(smk.p[current_class_idx]).flatten()
         aspatial_p /= aspatial_p.sum()
-
+        # print(i,class_idx[lags[i]])
         lag_idx = class_idx[lags[i]]
         conditional_matrix = smk.P[lag_idx]
         p = conditional_matrix[current_class_idx].flatten()
         # correct for tolerance, see https://stackoverflow.com/questions/25985120/numpy-1-9-0-valueerror-probabilities-do-not-sum-to-1
-        p = np.nan_to_num(p)
-        if p.sum() == 0:
-            if fill_null_probs:
-                warn(
-                    f"No spatial transition rules for {current_label} with conrtext {lags[i]}"
-                    "falling back to aspatial transition rules"
-                )
-                probs.append(aspatial_p)
-            else:
-                raise ValueError(
-                    f"No spatial transition rules for {current_label} with conrtext {lags[i]}"
-                )
+        # p = np.nan_to_num(p)
+        if aspatial:
+            probs.append(aspatial_p)
         else:
-            p /= p.sum()
+            if p.sum() == 0:
+                if fill_null_probs:
+                    warn(
+                        f"No spatial transition rules for {current_label} with context {lags[i]} "
+                        "falling back to aspatial transition rules",
+                        stacklevel=2,
+                    )
+                    probs.append(aspatial_p)
+                else:
+                    raise ValueError(
+                        f"No spatial transition rules for {current_label} with context {lags[i]} "
+                    )
+            else:
+                # p /= p.sum()
 
-            probs.append(np.nan_to_num(p))
+                probs.append(np.nan_to_num(p))
 
     return probs

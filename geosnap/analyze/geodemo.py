@@ -178,7 +178,7 @@ def cluster(
             random_state=random_state,
             **cluster_kwargs,
         )
-        labels = model.labels_.astype(str)
+        labels = model.labels_
         data = data.reset_index()
         clusters = pd.DataFrame(
             {
@@ -226,7 +226,7 @@ def cluster(
                 **cluster_kwargs,
             )
 
-            labels = pd.Series(model.labels_, name=model_colname).astype(str)
+            labels = pd.Series(model.labels_, name=model_colname)
             clusters = pd.DataFrame(
                 {
                     model_colname: labels,
@@ -416,7 +416,7 @@ def regionalize(
             **region_kwargs,
         )
 
-        labels = pd.Series(model.labels_).astype(str)
+        labels = pd.Series(model.labels_)
         clusters = pd.DataFrame(
             {
                 model_colname: labels,
