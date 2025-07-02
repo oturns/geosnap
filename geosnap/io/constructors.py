@@ -271,7 +271,7 @@ def get_ltdb(
         ltdb = datastore.ltdb().reset_index()
         if not boundary.crs.equals(4326):
             boundary = boundary.copy().to_crs(4326)
-        tracts = tracts[tracts.representative_point().intersects(boundary.unary_union)]
+        tracts = tracts[tracts.representative_point().intersects(boundary.union_all())]
         gdf = ltdb[ltdb["geoid"].isin(tracts["geoid"])]
         gdf = gpd.GeoDataFrame(gdf.merge(tracts, on="geoid", how="left"), crs=4326)
         gdf = gdf[gdf["year"].isin(years)]
@@ -337,7 +337,7 @@ def get_ncdb(
         ncdb = datastore.ncdb().reset_index()
         if not boundary.crs.equals(4326):
             boundary = boundary.copy().to_crs(4326)
-        tracts = tracts[tracts.representative_point().intersects(boundary.unary_union)]
+        tracts = tracts[tracts.representative_point().intersects(boundary.union_all())]
         gdf = ncdb[ncdb["geoid"].isin(tracts["geoid"])]
         gdf = gpd.GeoDataFrame(gdf.merge(tracts, on="geoid", how="left"), crs=4326)
         gdf = gdf[gdf["year"].isin(years)]
@@ -462,7 +462,7 @@ def get_census(
     if isinstance(boundary, gpd.GeoDataFrame):
         if not boundary.crs.equals(4326):
             boundary = boundary.copy().to_crs(4326)
-        tracts = tracts[tracts.representative_point().intersects(boundary.unary_union)]
+        tracts = tracts[tracts.representative_point().intersects(boundary.union_all())]
         gdf = tracts.copy()
 
     else:
@@ -578,7 +578,7 @@ def get_lodes(
                 "if this produces unexpected results, try reprojecting",
                 stacklevel=2,
             )
-        gdf = gdf[gdf.representative_point().intersects(boundary.unary_union)]
+        gdf = gdf[gdf.representative_point().intersects(boundary.union_all())]
 
     # grab state abbreviations
     names = (
