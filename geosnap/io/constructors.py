@@ -1,3 +1,4 @@
+import contextlib
 from warnings import warn
 
 import geopandas as gpd
@@ -592,19 +593,17 @@ def get_lodes(
         for name in names:
             merged_year = []
             if name == "PR":
-                raise Exception("does not yet include built-in data for Puerto Rico")
+                raise ValueError("LODES does not yet include data for Puerto Rico")
             try:
                 df = get_lehd(dataset=dataset, year=year, state=name, version=version)
                 df = gdf.merge(df, right_index=True, left_on="geoid", how="left")
                 df["year"] = year
                 merged_year.append(df)
             except ValueError:
-                warn(f"{name.upper()} {year} not found!")
+                warn(f"{name.upper()} {year} not found!", stacklevel=2)
                 pass
-            try:
+            with contextlib.suppress(ValueError):
                 dfs.append(pd.concat(merged_year))
-            except ValueError:
-                pass  # we've already warned
     out = pd.concat(dfs, sort=True)
     out = out.groupby(["geoid", "year"]).first().reset_index()
     out.crs = 4326
@@ -613,16 +612,14 @@ def get_lodes(
 
 def _msa_to_county(datastore, msa_fips):
     if msa_fips is None:
-        return None
+        return 0  # dummy integer guaranteed to return no slice from `msa_defs`
     msa_defs = datastore.msa_definitions()
     pr_metros = set(
         msa_defs[msa_defs["CBSA Title"].str.contains("PR")]["CBSA Code"].tolist()
     )
     if msa_fips in pr_metros:
-        raise Exception(
-            "geosnap does not yet include built-in data for Puerto Rico"
-        )
-    msa_counties = msa_defs[msa_defs["CBSA Code"] ==int(msa_fips)]["stcofips"].tolist()
+        raise Exception("geosnap does not yet include built-in data for Puerto Rico")
+    msa_counties = msa_defs[msa_defs["CBSA Code"] == int(msa_fips)]["stcofips"].tolist()
 
     return msa_counties
 
