@@ -168,7 +168,7 @@ def convert_census_gdb(
                 .compute()
                 .set_index("GEOID")
             )
-            if not "ACS_" in i:  # only the geoms have the ACS prefix
+            if "ACS_" not in i:  # only the geoms have the ACS prefix
                 df = df[df.columns[df.columns.str.contains("e")]]
                 df.columns = pd.Series(df.columns).apply(reformat_acs_vars)
             df = df.dropna(axis=1, how="all")
@@ -219,16 +219,14 @@ def get_lehd(dataset="wac", state="dc", year=2015, version=8):
     renamer = dict(zip(lodes_vars["variable"].tolist(), lodes_vars["name"].tolist()))
 
     state = state.lower()
-    url = "https://lehd.ces.census.gov/data/lodes/LODES{version}/{state}/{dataset}/{state}_{dataset}_S000_JT00_{year}.csv.gz".format(
-        dataset=dataset, state=state, year=year, version=version
-    )
+    url = f"https://lehd.ces.census.gov/data/lodes/LODES{version}/{state}/{dataset}/{state}_{dataset}_S000_JT00_{year}.csv.gz"
     try:
         df = pd.read_csv(url, converters={"w_geocode": str, "h_geocode": str})
-    except HTTPError:
+    except HTTPError as e:
         raise ValueError(
             "Unable to retrieve LEHD data. Check your internet connection "
             "and that the state/year combination you specified is available"
-        )
+        ) from e
     df = df.rename({"w_geocode": "geoid", "h_geocode": "geoid"}, axis=1)
     df.rename(renamer, axis="columns", inplace=True)
     df = df.set_index("geoid")
@@ -283,8 +281,8 @@ def adjust_inflation(df, columns, given_year, base_year):
             assert (
                 base_year in inflation.YEAR.unique()
             ), f"Unable to find adjustment values for {base_year}"
-        except Exception:
-            raise ValueError(f"Unable to find adjustment values for {base_year}")
+        except Exception as e:
+            raise ValueError(f"Unable to find adjustment values for {base_year}") from e
 
     inflation.columns = inflation.columns.str.lower()
     inflation.columns = inflation.columns.str.strip(".")

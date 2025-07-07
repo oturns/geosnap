@@ -1,4 +1,5 @@
 """functions for choropleth mapping timeseries data."""
+
 import os
 import re
 import tempfile
@@ -378,7 +379,6 @@ def animate_timeseries(
             colors = temp[color_col] if color_col is not None else None
 
             if categorical:
-
                 temp.plot(
                     column,
                     categorical=True,

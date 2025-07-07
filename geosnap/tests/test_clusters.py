@@ -63,7 +63,7 @@ def test_ward_pooling_unique():
         pooling="unique",
         model_colname="ward_unique",
     )
-    labels = r.ward_unique.dropna().astype(str).values
+    labels = r.ward_unique.dropna().astype(int).astype(str).values
     assert_array_equal(
         labels,
         np.array(

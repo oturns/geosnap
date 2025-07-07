@@ -97,7 +97,7 @@ def test_isos_with_edges():
     walk_net = get_network_from_gdf(tracts)
     type(walk_net)
     facilities = ox.features.features_from_polygon(
-    tracts.unary_union, {"amenity": "fuel"}
+    tracts.union_all(), {"amenity": "fuel"}
 )
     #facilities = facilities[facilities.geometry.type == "Point"]
     alpha = isochrones_from_gdf(
