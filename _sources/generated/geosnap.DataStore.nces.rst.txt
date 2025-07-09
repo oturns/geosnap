@@ -1,0 +1,6 @@
+﻿geosnap.DataStore.nces
+======================
+
+.. currentmodule:: geosnap
+
+.. automethod:: DataStore.nces

@@ -1,0 +1,6 @@
+﻿geosnap.analyze.segdyn.spacetime\_dyn
+=====================================
+
+.. currentmodule:: geosnap.analyze.segdyn
+
+.. autofunction:: spacetime_dyn

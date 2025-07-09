@@ -1,0 +1,6 @@
+﻿geosnap.io.get\_network\_from\_gdf
+==================================
+
+.. currentmodule:: geosnap.io
+
+.. autofunction:: get_network_from_gdf

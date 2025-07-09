@@ -1,0 +1,6 @@
+﻿geosnap.DataStore.ejscreen\_codebook
+====================================
+
+.. currentmodule:: geosnap
+
+.. automethod:: DataStore.ejscreen_codebook

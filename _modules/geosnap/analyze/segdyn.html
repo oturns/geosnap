@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>geosnap.analyze.segdyn &#8212; geosnap v0.15.3 Manual</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css?v=9afac83c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+    <script src="../../../_static/documentation_options.js?v=d86fca55"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="../../../_static/geosnap.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+          geosnap</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.15.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../installation.html">Installation</a></li>
+                <li><a href="../../../api.html">API</a></li>
+                <li><a href="../../../data.html">Data</a></li>
+                <li><a href="https://oturns.github.io/geosnap-guide/">User Guide</a></li>
+                <li><a href="../../../references.html">References</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#installing-a-released-version">Installing a released version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#installing-development-version">Installing development version</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#io-module">IO Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#analyze-module">Analyze Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#harmonize-module">Harmonize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#visualize-module">Visualize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#util-module">Util Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data.html">Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../data.html#tabular-data">Tabular Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data.html#geo-data">Geo Data</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for geosnap.analyze.segdyn</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Tools for analyzing changes in segregation over time and space.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">joblib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Parallel</span><span class="p">,</span> <span class="n">delayed</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">segregation</span><span class="w"> </span><span class="kn">import</span> <span class="n">batch</span><span class="p">,</span> <span class="n">dynamics</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_prep_single</span><span class="p">(</span><span class="n">group</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Private function for parallel batch computation of single-group measures.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    group : tuple</span>
+<span class="sd">        arguments passed to batch_compute_singlegroup</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    geodataframe</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;time_index&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">batch</span><span class="o">.</span><span class="n">batch_compute_singlegroup</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">**</span><span class="n">args</span><span class="p">)</span>
+    <span class="n">gdf</span><span class="p">[</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;time_index&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">time</span>
+    <span class="k">return</span> <span class="n">gdf</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_prep_prof</span><span class="p">(</span><span class="n">group</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Private function for parallel computation of multiscalar profiles.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    group : tuple</span>
+<span class="sd">        arguments passed to multiscalar profile function</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    geodataframe</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;time_index&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;time_index&quot;</span><span class="p">)</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;n_jobs&quot;</span><span class="p">)</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;backend&quot;</span><span class="p">)</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">dynamics</span><span class="o">.</span><span class="n">compute_multiscalar_profile</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">**</span><span class="n">args</span><span class="p">)</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+    <span class="n">gdf</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">time</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">gdf</span>
+
+
+<div class="viewcode-block" id="singlegroup_tempdyn">
+<a class="viewcode-back" href="../../../generated/geosnap.analyze.segdyn.singlegroup_tempdyn.html#geosnap.analyze.segdyn.singlegroup_tempdyn">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">singlegroup_tempdyn</span><span class="p">(</span>
+    <span class="n">gdf</span><span class="p">,</span>
+    <span class="n">group_pop_var</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">total_pop_var</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">time_index</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span>
+    <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;loky&quot;</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">index_kwargs</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Batch compute singlegroup segregation indices for each time period in parallel.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    gdf : geopandas.GeoDataFrame</span>
+<span class="sd">        geodataframe formatted as a long-form timeseries</span>
+<span class="sd">    group_pop_var : str</span>
+<span class="sd">        name of column on gdf containing population counts for the group of interest</span>
+<span class="sd">    total_pop_var : str</span>
+<span class="sd">        name of column on gdf containing total population counts for the unit</span>
+<span class="sd">    time_index : str</span>
+<span class="sd">        column on the dataframe that denotes unique time periods, by default &quot;year&quot;</span>
+<span class="sd">    n_jobs : int, optional</span>
+<span class="sd">        number of cores to use for computation. If -1, all available cores will be</span>
+<span class="sd">        used, by default -1</span>
+<span class="sd">    backend : str, optional</span>
+<span class="sd">        computation backend passed to joblib. One of {&#39;multiprocessing&#39;, &#39;loky&#39;,</span>
+<span class="sd">        &#39;threading&#39;}, by default &quot;loky&quot;</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    geopandas.GeoDataFrame</span>
+<span class="sd">        dataframe with unique segregation indices as rows and estimates for each</span>
+<span class="sd">        time period as columns</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># essentially implement a parallelized grouby-apply</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">input_args</span> <span class="o">=</span> <span class="nb">locals</span><span class="p">()</span>
+    <span class="n">input_args</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;gdf&quot;</span><span class="p">)</span>
+    <span class="n">input_args</span><span class="p">[</span>
+        <span class="s2">&quot;backend&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;multiprocessing&quot;</span>  <span class="c1"># threading backend fails for modified gini and dissim</span>
+    <span class="c1"># Create a tuple of (df, arguments) for each unique time period to pass to the parallel function</span>
+    <span class="n">dataframes</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([[</span><span class="n">group</span><span class="p">,</span> <span class="n">input_args</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">gdf</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">time_index</span><span class="p">)])</span>
+    <span class="n">estimates</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">)(</span>
+        <span class="n">delayed</span><span class="p">(</span><span class="n">_prep_single</span><span class="p">)(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">dataframes</span>
+    <span class="p">)</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">estimates</span><span class="p">)</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">time_index</span><span class="p">)</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># don&#39;t want a multiindex</span>
+    <span class="k">return</span> <span class="n">gdf</span></div>
+
+
+
+<div class="viewcode-block" id="multigroup_tempdyn">
+<a class="viewcode-back" href="../../../generated/geosnap.analyze.segdyn.multigroup_tempdyn.html#geosnap.analyze.segdyn.multigroup_tempdyn">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">multigroup_tempdyn</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_index</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span> <span class="n">index_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Batch compute multigroup segregation indices for each time period.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    gdf : geopandas.GeoDataFrame</span>
+<span class="sd">        geodataframe formatted as a long-form timeseries</span>
+<span class="sd">    groups : list</span>
+<span class="sd">        list of columns on gdf containing population counts for each group of interest</span>
+<span class="sd">    time_index : str</span>
+<span class="sd">        column on the dataframe that denotes unique time periods, by default &quot;year&quot;</span>
+<span class="sd">    index_kwargs : dict</span>
+<span class="sd">        dictionary of additional keyword arguments passed to</span>
+<span class="sd">        segregation.batch.batch_compute_multigroup</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    geopandas.GeoDataFrame</span>
+<span class="sd">        dataframe with unique segregation indices as rows and estimates for each</span>
+<span class="sd">        time period as columns</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="c1"># could parallelize this, but the indices are fast enough it&#39;s not clearly worth it</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">index_kwargs</span><span class="p">:</span>
+        <span class="n">index_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">time_index</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">batch</span><span class="o">.</span><span class="n">batch_compute_multigroup</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="n">groups</span><span class="p">,</span> <span class="o">**</span><span class="n">index_kwargs</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">unstack</span><span class="p">()</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">gdf</span></div>
+
+
+
+<div class="viewcode-block" id="spacetime_dyn">
+<a class="viewcode-back" href="../../../generated/geosnap.analyze.segdyn.spacetime_dyn.html#geosnap.analyze.segdyn.spacetime_dyn">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">spacetime_dyn</span><span class="p">(</span>
+    <span class="n">gdf</span><span class="p">,</span>
+    <span class="n">segregation_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">group_pop_var</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">total_pop_var</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">groups</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">time_index</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span>
+    <span class="n">distances</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;loky&quot;</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Batch compute multiscalar segregation profiles for each time period in parallel.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    gdf : geopandas.GeoDataFrame</span>
+<span class="sd">        geodataframe formatted as a long-form timeseries</span>
+<span class="sd">    segregation_index : segregation.singlegroup or segregation.multigroup class</span>
+<span class="sd">        a segregation index class from the pysal `segregation` package</span>
+<span class="sd">    group_pop_var : str</span>
+<span class="sd">        name of column on gdf containing population counts for the group of interest</span>
+<span class="sd">    total_pop_var : str</span>
+<span class="sd">        name of column on gdf containing total population counts for the unit</span>
+<span class="sd">    groups : list</span>
+<span class="sd">        list of columns on gdf containing population counts for each group of interest</span>
+<span class="sd">        (for multigroup indices)</span>
+<span class="sd">    distances : list</span>
+<span class="sd">        list of distances used to define the radius of the egohood at each step of the profile</span>
+<span class="sd">    time_index : str</span>
+<span class="sd">        column on the dataframe that denotes unique time periods, by default &quot;year&quot;</span>
+<span class="sd">    n_jobs : int, optional</span>
+<span class="sd">        number of cores to use for computation. If -1, all available cores will be</span>
+<span class="sd">        used, by default -1</span>
+<span class="sd">    backend : str, optional</span>
+<span class="sd">        computation backend passed to joblib. One of {&#39;multiprocessing&#39;, &#39;loky&#39;,</span>
+<span class="sd">        &#39;threading&#39;}, by default &quot;loky&quot;</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    geopandas.GeoDataFrame</span>
+<span class="sd">        dataframe with unique time periods as rows and estimates for each</span>
+<span class="sd">        spatial extent as columns</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="c1"># essentially implement a parallelized grouby-apply</span>
+    <span class="k">assert</span> <span class="n">distances</span><span class="p">,</span> <span class="s2">&quot;You must supply a list of distances&quot;</span>
+    <span class="n">input_args</span> <span class="o">=</span> <span class="nb">locals</span><span class="p">()</span>
+    <span class="n">input_args</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;gdf&quot;</span><span class="p">)</span>
+    <span class="n">input_args</span><span class="p">[</span>
+        <span class="s2">&quot;backend&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;multiprocessing&quot;</span>  <span class="c1"># threading backend fails for modified gini and dissim</span>
+    <span class="c1"># Create a tuple of (df, arguments) for each unique time period to pass to the parallel function</span>
+    <span class="n">dataframes</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([[</span><span class="n">group</span><span class="p">,</span> <span class="n">input_args</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">gdf</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">time_index</span><span class="p">)])</span>
+    <span class="n">estimates</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">)(</span>
+        <span class="n">delayed</span><span class="p">(</span><span class="n">_prep_prof</span><span class="p">)(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">dataframes</span>
+    <span class="p">)</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">estimates</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">gdf</span></div>
+
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2023, geosnap developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.1.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

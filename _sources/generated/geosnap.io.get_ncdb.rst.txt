@@ -1,0 +1,6 @@
+﻿geosnap.io.get\_ncdb
+====================
+
+.. currentmodule:: geosnap.io
+
+.. autofunction:: get_ncdb

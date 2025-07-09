@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>geosnap.analyze.dynamics &#8212; geosnap v0.15.3 Manual</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css?v=9afac83c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+    <script src="../../../_static/documentation_options.js?v=d86fca55"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="../../../_static/geosnap.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+          geosnap</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.15.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../installation.html">Installation</a></li>
+                <li><a href="../../../api.html">API</a></li>
+                <li><a href="../../../data.html">Data</a></li>
+                <li><a href="https://oturns.github.io/geosnap-guide/">User Guide</a></li>
+                <li><a href="../../../references.html">References</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#installing-a-released-version">Installing a released version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#installing-development-version">Installing development version</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#io-module">IO Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#analyze-module">Analyze Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#harmonize-module">Harmonize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#visualize-module">Visualize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#util-module">Util Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data.html">Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../data.html#tabular-data">Tabular Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data.html#geo-data">Geo Data</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for geosnap.analyze.dynamics</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Transition and sequence analysis of neighborhood change.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">time</span><span class="w"> </span><span class="kn">import</span> <span class="n">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">giddy.markov</span><span class="w"> </span><span class="kn">import</span> <span class="n">Markov</span><span class="p">,</span> <span class="n">Spatial_Markov</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">giddy.sequence</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">libpysal.weights</span><span class="w"> </span><span class="kn">import</span> <span class="n">Voronoi</span><span class="p">,</span> <span class="n">lag_categorical</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">libpysal.weights.contiguity</span><span class="w"> </span><span class="kn">import</span> <span class="n">Queen</span><span class="p">,</span> <span class="n">Rook</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">libpysal.weights.distance</span><span class="w"> </span><span class="kn">import</span> <span class="n">KNN</span><span class="p">,</span> <span class="n">DistanceBand</span><span class="p">,</span> <span class="n">Kernel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.random</span><span class="w"> </span><span class="kn">import</span> <span class="n">PCG64</span><span class="p">,</span> <span class="n">SeedSequence</span><span class="p">,</span> <span class="n">default_rng</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.cluster</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgglomerativeClustering</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm.auto</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="n">Ws</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;queen&quot;</span><span class="p">:</span> <span class="n">Queen</span><span class="p">,</span>
+    <span class="s2">&quot;rook&quot;</span><span class="p">:</span> <span class="n">Rook</span><span class="p">,</span>
+    <span class="s2">&quot;voronoi&quot;</span><span class="p">:</span> <span class="n">Voronoi</span><span class="p">,</span>
+    <span class="s2">&quot;knn&quot;</span><span class="p">:</span> <span class="n">KNN</span><span class="p">,</span>
+    <span class="s2">&quot;kernel&quot;</span><span class="p">:</span> <span class="n">Kernel</span><span class="p">,</span>
+    <span class="s2">&quot;distanceband&quot;</span><span class="p">:</span> <span class="n">DistanceBand</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="transition">
+<a class="viewcode-back" href="../../../generated/geosnap.analyze.transition.html#geosnap.analyze.transition">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">transition</span><span class="p">(</span>
+    <span class="n">gdf</span><span class="p">,</span>
+    <span class="n">cluster_col</span><span class="p">,</span>
+    <span class="n">temporal_index</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span>
+    <span class="n">unit_index</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span>
+    <span class="n">w_type</span><span class="o">=</span><span class="s2">&quot;rook&quot;</span><span class="p">,</span>
+    <span class="n">w_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">permutations</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Model neighborhood change as a discrete spatial Markov process.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    gdf : geopandas.GeoDataFrame or pandas.DataFrame</span>
+<span class="sd">        Long-form geopandas.GeoDataFrame or pandas.DataFrame containing neighborhood</span>
+<span class="sd">        attributes with a column defining neighborhood clusters.</span>
+<span class="sd">    cluster_col : string or int</span>
+<span class="sd">        Column name for the neighborhood segmentation, such as</span>
+<span class="sd">        &quot;ward&quot;, &quot;kmeans&quot;, etc.</span>
+<span class="sd">    temporal_index : string, optional</span>
+<span class="sd">        Column defining time and or sequencing of the long-form data.</span>
+<span class="sd">        Default is &quot;year&quot;.</span>
+<span class="sd">    unit_index : string, optional</span>
+<span class="sd">        Column identifying the unique id of spatial units.</span>
+<span class="sd">        Default is &quot;geoid&quot;.</span>
+<span class="sd">    w_type : string, optional</span>
+<span class="sd">        Type of spatial weights type (&quot;rook&quot;, &quot;queen&quot;, &quot;knn&quot; or</span>
+<span class="sd">        &quot;kernel&quot;) to be used for spatial structure. Default is</span>
+<span class="sd">        None, if non-spatial Markov transition rates are desired.</span>
+<span class="sd">    w_options : dict</span>
+<span class="sd">        additional options passed to a libpysal weights constructor</span>
+<span class="sd">        (e.g. `k` for a KNN weights matrix)</span>
+<span class="sd">    permutations : int, optional</span>
+<span class="sd">        number of permutations for use in randomization based</span>
+<span class="sd">        inference (the default is 0).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    --------</span>
+<span class="sd">    mar : giddy.markov.Markov instance or giddy.markov.Spatial_Markov</span>
+<span class="sd">        if w_type=None, a classic Markov instance is returned.</span>
+<span class="sd">        if w_type is given, a Spatial_Markov instance is returned.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from geosnap import Community</span>
+<span class="sd">    &gt;&gt;&gt; columbus = Community.from_ltdb(msa_fips=&quot;18140&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; columbus1 = columbus.cluster(columns=[&#39;median_household_income&#39;,</span>
+<span class="sd">    ... &#39;p_poverty_rate&#39;, &#39;p_edu_college_greater&#39;, &#39;p_unemployment_rate&#39;],</span>
+<span class="sd">    ... method=&#39;ward&#39;, n_clusters=6)</span>
+<span class="sd">    &gt;&gt;&gt; gdf = columbus1.gdf</span>
+<span class="sd">    &gt;&gt;&gt; a = transition(gdf, &quot;ward&quot;, w_type=&quot;rook&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; a.p</span>
+<span class="sd">    array([[0.79189189, 0.00540541, 0.0027027 , 0.13243243, 0.06216216,</span>
+<span class="sd">        0.00540541],</span>
+<span class="sd">       [0.0203252 , 0.75609756, 0.10569106, 0.11382114, 0.        ,</span>
+<span class="sd">        0.00406504],</span>
+<span class="sd">       [0.00917431, 0.20183486, 0.75229358, 0.01834862, 0.        ,</span>
+<span class="sd">        0.01834862],</span>
+<span class="sd">       [0.1959799 , 0.18341709, 0.00251256, 0.61809045, 0.        ,</span>
+<span class="sd">        0.        ],</span>
+<span class="sd">       [0.32307692, 0.        , 0.        , 0.        , 0.66153846,</span>
+<span class="sd">        0.01538462],</span>
+<span class="sd">       [0.09375   , 0.0625    , 0.        , 0.        , 0.        ,</span>
+<span class="sd">        0.84375   ]])</span>
+<span class="sd">    &gt;&gt;&gt; a.P[0]</span>
+<span class="sd">    array([[0.82119205, 0.        , 0.        , 0.10927152, 0.06622517,</span>
+<span class="sd">        0.00331126],</span>
+<span class="sd">       [0.14285714, 0.57142857, 0.14285714, 0.14285714, 0.        ,</span>
+<span class="sd">        0.        ],</span>
+<span class="sd">       [0.5       , 0.        , 0.5       , 0.        , 0.        ,</span>
+<span class="sd">        0.        ],</span>
+<span class="sd">       [0.21428571, 0.14285714, 0.        , 0.64285714, 0.        ,</span>
+<span class="sd">        0.        ],</span>
+<span class="sd">       [0.18918919, 0.        , 0.        , 0.        , 0.78378378,</span>
+<span class="sd">        0.02702703],</span>
+<span class="sd">       [0.28571429, 0.        , 0.        , 0.        , 0.        ,</span>
+<span class="sd">        0.71428571]])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">w_options</span><span class="p">:</span>
+        <span class="n">w_options</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">assert</span> <span class="n">unit_index</span> <span class="ow">in</span> <span class="n">gdf</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;The unit_index (</span><span class="si">{</span><span class="n">unit_index</span><span class="si">}</span><span class="s2">) column is not in the geodataframe&quot;</span>
+    <span class="p">)</span>
+    <span class="n">gdf_temp</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">gdf_temp</span><span class="p">[[</span><span class="n">unit_index</span><span class="p">,</span> <span class="n">temporal_index</span><span class="p">,</span> <span class="n">cluster_col</span><span class="p">]]</span>
+    <span class="n">df_wide</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span>
+        <span class="n">index</span><span class="o">=</span><span class="n">unit_index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">temporal_index</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">cluster_col</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">df_wide</span><span class="o">.</span><span class="n">values</span>
+    <span class="k">if</span> <span class="n">w_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">mar</span> <span class="o">=</span> <span class="n">Markov</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>  <span class="c1"># class markov modeling</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">geoms</span> <span class="o">=</span> <span class="n">gdf_temp</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">unit_index</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()[</span><span class="n">gdf_temp</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="n">gdf_wide</span> <span class="o">=</span> <span class="n">df_wide</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">geoms</span><span class="p">,</span> <span class="n">left_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">Ws</span><span class="p">[</span><span class="n">w_type</span><span class="p">]</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">gdf_wide</span><span class="p">),</span> <span class="o">**</span><span class="n">w_options</span><span class="p">)</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s2">&quot;r&quot;</span>
+        <span class="n">mar</span> <span class="o">=</span> <span class="n">Spatial_Markov</span><span class="p">(</span>
+            <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">permutations</span><span class="o">=</span><span class="n">permutations</span><span class="p">,</span> <span class="n">discrete</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">variable_name</span><span class="o">=</span><span class="n">cluster_col</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">mar</span></div>
+
+
+
+<div class="viewcode-block" id="sequence">
+<a class="viewcode-back" href="../../../generated/geosnap.analyze.sequence.html#geosnap.analyze.sequence">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">sequence</span><span class="p">(</span>
+    <span class="n">gdf</span><span class="p">,</span>
+    <span class="n">cluster_col</span><span class="p">,</span>
+    <span class="n">seq_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">subs_mat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">dist_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">indel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">temporal_index</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span>
+    <span class="n">unit_index</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Pairwise sequence analysis and sequence clustering.</span>
+
+<span class="sd">    Dynamic programming if optimal matching.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    gdf             : geopandas.GeoDataFrame or pandas.DataFrame</span>
+<span class="sd">                      Long-form geopandas.GeoDataFrame or pandas.DataFrame containing neighborhood</span>
+<span class="sd">                      attributes with a column defining neighborhood clusters.</span>
+<span class="sd">    cluster_col     : string or int</span>
+<span class="sd">                      Column name for the neighborhood segmentation, such as</span>
+<span class="sd">                      &quot;ward&quot;, &quot;kmeans&quot;, etc.</span>
+<span class="sd">    seq_clusters    : int, optional</span>
+<span class="sd">                      Number of neighborhood sequence clusters. Agglomerative</span>
+<span class="sd">                      Clustering with Ward linkage is now used for clustering</span>
+<span class="sd">                      the sequences. Default is 5.</span>
+<span class="sd">    dist_type       : string</span>
+<span class="sd">                      &quot;hamming&quot;: hamming distance (substitution only</span>
+<span class="sd">                      and its cost is constant 1) from sklearn.metrics;</span>
+<span class="sd">                      &quot;markov&quot;: utilize empirical transition</span>
+<span class="sd">                      probabilities to define substitution costs;</span>
+<span class="sd">                      &quot;interval&quot;: differences between states are used</span>
+<span class="sd">                      to define substitution costs, and indel=k-1;</span>
+<span class="sd">                      &quot;arbitrary&quot;: arbitrary distance if there is not a</span>
+<span class="sd">                      strong theory guidance: substitution=0.5, indel=1.</span>
+<span class="sd">                      &quot;tran&quot;: transition-oriented optimal matching. Sequence of</span>
+<span class="sd">                      transitions. Based on :cite:`Biemann:2011`.</span>
+<span class="sd">    subs_mat        : array</span>
+<span class="sd">                      (k,k), substitution cost matrix. Should be hollow (</span>
+<span class="sd">                      0 cost between the same type), symmetric and non-negative.</span>
+<span class="sd">    indel           : float, optional</span>
+<span class="sd">                      insertion/deletion cost.</span>
+<span class="sd">    temporal_index        : string, optional</span>
+<span class="sd">                      Column defining time and or sequencing of the long-form data.</span>
+<span class="sd">                      Default is &quot;year&quot;.</span>
+<span class="sd">    unit_index          : string, optional</span>
+<span class="sd">                      Column identifying the unique id of spatial units.</span>
+<span class="sd">                      Default is &quot;geoid&quot;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    --------</span>
+<span class="sd">    gdf_temp        : geopandas.GeoDataFrame or pandas.DataFrame</span>
+<span class="sd">                      geopandas.GeoDataFrame or pandas.DataFrame with a new column for sequence</span>
+<span class="sd">                      labels.</span>
+<span class="sd">    df_wide         : pandas.DataFrame</span>
+<span class="sd">                      Wide-form DataFrame with k (k is the number of periods)</span>
+<span class="sd">                      columns of neighborhood types and 1 column of sequence</span>
+<span class="sd">                      labels.</span>
+<span class="sd">    seq_dis_mat     : array</span>
+<span class="sd">                      (n,n), distance/dissimilarity matrix for each pair of</span>
+<span class="sd">                      sequences</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from geosnap.data import Community</span>
+<span class="sd">    &gt;&gt;&gt; columbus = Community.from_ltdb(msa_fips=&quot;18140&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; columbus1 = columbus.cluster(columns=[&#39;median_household_income&#39;,</span>
+<span class="sd">    ... &#39;p_poverty_rate&#39;, &#39;p_edu_college_greater&#39;, &#39;p_unemployment_rate&#39;],</span>
+<span class="sd">    ... method=&#39;ward&#39;, n_clusters=6)</span>
+<span class="sd">    &gt;&gt;&gt; gdf = columbus1.gdf</span>
+<span class="sd">    &gt;&gt;&gt; gdf_new, df_wide, seq_hamming = Sequence(gdf, dist_type=&quot;hamming&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; seq_hamming.seq_dis_mat[:5, :5]</span>
+<span class="sd">    array([[0., 3., 4., 5., 5.],</span>
+<span class="sd">           [3., 0., 3., 3., 3.],</span>
+<span class="sd">           [4., 3., 0., 2., 2.],</span>
+<span class="sd">           [5., 3., 2., 0., 0.],</span>
+<span class="sd">           [5., 3., 2., 0., 0.]])</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">unit_index</span> <span class="ow">in</span> <span class="n">gdf</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;The unit_index (</span><span class="si">{</span><span class="n">unit_index</span><span class="si">}</span><span class="s2">) column is not in the geodataframe&quot;</span>
+    <span class="p">)</span>
+    <span class="n">gdf_temp</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">gdf_temp</span><span class="p">[[</span><span class="n">unit_index</span><span class="p">,</span> <span class="n">temporal_index</span><span class="p">,</span> <span class="n">cluster_col</span><span class="p">]]</span>
+    <span class="n">df_wide</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">unit_index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">temporal_index</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">cluster_col</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;int&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">df_wide</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">seq_dis_mat</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">(</span>
+        <span class="n">y</span><span class="p">,</span> <span class="n">subs_mat</span><span class="o">=</span><span class="n">subs_mat</span><span class="p">,</span> <span class="n">dist_type</span><span class="o">=</span><span class="n">dist_type</span><span class="p">,</span> <span class="n">indel</span><span class="o">=</span><span class="n">indel</span><span class="p">,</span> <span class="n">cluster_type</span><span class="o">=</span><span class="n">cluster_col</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">seq_dis_mat</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">AgglomerativeClustering</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="n">seq_clusters</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">seq_dis_mat</span><span class="p">)</span>
+    <span class="n">name_seq</span> <span class="o">=</span> <span class="n">dist_type</span> <span class="o">+</span> <span class="s2">&quot;_</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">seq_clusters</span><span class="p">)</span>
+    <span class="n">df_wide</span><span class="p">[</span><span class="n">name_seq</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">labels_</span>
+    <span class="n">gdf_temp</span> <span class="o">=</span> <span class="n">gdf_temp</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df_wide</span><span class="p">[[</span><span class="n">name_seq</span><span class="p">]],</span> <span class="n">left_on</span><span class="o">=</span><span class="n">unit_index</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">gdf_temp</span> <span class="o">=</span> <span class="n">gdf_temp</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">gdf_temp</span><span class="p">,</span> <span class="n">df_wide</span><span class="p">,</span> <span class="n">seq_dis_mat</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">predict_markov_labels</span><span class="p">(</span>
+    <span class="n">gdf</span><span class="p">,</span>
+    <span class="n">unit_index</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span>
+    <span class="n">temporal_index</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span>
+    <span class="n">cluster_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">w_type</span><span class="o">=</span><span class="s2">&quot;rook&quot;</span><span class="p">,</span>
+    <span class="n">w_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">base_year</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">new_colname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">time_steps</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">increment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Predict neighborhood labels based on spatial Markov transition model</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    gdf : geopandas.GeoDataFrame</span>
+<span class="sd">        a long-form geodataframe with a column of labels to be simulated with a spatial Markov model</span>
+<span class="sd">    unit_index : str,</span>
+<span class="sd">        column on dataframe that identifies unique geographic units, by default &quot;geoid&quot;</span>
+<span class="sd">    temporal_index : str</span>
+<span class="sd">        column on dataframe that identifies unique time periods, by default &quot;year&quot;</span>
+<span class="sd">    cluster_col : str</span>
+<span class="sd">        column on the dataframe that stores cluster or other labels to be simulated</span>
+<span class="sd">    w_type : str, optional</span>
+<span class="sd">        type of spatial weights matrix to include in the transition model, by default &quot;queen&quot;</span>
+<span class="sd">    w_options : dict, optional</span>
+<span class="sd">        additional keyword arguments passed to the libpysal weights constructor</span>
+<span class="sd">    base_year : int or str, optional</span>
+<span class="sd">        the year from which to begin simulation (i.e. the set of labels to define the first</span>
+<span class="sd">        period of the Markov sequence)</span>
+<span class="sd">    new_colname : str, optional</span>
+<span class="sd">        new column name to store predicted labels under. Defaults to &quot;predicted&quot;</span>
+<span class="sd">    time_steps : int, optional</span>
+<span class="sd">        the number of time-steps to simulate, by default 1</span>
+<span class="sd">    increment : str or int, optional</span>
+<span class="sd">        styled increment each time-step referrs to. For example, for a model fitted to decadal</span>
+<span class="sd">        Census data, each time-step refers to a period of ten years, so an increment of 10 ensures</span>
+<span class="sd">        that the temporal index aligns appropriately with the time steps being simulated</span>
+<span class="sd">    verbose: bool</span>
+<span class="sd">        if true, print warnings from the label sampling process</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    geopandas.GeoDataFrame</span>
+<span class="sd">        long-form geodataframe with predicted cluster labels stored in the `new_colname` column</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">crs</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">crs</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">new_colname</span><span class="p">:</span>
+        <span class="n">new_colname</span> <span class="o">=</span> <span class="s2">&quot;predicted&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">w_options</span><span class="p">:</span>
+        <span class="n">w_options</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">assert</span> <span class="n">cluster_col</span> <span class="ow">and</span> <span class="n">cluster_col</span> <span class="ow">in</span> <span class="n">gdf</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;The input dataframe has no column named </span><span class="si">{</span><span class="n">cluster_col</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">base_year</span><span class="p">,</span> <span class="p">(</span>
+        <span class="s2">&quot;Missing `base_year`. You must provide an initial time point with labels to begin simulation&quot;</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="n">base_year</span> <span class="ow">in</span> <span class="n">gdf</span><span class="p">[</span><span class="n">temporal_index</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="p">(</span>
+        <span class="s2">&quot;A set of observations with `temporal_index`==`base_year` must be included in the gdf&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="n">cluster_col</span><span class="p">])</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">transition</span><span class="p">(</span>
+        <span class="n">gdf</span><span class="p">,</span>
+        <span class="n">cluster_col</span><span class="p">,</span>
+        <span class="n">w_type</span><span class="o">=</span><span class="n">w_type</span><span class="p">,</span>
+        <span class="n">unit_index</span><span class="o">=</span><span class="n">unit_index</span><span class="p">,</span>
+        <span class="n">temporal_index</span><span class="o">=</span><span class="n">temporal_index</span><span class="p">,</span>
+        <span class="n">w_options</span><span class="o">=</span><span class="n">w_options</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">time_steps</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="p">[</span><span class="n">gdf</span><span class="p">[</span><span class="n">temporal_index</span><span class="p">]</span> <span class="o">==</span> <span class="n">base_year</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">Ws</span><span class="p">[</span><span class="n">w_type</span><span class="p">]</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="o">**</span><span class="n">w_options</span><span class="p">)</span>
+        <span class="n">predicted</span> <span class="o">=</span> <span class="n">_draw_labels</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">gdf</span><span class="p">,</span> <span class="n">cluster_col</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">unit_index</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">new_colname</span><span class="p">:</span>
+            <span class="n">predicted</span> <span class="o">=</span> <span class="n">predicted</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="n">cluster_col</span><span class="p">:</span> <span class="n">new_colname</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">predicted</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">increment</span><span class="p">,</span> <span class="p">(</span>
+            <span class="s2">&quot;You must set the `increment` argument to simulate multiple time steps&quot;</span>
+        <span class="p">)</span>
+        <span class="n">predictions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="p">[</span><span class="n">gdf</span><span class="p">[</span><span class="n">temporal_index</span><span class="p">]</span> <span class="o">==</span> <span class="n">base_year</span><span class="p">]</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="p">[[</span><span class="n">unit_index</span><span class="p">,</span> <span class="n">cluster_col</span><span class="p">,</span> <span class="n">temporal_index</span><span class="p">,</span> <span class="n">gdf</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">name</span><span class="p">]]</span>
+        <span class="n">current_time</span> <span class="o">=</span> <span class="n">base_year</span> <span class="o">+</span> <span class="n">increment</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="n">cluster_col</span><span class="p">])</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">Ws</span><span class="p">[</span><span class="n">w_type</span><span class="p">]</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="o">**</span><span class="n">w_options</span><span class="p">)</span>
+        <span class="n">predictions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">time_steps</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="c1"># use the last known set of labels  to get the spatial context for each geog unit</span>
+            <span class="n">gdf</span> <span class="o">=</span> <span class="n">predictions</span><span class="p">[</span><span class="n">step</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+            <span class="n">predicted</span> <span class="o">=</span> <span class="n">_draw_labels</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">gdf</span><span class="p">,</span> <span class="n">cluster_col</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">unit_index</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+            <span class="n">predicted</span><span class="p">[</span><span class="n">temporal_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_time</span>
+            <span class="n">predictions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">predicted</span><span class="p">)</span>
+            <span class="n">current_time</span> <span class="o">+=</span> <span class="n">increment</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">predictions</span><span class="p">),</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">new_colname</span><span class="p">:</span>
+            <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="n">cluster_col</span><span class="p">:</span> <span class="n">new_colname</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">gdf</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_draw_labels</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">gdf</span><span class="p">,</span> <span class="n">cluster_col</span><span class="p">,</span> <span class="n">markov</span><span class="p">,</span> <span class="n">unit_index</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Draw a random class label from the spatially-conditioned transition rates.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    w : libpysal.weights.W</span>
+<span class="sd">        spatial weights object</span>
+<span class="sd">    gdf : geopandas.GeoDataFrame</span>
+<span class="sd">        geodataframe of observations with class/cluster labels as a column</span>
+<span class="sd">    cluster_col : string</span>
+<span class="sd">        the column on the dataframe that holds class labels</span>
+<span class="sd">    markov : giddy.Spatial_Markov</span>
+<span class="sd">        an instance of a Spatial_Markov class</span>
+<span class="sd">    unit_index : string</span>
+<span class="sd">        the column on the dataframe that identifies unique spatial units</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    geopandas.GeoDataFrame</span>
+<span class="sd">        long-form geodataframe with predicted cluster labels stored in the `new_colname` column</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="n">cluster_col</span><span class="p">])</span>
+    <span class="n">lags</span> <span class="o">=</span> <span class="n">lag_categorical</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">gdf</span><span class="p">[</span><span class="n">cluster_col</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">clusters</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span><span class="n">cluster_col</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">classes</span> <span class="o">=</span> <span class="n">markov</span><span class="o">.</span><span class="n">classes</span>
+    <span class="n">cluster_idx</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">classes</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">classes</span><span class="p">)))))</span>
+
+    <span class="n">labels</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">lag</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lags</span><span class="p">):</span>
+        <span class="c1">#  select the transition matrix using the label of unit&#39;s spatial lag</span>
+        <span class="n">spatial_context</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">markov</span><span class="o">.</span><span class="n">P</span><span class="p">,</span> <span class="n">posinf</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">neginf</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)[</span>
+            <span class="n">cluster_idx</span><span class="p">[</span><span class="n">lag</span><span class="p">]</span>
+        <span class="p">]</span>
+        <span class="c1">#  select the class row from the transition matrix using the unit&#39;s label</span>
+        <span class="n">probs</span> <span class="o">=</span> <span class="n">spatial_context</span><span class="p">[</span><span class="n">cluster_idx</span><span class="p">[</span><span class="n">clusters</span><span class="p">[</span><span class="n">i</span><span class="p">]]]</span>
+        <span class="n">probs</span> <span class="o">/=</span> <span class="n">probs</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>  <span class="c1"># correct for tolerance, see https://stackoverflow.com/questions/25985120/numpy-1-9-0-valueerror-probabilities-do-not-sum-to-1</span>
+        <span class="n">probs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">probs</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+        <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">probs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># in case obs have a modal neighbor never before seen in the model</span>
+            <span class="c1"># (so all transition probs are 0)</span>
+            <span class="c1"># fall back to the aspatial transition matrix</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="n">warn</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Falling back to aspatial transition rule for unit &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">gdf</span><span class="p">[</span><span class="n">unit_index</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="n">probs</span> <span class="o">=</span> <span class="n">markov</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">cluster_idx</span><span class="p">[</span><span class="n">clusters</span><span class="p">[</span><span class="n">i</span><span class="p">]]]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+        <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">classes</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">probs</span><span class="p">)</span>
+
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">cluster_col</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">gdf</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">gdf</span><span class="p">[[</span><span class="n">unit_index</span><span class="p">,</span> <span class="n">gdf</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">name</span><span class="p">]]</span>
+    <span class="n">predicted</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">labels</span><span class="p">,</span> <span class="n">out</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">predicted</span>
+
+
+<div class="viewcode-block" id="draw_sequence_from_gdf">
+<a class="viewcode-back" href="../../../generated/geosnap.analyze.draw_sequence_from_gdf.html#geosnap.analyze.draw_sequence_from_gdf">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">draw_sequence_from_gdf</span><span class="p">(</span>
+    <span class="n">gdf</span><span class="p">,</span>
+    <span class="n">w</span><span class="p">,</span>
+    <span class="n">label_column</span><span class="p">,</span>
+    <span class="n">smk</span><span class="p">,</span>
+    <span class="n">time_column</span><span class="p">,</span>
+    <span class="n">start_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">time_steps</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">increment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">aspatial</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Draw a set of class labels for each unit in a geodataframe using transition</span>
+<span class="sd">    probabilities defined by a giddy.Spatial_Markov model and the spatial lag of each</span>
+<span class="sd">    unit.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    gdf : geopandas.GeoDataFrame</span>
+<span class="sd">        geodataframe of observations with class/cluster labels as a column</span>
+<span class="sd">    w : libpysal.weights.W</span>
+<span class="sd">        spatial weights object that defines the neigbhbor graph for each unit.</span>
+<span class="sd">    label_column : str</span>
+<span class="sd">        the column on the dataframe that holds class labels</span>
+<span class="sd">    smk : giddy.Spatial_Markov</span>
+<span class="sd">        an instance of a Spatial_Markov class created from the giddy package</span>
+<span class="sd">        or `geosnap.analyze.transition`</span>
+<span class="sd">    time_column : str</span>
+<span class="sd">        column on dataframe that identifies unique time periods, by default &quot;year&quot;</span>
+<span class="sd">    start_time : str, int, or float, optional</span>
+<span class="sd">        Time period to begin drawing a sequence of labels (must be present in</span>
+<span class="sd">        `gdf[label_col]`). If None, use the most recent time period given by</span>
+<span class="sd">        max(gdf[label_column].unique()). By default None</span>
+<span class="sd">    time_steps : int, optional</span>
+<span class="sd">        the number of time-steps to simulate (i.e. the number of labels to draw in a</span>
+<span class="sd">        sequence for each unit), by default 1</span>
+<span class="sd">    increment : itn, required</span>
+<span class="sd">        styled increment each time-step referrs to. For example, for a model fitted to</span>
+<span class="sd">        decadal Census data, each time-step refers to a period of ten years, so an</span>
+<span class="sd">        increment of 10 ensures that the temporal index aligns appropriately with the</span>
+<span class="sd">        time steps being simulated</span>
+<span class="sd">    seed: int</span>
+<span class="sd">        seed for  reproducible pseudo-random results. Used to create a SeedSequence and</span>
+<span class="sd">        spawn a set of Generators using PCG64. If None, uses the current time</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    geopandas.GeoDataFrame</span>
+<span class="sd">        long-form geodataframe with the same index as the geodataframe in the</span>
+<span class="sd">        time period equal the start time (i.e. `gdf[gdf[time_column]==start_time]`).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">increment</span>
+
+    <span class="n">steps</span> <span class="o">=</span> <span class="p">[</span><span class="n">start_time</span> <span class="o">+</span> <span class="p">(</span><span class="n">increment</span> <span class="o">*</span> <span class="n">step</span><span class="p">)</span> <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">time_steps</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+    <span class="n">steps</span> <span class="o">=</span> <span class="n">steps</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="p">[[</span><span class="n">label_column</span><span class="p">,</span> <span class="n">time_column</span><span class="p">,</span> <span class="n">gdf</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">name</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="n">dfs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+    <span class="n">current_df</span> <span class="o">=</span> <span class="n">gdf</span><span class="p">[</span><span class="n">gdf</span><span class="p">[</span><span class="n">time_column</span><span class="p">]</span> <span class="o">==</span> <span class="n">start_time</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">seed</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="p">())</span>
+
+    <span class="n">base_seq</span> <span class="o">=</span> <span class="n">SeedSequence</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">child_seqs</span> <span class="o">=</span> <span class="n">base_seq</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span><span class="n">time_steps</span><span class="p">)</span>
+    <span class="n">generators</span> <span class="o">=</span> <span class="p">[</span><span class="n">PCG64</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span> <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">child_seqs</span><span class="p">]</span>
+
+    <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_df</span><span class="p">)</span>
+    <span class="c1"># must run in sequence because we need the prior time&#39;s spatial lag</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tqdm</span><span class="p">(</span><span class="n">steps</span><span class="p">)):</span>
+        <span class="c1"># `steps` and `dfs` are off by one so the ith in dfs is the previous time period</span>
+        <span class="n">current_df</span> <span class="o">=</span> <span class="n">dfs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">predicted_labels</span> <span class="o">=</span> <span class="n">_draw_labels_from_gdf</span><span class="p">(</span>
+            <span class="n">current_df</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">label_column</span><span class="p">,</span> <span class="n">smk</span><span class="p">,</span> <span class="n">generators</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">aspatial</span><span class="o">=</span><span class="n">aspatial</span>
+        <span class="p">)</span>
+        <span class="n">predicted_df</span> <span class="o">=</span> <span class="n">gdf</span><span class="p">[</span><span class="n">gdf</span><span class="p">[</span><span class="n">time_column</span><span class="p">]</span> <span class="o">==</span> <span class="n">start_time</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="c1"># overwrite labels with predictions for the new time period</span>
+        <span class="n">predicted_df</span><span class="p">[</span><span class="n">label_column</span><span class="p">]</span> <span class="o">=</span> <span class="n">predicted_labels</span>
+        <span class="n">predicted_df</span><span class="p">[</span><span class="n">time_column</span><span class="p">]</span> <span class="o">=</span> <span class="n">step</span>
+
+        <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">predicted_df</span><span class="p">)</span>
+    <span class="n">simulated</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">simulated</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_draw_labels_from_gdf</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">label_column</span><span class="p">,</span> <span class="n">smk</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">aspatial</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Draw set of new labels given a geodataframe and a spatial Markov transition model</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    gdf : geopandas.GeoDataFrame</span>
+<span class="sd">        a geodataframe defining the study region, including a column holding class labels</span>
+<span class="sd">    w : libpysal.Weights</span>
+<span class="sd">        a spatial weights matrix relating units to one another. This should be the same</span>
+<span class="sd">        W object that was used to fit the Spatial_Markov instance</span>
+<span class="sd">    label_column : str</span>
+<span class="sd">        the column in gdf holding class labels</span>
+<span class="sd">    smk : giddy.Spatial_Markov</span>
+<span class="sd">        a spatial Markov transition model created by the pysal giddy package</span>
+<span class="sd">        or geosnap.analyze.transition</span>
+<span class="sd">    seed: int or nmnumpy.random.Generator instance</span>
+<span class="sd">        seed passed to np.random.default_rng for reproducible pseudo-random results</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    numpy.array</span>
+<span class="sd">        an array of simulated class labels drawn from the conditional probabilities</span>
+<span class="sd">        provided in the Spatial_Markov object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">classes</span> <span class="o">=</span> <span class="n">smk</span><span class="o">.</span><span class="n">classes</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">gdf</span><span class="p">[</span><span class="n">label_column</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">lags</span> <span class="o">=</span> <span class="n">lag_categorical</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+    <span class="n">probs</span> <span class="o">=</span> <span class="n">_conditional_probs_from_smk</span><span class="p">(</span>
+        <span class="n">labels</span><span class="p">,</span> <span class="n">lags</span><span class="p">,</span> <span class="n">smk</span><span class="p">,</span> <span class="n">fill_null_probs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">aspatial</span><span class="o">=</span><span class="n">aspatial</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">lags</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">probs</span><span class="p">),</span> <span class="p">(</span>
+        <span class="s2">&quot;Lag values and probability vectors are different lengths&quot;</span>
+    <span class="p">)</span>
+    <span class="n">simulated_labels</span> <span class="o">=</span> <span class="n">_draw_labels_from_probs</span><span class="p">(</span><span class="n">classes</span><span class="p">,</span> <span class="n">probs</span><span class="o">=</span><span class="n">probs</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">simulated_labels</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_draw_labels_from_probs</span><span class="p">(</span><span class="n">classes</span><span class="p">,</span> <span class="n">probs</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Draw from a fized set of classes using a vector of probabilities</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    classes : list-like</span>
+<span class="sd">        set of class labels</span>
+<span class="sd">    probs : list-like</span>
+<span class="sd">        list of probabilities</span>
+<span class="sd">    seed: int or numpy.random.Generator instance</span>
+<span class="sd">        seed passed to np.random.default_rng for reproducible pseudo-random results</span>
+<span class="sd">    verbose : bool, optional</span>
+<span class="sd">        if true, print a warning when a label cannot be drawn from the</span>
+<span class="sd">        probability vector, by default True</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        list of labels drawn from `classes` with size n_probs</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">probs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">probs</span><span class="p">)</span>
+    <span class="c1"># for each set of probabilities in the array, draw a label</span>
+    <span class="c1"># this could also be done in parallel. We could also take multiple draws per</span>
+    <span class="c1"># unit by passing a `size` argument to rng.choice</span>
+    <span class="n">probs</span> <span class="o">=</span> <span class="n">probs</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">classes</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">x</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">probs</span><span class="o">.</span><span class="n">values</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_conditional_probs_from_smk</span><span class="p">(</span>
+    <span class="n">labels</span><span class="p">,</span> <span class="n">lags</span><span class="p">,</span> <span class="n">smk</span><span class="p">,</span> <span class="n">fill_null_probs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">aspatial</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Given a set of existing labels and associated lags, return a vector of</span>
+<span class="sd">    transition probabilities from a giddy.Spatial_Markov model</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    labels : list</span>
+<span class="sd">        array of categorical labels that define a class for each unit</span>
+<span class="sd">    lags : list</span>
+<span class="sd">        array of categorical labels that define the context for each unit</span>
+<span class="sd">    smk : giddy.Spatial_Markov</span>
+<span class="sd">        a spatial Markov transition model from giddy or geosnap.analyze.transition</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        list of lists, where each element of the outer list is</span>
+<span class="sd">        a set of transition probabilities, and each element of the innerr</span>
+<span class="sd">        list(s) is the probability of transitioning into class with index i</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># classes = pd.Categorical(smk.classes)</span>
+    <span class="n">class_idx</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">smk</span><span class="o">.</span><span class="n">classes</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">smk</span><span class="o">.</span><span class="n">classes</span><span class="p">))))</span>
+
+    <span class="c1"># mapping back to the order each class is given in the smk object</span>
+    <span class="c1"># class_idx = dict(zip(classes, list(range(len(classes)))))</span>
+
+    <span class="c1"># print(class_idx)</span>
+
+    <span class="n">probs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="c1"># this piece could be parallelized as long as it gets concatenated back in order</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
+        <span class="n">current_label</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">current_class_idx</span> <span class="o">=</span> <span class="n">class_idx</span><span class="p">[</span><span class="n">current_label</span><span class="p">]</span>
+        <span class="c1"># print(current_class_idx)</span>
+
+        <span class="n">aspatial_p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">smk</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">current_class_idx</span><span class="p">])</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="n">aspatial_p</span> <span class="o">/=</span> <span class="n">aspatial_p</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="c1"># print(i,class_idx[lags[i]])</span>
+        <span class="n">lag_idx</span> <span class="o">=</span> <span class="n">class_idx</span><span class="p">[</span><span class="n">lags</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+        <span class="n">conditional_matrix</span> <span class="o">=</span> <span class="n">smk</span><span class="o">.</span><span class="n">P</span><span class="p">[</span><span class="n">lag_idx</span><span class="p">]</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">conditional_matrix</span><span class="p">[</span><span class="n">current_class_idx</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="c1"># correct for tolerance, see https://stackoverflow.com/questions/25985120/numpy-1-9-0-valueerror-probabilities-do-not-sum-to-1</span>
+        <span class="c1"># p = np.nan_to_num(p)</span>
+        <span class="k">if</span> <span class="n">aspatial</span><span class="p">:</span>
+            <span class="n">probs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">aspatial_p</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">fill_null_probs</span><span class="p">:</span>
+                    <span class="n">warn</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;No spatial transition rules for </span><span class="si">{</span><span class="n">current_label</span><span class="si">}</span><span class="s2"> with context </span><span class="si">{</span><span class="n">lags</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2"> &quot;</span>
+                        <span class="s2">&quot;falling back to aspatial transition rules&quot;</span><span class="p">,</span>
+                        <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">probs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">aspatial_p</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;No spatial transition rules for </span><span class="si">{</span><span class="n">current_label</span><span class="si">}</span><span class="s2"> with context </span><span class="si">{</span><span class="n">lags</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2"> &quot;</span>
+                    <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># p /= p.sum()</span>
+
+                <span class="n">probs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">probs</span>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2023, geosnap developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.1.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,6 @@
+﻿geosnap.DataStore.bea\_regions
+==============================
+
+.. currentmodule:: geosnap
+
+.. automethod:: DataStore.bea_regions

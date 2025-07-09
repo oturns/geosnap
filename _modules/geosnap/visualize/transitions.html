@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>geosnap.visualize.transitions &#8212; geosnap v0.15.3 Manual</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css?v=9afac83c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+    <script src="../../../_static/documentation_options.js?v=d86fca55"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="../../../_static/geosnap.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+          geosnap</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.15.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../installation.html">Installation</a></li>
+                <li><a href="../../../api.html">API</a></li>
+                <li><a href="../../../data.html">Data</a></li>
+                <li><a href="https://oturns.github.io/geosnap-guide/">User Guide</a></li>
+                <li><a href="../../../references.html">References</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#installing-a-released-version">Installing a released version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#installing-development-version">Installing development version</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#io-module">IO Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#analyze-module">Analyze Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#harmonize-module">Harmonize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#visualize-module">Visualize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#util-module">Util Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data.html">Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../data.html#tabular-data">Tabular Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data.html#geo-data">Geo Data</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for geosnap.visualize.transitions</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;plotting for spatial Markov transition matrices.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">networkx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..analyze.dynamics</span><span class="w"> </span><span class="kn">import</span> <span class="n">transition</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;plot_transition_graphs&quot;</span><span class="p">,</span> <span class="s2">&quot;plot_transition_matrix&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="plot_transition_matrix">
+<a class="viewcode-back" href="../../../generated/geosnap.visualize.plot_transition_matrix.html#geosnap.visualize.plot_transition_matrix">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_transition_matrix</span><span class="p">(</span>
+    <span class="n">gdf</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">cluster_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">w_type</span><span class="o">=</span><span class="s2">&quot;rook&quot;</span><span class="p">,</span>
+    <span class="n">w_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">temporal_index</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span>
+    <span class="n">unit_index</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span>
+    <span class="n">permutations</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span>
+    <span class="n">n_rows</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">n_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">suptitle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">title_kwds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">savefig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+    <span class="n">transition_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot global and spatially-conditioned transition matrices as heatmaps.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    gdf : geopandas.GeoDataFrame</span>
+<span class="sd">        a long-form geodataframe with columns for unit index, time index, and class value</span>
+<span class="sd">    cluster_col : str</span>
+<span class="sd">        column on the gdf containing neighborhood type labels</span>
+<span class="sd">    temporal_index : string, optional</span>
+<span class="sd">        Column defining time and or sequencing of the long-form data.</span>
+<span class="sd">        Default is &quot;year&quot;.</span>
+<span class="sd">    unit_index : string, optional</span>
+<span class="sd">        Column identifying the unique id of spatial units.</span>
+<span class="sd">        Default is &quot;geoid&quot;.</span>
+<span class="sd">    w_type : string, optional</span>
+<span class="sd">        Type of spatial weights type (&quot;rook&quot;, &quot;queen&quot;, &quot;knn&quot; or</span>
+<span class="sd">        &quot;kernel&quot;) to be used for spatial structure. Default is</span>
+<span class="sd">        None, if non-spatial Markov transition rates are desired.</span>
+<span class="sd">    w_options : dict</span>
+<span class="sd">        additional options passed to a libpysal weights constructor (e.g. `k` for a KNN weights matrix)</span>
+<span class="sd">    permutations : int, optional</span>
+<span class="sd">        number of permutations for use in randomization based</span>
+<span class="sd">        inference (the default is 0).</span>
+<span class="sd">    figsize : tuple, optional</span>
+<span class="sd">        size of the resulting figure (13, 12)</span>
+<span class="sd">    n_rows : int, optional</span>
+<span class="sd">        rows in the plot; n_rows * n_cols must be &gt;= the number of neighborhood types</span>
+<span class="sd">    n_cols : int, optional</span>
+<span class="sd">        columns in the plot; n_rows * n_cols must be &gt;= the number of neighborhood types</span>
+<span class="sd">    suptitle : str, optional</span>
+<span class="sd">        title of the figure</span>
+<span class="sd">    title_kwds : dict, optional</span>
+<span class="sd">        additional keyword options for formatting the title</span>
+<span class="sd">    savefig : str, optional</span>
+<span class="sd">        location the plot will be saved</span>
+<span class="sd">    dpi : int, optional</span>
+<span class="sd">        dpi of the resulting image, default is 300</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    matplotlib Axes</span>
+<span class="sd">        the axes on which the plots are drawn</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">title_kwds</span><span class="p">:</span>
+        <span class="n">title_kwds</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;fontsize&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="k">if</span> <span class="n">transition_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;Creating a transition model implicitly is deprecated and will be removed in future versions. &quot;</span>
+            <span class="s2">&quot;please pass a giddy.Spatial_Markov instance using `giddy` or `geosnap.analyze.transition`&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">sm</span> <span class="o">=</span> <span class="n">transition</span><span class="p">(</span>
+            <span class="n">gdf</span><span class="p">,</span>
+            <span class="n">cluster_col</span><span class="o">=</span><span class="n">cluster_col</span><span class="p">,</span>
+            <span class="n">temporal_index</span><span class="o">=</span><span class="n">temporal_index</span><span class="p">,</span>
+            <span class="n">unit_index</span><span class="o">=</span><span class="n">unit_index</span><span class="p">,</span>
+            <span class="n">w_type</span><span class="o">=</span><span class="n">w_type</span><span class="p">,</span>
+            <span class="n">permutations</span><span class="o">=</span><span class="n">permutations</span><span class="p">,</span>
+            <span class="n">w_options</span><span class="o">=</span><span class="n">w_options</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sm</span> <span class="o">=</span> <span class="n">transition_model</span>
+    <span class="k">if</span> <span class="n">n_rows</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">n_cols</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">sqcols</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sm</span><span class="o">.</span><span class="n">classes</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)))</span>
+        <span class="n">n_cols</span> <span class="o">=</span> <span class="n">sqcols</span>
+        <span class="n">n_rows</span> <span class="o">=</span> <span class="n">sqcols</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">n_rows</span><span class="p">,</span> <span class="n">n_cols</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+    <span class="n">axs</span> <span class="o">=</span> <span class="n">axs</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+    <span class="n">ls</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">classes</span>
+    <span class="n">lags_all</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Modal Neighbor - &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">ls</span><span class="p">]</span>
+
+    <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span>
+        <span class="n">sm</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
+        <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">xticklabels</span><span class="o">=</span><span class="n">ls</span><span class="p">,</span>
+        <span class="n">yticklabels</span><span class="o">=</span><span class="n">ls</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Global&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;minor&quot;</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;minor&quot;</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sm</span><span class="o">.</span><span class="n">P</span><span class="p">)):</span>
+
+        <span class="c1"># Loop over data dimensions and create text annotations.</span>
+        <span class="n">p_temp</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span>
+            <span class="n">p_temp</span><span class="p">,</span>
+            <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+            <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">xticklabels</span><span class="o">=</span><span class="n">ls</span><span class="p">,</span>
+            <span class="n">yticklabels</span><span class="o">=</span><span class="n">ls</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">axs</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">lags_all</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+        <span class="n">axs</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;minor&quot;</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">axs</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;minor&quot;</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1"># pop off any unused axes</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">axs</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">sm</span><span class="o">.</span><span class="n">P</span><span class="p">):</span>
+            <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">suptitle</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">suptitle</span><span class="p">,</span> <span class="o">**</span><span class="n">title_kwds</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">top</span><span class="o">=</span><span class="mf">0.89</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">savefig</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">savefig</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">axs</span></div>
+
+
+
+<div class="viewcode-block" id="plot_transition_graphs">
+<a class="viewcode-back" href="../../../generated/geosnap.visualize.plot_transition_graphs.html#geosnap.visualize.plot_transition_graphs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_transition_graphs</span><span class="p">(</span>
+    <span class="n">gdf</span><span class="p">,</span>
+    <span class="n">cluster_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span>
+    <span class="n">w_type</span><span class="o">=</span><span class="s2">&quot;queen&quot;</span><span class="p">,</span>
+    <span class="n">w_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">temporal_index</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span>
+    <span class="n">unit_index</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span>
+    <span class="n">permutations</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">layout</span><span class="o">=</span><span class="s2">&quot;dot&quot;</span><span class="p">,</span>
+    <span class="n">args</span><span class="o">=</span><span class="s2">&quot;-n -Groot=0 -Goverlap=false -Gnodesep=0.01 -Gfont_size=1 -Gmindist=3.5 -Gsize=30,30!&quot;</span><span class="p">,</span>
+    <span class="n">transition_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot a network graph representation of global and spatially-conditioned transition matrices.</span>
+
+<span class="sd">       This function requires pygraphviz to be installed. For linux and macos, it can be installed with</span>
+<span class="sd">       `conda install -c conda-forge pygraphviz`. At the time of this writing there is no pygraphviz build</span>
+<span class="sd">       available for Windows from mainstream conda channels, but it can be installed with</span>
+<span class="sd">       `conda install -c alubbock pygraphviz`</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    gdf : geopandas.GeoDataFrame</span>
+<span class="sd">        long-form geodataframe with a column holding labels appropriate</span>
+<span class="sd">        for using as input to `geosnap.analyze.transition`</span>
+<span class="sd">    cluster_col : str</span>
+<span class="sd">        column on the gdf containing neighborhood type labels</span>
+<span class="sd">    output_dir : str</span>
+<span class="sd">        the location that output images will be placed</span>
+<span class="sd">    temporal_index : string, optional</span>
+<span class="sd">        Column defining time and or sequencing of the long-form data.</span>
+<span class="sd">        Default is &quot;year&quot;.</span>
+<span class="sd">    unit_index : string, optional</span>
+<span class="sd">        Column identifying the unique id of spatial units.</span>
+<span class="sd">        Default is &quot;geoid&quot;.</span>
+<span class="sd">    w_type : string, optional</span>
+<span class="sd">        Type of spatial weights type (&quot;rook&quot;, &quot;queen&quot;, &quot;knn&quot; or</span>
+<span class="sd">        &quot;kernel&quot;) to be used for spatial structure. Default is</span>
+<span class="sd">        None, if non-spatial Markov transition rates are desired.</span>
+<span class="sd">    w_options : dict</span>
+<span class="sd">        additional options passed to a libpysal weights constructor (e.g. `k` for a KNN weights matrix)</span>
+<span class="sd">    permutations : int, optional</span>
+<span class="sd">        number of permutations for use in randomization based</span>
+<span class="sd">        inference (the default is 0).</span>
+<span class="sd">    layout : str, &#39;dot&#39;</span>
+<span class="sd">        graphviz layout for plotting</span>
+<span class="sd">    args : str, optional</span>
+<span class="sd">        additional arguments passed to graphviz.</span>
+<span class="sd">        default is  &quot;-n -Groot=0 -Goverlap=false -Gnodesep=0.01 -Gfont_size=1 -Gmindist=3.5 -Gsize=30,30!&quot;</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    ------</span>
+<span class="sd">    None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pygraphviz</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;You must have pygraphviz installed to use graph plotting&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">transition_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;Creating a transition model implicitly is deprecated and will be removed in future versions. &quot;</span>
+            <span class="s2">&quot;please pass a giddy.Spatial_Markov instance created using `giddy` or `geosnap.analyze.transition`&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">sm</span> <span class="o">=</span> <span class="n">transition</span><span class="p">(</span>
+            <span class="n">gdf</span><span class="p">,</span>
+            <span class="n">cluster_col</span><span class="o">=</span><span class="n">cluster_col</span><span class="p">,</span>
+            <span class="n">temporal_index</span><span class="o">=</span><span class="n">temporal_index</span><span class="p">,</span>
+            <span class="n">unit_index</span><span class="o">=</span><span class="n">unit_index</span><span class="p">,</span>
+            <span class="n">w_type</span><span class="o">=</span><span class="n">w_type</span><span class="p">,</span>
+            <span class="n">permutations</span><span class="o">=</span><span class="n">permutations</span><span class="p">,</span>
+            <span class="n">w_options</span><span class="o">=</span><span class="n">w_options</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sm</span> <span class="o">=</span> <span class="n">transition_model</span>
+
+    <span class="c1"># plot the global transition matrix</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">p</span>
+    <span class="n">graph</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">dt</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;weight&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">)]</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">G</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">get_edge_attributes</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="s2">&quot;weight&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;weight&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">nx_agraph</span><span class="o">.</span><span class="n">to_agraph</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+    <span class="n">A</span><span class="o">.</span><span class="n">layout</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>  <span class="c1"># use either circo or dot layout</span>
+    <span class="n">A</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cluster_col</span><span class="si">}</span><span class="s2">_transitions_global.png&quot;</span><span class="p">))</span>
+
+    <span class="c1"># then plot each of the spatially-conditioned matrices</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sm</span><span class="o">.</span><span class="n">P</span><span class="p">):</span>
+
+        <span class="n">graph</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">dt</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;weight&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">)]</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
+        <span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+        <span class="n">G</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">get_edge_attributes</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="s2">&quot;weight&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;weight&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="n">A</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">nx_agraph</span><span class="o">.</span><span class="n">to_agraph</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="n">A</span><span class="o">.</span><span class="n">layout</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>  <span class="c1"># use either circo or dot layout</span>
+        <span class="n">A</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cluster_col</span><span class="si">}</span><span class="s2">_transitions_nb</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">))</span></div>
+
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2023, geosnap developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.1.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

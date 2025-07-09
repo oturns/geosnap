@@ -1,0 +1,45 @@
+﻿geosnap.DataStore
+=================
+
+.. currentmodule:: geosnap
+
+.. autoclass:: DataStore
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DataStore.__init__
+      ~DataStore.acs
+      ~DataStore.bea_regions
+      ~DataStore.blocks_2000
+      ~DataStore.blocks_2010
+      ~DataStore.blocks_2020
+      ~DataStore.codebook
+      ~DataStore.counties
+      ~DataStore.ejscreen
+      ~DataStore.ejscreen_codebook
+      ~DataStore.lodes_codebook
+      ~DataStore.ltdb
+      ~DataStore.msa_definitions
+      ~DataStore.msas
+      ~DataStore.ncdb
+      ~DataStore.nces
+      ~DataStore.nlcd_definitions
+      ~DataStore.seda
+      ~DataStore.show_data_dir
+      ~DataStore.states
+      ~DataStore.tracts_1990
+      ~DataStore.tracts_2000
+      ~DataStore.tracts_2010
+      ~DataStore.tracts_2020
+   
+   
+
+   
+   
+   

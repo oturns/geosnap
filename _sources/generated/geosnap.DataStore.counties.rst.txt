@@ -1,0 +1,6 @@
+﻿geosnap.DataStore.counties
+==========================
+
+.. currentmodule:: geosnap
+
+.. automethod:: DataStore.counties

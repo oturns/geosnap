@@ -1,0 +1,6 @@
+﻿geosnap.analyze.ModelResults.plot\_boundary\_silhouette
+=======================================================
+
+.. currentmodule:: geosnap.analyze
+
+.. automethod:: ModelResults.plot_boundary_silhouette

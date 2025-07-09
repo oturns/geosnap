@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>geosnap.io.networkio &#8212; geosnap v0.15.3 Manual</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css?v=9afac83c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+    <script src="../../../_static/documentation_options.js?v=d86fca55"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="../../../_static/geosnap.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+          geosnap</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.15.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../installation.html">Installation</a></li>
+                <li><a href="../../../api.html">API</a></li>
+                <li><a href="../../../data.html">Data</a></li>
+                <li><a href="https://oturns.github.io/geosnap-guide/">User Guide</a></li>
+                <li><a href="../../../references.html">References</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#installing-a-released-version">Installing a released version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#installing-development-version">Installing development version</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#io-module">IO Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#analyze-module">Analyze Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#harmonize-module">Harmonize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#visualize-module">Visualize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#util-module">Util Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data.html">Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../data.html#tabular-data">Tabular Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data.html#geo-data">Geo Data</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for geosnap.io.networkio</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandana</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pdna</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_reproject_osm_nodes</span><span class="p">(</span><span class="n">nodes_df</span><span class="p">,</span> <span class="n">input_crs</span><span class="p">,</span> <span class="n">output_crs</span><span class="p">):</span>
+    <span class="c1">#  take original x,y coordinates and convert into geopandas.Series, then reproject</span>
+    <span class="n">nodes</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">points_from_xy</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">nodes_df</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">nodes_df</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">input_crs</span><span class="p">)</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span>
+        <span class="n">output_crs</span>
+    <span class="p">)</span>
+    <span class="c1">#  convert to dataframe and recreate the x and y cols</span>
+    <span class="n">nodes</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">nodes_df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">nodes</span><span class="p">)</span>
+    <span class="n">nodes</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nodes</span><span class="o">.</span><span class="n">centroid</span><span class="o">.</span><span class="n">x</span>
+    <span class="n">nodes</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nodes</span><span class="o">.</span><span class="n">centroid</span><span class="o">.</span><span class="n">y</span>
+    <span class="k">return</span> <span class="n">nodes</span>
+
+
+<div class="viewcode-block" id="get_network_from_gdf">
+<a class="viewcode-back" href="../../../generated/geosnap.io.get_network_from_gdf.html#geosnap.io.get_network_from_gdf">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_network_from_gdf</span><span class="p">(</span>
+    <span class="n">gdf</span><span class="p">,</span> <span class="n">network_type</span><span class="o">=</span><span class="s2">&quot;walk&quot;</span><span class="p">,</span> <span class="n">twoway</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">add_travel_times</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default_speeds</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a pandana.Network object from a geodataframe (via OSMnx graph).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    gdf : geopandas.GeoDataFrame</span>
+<span class="sd">        dataframe covering the study area of interest; Note the first step is to take</span>
+<span class="sd">        the unary union of this dataframe, which is expensive, so large dataframes may</span>
+<span class="sd">        be time-consuming. The network will inherit the CRS from this dataframe</span>
+<span class="sd">    network_type : str, {&quot;all_private&quot;, &quot;all&quot;, &quot;bike&quot;, &quot;drive&quot;, &quot;drive_service&quot;, &quot;walk&quot;}</span>
+<span class="sd">        the type of network to collect from OSM (passed to `osmnx.graph_from_polygon`)</span>
+<span class="sd">        by default &quot;walk&quot;</span>
+<span class="sd">    twoway : bool, optional</span>
+<span class="sd">        Whether to treat the pandana.Network as directed or undirected. For a directed network,</span>
+<span class="sd">        use `twoway=False` (which is the default). For an undirected network (e.g. a</span>
+<span class="sd">        walk network) where travel can flow in both directions, the network is more</span>
+<span class="sd">        efficient when twoway=True but forces the impedance to be equal in both</span>
+<span class="sd">        directions. This has implications for auto or multimodal</span>
+<span class="sd">        networks where impedance is generally different depending on travel direction.</span>
+<span class="sd">    add_travel_times : bool, default=False</span>
+<span class="sd">        whether to use posted travel times from OSM as the impedance measure (rather</span>
+<span class="sd">        than network-distance). Speeds are based on max posted drive speeds, see</span>
+<span class="sd">        &lt;https://osmnx.readthedocs.io/en/stable/internals-reference.html#osmnx-speed-module&gt;</span>
+<span class="sd">        for more information.</span>
+<span class="sd">    default_speeds : dict, optional</span>
+<span class="sd">        default speeds passed assumed when no data available on the OSM edge. Defaults</span>
+<span class="sd">        to  {&quot;residential&quot;: 35, &quot;secondary&quot;: 50, &quot;tertiary&quot;: 60}. Only considered if</span>
+<span class="sd">        add_travel_times is True</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pandana.Network</span>
+<span class="sd">        a pandana.Network object with node coordinates stored in the same system as the</span>
+<span class="sd">        input geodataframe. If add_travel_times is True, the network impedance</span>
+<span class="sd">        is travel time measured in seconds (assuming automobile travel speeds); else </span>
+<span class="sd">        the impedance is travel distance measured in meters</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ImportError</span>
+<span class="sd">        requires `osmnx`, raises if module not available</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">osmnx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ox</span>
+    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;this functions requires the osmnx module&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+    <span class="n">output_crs</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">gdf</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">is_geographic</span><span class="p">:</span>
+        <span class="n">output_crs</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">crs</span>
+        <span class="n">warn</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;GeoDataFrame is stored in coordinate system </span><span class="si">{</span><span class="n">output_crs</span><span class="si">}</span><span class="s2"> so the &quot;</span>
+            <span class="s2">&quot;pandana.Network will also be stored in this system&quot;</span><span class="p">,</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="mi">4326</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">default_speeds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">default_speeds</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;residential&quot;</span><span class="p">:</span> <span class="mi">35</span><span class="p">,</span>
+            <span class="s2">&quot;secondary&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>
+            <span class="s2">&quot;tertiary&quot;</span><span class="p">:</span> <span class="mi">60</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="n">impedance</span> <span class="o">=</span> <span class="s2">&quot;length&quot;</span>
+    <span class="n">graph</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">graph_from_polygon</span><span class="p">(</span><span class="n">gdf</span><span class="o">.</span><span class="n">union_all</span><span class="p">(),</span> <span class="n">network_type</span><span class="o">=</span><span class="n">network_type</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">add_travel_times</span><span class="p">:</span>
+        <span class="n">graph</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">add_edge_speeds</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">hwy_speeds</span><span class="o">=</span><span class="n">default_speeds</span><span class="p">)</span>
+        <span class="n">graph</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">add_edge_travel_times</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+        <span class="n">impedance</span> <span class="o">=</span> <span class="s2">&quot;travel_time&quot;</span>
+
+    <span class="n">n</span><span class="p">,</span> <span class="n">e</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">graph_to_gdfs</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">output_crs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">_reproject_osm_nodes</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">input_crs</span><span class="o">=</span><span class="mi">4326</span><span class="p">,</span> <span class="n">output_crs</span><span class="o">=</span><span class="n">output_crs</span><span class="p">)</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">output_crs</span><span class="p">)</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+    <span class="n">net</span> <span class="o">=</span> <span class="n">pdna</span><span class="o">.</span><span class="n">Network</span><span class="p">(</span>
+        <span class="n">edge_from</span><span class="o">=</span><span class="n">e</span><span class="p">[</span><span class="s2">&quot;u&quot;</span><span class="p">],</span>
+        <span class="n">edge_to</span><span class="o">=</span><span class="n">e</span><span class="p">[</span><span class="s2">&quot;v&quot;</span><span class="p">],</span>
+        <span class="n">edge_weights</span><span class="o">=</span><span class="n">e</span><span class="p">[[</span><span class="n">impedance</span><span class="p">]],</span>
+        <span class="n">node_x</span><span class="o">=</span><span class="n">n</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span>
+        <span class="n">node_y</span><span class="o">=</span><span class="n">n</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">],</span>
+        <span class="n">twoway</span><span class="o">=</span><span class="n">twoway</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># keep the geometries on hand, since we have them already</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">edges_df</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">edges_df</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">e</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">output_crs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">net</span></div>
+
+
+<div class="viewcode-block" id="project_network">
+<a class="viewcode-back" href="../../../generated/geosnap.io.project_network.html#geosnap.io.project_network">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">project_network</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">output_crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">input_crs</span><span class="o">=</span><span class="mi">4326</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reproject a pandana.Network object into another coordinate system.</span>
+
+<span class="sd">    Note this function does not change the legth of any network edges, but</span>
+<span class="sd">    reprojects the x and y coordinates of the nodes (e.g. for precise snapping)</span>
+<span class="sd">    between nodes and projected origin/destination data</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    network : pandana.Network</span>
+<span class="sd">        an instantiated pandana Network object</span>
+<span class="sd">    input_crs : int, optional</span>
+<span class="sd">        the coordinate system used in the Network.node_df dataframe. Typically</span>
+<span class="sd">        these data are collected in Lon/Lat, so the default 4326</span>
+<span class="sd">    output_crs : int, str, or pyproj.crs.CRS, required</span>
+<span class="sd">        EPSG code or pyproj.crs.CRS object of the output coordinate system</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pandana.Network</span>
+<span class="sd">        an initialized pandana.Network with &#39;x&#39; and y&#39; values represented</span>
+<span class="sd">        by coordinates in the specified CRS</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">output_crs</span><span class="p">,</span> <span class="s2">&quot;You must provide an output CRS&quot;</span>
+
+    <span class="c1">#  take original x,y coordinates and convert into geopandas.Series, then reproject</span>
+    <span class="n">nodes</span> <span class="o">=</span> <span class="n">_reproject_osm_nodes</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">nodes_df</span><span class="p">,</span> <span class="n">input_crs</span><span class="p">,</span> <span class="n">output_crs</span><span class="p">)</span>
+    <span class="n">edges</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">edges_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="s2">&quot;geometry&quot;</span> <span class="ow">in</span> <span class="n">edges</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">edges</span> <span class="o">=</span> <span class="n">edges</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">output_crs</span><span class="p">)</span>
+
+    <span class="c1">#  reinstantiate the network (needs to rebuild the tree)</span>
+    <span class="n">net</span> <span class="o">=</span> <span class="n">pdna</span><span class="o">.</span><span class="n">Network</span><span class="p">(</span>
+        <span class="n">node_x</span><span class="o">=</span><span class="n">nodes</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span>
+        <span class="n">node_y</span><span class="o">=</span><span class="n">nodes</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">],</span>
+        <span class="n">edge_from</span><span class="o">=</span><span class="n">edges</span><span class="p">[</span><span class="s2">&quot;from&quot;</span><span class="p">],</span>
+        <span class="n">edge_to</span><span class="o">=</span><span class="n">edges</span><span class="p">[</span><span class="s2">&quot;to&quot;</span><span class="p">],</span>
+        <span class="n">edge_weights</span><span class="o">=</span><span class="n">edges</span><span class="p">[[</span><span class="n">network</span><span class="o">.</span><span class="n">impedance_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]]],</span>
+        <span class="n">twoway</span><span class="o">=</span><span class="n">network</span><span class="o">.</span><span class="n">_twoway</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">net</span></div>
+
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2023, geosnap developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.1.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

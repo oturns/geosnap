@@ -1,0 +1,6 @@
+﻿geosnap.analyze.pdna\_to\_adj
+=============================
+
+.. currentmodule:: geosnap.analyze
+
+.. autofunction:: pdna_to_adj

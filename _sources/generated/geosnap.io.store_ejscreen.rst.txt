@@ -1,0 +1,6 @@
+﻿geosnap.io.store\_ejscreen
+==========================
+
+.. currentmodule:: geosnap.io
+
+.. autofunction:: store_ejscreen

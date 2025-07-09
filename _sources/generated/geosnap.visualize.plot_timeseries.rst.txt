@@ -1,0 +1,6 @@
+﻿geosnap.visualize.plot\_timeseries
+==================================
+
+.. currentmodule:: geosnap.visualize
+
+.. autofunction:: plot_timeseries

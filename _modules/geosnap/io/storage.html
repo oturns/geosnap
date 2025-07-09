@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>geosnap.io.storage &#8212; geosnap v0.15.3 Manual</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css?v=9afac83c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+    <script src="../../../_static/documentation_options.js?v=d86fca55"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="../../../_static/geosnap.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+          geosnap</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.15.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../installation.html">Installation</a></li>
+                <li><a href="../../../api.html">API</a></li>
+                <li><a href="../../../data.html">Data</a></li>
+                <li><a href="https://oturns.github.io/geosnap-guide/">User Guide</a></li>
+                <li><a href="../../../references.html">References</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#installing-a-released-version">Installing a released version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#installing-development-version">Installing development version</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#io-module">IO Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#analyze-module">Analyze Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#harmonize-module">Harmonize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#visualize-module">Visualize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#util-module">Util Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data.html">Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../data.html#tabular-data">Tabular Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data.html#geo-data">Geo Data</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for geosnap.io.storage</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Tools for creating and manipulating neighborhood datasets.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">zipfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">quilt3</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">platformdirs</span><span class="w"> </span><span class="kn">import</span> <span class="n">user_data_dir</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">adjust_inflation</span>
+
+<span class="n">script_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+
+<span class="n">_fipstable</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span> <span class="s2">&quot;stfipstable.csv&quot;</span><span class="p">),</span>
+    <span class="n">converters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;FIPS Code&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">},</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_make_data_dir</span><span class="p">(</span><span class="n">data_dir</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">):</span>
+    <span class="n">appname</span> <span class="o">=</span> <span class="s2">&quot;geosnap&quot;</span>
+    <span class="n">appauthor</span> <span class="o">=</span> <span class="s2">&quot;geosnap&quot;</span>
+
+    <span class="k">if</span> <span class="n">data_dir</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
+        <span class="n">data_dir</span> <span class="o">=</span> <span class="n">user_data_dir</span><span class="p">(</span><span class="n">appname</span><span class="p">,</span> <span class="n">appauthor</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">data_dir</span><span class="p">):</span>
+        <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data_dir</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">store_seda</span><span class="p">(</span><span class="n">data_dir</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">accept_eula</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Collect data from the Stanford Educational Data Archive and store as local parquet files</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data_dir : str, optional</span>
+<span class="sd">        path to desired storage location. If &quot;auto&quot;, geosnap will use its default data</span>
+<span class="sd">        directory provided by platformdirs, by default &quot;auto&quot;</span>
+<span class="sd">    accept_eula : bool, optional</span>
+<span class="sd">        Whether the accept the EULA from SEDA, by default False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">eula</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">DATA USE AGREEMENT:</span>
+
+<span class="s2">You agree not to use the data sets for commercial advantage, or in the course of for-profit activities. Commercial entities wishing to use this Service should contact Stanford University’s Office of Technology Licensing (info@otlmail.stanford.edu).</span>
+
+<span class="s2">You agree that you will not use these data to identify or to otherwise infringe the privacy or confidentiality rights of individuals.</span>
+
+<span class="s2">THE DATA SETS ARE PROVIDED “AS IS” AND STANFORD MAKES NO REPRESENTATIONS AND EXTENDS NO WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED. STANFORD SHALL NOT BE LIABLE FOR ANY CLAIMS OR DAMAGES WITH RESPECT TO ANY LOSS OR OTHER CLAIM BY YOU OR ANY THIRD PARTY ON ACCOUNT OF, OR ARISING FROM THE USE OF THE DATA SETS.</span>
+
+<span class="s2">You agree that this Agreement and any dispute arising under it is governed by the laws of the State of California of the United States of America, applicable to agreements negotiated, executed, and performed within California.</span>
+
+<span class="s2">You agree to acknowledge the Stanford Education Data Archive as the source of these data. In publications, please cite the data as:</span>
+
+<span class="s2">Reardon, S. F., Ho, A. D., Shear, B. R., Fahle, E. M., Kalogrides, D., Jang, H., &amp; Chavez, B. (2021). Stanford Education Data Archive (Version 4.1). Retrieved from http://purl.stanford.edu/xv742vh9296.</span>
+
+<span class="s2">Subject to your compliance with the terms and conditions set forth in this Agreement, Stanford grants you a revocable, non-exclusive, non-transferable right to access and make use of the Data Sets.</span>
+
+<span class="s2">        &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">accept_eula</span><span class="p">,</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;You must accept the EULA by passing `accept_eula=True` </span><span class="se">\n</span><span class="si">{</span><span class="n">eula</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+    <span class="n">pth</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">_make_data_dir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">),</span> <span class="s2">&quot;seda&quot;</span><span class="p">)</span>
+    <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">pth</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">std</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;cs&quot;</span><span class="p">,</span> <span class="s2">&quot;gcs&quot;</span><span class="p">]:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">fn</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;seda_school_pool_</span><span class="si">{</span><span class="n">std</span><span class="si">}</span><span class="s2">_4.1&quot;</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloading </span><span class="si">{</span><span class="n">fn</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;https://stacks.stanford.edu/file/druid:xv742vh9296/</span><span class="si">{</span><span class="n">fn</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">,</span>
+                <span class="n">converters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;sedasch&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;fips&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">},</span>
+            <span class="p">)</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">sedasch</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">sedasch</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">)</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">fips</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">fips</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Unable to access remote SEDA data&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+        <span class="n">t</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">pth</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fn</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">pooling</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;long&quot;</span><span class="p">,</span> <span class="s2">&quot;pool&quot;</span><span class="p">]:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">fn</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;seda_geodist_</span><span class="si">{</span><span class="n">pooling</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">std</span><span class="si">}</span><span class="s2">_4.1&quot;</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloading </span><span class="si">{</span><span class="n">fn</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;https://stacks.stanford.edu/file/druid:xv742vh9296/</span><span class="si">{</span><span class="n">fn</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">,</span>
+                    <span class="n">converters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;sedalea&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;fips&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">},</span>
+                <span class="p">)</span>
+                <span class="n">t</span><span class="o">.</span><span class="n">sedalea</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">sedalea</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">)</span>
+                <span class="n">t</span><span class="o">.</span><span class="n">fips</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">fips</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Unable to access remote SEDA data&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+            <span class="n">t</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">pth</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fn</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="store_census">
+<a class="viewcode-back" href="../../../generated/geosnap.io.store_census.html#geosnap.io.store_census">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">store_census</span><span class="p">(</span><span class="n">data_dir</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Save census data to the local quilt package storage.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">        Data will be available in the geosnap.data.datasets and will be used</span>
+<span class="sd">        in place of streaming data for all census queries. The</span>
+<span class="sd">        census/administrative package is 185 MB.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">install</span><span class="p">(</span>
+        <span class="s2">&quot;census/tracts_cartographic&quot;</span><span class="p">,</span> <span class="s2">&quot;s3://spatial-ucr&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">_make_data_dir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">install</span><span class="p">(</span>
+        <span class="s2">&quot;census/administrative&quot;</span><span class="p">,</span> <span class="s2">&quot;s3://spatial-ucr&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">_make_data_dir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Data stored in </span><span class="si">{</span><span class="n">_make_data_dir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="store_blocks_2000">
+<a class="viewcode-back" href="../../../generated/geosnap.io.store_blocks_2000.html#geosnap.io.store_blocks_2000">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">store_blocks_2000</span><span class="p">(</span><span class="n">data_dir</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Save census 2000 census block data to the local quilt package storage.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">        Data will be available in the geosnap.data.datasets and will be used</span>
+<span class="sd">        in place of streaming data for all census queries.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pth</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">_make_data_dir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">),</span> <span class="s2">&quot;blocks_2000&quot;</span><span class="p">)</span>
+    <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">pth</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="s2">&quot;census/blocks_2000&quot;</span><span class="p">,</span> <span class="s2">&quot;s3://spatial-ucr&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">pth</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="store_blocks_2010">
+<a class="viewcode-back" href="../../../generated/geosnap.io.store_blocks_2010.html#geosnap.io.store_blocks_2010">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">store_blocks_2010</span><span class="p">(</span><span class="n">data_dir</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Save census 2010 census block data to the local quilt package storage.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">        Data will be available in the geosnap.data.datasets and will be used</span>
+<span class="sd">        in place of streaming data for all census queries.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pth</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">_make_data_dir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">),</span> <span class="s2">&quot;blocks_2010&quot;</span><span class="p">)</span>
+    <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">pth</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="s2">&quot;census/blocks_2010&quot;</span><span class="p">,</span> <span class="s2">&quot;s3://spatial-ucr&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">pth</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="store_blocks_2020">
+<a class="viewcode-back" href="../../../generated/geosnap.io.store_blocks_2020.html#geosnap.io.store_blocks_2020">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">store_blocks_2020</span><span class="p">(</span><span class="n">data_dir</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Save census 2020 census block data to the local quilt package storage.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">        Data will be available in the geosnap.data.datasets and will be used</span>
+<span class="sd">        in place of streaming data for all census queries.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pth</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">_make_data_dir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">),</span> <span class="s2">&quot;blocks_2020&quot;</span><span class="p">)</span>
+    <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">pth</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="s2">&quot;census/blocks_2020&quot;</span><span class="p">,</span> <span class="s2">&quot;s3://spatial-ucr&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">pth</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="store_ejscreen">
+<a class="viewcode-back" href="../../../generated/geosnap.io.store_ejscreen.html#geosnap.io.store_ejscreen">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">store_ejscreen</span><span class="p">(</span><span class="n">years</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Save EPA EJScreen data to the local geosnap storage.</span>
+<span class="sd">       Each year is about 1GB.</span>
+
+<span class="sd">     Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    years : list (optional)</span>
+<span class="sd">        subset of years to collect. Currently 2015-2020 vintages</span>
+<span class="sd">        are available. Pass &#39;all&#39; (default) to fetch every available vintage.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">        Data will be available in the geosnap.data.datasets and will be used</span>
+<span class="sd">        in place of streaming data for all census queries.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pth</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">_make_data_dir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">),</span> <span class="s2">&quot;epa&quot;</span><span class="p">)</span>
+    <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">pth</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">years</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+        <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="s2">&quot;epa/ejscreen&quot;</span><span class="p">,</span> <span class="s2">&quot;s3://spatial-ucr&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">pth</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="s2">&quot;years&quot;</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
+            <span class="n">years</span> <span class="o">=</span> <span class="p">[</span><span class="n">years</span><span class="p">]</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">browse</span><span class="p">(</span><span class="s2">&quot;epa/ejscreen&quot;</span><span class="p">,</span> <span class="s2">&quot;s3://spatial-ucr&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">years</span><span class="p">:</span>
+            <span class="n">p</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;ejscreen_</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span>
+                <span class="n">dest</span><span class="o">=</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">pth</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;ejscreen_</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">)</span>
+            <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="store_nces">
+<a class="viewcode-back" href="../../../generated/geosnap.io.store_nces.html#geosnap.io.store_nces">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">store_nces</span><span class="p">(</span><span class="n">years</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Save NCES data to the local geosnap storage.</span>
+<span class="sd">       Each year is about 1GB.</span>
+
+<span class="sd">     Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    years : list (optional)</span>
+<span class="sd">        subset of years to collect. Pass &#39;all&#39; (default) to fetch every available vintage.</span>
+<span class="sd">    dataset : str in {&quot;sabs&quot;, &quot;districts&quot;, &quot;schools&quot;}</span>
+<span class="sd">        which dataset to store. Defaults to &quot;all&quot; which include all three</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">        Data will be available in the geosnap.data.datasets and will be used</span>
+<span class="sd">        in place of streaming data for all census queries.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">datasets</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;sabs&quot;</span><span class="p">,</span> <span class="s2">&quot;districts&quot;</span><span class="p">,</span> <span class="s2">&quot;schools&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">dataset</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span> <span class="k">else</span> <span class="p">[</span><span class="n">dataset</span><span class="p">]</span>
+
+    <span class="n">pth</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">_make_data_dir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">),</span> <span class="s2">&quot;nces&quot;</span><span class="p">)</span>
+    <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">pth</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">years</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+            <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;nces/</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;s3://spatial-ucr&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">pth</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="s2">&quot;years&quot;</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
+                <span class="n">years</span> <span class="o">=</span> <span class="p">[</span><span class="n">years</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="s2">&quot;districts&quot;</span><span class="p">:</span>
+                <span class="n">p</span> <span class="o">=</span> <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">browse</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;nces/</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;s3://spatial-ucr&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">years</span><span class="p">:</span>
+                    <span class="n">p</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;school_districts_</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span>
+                        <span class="n">dest</span><span class="o">=</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span>
+                            <span class="n">pth</span><span class="p">,</span> <span class="s2">&quot;nces&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;school_districts_</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">.parquet&quot;</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">p</span> <span class="o">=</span> <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">browse</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;nces/</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;s3://spatial-ucr&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">years</span><span class="p">:</span>
+                    <span class="n">p</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span>
+                        <span class="n">dest</span><span class="o">=</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">pth</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;nces</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">)</span>
+                    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="store_acs">
+<a class="viewcode-back" href="../../../generated/geosnap.io.store_acs.html#geosnap.io.store_acs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">store_acs</span><span class="p">(</span><span class="n">years</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s2">&quot;tract&quot;</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Save census American Community Survey 5-year data to the local geosnap storage.</span>
+<span class="sd">       Each year is about 550mb for tract level and about 900mb for blockgroup level.</span>
+
+<span class="sd">     Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    years : list (optional)</span>
+<span class="sd">        subset of years to collect. Default is &#39;all&#39; to fetch every available vintage.</span>
+<span class="sd">        Currently 2012-2021 vintages are available</span>
+<span class="sd">    level : str (optional)</span>
+<span class="sd">        geography level to fetch. Options: {&#39;tract&#39;, &#39;bg&#39;} for tract</span>
+<span class="sd">        or blockgroup</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">        Data will be available in the geosnap.data.datasets and will be used</span>
+<span class="sd">        in place of streaming data for all census queries.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pth</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">_make_data_dir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">),</span> <span class="s2">&quot;acs&quot;</span><span class="p">)</span>
+    <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">pth</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">years</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+        <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="s2">&quot;census/acs&quot;</span><span class="p">,</span> <span class="s2">&quot;s3://spatial-ucr&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">pth</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">years</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
+            <span class="n">years</span> <span class="o">=</span> <span class="p">[</span><span class="n">years</span><span class="p">]</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">quilt3</span><span class="o">.</span><span class="n">Package</span><span class="o">.</span><span class="n">browse</span><span class="p">(</span><span class="s2">&quot;census/acs&quot;</span><span class="p">,</span> <span class="s2">&quot;s3://spatial-ucr&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">years</span><span class="p">:</span>
+            <span class="n">p</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;acs_</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span>
+                <span class="n">dest</span><span class="o">=</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">pth</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;acs_</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">)</span>
+            <span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_ltdb_reader</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">dropcols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">currency_year</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+        <span class="n">path</span><span class="p">,</span>
+        <span class="n">na_values</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="mi">99999</span><span class="p">,</span> <span class="o">-</span><span class="mi">999</span><span class="p">],</span>
+        <span class="n">converters</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;placefp10&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">},</span>
+        <span class="n">low_memory</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;latin1&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">dropcols</span><span class="p">:</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">dropcols</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;geoid&quot;</span>
+    <span class="n">newlist</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># ignoring the first 4 columns, remove year suffix from column names</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">[</span><span class="mi">4</span><span class="p">:]:</span>
+        <span class="n">newlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">colnames</span> <span class="o">=</span> <span class="n">names</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="o">+</span> <span class="n">newlist</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">colnames</span>
+
+    <span class="c1"># prepend a 0 when FIPS is too short</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;geoid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;geoid&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">year</span>
+
+    <span class="n">inflate_cols</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;mhmval&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;mrent&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;incpc&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;hinc&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;hincw&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;hincb&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;hinch&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;hinca&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+
+    <span class="n">inflate_available</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">inflate_cols</span><span class="p">)))</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">inflate_available</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">adjust_inflation</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">inflate_available</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">base_year</span><span class="o">=</span><span class="n">currency_year</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span>
+
+
+<div class="viewcode-block" id="store_ltdb">
+<a class="viewcode-back" href="../../../generated/geosnap.io.store_ltdb.html#geosnap.io.store_ltdb">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">store_ltdb</span><span class="p">(</span>
+    <span class="n">sample_zip</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">fullcount_zip</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">sample_paths</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">fullcount_paths</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">data_dir</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+    <span class="n">currency_year</span><span class="o">=</span><span class="mi">2010</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read &amp; store data from Brown&#39;s Longitudinal Tract Database (LTDB).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sample_zip : str</span>
+<span class="sd">        file path of the zip file containing the standard Sample CSV files</span>
+<span class="sd">        downloaded from</span>
+<span class="sd">        https://s4.ad.brown.edu/projects/diversity/Researcher/LTBDDload/Default.aspx</span>
+<span class="sd">    fullcount_zip: str</span>
+<span class="sd">        file path of the zip file containing the standard Fullcount CSV files</span>
+<span class="sd">        downloaded from</span>
+<span class="sd">        https://s4.ad.brown.edu/projects/diversity/Researcher/LTBDDload/Default.aspx</span>
+<span class="sd">    sample_paths: dict</span>
+<span class="sd">        dictionary of CSV files (e.g. if manually unzipping the archive from LTDB). The</span>
+<span class="sd">        dict should be formatted using `sample_{year}` as the key, with the value storing</span>
+<span class="sd">        the path to the given csv, as in {&#39;sample_1970&#39;: &#39;path/to/sample_1970.csv&#39;,}</span>
+<span class="sd">    fullcount_paths: dict</span>
+<span class="sd">        dictionary of CSV files (e.g. if manually unzipping the archive from LTDB). The</span>
+<span class="sd">        dict should be formatted using `fullcount_{year}` as the key, with the value storing</span>
+<span class="sd">        the path to the given csv, as in {&#39;fullcount_1970&#39;: &#39;path/to/fullcount_1970.csv&#39;,}</span>
+<span class="sd">    data_dir: str</span>
+<span class="sd">        directory to store the resulting parquet file. If &#39;auto&#39; (default) the default</span>
+<span class="sd">        geosnap data directory will be used (via the `platformdirs` package)</span>
+<span class="sd">    currency_year : int</span>
+<span class="sd">        year used to express common dollar values. Default is 2010 meaning all currency</span>
+<span class="sd">        variables (e.g. median income) will be expressed in real 2010 values.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">codebook</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">script_dir</span><span class="p">,</span> <span class="s2">&quot;variables.csv&quot;</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">sample_zip</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">sample_paths</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;No Sample Data Found. You must pass either a zip archive of &quot;</span>
+            <span class="s2">&quot;LTDB data or a dict of csv paths from the unpacked archive &quot;</span>
+            <span class="s2">&quot;using `sample_</span><span class="si">{year}</span><span class="s2">` format for the dictionary keys&quot;</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">sample_paths</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">sample_base</span> <span class="o">=</span> <span class="s2">&quot;ltdb_std_all_sample/ltdb_std_all_sample/&quot;</span>
+        <span class="n">sample_zip</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">sample_zip</span><span class="p">)</span>
+        <span class="n">sample_paths</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;sample_1970&quot;</span><span class="p">:</span> <span class="n">sample_zip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sample_base</span><span class="si">}</span><span class="s2">ltdb_std_1970_sample.csv&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;sample_1980&quot;</span><span class="p">:</span> <span class="n">sample_zip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sample_base</span><span class="si">}</span><span class="s2">ltdb_std_1980_sample.csv&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;sample_1990&quot;</span><span class="p">:</span> <span class="n">sample_zip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sample_base</span><span class="si">}</span><span class="s2">ltdb_std_1990_sample.csv&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;sample_2000&quot;</span><span class="p">:</span> <span class="n">sample_zip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sample_base</span><span class="si">}</span><span class="s2">LTDB_Std_ 2000_ Sample.csv&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;sample_2010&quot;</span><span class="p">:</span> <span class="n">sample_zip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sample_base</span><span class="si">}</span><span class="s2">LTDB_std_200812_Sample.csv&quot;</span><span class="p">),</span>
+        <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">fullcount_zip</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">fullcount_paths</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;No Fullcount Data Found. You must pass either a zip archive of &quot;</span>
+            <span class="s2">&quot;LTDB data or a dict of csv paths from the unpacked archive &quot;</span>
+            <span class="s2">&quot;using `fullcount_</span><span class="si">{year}</span><span class="s2">` format for the dictionary keys&quot;</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">fullcount_paths</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fullcount_base</span> <span class="o">=</span> <span class="s2">&quot;ltdb_std_all_fullcount/ltdb_std_all_fullcount/&quot;</span>
+        <span class="n">fullcount_zip</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">fullcount_zip</span><span class="p">)</span>
+        <span class="n">fullcount_paths</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;fullcount_1970&quot;</span><span class="p">:</span> <span class="n">fullcount_zip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fullcount_base</span><span class="si">}</span><span class="s2">LTDB_Std_1970_fullcount.csv&quot;</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;fullcount_1980&quot;</span><span class="p">:</span> <span class="n">fullcount_zip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fullcount_base</span><span class="si">}</span><span class="s2">LTDB_Std_1980_fullcount.csv&quot;</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;fullcount_1990&quot;</span><span class="p">:</span> <span class="n">fullcount_zip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fullcount_base</span><span class="si">}</span><span class="s2">LTDB_Std_1990_fullcount.csv&quot;</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;fullcount_2000&quot;</span><span class="p">:</span> <span class="n">fullcount_zip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fullcount_base</span><span class="si">}</span><span class="s2">LTDB_Std_2000_fullcount.csv&quot;</span>
+            <span class="p">),</span>
+        <span class="p">}</span>
+
+    <span class="c1"># read in Brown&#39;s LTDB data, both the sample and fullcount files for each</span>
+    <span class="c1"># year population, housing units &amp; occupied housing units appear in both</span>
+    <span class="c1"># &quot;sample&quot; and &quot;fullcount&quot; files-- currently drop sample and keep fullcount</span>
+
+    <span class="c1"># read all samples</span>
+    <span class="n">sample70</span> <span class="o">=</span> <span class="n">_ltdb_reader</span><span class="p">(</span>
+        <span class="n">sample_paths</span><span class="p">[</span><span class="s2">&quot;sample_1970&quot;</span><span class="p">],</span>
+        <span class="n">dropcols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;POP70SP1&quot;</span><span class="p">,</span> <span class="s2">&quot;HU70SP&quot;</span><span class="p">,</span> <span class="s2">&quot;OHU70SP&quot;</span><span class="p">],</span>
+        <span class="n">year</span><span class="o">=</span><span class="mi">1970</span><span class="p">,</span>
+        <span class="n">currency_year</span><span class="o">=</span><span class="n">currency_year</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">sample80</span> <span class="o">=</span> <span class="n">_ltdb_reader</span><span class="p">(</span>
+        <span class="n">sample_paths</span><span class="p">[</span><span class="s2">&quot;sample_1980&quot;</span><span class="p">],</span>
+        <span class="n">dropcols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;pop80sf3&quot;</span><span class="p">,</span> <span class="s2">&quot;pop80sf4&quot;</span><span class="p">,</span> <span class="s2">&quot;hu80sp&quot;</span><span class="p">,</span> <span class="s2">&quot;ohu80sp&quot;</span><span class="p">],</span>
+        <span class="n">year</span><span class="o">=</span><span class="mi">1980</span><span class="p">,</span>
+        <span class="n">currency_year</span><span class="o">=</span><span class="n">currency_year</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">sample90</span> <span class="o">=</span> <span class="n">_ltdb_reader</span><span class="p">(</span>
+        <span class="n">sample_paths</span><span class="p">[</span><span class="s2">&quot;sample_1990&quot;</span><span class="p">],</span>
+        <span class="n">dropcols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;POP90SF3&quot;</span><span class="p">,</span> <span class="s2">&quot;POP90SF4&quot;</span><span class="p">,</span> <span class="s2">&quot;HU90SP&quot;</span><span class="p">,</span> <span class="s2">&quot;OHU90SP&quot;</span><span class="p">],</span>
+        <span class="n">year</span><span class="o">=</span><span class="mi">1990</span><span class="p">,</span>
+        <span class="n">currency_year</span><span class="o">=</span><span class="n">currency_year</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">sample00</span> <span class="o">=</span> <span class="n">_ltdb_reader</span><span class="p">(</span>
+        <span class="n">sample_paths</span><span class="p">[</span><span class="s2">&quot;sample_2000&quot;</span><span class="p">],</span>
+        <span class="n">dropcols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;POP00SF3&quot;</span><span class="p">,</span> <span class="s2">&quot;HU00SP&quot;</span><span class="p">,</span> <span class="s2">&quot;OHU00SP&quot;</span><span class="p">],</span>
+        <span class="n">year</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span>
+        <span class="n">currency_year</span><span class="o">=</span><span class="n">currency_year</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">sample10</span> <span class="o">=</span> <span class="n">_ltdb_reader</span><span class="p">(</span>
+        <span class="n">sample_paths</span><span class="p">[</span><span class="s2">&quot;sample_2010&quot;</span><span class="p">],</span> <span class="n">year</span><span class="o">=</span><span class="mi">2010</span><span class="p">,</span> <span class="n">currency_year</span><span class="o">=</span><span class="n">currency_year</span>
+    <span class="p">)</span>
+
+    <span class="c1"># read all fullcount files</span>
+    <span class="n">fullcount70</span> <span class="o">=</span> <span class="n">_ltdb_reader</span><span class="p">(</span>
+        <span class="n">fullcount_paths</span><span class="p">[</span><span class="s2">&quot;fullcount_1970&quot;</span><span class="p">],</span> <span class="n">year</span><span class="o">=</span><span class="mi">1970</span><span class="p">,</span> <span class="n">currency_year</span><span class="o">=</span><span class="n">currency_year</span>
+    <span class="p">)</span>
+    <span class="n">fullcount80</span> <span class="o">=</span> <span class="n">_ltdb_reader</span><span class="p">(</span>
+        <span class="n">fullcount_paths</span><span class="p">[</span><span class="s2">&quot;fullcount_1980&quot;</span><span class="p">],</span> <span class="n">year</span><span class="o">=</span><span class="mi">1980</span><span class="p">,</span> <span class="n">currency_year</span><span class="o">=</span><span class="n">currency_year</span>
+    <span class="p">)</span>
+    <span class="n">fullcount90</span> <span class="o">=</span> <span class="n">_ltdb_reader</span><span class="p">(</span>
+        <span class="n">fullcount_paths</span><span class="p">[</span><span class="s2">&quot;fullcount_1990&quot;</span><span class="p">],</span> <span class="n">year</span><span class="o">=</span><span class="mi">1990</span><span class="p">,</span> <span class="n">currency_year</span><span class="o">=</span><span class="n">currency_year</span>
+    <span class="p">)</span>
+    <span class="n">fullcount00</span> <span class="o">=</span> <span class="n">_ltdb_reader</span><span class="p">(</span>
+        <span class="n">fullcount_paths</span><span class="p">[</span><span class="s2">&quot;fullcount_2000&quot;</span><span class="p">],</span> <span class="n">year</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">currency_year</span><span class="o">=</span><span class="n">currency_year</span>
+    <span class="p">)</span>
+
+    <span class="c1"># join the sample and fullcount variables into a single df for the year</span>
+    <span class="n">ltdb_1970</span> <span class="o">=</span> <span class="n">sample70</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">fullcount70</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">7</span><span class="p">:],</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;left&quot;</span>
+    <span class="p">)</span>
+    <span class="n">ltdb_1980</span> <span class="o">=</span> <span class="n">sample80</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">fullcount80</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">7</span><span class="p">:],</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;left&quot;</span>
+    <span class="p">)</span>
+    <span class="n">ltdb_1990</span> <span class="o">=</span> <span class="n">sample90</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">fullcount90</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">7</span><span class="p">:],</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;left&quot;</span>
+    <span class="p">)</span>
+    <span class="n">ltdb_2000</span> <span class="o">=</span> <span class="n">sample00</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">fullcount00</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">7</span><span class="p">:],</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;left&quot;</span>
+    <span class="p">)</span>
+    <span class="n">ltdb_2010</span> <span class="o">=</span> <span class="n">sample10</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">ltdb_1970</span><span class="p">,</span> <span class="n">ltdb_1980</span><span class="p">,</span> <span class="n">ltdb_1990</span><span class="p">,</span> <span class="n">ltdb_2000</span><span class="p">,</span> <span class="n">ltdb_2010</span><span class="p">],</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">renamer</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="nb">zip</span><span class="p">(</span>
+            <span class="n">codebook</span><span class="p">[</span><span class="s2">&quot;ltdb&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+            <span class="n">codebook</span><span class="p">[</span><span class="s2">&quot;variable&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">renamer</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;columns&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># compute additional variables from lookup table</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">codebook</span><span class="p">[</span><span class="s2">&quot;formula&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">keeps</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">codebook</span><span class="p">[</span><span class="s2">&quot;variable&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">])]</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">keeps</span><span class="p">]</span>
+
+    <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_make_data_dir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">),</span> <span class="s2">&quot;ltdb.parquet&quot;</span><span class="p">),</span> <span class="n">compression</span><span class="o">=</span><span class="s2">&quot;brotli&quot;</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="store_ncdb">
+<a class="viewcode-back" href="../../../generated/geosnap.io.store_ncdb.html#geosnap.io.store_ncdb">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">store_ncdb</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read &amp; store data from Geolytics&#39;s Neighborhood Change Database.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filepath : str</span>
+<span class="sd">        location of the input CSV file extracted from your Geolytics DVD</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">codebook</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">script_dir</span><span class="p">,</span> <span class="s2">&quot;variables.csv&quot;</span><span class="p">))</span>
+    <span class="n">ncdb_vars</span> <span class="o">=</span> <span class="n">codebook</span><span class="p">[</span><span class="s2">&quot;ncdb&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">values</span>
+
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">ncdb_vars</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">suffix</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;7&quot;</span><span class="p">,</span> <span class="s2">&quot;8&quot;</span><span class="p">,</span> <span class="s2">&quot;9&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">]:</span>
+            <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span> <span class="o">+</span> <span class="n">suffix</span><span class="p">)</span>
+    <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;GEO2010&quot;</span><span class="p">)</span>
+
+    <span class="n">c</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+    <span class="n">keep</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">col</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+                <span class="n">keep</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+        <span class="n">filepath</span><span class="p">,</span>
+        <span class="n">usecols</span><span class="o">=</span><span class="n">keep</span><span class="p">,</span>
+        <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;c&quot;</span><span class="p">,</span>
+        <span class="n">na_values</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="mi">99999</span><span class="p">,</span> <span class="o">-</span><span class="mi">999</span><span class="p">],</span>
+        <span class="n">converters</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;GEO2010&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="s2">&quot;COUNTY&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="s2">&quot;COUSUB&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="s2">&quot;DIVISION&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="s2">&quot;REGION&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="s2">&quot;STATE&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="n">cols</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+    <span class="n">fixed</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">col</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;D&quot;</span><span class="p">):</span>
+            <span class="n">fixed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;D&quot;</span> <span class="o">+</span> <span class="n">col</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">col</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;N&quot;</span><span class="p">):</span>
+            <span class="n">fixed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;N&quot;</span> <span class="o">+</span> <span class="n">col</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">col</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;1A&quot;</span><span class="p">):</span>
+            <span class="n">fixed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">col</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;2&quot;</span><span class="p">)</span>
+
+    <span class="n">orig</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">col</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;D&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">col</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;N&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">col</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;1A&quot;</span><span class="p">):</span>
+            <span class="n">orig</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+
+    <span class="n">renamer</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">orig</span><span class="p">,</span> <span class="n">fixed</span><span class="p">))</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">renamer</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;columns&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">names</span><span class="p">)]]</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">wide_to_long</span><span class="p">(</span>
+        <span class="n">df</span><span class="p">,</span> <span class="n">stubnames</span><span class="o">=</span><span class="n">ncdb_vars</span><span class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="s2">&quot;GEO2010&quot;</span><span class="p">,</span> <span class="n">j</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;(7|8|9|0|1|2)&quot;</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+        <span class="p">{</span><span class="mi">7</span><span class="p">:</span> <span class="mi">1970</span><span class="p">,</span> <span class="mi">8</span><span class="p">:</span> <span class="mi">1980</span><span class="p">,</span> <span class="mi">9</span><span class="p">:</span> <span class="mi">1990</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">2000</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">2010</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">2010</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s2">&quot;GEO2010&quot;</span><span class="p">,</span> <span class="s2">&quot;year&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+
+    <span class="n">mapper</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">codebook</span><span class="p">()</span><span class="o">.</span><span class="n">ncdb</span><span class="p">,</span> <span class="n">codebook</span><span class="p">()</span><span class="o">.</span><span class="n">variable</span><span class="p">))</span>
+
+    <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">mapper</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;columns&quot;</span><span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;geoid&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">codebook</span><span class="p">[</span><span class="s2">&quot;formula&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unable to compute </span><span class="si">{</span><span class="n">row</span><span class="si">}</span><span class="s2"> with </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">keeps</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">codebook</span><span class="p">[</span><span class="s2">&quot;variable&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">])]</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">keeps</span><span class="p">]</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">n_total_pop</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_make_data_dir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">),</span> <span class="s2">&quot;ncdb.parquet&quot;</span><span class="p">),</span> <span class="n">compression</span><span class="o">=</span><span class="s2">&quot;brotli&quot;</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_fips_filter</span><span class="p">(</span>
+    <span class="n">state_fips</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">county_fips</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">msa_fips</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fips</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">msa_definitions</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+        <span class="n">Path</span><span class="p">(</span><span class="n">script_dir</span><span class="p">,</span> <span class="s2">&quot;msa_definitions.csv&quot;</span><span class="p">),</span>
+        <span class="n">converters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;stcofips&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;CBSA Code&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="n">fips_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">each</span> <span class="ow">in</span> <span class="p">[</span><span class="n">state_fips</span><span class="p">,</span> <span class="n">county_fips</span><span class="p">,</span> <span class="n">fips</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">each</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,)):</span>
+            <span class="n">each</span> <span class="o">=</span> <span class="p">[</span><span class="n">each</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">each</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,)):</span>
+            <span class="n">fips_list</span> <span class="o">+=</span> <span class="n">each</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;72&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">fips_list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s2">&quot;geosnap does not yet include built-in data for Puerto Rico&quot;</span>
+            <span class="p">)</span>
+    <span class="k">if</span> <span class="n">msa_fips</span><span class="p">:</span>
+        <span class="n">pr_metros</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="n">msa_definitions</span><span class="p">[</span><span class="n">msa_definitions</span><span class="p">[</span><span class="s2">&quot;CBSA Title&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s2">&quot;PR&quot;</span><span class="p">)][</span>
+                <span class="s2">&quot;CBSA Code&quot;</span>
+            <span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">msa_fips</span> <span class="ow">in</span> <span class="n">pr_metros</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s2">&quot;geosnap does not yet include built-in data for Puerto Rico&quot;</span>
+            <span class="p">)</span>
+        <span class="n">fips_list</span> <span class="o">+=</span> <span class="n">msa_definitions</span><span class="p">[</span><span class="n">msa_definitions</span><span class="p">[</span><span class="s2">&quot;CBSA Code&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">msa_fips</span><span class="p">][</span>
+            <span class="s2">&quot;stcofips&quot;</span>
+        <span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">geoid</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">fips_list</span><span class="p">))]</span>
+
+    <span class="k">return</span> <span class="n">df</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_from_db</span><span class="p">(</span>
+    <span class="n">datastore</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">,</span>
+    <span class="n">state_fips</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">county_fips</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">msa_fips</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">fips</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">years</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">years</span><span class="p">)]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">_fips_filter</span><span class="p">(</span>
+        <span class="n">state_fips</span><span class="o">=</span><span class="n">state_fips</span><span class="p">,</span>
+        <span class="n">county_fips</span><span class="o">=</span><span class="n">county_fips</span><span class="p">,</span>
+        <span class="n">msa_fips</span><span class="o">=</span><span class="n">msa_fips</span><span class="p">,</span>
+        <span class="n">fips</span><span class="o">=</span><span class="n">fips</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># we know we&#39;re using 2010, need to drop the year column so no conficts</span>
+    <span class="n">tracts</span> <span class="o">=</span> <span class="n">datastore</span><span class="o">.</span><span class="n">tracts_2010</span><span class="p">()</span>
+    <span class="n">tracts</span> <span class="o">=</span> <span class="n">tracts</span><span class="p">[[</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">]]</span>
+    <span class="n">tracts</span> <span class="o">=</span> <span class="n">tracts</span><span class="p">[</span><span class="n">tracts</span><span class="o">.</span><span class="n">geoid</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">geoid</span><span class="p">)]</span>
+
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">tracts</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;geoid&quot;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;geoid&quot;</span><span class="p">)</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gdf</span>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2023, geosnap developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.1.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

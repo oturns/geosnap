@@ -1,0 +1,6 @@
+﻿geosnap.analyze.lincs\_from\_gdf
+================================
+
+.. currentmodule:: geosnap.analyze
+
+.. autofunction:: lincs_from_gdf

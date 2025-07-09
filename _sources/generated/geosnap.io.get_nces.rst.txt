@@ -1,0 +1,6 @@
+﻿geosnap.io.get\_nces
+====================
+
+.. currentmodule:: geosnap.io
+
+.. autofunction:: get_nces

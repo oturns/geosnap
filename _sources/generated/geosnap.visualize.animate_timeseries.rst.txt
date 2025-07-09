@@ -1,0 +1,6 @@
+﻿geosnap.visualize.animate\_timeseries
+=====================================
+
+.. currentmodule:: geosnap.visualize
+
+.. autofunction:: animate_timeseries

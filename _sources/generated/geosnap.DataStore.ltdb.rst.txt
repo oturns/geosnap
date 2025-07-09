@@ -1,0 +1,6 @@
+﻿geosnap.DataStore.ltdb
+======================
+
+.. currentmodule:: geosnap
+
+.. automethod:: DataStore.ltdb

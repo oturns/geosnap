@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>geosnap.DataStore &#8212; geosnap v0.15.3 Manual</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css?v=9afac83c" />
+    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+    <script src="../_static/documentation_options.js?v=d86fca55"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="../_static/geosnap.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="geosnap.DataStore.acs" href="geosnap.DataStore.acs.html" />
+    <link rel="prev" title="API reference" href="../api.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          geosnap</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.15.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../installation.html">Installation</a></li>
+                <li><a href="../api.html">API</a></li>
+                <li><a href="../data.html">Data</a></li>
+                <li><a href="https://oturns.github.io/geosnap-guide/">User Guide</a></li>
+                <li><a href="../references.html">References</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#installing-a-released-version">Installing a released version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#installing-development-version">Installing development version</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#io-module">IO Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#analyze-module">Analyze Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#harmonize-module">Harmonize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#visualize-module">Visualize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#util-module">Util Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data.html">Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../data.html#tabular-data">Tabular Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../data.html#geo-data">Geo Data</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">geosnap.DataStore</a><ul>
+<li><a class="reference internal" href="#geosnap.DataStore"><code class="docutils literal notranslate"><span class="pre">DataStore</span></code></a><ul>
+<li><a class="reference internal" href="#geosnap.DataStore.__init__"><code class="docutils literal notranslate"><span class="pre">DataStore.__init__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <section id="geosnap-datastore">
+<h1>geosnap.DataStore<a class="headerlink" href="#geosnap-datastore" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="geosnap.DataStore">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">geosnap.</span></span><span class="sig-name descname"><span class="pre">DataStore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disclaimer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/_data.html#DataStore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geosnap.DataStore" title="Link to this definition">¶</a></dt>
+<dd><p>Storage for geosnap data. Currently supports data from several U.S. federal agencies and national research centers.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="geosnap.DataStore.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disclaimer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/geosnap/_data.html#DataStore.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#geosnap.DataStore.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#geosnap.DataStore.__init__" title="geosnap.DataStore.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([data_dir, disclaimer])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="geosnap.DataStore.acs.html#geosnap.DataStore.acs" title="geosnap.DataStore.acs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">acs</span></code></a>([year, level, states])</p></td>
+<td><p>American Community Survey Data (5-year estimates).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="geosnap.DataStore.bea_regions.html#geosnap.DataStore.bea_regions" title="geosnap.DataStore.bea_regions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bea_regions</span></code></a>()</p></td>
+<td><p>Return a table that maps states to their respective BEA regions</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="geosnap.DataStore.blocks_2000.html#geosnap.DataStore.blocks_2000" title="geosnap.DataStore.blocks_2000"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blocks_2000</span></code></a>([states, fips])</p></td>
+<td><p>Census blocks for 2000.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="geosnap.DataStore.blocks_2010.html#geosnap.DataStore.blocks_2010" title="geosnap.DataStore.blocks_2010"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blocks_2010</span></code></a>([states, fips])</p></td>
+<td><p>Census blocks for 2010.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="geosnap.DataStore.blocks_2020.html#geosnap.DataStore.blocks_2020" title="geosnap.DataStore.blocks_2020"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blocks_2020</span></code></a>([states, fips])</p></td>
+<td><p>Census blocks for 2020.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="geosnap.DataStore.codebook.html#geosnap.DataStore.codebook" title="geosnap.DataStore.codebook"><code class="xref py py-obj docutils literal notranslate"><span class="pre">codebook</span></code></a>()</p></td>
+<td><p>Codebook.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="geosnap.DataStore.counties.html#geosnap.DataStore.counties" title="geosnap.DataStore.counties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">counties</span></code></a>()</p></td>
+<td><p>Nationwide counties as drawn in 2010.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="geosnap.DataStore.ejscreen.html#geosnap.DataStore.ejscreen" title="geosnap.DataStore.ejscreen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ejscreen</span></code></a>([year, states])</p></td>
+<td><p>EPA EJScreen Data &lt;<a class="reference external" href="https://www.epa.gov/ejscreen">https://www.epa.gov/ejscreen</a>&gt;.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="geosnap.DataStore.ejscreen_codebook.html#geosnap.DataStore.ejscreen_codebook" title="geosnap.DataStore.ejscreen_codebook"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ejscreen_codebook</span></code></a>()</p></td>
+<td><p>Table of variable definitions used in the EPE Environmental Justice Screening dataset</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="geosnap.DataStore.lodes_codebook.html#geosnap.DataStore.lodes_codebook" title="geosnap.DataStore.lodes_codebook"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lodes_codebook</span></code></a>()</p></td>
+<td><p>Return a table of descriptive variable names for the LODES data</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="geosnap.DataStore.ltdb.html#geosnap.DataStore.ltdb" title="geosnap.DataStore.ltdb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ltdb</span></code></a>()</p></td>
+<td><p>Longitudinal Tract Database (LTDB).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="geosnap.DataStore.msa_definitions.html#geosnap.DataStore.msa_definitions" title="geosnap.DataStore.msa_definitions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">msa_definitions</span></code></a>()</p></td>
+<td><p>2010 Metropolitan Statistical Area definitions.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="geosnap.DataStore.msas.html#geosnap.DataStore.msas" title="geosnap.DataStore.msas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">msas</span></code></a>()</p></td>
+<td><p>Metropolitan Statistical Areas as drawn in 2020.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="geosnap.DataStore.ncdb.html#geosnap.DataStore.ncdb" title="geosnap.DataStore.ncdb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ncdb</span></code></a>()</p></td>
+<td><p>Geolytics Neighborhood Change Database (NCDB).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="geosnap.DataStore.nces.html#geosnap.DataStore.nces" title="geosnap.DataStore.nces"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nces</span></code></a>([year, dataset])</p></td>
+<td><p>National Center for Education Statistics (NCES) Data.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="geosnap.DataStore.nlcd_definitions.html#geosnap.DataStore.nlcd_definitions" title="geosnap.DataStore.nlcd_definitions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nlcd_definitions</span></code></a>()</p></td>
+<td><p>Table of NLCD land classification system definitions.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="geosnap.DataStore.seda.html#geosnap.DataStore.seda" title="geosnap.DataStore.seda"><code class="xref py py-obj docutils literal notranslate"><span class="pre">seda</span></code></a>([level, pooling, standardize, accept_eula])</p></td>
+<td><p>Acheievement data from the Stanford Education Data Archive (currently version 4.1).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="geosnap.DataStore.show_data_dir.html#geosnap.DataStore.show_data_dir" title="geosnap.DataStore.show_data_dir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_data_dir</span></code></a>([verbose])</p></td>
+<td><p>Print the location of the local geosnap data storage directory.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="geosnap.DataStore.states.html#geosnap.DataStore.states" title="geosnap.DataStore.states"><code class="xref py py-obj docutils literal notranslate"><span class="pre">states</span></code></a>()</p></td>
+<td><p>States.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="geosnap.DataStore.tracts_1990.html#geosnap.DataStore.tracts_1990" title="geosnap.DataStore.tracts_1990"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tracts_1990</span></code></a>([states])</p></td>
+<td><p>Nationwide Census Tracts as drawn in 1990 (cartographic 500k).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="geosnap.DataStore.tracts_2000.html#geosnap.DataStore.tracts_2000" title="geosnap.DataStore.tracts_2000"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tracts_2000</span></code></a>([states])</p></td>
+<td><p>Nationwide Census Tracts as drawn in 2000 (cartographic 500k).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="geosnap.DataStore.tracts_2010.html#geosnap.DataStore.tracts_2010" title="geosnap.DataStore.tracts_2010"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tracts_2010</span></code></a>([states])</p></td>
+<td><p>Nationwide Census Tracts as drawn in 2010 (cartographic 500k).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="geosnap.DataStore.tracts_2020.html#geosnap.DataStore.tracts_2020" title="geosnap.DataStore.tracts_2020"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tracts_2020</span></code></a>([states])</p></td>
+<td><p>Nationwide Census Tracts as drawn in 2020 (cartographic 500k).</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="../_sources/generated/geosnap.DataStore.rst.txt"
+     rel="nofollow">Source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2023, geosnap developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.1.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

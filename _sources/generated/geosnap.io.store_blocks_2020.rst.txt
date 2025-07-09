@@ -1,0 +1,6 @@
+﻿geosnap.io.store\_blocks\_2020
+==============================
+
+.. currentmodule:: geosnap.io
+
+.. autofunction:: store_blocks_2020

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Built-In Datasets &#8212; geosnap v0.15.3 Manual</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css?v=9afac83c" />
+    <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
+    <script src="_static/documentation_options.js?v=d86fca55"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="_static/geosnap.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="References" href="references.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          geosnap</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.15.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="installation.html">Installation</a></li>
+                <li><a href="api.html">API</a></li>
+                <li><a href="#">Data</a></li>
+                <li><a href="https://oturns.github.io/geosnap-guide/">User Guide</a></li>
+                <li><a href="references.html">References</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installing-a-released-version">Installing a released version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installing-development-version">Installing development version</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#io-module">IO Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#analyze-module">Analyze Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#harmonize-module">Harmonize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#visualize-module">Visualize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#util-module">Util Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#tabular-data">Tabular Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#geo-data">Geo Data</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Built-In Datasets</a><ul>
+<li><a class="reference internal" href="#tabular-data">Tabular Data</a></li>
+<li><a class="reference internal" href="#geo-data">Geo Data</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <section id="built-in-datasets">
+<h1>Built-In Datasets<a class="headerlink" href="#built-in-datasets" title="Link to this heading">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">geosnap</span></code> has a lightweight installation footprint (the codebase clocks in at 174KB), but it also
+has access to several large, built-in datasets transparently, thanks to <a class="reference external" href="https://quiltdata.com">quilt</a>.
+We host a variety of U.S. Census, landsat imagery, and OSM road network data in our <a class="reference external" href="https://open.quiltdata.com/b/spatial-ucr/tree/">public quilt bucket</a>,
+and <code class="docutils literal notranslate"><span class="pre">geosnap</span></code> has convenience methods for building datasets from them.</p>
+<p>All built-in datasets are available as methods on the <code class="docutils literal notranslate"><span class="pre">geosnap.DataStore</span></code> class. For more information, see the <a class="reference external" href="https://oturns.github.io/geosnap-guide/notebooks/01_getting_started.html">Getting Started</a> tutorial</p>
+<p>To keep its slender profile, <code class="docutils literal notranslate"><span class="pre">geosnap</span></code> is conservative about storing these data locally. By default, when you use built-in data, it is streamed from s3 via <code class="docutils literal notranslate"><span class="pre">quilt</span></code>.
+We store the data as efficient parquet files, and quilt provides access to them via Amazon’s <a class="reference external" href="https://registry.opendata.aws/spatial-ucr/">open data cloud</a>.
+This means that streaming data is relatively fast and efficient.</p>
+<p>If you plan to make repeated queries, or you need offline access to the data, <code class="docutils literal notranslate"><span class="pre">geosnap</span></code> also has functions
+for caching all the data locally (see the <a class="reference external" href="https://oturns.github.io/geosnap-guide/notebooks/01_getting_started.html">Getting Started</a> tutorial).
+Since we store everything in parquet, local storage is still highly efficient, and <code class="docutils literal notranslate"><span class="pre">geosnap</span></code> will use <a class="reference external" href="https://pypi.org/project/platformdirs/">platformdirs</a>
+to determine the best place to store the data on your machine.</p>
+<section id="tabular-data">
+<h2>Tabular Data<a class="headerlink" href="#tabular-data" title="Link to this heading">¶</a></h2>
+<p>To view the <a class="reference external" href="https://github.com/oturns/geosnap/blob/main/geosnap/io/variables.csv">codebook</a> for geosnap’s builtin datasets, use</p>
+<p><code class="docutils literal notranslate"><span class="pre">geosnap.datasets.codebook()</span></code></p>
+<p>which will return a pandas.DataFrame of variable names, definitions, formulas for intermediate variables, and translations to original sources.
+All variables are collected via the U.S. Census Bureau from either the decennial census, the American Community Survey, or the <a class="reference external" href="https://lehd.ces.census.gov/data/lodes/LODES7/">Longitudinal Employment Household Dynamics</a> dataset.</p>
+</section>
+<section id="geo-data">
+<h2>Geo Data<a class="headerlink" href="#geo-data" title="Link to this heading">¶</a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Data</p></th>
+<th class="head"><p>Source</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Blocks
+2000</p></td>
+<td><p><a class="reference external" href="https://www2.census.gov/geo/tiger/TIGER2010/TABBLOCK/2000/">https://www2.census.gov/geo/tiger/TIGER2010/TABBLOCK/2000/</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Blocks
+2010</p></td>
+<td><p><a class="reference external" href="https://www2.census.gov/geo/tiger/TIGER2018/TABBLOCK/">https://www2.census.gov/geo/tiger/TIGER2018/TABBLOCK/</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Blocks
+2020</p></td>
+<td><p><a class="reference external" href="https://www2.census.gov/geo/tiger/TIGER2021/TABBLOCK/">https://www2.census.gov/geo/tiger/TIGER2021/TABBLOCK/</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Tracts
+1990</p></td>
+<td><p><a class="reference external" href="https://github.co">https://github.co</a>
+m/loganpowell/census-geojson/tree/master/GeoJSON/500k/1990</p></td>
+</tr>
+<tr class="row-even"><td><p>Tracts
+2000</p></td>
+<td><p><a class="reference external" href="https://github.co">https://github.co</a>
+m/loganpowell/census-geojson/tree/master/GeoJSON/500k/2000</p></td>
+</tr>
+<tr class="row-odd"><td><p>Tracts
+2010</p></td>
+<td><p><a class="reference external" href="https://github.co">https://github.co</a>
+m/loganpowell/census-geojson/tree/master/GeoJSON/500k/2010</p></td>
+</tr>
+<tr class="row-even"><td><p>MSA
+Defi
+nitions</p></td>
+<td><p>https:
+//www2.census.gov/programs-surveys/metro-micro/geographies
+/reference-files/2018/delineation-files/list1_Sep_2018.xls</p></td>
+</tr>
+<tr class="row-odd"><td><p>In
+flation
+Adj
+ustment</p></td>
+<td><p><a class="reference external" href="https://www.bls.gov/cpi/research-series/allitems.xlsx">https://www.bls.gov/cpi/research-series/allitems.xlsx</a></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="_sources/data.rst.txt"
+     rel="nofollow">Source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2023, geosnap developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.1.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

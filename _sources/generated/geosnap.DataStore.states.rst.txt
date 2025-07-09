@@ -1,0 +1,6 @@
+﻿geosnap.DataStore.states
+========================
+
+.. currentmodule:: geosnap
+
+.. automethod:: DataStore.states

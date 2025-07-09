@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>geosnap.analyze.network &#8212; geosnap v0.15.3 Manual</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css?v=9afac83c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+    <script src="../../../_static/documentation_options.js?v=d86fca55"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="../../../_static/geosnap.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+          geosnap</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.15.3</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../installation.html">Installation</a></li>
+                <li><a href="../../../api.html">API</a></li>
+                <li><a href="../../../data.html">Data</a></li>
+                <li><a href="https://oturns.github.io/geosnap-guide/">User Guide</a></li>
+                <li><a href="../../../references.html">References</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#installing-a-released-version">Installing a released version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#installing-development-version">Installing development version</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#io-module">IO Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#analyze-module">Analyze Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#harmonize-module">Harmonize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#visualize-module">Visualize Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api.html#util-module">Util Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data.html">Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../data.html#tabular-data">Tabular Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data.html#geo-data">Geo Data</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for geosnap.analyze.network</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">libpysal.cg</span><span class="w"> </span><span class="kn">import</span> <span class="n">alpha_shape_auto</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">shapely</span><span class="w"> </span><span class="kn">import</span> <span class="n">concave_hull</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">shapely.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiPoint</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_geom_to_hull</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="n">ratio</span><span class="p">,</span> <span class="n">allow_holes</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">concave_hull</span><span class="p">(</span><span class="n">MultiPoint</span><span class="p">(</span><span class="n">geom</span><span class="p">),</span> <span class="n">ratio</span><span class="o">=</span><span class="n">ratio</span><span class="p">,</span> <span class="n">allow_holes</span><span class="o">=</span><span class="n">allow_holes</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">concave_hull</span><span class="p">(</span>
+            <span class="n">MultiPoint</span><span class="p">(</span><span class="n">geom</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">),</span>
+            <span class="n">ratio</span><span class="o">=</span><span class="n">ratio</span><span class="p">,</span>
+            <span class="n">allow_holes</span><span class="o">=</span><span class="n">allow_holes</span><span class="p">,</span>
+        <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_geom_to_alpha</span><span class="p">(</span><span class="n">geom</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">alpha_shape_auto</span><span class="p">(</span>
+            <span class="n">gpd</span><span class="o">.</span><span class="n">GeoSeries</span><span class="p">(</span><span class="n">geom</span><span class="p">)</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">()[[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">alpha_shape_auto</span><span class="p">(</span><span class="n">geom</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">()[[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_points_to_poly</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">hull</span><span class="o">=</span><span class="s2">&quot;shapely&quot;</span><span class="p">,</span> <span class="n">ratio</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">allow_holes</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">hull</span> <span class="o">==</span> <span class="s2">&quot;libpysal&quot;</span><span class="p">:</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">column</span><span class="p">)[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">_geom_to_alpha</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">hull</span> <span class="o">==</span> <span class="s2">&quot;shapely&quot;</span><span class="p">:</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">column</span><span class="p">)[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">_geom_to_hull</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ratio</span><span class="p">,</span> <span class="n">allow_holes</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;`algorithm must be either &#39;shapely&#39; or &#39;libpysal&#39; but </span><span class="si">{</span><span class="n">hull</span><span class="si">}</span><span class="s2"> was passed&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">output</span>
+
+
+<div class="viewcode-block" id="pdna_to_adj">
+<a class="viewcode-back" href="../../../generated/geosnap.analyze.pdna_to_adj.html#geosnap.analyze.pdna_to_adj">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">pdna_to_adj</span><span class="p">(</span><span class="n">origins</span><span class="p">,</span> <span class="n">network</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">reindex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">drop_nonorigins</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create an adjacency list of shortest network-based travel between</span>
+<span class="sd">       origins and destinations in a pandana.Network.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    origins : geopandas.GeoDataFrame</span>
+<span class="sd">        Geodataframe of origin geometries to begin routing. If geometries are</span>
+<span class="sd">        polygons, they will be collapsed to centroids</span>
+<span class="sd">    network : pandana.Network</span>
+<span class="sd">        pandana.Network instance that stores the local travel network</span>
+<span class="sd">    threshold : int</span>
+<span class="sd">        maximum travel distance (inclusive)</span>
+<span class="sd">    reindex : bool, optional</span>
+<span class="sd">        if True, use geodataframe index to identify observations in the</span>
+<span class="sd">        adjlist. If False, the node_id from the OSM node nearest each</span>
+<span class="sd">        observation will be used. by default True</span>
+<span class="sd">    drop_nonorigins : bool, optional</span>
+<span class="sd">        If True, drop any destination nodes that are not also origins,</span>
+<span class="sd">        by default True</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pandas.DataFrame</span>
+<span class="sd">        adjacency list with columns &#39;origin&#39;, &#39;destination&#39;, and &#39;cost&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">node_ids</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get_node_ids</span><span class="p">(</span><span class="n">origins</span><span class="o">.</span><span class="n">centroid</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">origins</span><span class="o">.</span><span class="n">centroid</span><span class="o">.</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="c1"># map node ids in the network to index in the gdf</span>
+    <span class="n">mapper</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">node_ids</span><span class="p">,</span> <span class="n">origins</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
+
+    <span class="n">namer</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;origin&quot;</span><span class="p">,</span> <span class="n">network</span><span class="o">.</span><span class="n">impedance_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="s2">&quot;cost&quot;</span><span class="p">}</span>
+
+    <span class="n">adj</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">nodes_in_range</span><span class="p">(</span><span class="n">node_ids</span><span class="p">,</span> <span class="n">threshold</span><span class="p">)</span>
+    <span class="n">adj</span> <span class="o">=</span> <span class="n">adj</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">namer</span><span class="p">)</span>
+    <span class="c1"># swap osm ids for gdf index</span>
+    <span class="k">if</span> <span class="n">reindex</span><span class="p">:</span>
+        <span class="n">adj</span> <span class="o">=</span> <span class="n">adj</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;destination&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">mapper</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="n">adj</span> <span class="o">=</span> <span class="n">adj</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;origin&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">mapper</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">drop_nonorigins</span><span class="p">:</span>
+        <span class="n">adj</span> <span class="o">=</span> <span class="n">adj</span><span class="p">[</span><span class="n">adj</span><span class="o">.</span><span class="n">destination</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">origins</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">)]</span>
+
+    <span class="k">return</span> <span class="n">adj</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">isochrones_from_id</span><span class="p">(</span>
+    <span class="n">origin</span><span class="p">,</span>
+    <span class="n">network</span><span class="p">,</span>
+    <span class="n">threshold</span><span class="p">,</span>
+    <span class="n">hull</span><span class="o">=</span><span class="s2">&quot;shapely&quot;</span><span class="p">,</span>
+    <span class="n">ratio</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+    <span class="n">allow_holes</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">use_edges</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">network_crs</span><span class="o">=</span><span class="mi">4326</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create travel isochrone(s) from a single origin using a pandana network.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    origin : int or list</span>
+<span class="sd">        A single or list of node id(s) from a `pandana.Network.nodes_df`</span>
+<span class="sd">        to serve as isochrone origins</span>
+<span class="sd">    network : pandana.Network</span>
+<span class="sd">        A pandana network object (preferably created with</span>
+<span class="sd">        geosnap.io.get_network_from_gdf)</span>
+<span class="sd">    threshold : int or list</span>
+<span class="sd">        A single or list of threshold distances for which isochrones will be</span>
+<span class="sd">        computed. These are in the same impedance units as edges from the </span>
+<span class="sd">        pandana.Network.edge_df</span>
+<span class="sd">    hull : str, {&#39;libpysal&#39;, &#39;shapely&#39;}</span>
+<span class="sd">        Which method to generate container polygons (concave hulls) for destination</span>
+<span class="sd">        points. If &#39;libpysal&#39;, use `libpysal.cg.alpha_shape_auto` to create the</span>
+<span class="sd">        concave hull, else if &#39;shapely&#39;, use  `shapely.concave_hull`.</span>
+<span class="sd">        Default is libpysal</span>
+<span class="sd">    ratio : float</span>
+<span class="sd">        ratio keyword passed to `shapely.concave_hull`. Only used if</span>
+<span class="sd">        `algorithm=&#39;hull&#39;`. Default is 0.3</span>
+<span class="sd">    allow_holes : bool</span>
+<span class="sd">        keyword passed to `shapely.concave_hull` governing  whether holes are</span>
+<span class="sd">        allowed in the resulting polygon. Only used if `algorithm=&#39;hull&#39;`.</span>
+<span class="sd">        Default is False.</span>
+<span class="sd">    network_crs : int or pyproj.CRS</span>
+<span class="sd">        which coordinate system the pandana.Network node coordinates are stored in.</span>
+<span class="sd">        Default is 4326</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    geopandas.GeoDataFrame</span>
+<span class="sd">        A geodataframe with a single attribute (distance) and a polygon</span>
+<span class="sd">        geometry representing a travel time isochrone, with a row for each</span>
+<span class="sd">        threshold distance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># create a geodataframe of nodes from the network</span>
+    <span class="n">node_df</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+        <span class="n">network</span><span class="o">.</span><span class="n">nodes_df</span><span class="p">,</span>
+        <span class="n">geometry</span><span class="o">=</span><span class="n">gpd</span><span class="o">.</span><span class="n">points_from_xy</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">nodes_df</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">network</span><span class="o">.</span><span class="n">nodes_df</span><span class="o">.</span><span class="n">y</span><span class="p">),</span>
+        <span class="n">crs</span><span class="o">=</span><span class="n">network_crs</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">maxdist</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">threshold</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">threshold</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="n">threshold</span>
+
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">pdna_to_adj</span><span class="p">(</span>
+        <span class="n">origins</span><span class="o">=</span><span class="n">node_df</span><span class="p">[</span><span class="n">node_df</span><span class="o">.</span><span class="n">index</span> <span class="o">==</span> <span class="n">origin</span><span class="p">],</span>
+        <span class="n">network</span><span class="o">=</span><span class="n">network</span><span class="p">,</span>
+        <span class="n">threshold</span><span class="o">=</span><span class="n">maxdist</span><span class="p">,</span>
+        <span class="n">reindex</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">drop_nonorigins</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">threshold</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">threshold</span> <span class="o">=</span> <span class="p">[</span><span class="n">threshold</span><span class="p">]</span>
+    <span class="n">threshold</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">distance</span> <span class="ow">in</span> <span class="n">threshold</span><span class="p">:</span>
+        <span class="c1"># select the nodes within each threshold distance and take their alpha shape</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">[</span><span class="n">matrix</span><span class="o">.</span><span class="n">cost</span> <span class="o">&lt;=</span> <span class="n">distance</span><span class="p">]</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="n">node_df</span><span class="p">[</span><span class="n">node_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">destination</span><span class="o">.</span><span class="n">tolist</span><span class="p">())]</span>
+        <span class="k">if</span> <span class="n">use_edges</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;geometry&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">network</span><span class="o">.</span><span class="n">edges_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">edges</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">edges_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">roads</span> <span class="o">=</span> <span class="n">edges</span><span class="p">[</span>
+                    <span class="p">(</span><span class="n">edges</span><span class="p">[</span><span class="s2">&quot;to&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
+                    <span class="o">&amp;</span> <span class="p">(</span><span class="n">edges</span><span class="p">[</span><span class="s2">&quot;from&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
+                <span class="p">]</span>
+                <span class="n">nodes</span> <span class="o">=</span> <span class="n">roads</span>
+        <span class="k">if</span> <span class="n">hull</span> <span class="o">==</span> <span class="s2">&quot;libpysal&quot;</span><span class="p">:</span>
+            <span class="n">alpha</span> <span class="o">=</span> <span class="n">_geom_to_alpha</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">hull</span> <span class="o">==</span> <span class="s2">&quot;shapely&quot;</span><span class="p">:</span>
+            <span class="n">alpha</span> <span class="o">=</span> <span class="n">_geom_to_hull</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span> <span class="n">ratio</span><span class="o">=</span><span class="n">ratio</span><span class="p">,</span> <span class="n">allow_holes</span><span class="o">=</span><span class="n">allow_holes</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;`algorithm must be either &#39;alpha&#39; or &#39;hull&#39; but </span><span class="si">{</span><span class="n">hull</span><span class="si">}</span><span class="s2"> was passed&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">geometry</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">alpha</span><span class="p">),</span> <span class="n">crs</span><span class="o">=</span><span class="n">network_crs</span><span class="p">)</span>
+        <span class="n">alpha</span><span class="p">[</span><span class="s2">&quot;distance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">distance</span>
+
+        <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">alpha</span>
+
+
+<div class="viewcode-block" id="isochrones_from_gdf">
+<a class="viewcode-back" href="../../../generated/geosnap.analyze.isochrones_from_gdf.html#geosnap.analyze.isochrones_from_gdf">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">isochrones_from_gdf</span><span class="p">(</span>
+    <span class="n">origins</span><span class="p">,</span>
+    <span class="n">threshold</span><span class="p">,</span>
+    <span class="n">network</span><span class="p">,</span>
+    <span class="n">network_crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">reindex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">hull</span><span class="o">=</span><span class="s2">&quot;shapely&quot;</span><span class="p">,</span>
+    <span class="n">ratio</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+    <span class="n">allow_holes</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">use_edges</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create travel isochrones for several origins simultaneously</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    origins : geopandas.GeoDataFrame</span>
+<span class="sd">        a geodataframe containing the locations of origin point features</span>
+<span class="sd">    threshold: float</span>
+<span class="sd">        maximum travel cost to define the isochrone, measured in the same</span>
+<span class="sd">        impedance units as edges_df in the pandana.Network object.</span>
+<span class="sd">    network : pandana.Network</span>
+<span class="sd">        pandana Network instance for calculating the shortest path isochrone</span>
+<span class="sd">        for each origin feature</span>
+<span class="sd">    network_crs : str, int, pyproj.CRS (optional)</span>
+<span class="sd">        the coordinate system used to store x and y coordinates in the passed</span>
+<span class="sd">        pandana network. If None, the network is assumed to be stored in the</span>
+<span class="sd">        same CRS as the origins geodataframe</span>
+<span class="sd">    reindex : bool</span>
+<span class="sd">        if True, use the dataframe index as the origin and destination IDs</span>
+<span class="sd">        (rather than the node_ids of the pandana.Network). Default is True</span>
+<span class="sd">    hull : str, {&#39;libpysal&#39;, &#39;shapely&#39;}</span>
+<span class="sd">        Which method to generate container polygons (concave hulls) for destination</span>
+<span class="sd">        points. If &#39;libpysal&#39;, use `libpysal.cg.alpha_shape_auto` to create the</span>
+<span class="sd">        concave hull, else if &#39;shapely&#39;, use  `shapely.concave_hull`.</span>
+<span class="sd">        Default is libpysal</span>
+<span class="sd">    ratio : float</span>
+<span class="sd">        ratio keyword passed to `shapely.concave_hull`. Only used if</span>
+<span class="sd">        `hull=&#39;shapely&#39;`. Default is 0.3</span>
+<span class="sd">    allow_holes : bool</span>
+<span class="sd">        keyword passed to `shapely.concave_hull` governing  whether holes are</span>
+<span class="sd">        allowed in the resulting polygon. Only used if `hull=&#39;shapely&#39;`.</span>
+<span class="sd">        Default is False.</span>
+<span class="sd">    use_edges: bool</span>
+<span class="sd">        If true, use vertices from the Network.edge_df to make the polygon more</span>
+<span class="sd">        accurate by adhering to roadways. Requires that the &#39;geometry&#39; column be</span>
+<span class="sd">        available on the Network.edges_df, most commonly by using</span>
+<span class="sd">        `geosnap.io.get_network_from_gdf`</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    GeoPandas.DataFrame</span>
+<span class="sd">        polygon geometries with the isochrones for each origin point feature</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">network_crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">network_crs</span> <span class="o">=</span> <span class="n">origins</span><span class="o">.</span><span class="n">crs</span>
+    <span class="n">node_ids</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get_node_ids</span><span class="p">(</span><span class="n">origins</span><span class="o">.</span><span class="n">centroid</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">origins</span><span class="o">.</span><span class="n">centroid</span><span class="o">.</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="c1"># map node ids in the network to index in the gdf</span>
+    <span class="n">mapper</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">node_ids</span><span class="p">,</span> <span class="n">origins</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
+
+    <span class="n">destinations</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+        <span class="n">network</span><span class="o">.</span><span class="n">nodes_df</span><span class="p">,</span>
+        <span class="n">geometry</span><span class="o">=</span><span class="n">gpd</span><span class="o">.</span><span class="n">points_from_xy</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">nodes_df</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">network</span><span class="o">.</span><span class="n">nodes_df</span><span class="o">.</span><span class="n">y</span><span class="p">),</span>
+        <span class="n">crs</span><span class="o">=</span><span class="n">network_crs</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">pdna_to_adj</span><span class="p">(</span>
+        <span class="n">origins</span><span class="p">,</span>
+        <span class="n">network</span><span class="o">=</span><span class="n">network</span><span class="p">,</span>
+        <span class="n">threshold</span><span class="o">=</span><span class="n">threshold</span><span class="p">,</span>
+        <span class="n">reindex</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">drop_nonorigins</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">use_edges</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;geometry&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">network</span><span class="o">.</span><span class="n">edges_df</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+        <span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;use_edges is True, but edge geometries are not available &quot;</span>
+            <span class="s2">&quot;in the Network object. Try recreating with &quot;</span>
+            <span class="s2">&quot;geosnap.io.get_network_from_gdf&quot;</span>
+        <span class="p">)</span>
+    <span class="n">alphas</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">origin</span> <span class="ow">in</span> <span class="n">matrix</span><span class="o">.</span><span class="n">origin</span><span class="o">.</span><span class="n">unique</span><span class="p">():</span>
+        <span class="n">do</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">[</span><span class="n">matrix</span><span class="o">.</span><span class="n">origin</span> <span class="o">==</span> <span class="n">origin</span><span class="p">]</span>
+        <span class="n">dest_pts</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">destinations</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">do</span><span class="p">[</span><span class="s2">&quot;destination&quot;</span><span class="p">]])</span>
+        <span class="k">if</span> <span class="n">use_edges</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;geometry&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">network</span><span class="o">.</span><span class="n">edges_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">edges</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">edges_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">roads</span> <span class="o">=</span> <span class="n">edges</span><span class="p">[</span>
+                    <span class="p">(</span><span class="n">edges</span><span class="p">[</span><span class="s2">&quot;to&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">dest_pts</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
+                    <span class="o">&amp;</span> <span class="p">(</span><span class="n">edges</span><span class="p">[</span><span class="s2">&quot;from&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">dest_pts</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
+                <span class="p">]</span>
+                <span class="n">dest_pts</span> <span class="o">=</span> <span class="n">roads</span>
+
+        <span class="k">if</span> <span class="n">hull</span> <span class="o">==</span> <span class="s2">&quot;libpysal&quot;</span><span class="p">:</span>
+            <span class="n">alpha</span> <span class="o">=</span> <span class="n">_geom_to_alpha</span><span class="p">(</span><span class="n">dest_pts</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">hull</span> <span class="o">==</span> <span class="s2">&quot;shapely&quot;</span><span class="p">:</span>
+            <span class="n">alpha</span> <span class="o">=</span> <span class="n">_geom_to_hull</span><span class="p">(</span><span class="n">dest_pts</span><span class="p">,</span> <span class="n">ratio</span><span class="o">=</span><span class="n">ratio</span><span class="p">,</span> <span class="n">allow_holes</span><span class="o">=</span><span class="n">allow_holes</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;`algorithm must be either &#39;alpha&#39; or &#39;hull&#39; but </span><span class="si">{</span><span class="n">hull</span><span class="si">}</span><span class="s2"> was passed&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">geometry</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">alpha</span><span class="p">),</span> <span class="n">crs</span><span class="o">=</span><span class="n">network_crs</span><span class="p">)</span>
+        <span class="n">alpha</span><span class="p">[</span><span class="s2">&quot;distance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">threshold</span>
+        <span class="n">alpha</span><span class="p">[</span><span class="s2">&quot;origin&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span>
+        <span class="n">alphas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">alphas</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;origin&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">reindex</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">mapper</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">network_crs</span><span class="p">)</span></div>
+
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2023, geosnap developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.1.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
