@@ -4,7 +4,7 @@ from geosnap.analyze import (
 )
 from geosnap import DataStore
 from geosnap.io import get_acs, get_network_from_gdf, project_network
-import pandana as pdna
+import pandarm as pdna
 import geopandas as gpd
 import os
 import pytest

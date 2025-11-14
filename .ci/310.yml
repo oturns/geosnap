@@ -23,7 +23,7 @@ dependencies:
   - s3fs
   - segregation >=2.0
   - pyproj >=3
-  - pandana
+  - pandarm
   - pooch
   - osmnx
   - pygraphviz

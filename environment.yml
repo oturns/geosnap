@@ -6,7 +6,7 @@ dependencies:
   - pandas
   - giddy >=2.2.1
   - libpysal
-  - geopandas  >=0.9
+  - geopandas >=1.1
   - matplotlib
   - scikit-learn
   - seaborn
@@ -23,5 +23,5 @@ dependencies:
   - s3fs
   - segregation >=2.0
   - pyproj >=3
-  - pandana
   - pooch
+  - pandarm
