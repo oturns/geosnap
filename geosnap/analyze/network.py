@@ -43,15 +43,15 @@ def _points_to_poly(df, column, hull="shapely", ratio=0.2, allow_holes=False):
 
 def pdna_to_adj(origins, network, threshold, reindex=True, drop_nonorigins=True):
     """Create an adjacency list of shortest network-based travel between
-       origins and destinations in a pandana.Network.
+       origins and destinations in a pandarm.Network.
 
     Parameters
     ----------
     origins : geopandas.GeoDataFrame
         Geodataframe of origin geometries to begin routing. If geometries are
         polygons, they will be collapsed to centroids
-    network : pandana.Network
-        pandana.Network instance that stores the local travel network
+    network : pandarm.Network
+        pandarm.Network instance that stores the local travel network
     threshold : int
         maximum travel distance (inclusive)
     reindex : bool, optional
@@ -96,20 +96,20 @@ def isochrones_from_id(
     use_edges=True,
     network_crs=4326
 ):
-    """Create travel isochrone(s) from a single origin using a pandana network.
+    """Create travel isochrone(s) from a single origin using a pandarm network.
 
     Parameters
     ----------
     origin : int or list
-        A single or list of node id(s) from a `pandana.Network.nodes_df`
+        A single or list of node id(s) from a `pandarm.Network.nodes_df`
         to serve as isochrone origins
-    network : pandana.Network
-        A pandana network object (preferably created with
+    network : pandarm.Network
+        A pandarm network object (preferably created with
         geosnap.io.get_network_from_gdf)
     threshold : int or list
         A single or list of threshold distances for which isochrones will be
-        computed. These are in the same impedance units as edges from the 
-        pandana.Network.edge_df
+        computed. These are in the same impedance units as edges from the
+        pandarm.Network.edge_df
     hull : str, {'libpysal', 'shapely'}
         Which method to generate container polygons (concave hulls) for destination
         points. If 'libpysal', use `libpysal.cg.alpha_shape_auto` to create the
@@ -123,7 +123,7 @@ def isochrones_from_id(
         allowed in the resulting polygon. Only used if `algorithm='hull'`.
         Default is False.
     network_crs : int or pyproj.CRS
-        which coordinate system the pandana.Network node coordinates are stored in.
+        which coordinate system the pandarm.Network node coordinates are stored in.
         Default is 4326
 
     Returns
@@ -208,17 +208,17 @@ def isochrones_from_gdf(
         a geodataframe containing the locations of origin point features
     threshold: float
         maximum travel cost to define the isochrone, measured in the same
-        impedance units as edges_df in the pandana.Network object.
-    network : pandana.Network
-        pandana Network instance for calculating the shortest path isochrone
+        impedance units as edges_df in the pandarm.Network object.
+    network : pandarm.Network
+        pandarm Network instance for calculating the shortest path isochrone
         for each origin feature
     network_crs : str, int, pyproj.CRS (optional)
         the coordinate system used to store x and y coordinates in the passed
-        pandana network. If None, the network is assumed to be stored in the
+        pandarm network. If None, the network is assumed to be stored in the
         same CRS as the origins geodataframe
     reindex : bool
         if True, use the dataframe index as the origin and destination IDs
-        (rather than the node_ids of the pandana.Network). Default is True
+        (rather than the node_ids of the pandarm.Network). Default is True
     hull : str, {'libpysal', 'shapely'}
         Which method to generate container polygons (concave hulls) for destination
         points. If 'libpysal', use `libpysal.cg.alpha_shape_auto` to create the

@@ -1,7 +1,7 @@
 from warnings import warn
 
 import geopandas as gpd
-import pandana as pdna
+import pandarm as pdna
 
 
 def _reproject_osm_nodes(nodes_df, input_crs, output_crs):
@@ -19,7 +19,7 @@ def _reproject_osm_nodes(nodes_df, input_crs, output_crs):
 def get_network_from_gdf(
     gdf, network_type="walk", twoway=False, add_travel_times=False, default_speeds=None
 ):
-    """Create a pandana.Network object from a geodataframe (via OSMnx graph).
+    """Create a pandarm.Network object from a geodataframe (via OSMnx graph).
 
     Parameters
     ----------
@@ -31,7 +31,7 @@ def get_network_from_gdf(
         the type of network to collect from OSM (passed to `osmnx.graph_from_polygon`)
         by default "walk"
     twoway : bool, optional
-        Whether to treat the pandana.Network as directed or undirected. For a directed network,
+        Whether to treat the pandarm.Network as directed or undirected. For a directed network,
         use `twoway=False` (which is the default). For an undirected network (e.g. a
         walk network) where travel can flow in both directions, the network is more
         efficient when twoway=True but forces the impedance to be equal in both
@@ -49,10 +49,10 @@ def get_network_from_gdf(
 
     Returns
     -------
-    pandana.Network
-        a pandana.Network object with node coordinates stored in the same system as the
+    pandarm.Network
+        a pandarm.Network object with node coordinates stored in the same system as the
         input geodataframe. If add_travel_times is True, the network impedance
-        is travel time measured in seconds (assuming automobile travel speeds); else 
+        is travel time measured in seconds (assuming automobile travel speeds); else
         the impedance is travel distance measured in meters
 
     Raises
@@ -70,7 +70,7 @@ def get_network_from_gdf(
         output_crs = gdf.crs
         warn(
             f"GeoDataFrame is stored in coordinate system {output_crs} so the "
-            "pandana.Network will also be stored in this system",
+            + "pandarm.Network will also be stored in this system",
             stacklevel=1,
         )
         gdf = gdf.to_crs(4326)
@@ -108,8 +108,9 @@ def get_network_from_gdf(
 
     return net
 
+
 def project_network(network, output_crs=None, input_crs=4326):
-    """Reproject a pandana.Network object into another coordinate system.
+    """Reproject a pandarm.Network object into another coordinate system.
 
     Note this function does not change the legth of any network edges, but
     reprojects the x and y coordinates of the nodes (e.g. for precise snapping)
@@ -117,8 +118,8 @@ def project_network(network, output_crs=None, input_crs=4326):
 
     Parameters
     ----------
-    network : pandana.Network
-        an instantiated pandana Network object
+    network : pandarm.Network
+        an instantiated pandarm Network object
     input_crs : int, optional
         the coordinate system used in the Network.node_df dataframe. Typically
         these data are collected in Lon/Lat, so the default 4326
@@ -127,8 +128,8 @@ def project_network(network, output_crs=None, input_crs=4326):
 
     Returns
     -------
-    pandana.Network
-        an initialized pandana.Network with 'x' and y' values represented
+    pandarm.Network
+        an initialized pandarm.Network with 'x' and y' values represented
         by coordinates in the specified CRS
     """
     assert output_crs, "You must provide an output CRS"
