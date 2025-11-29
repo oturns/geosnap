@@ -18,15 +18,16 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         environment-file:
-          - .ci/310.yml
           - .ci/311.yml
           - .ci/312.yml
+          - .ci/313.yml
+          - .ci/314.yml
         include:
-          - environment-file: .ci/311.yml
+          - environment-file: .ci/313.yml
             os: macos-latest
-          - environment-file: .ci/311.yml
-            os: macos-14  # Apple Silicon
-          - environment-file: .ci/311.yml
+          - environment-file: .ci/313.yml
+            os: macos-15-intel
+          - environment-file: .ci/313.yml
             os: windows-latest
     defaults:
       run:

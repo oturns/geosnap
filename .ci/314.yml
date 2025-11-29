@@ -1,0 +1,46 @@
+name: test
+channels:
+  - conda-forge
+dependencies:
+  - python =3.10
+  - pandas
+  - giddy >=2.2.1
+  - libpysal
+  - geopandas  >=0.9
+  - hdbscan
+  - matplotlib 
+  - scikit-learn
+  - seaborn
+  - pyarrow >=0.14.1
+  - platformdirs
+  - pip
+  - tqdm
+  - quilt3 >=3.6
+  - xlrd
+  - tobler >=0.8.2
+  - spopt >=0.3.0
+  - fsspec
+  - s3fs
+  - segregation >=2.0
+  - pyproj >=3
+  - pandarm
+  - pooch
+  - osmnx
+  - pygraphviz
+  # testing
+  - jupyter
+  - pytest
+  - pytest-cov
+  - pytest-xdist
+  - codecov
+  - coverage
+  
+  - python-wget
+  - contextily
+  - python-graphviz
+  - nbsphinx
+  - numpydoc
+  - sphinx
+  - sphinxcontrib-bibtex
+  - sphinx_bootstrap_theme
+  - myst-parser
