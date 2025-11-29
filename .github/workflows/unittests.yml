@@ -60,7 +60,7 @@ jobs:
            --cov-report xml \
            geosnap
       - name: codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.xml
