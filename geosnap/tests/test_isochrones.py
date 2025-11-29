@@ -8,7 +8,6 @@ import pandarm as pdna
 import geopandas as gpd
 import os
 import pytest
-import sys
 from numpy.testing import assert_almost_equal
 import osmnx as ox
 
@@ -23,22 +22,12 @@ def get_data():
 
     return example_origin, sd_network
 
-
-@pytest.mark.skipif(
-    sys.platform.startswith("win"),
-    reason="skipping test on windows because of dtype issue",
-)
 @pytest.mark.xdist_group(name="group1")
 def test_isos_from_ids():
     example_origin, sd_network = get_data()
     iso = isochrones_from_id(example_origin, sd_network, threshold=1600, hull='libpysal')
     assert_almost_equal(iso.area.round(6).astype(float).tolist()[0], 0.000128)
 
-
-@pytest.mark.skipif(
-    sys.platform.startswith("win"),
-    reason="skipping test on windows because of dtype issue",
-)
 @pytest.mark.xdist_group(name="group1")
 def test_isos_from_gdf_pysal():
     example_origin, sd_network = get_data()
@@ -57,10 +46,6 @@ def test_isos_from_gdf_pysal():
     )
     assert_almost_equal(t.area.astype(float).round(8).tolist()[0], 0.00012821)
 
-@pytest.mark.skipif(
-    sys.platform.startswith("win"),
-    reason="skipping test on windows because of dtype issue",
-)
 @pytest.mark.xdist_group(name="group1")
 def test_isos_from_gdf_shapely():
     example_origin, sd_network = get_data()
@@ -78,20 +63,12 @@ def test_isos_from_gdf_shapely():
     )
     assert_almost_equal(t.area.astype(float).round(8).tolist()[0], 0.00012474)
 
-@pytest.mark.skipif(
-    sys.platform.startswith("win"),
-    reason="skipping test on windows because of dtype issue",
-)
 def test_network_constructor():
     tracts = get_acs(DataStore(), county_fips='48301', level='tract', years=2015)
     walk_net = get_network_from_gdf(tracts)
     # this will grow depending on the size of the OSM network when tested...
     assert walk_net.edges_df.shape[0] > 6000
 
-@pytest.mark.skipif(
-    sys.platform.startswith("win"),
-    reason="skipping test on windows because of dtype issue",
-)
 def test_isos_with_edges():
     tracts = get_acs(DataStore(), county_fips='48301', level='tract', years=2015)
     walk_net = get_network_from_gdf(tracts)
@@ -107,10 +84,6 @@ def test_isos_with_edges():
     # this will grow depending on the size of the OSM network when tested...
     assert alpha.area.round(8).iloc[0] >= 0.00036433
 
-@pytest.mark.skipif(
-    sys.platform.startswith("win"),
-    reason="skipping test on windows because of dtype issue",
-)
 def test_project_network():   
     tracts = get_acs(DataStore(), county_fips='48301', level='tract', years=2015)
     walk_net = get_network_from_gdf(tracts)

@@ -23,7 +23,7 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering :: GIS",
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 dependencies = [
     "numpy",
     "pandas",
@@ -47,7 +47,7 @@ dependencies = [
     "segregation>=2.1",
     #"proplot>=0.9",
     "pyproj>=3",
-    "pandana",
+    "pandarm",
     "pooch"
 ]
 
