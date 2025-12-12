@@ -242,7 +242,7 @@ def store_nces(years="all", dataset="all", data_dir="auto"):
                 p = quilt3.Package.browse(f"nces/{d}", "s3://spatial-ucr")
                 for year in years:
                     p[f"{d}_{year}.parquet"].fetch(
-                        dest=pathlib.Path(pth, f"nces{d}_{year}.parquet")
+                        dest=pathlib.Path(pth, f"{d}_{year}.parquet")
                     )
 
 
