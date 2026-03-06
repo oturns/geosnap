@@ -55,7 +55,7 @@ class _Map(dict):
 class DataStore:
     """Storage for geosnap data. Currently supports data from several U.S. federal agencies and national research centers."""
 
-    def __init__(self, data_dir="auto", disclaimer=False, inmemory=False):
+    def __init__(self, data_dir="auto", disclaimer=False, inmemory=True):
         appname = "geosnap"
         appauthor = "geosnap"
 
