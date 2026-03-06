@@ -2,6 +2,7 @@ import contextlib
 from warnings import warn
 
 import geopandas as gpd
+import ibis
 import pandas as pd
 
 from .storage import _fips_filter, _fipstable, _from_db, adjust_inflation
@@ -106,6 +107,7 @@ def get_ejscreen(
         df = datastore.ejscreen(
             states=states,
             year=year,
+            execute=False
         )
         df = _fips_filter(
             state_fips=state_fips,
@@ -115,8 +117,8 @@ def get_ejscreen(
             data=df,
         )
         dflist.append(df)
-    gdf = pd.concat(dflist)
-    return gdf.reset_index(drop=True)
+    gdf = ibis.union(*dflist, distinct=True)
+    return gdf
 
 
 def get_acs(
@@ -203,6 +205,7 @@ def get_acs(
             level=level,
             states=states,
             year=year,
+            execute=False
         )
         df = _fips_filter(
             state_fips=state_fips,
@@ -219,8 +222,10 @@ def get_acs(
                     "Currency columns unavailable at this resolution; not adjusting for inflation"
                 )
         dflist.append(df)
-    gdf = pd.concat(dflist)
-    return gdf.reset_index(drop=True)
+    gdf = ibis.union(*dflist, distinct=True
+    )
+
+    return gdf.to_pandas()
 
 
 def get_ltdb(
@@ -557,13 +562,13 @@ def get_lodes(
     if boundary and not boundary.crs.equals(4326):
         boundary = boundary.copy().to_crs(4326)
     if version == 5:
-        gdf = datastore.blocks_2000(states=states, fips=(tuple(allfips)))
+        gdf = datastore.blocks_2000(states=states, fips=(tuple(allfips)), execute=False)
     elif version == 7:
-        gdf = datastore.blocks_2010(states=states, fips=(tuple(allfips)))
+        gdf = datastore.blocks_2010(states=states, fips=(tuple(allfips)), execute=False)
     elif version == 8:
-        gdf = datastore.blocks_2020(states=states, fips=(tuple(allfips)))
+        gdf = datastore.blocks_2020(states=states, fips=(tuple(allfips)), execute=False)
 
-    gdf = gdf.drop(columns=["year"])
+    gdf = gdf.drop("year")
     gdf = _fips_filter(
         state_fips=state_fips,
         county_fips=county_fips,
@@ -596,19 +601,22 @@ def get_lodes(
             if name == "PR":
                 raise ValueError("LODES does not yet include data for Puerto Rico")
             try:
-                df = get_lehd(dataset=dataset, year=year, state=name, version=version)
-                df = gdf.merge(df, right_index=True, left_on="geoid", how="left")
-                df["year"] = year
-                merged_year.append(df)
+                df = ibis.memtable(
+                    get_lehd(
+                        dataset=dataset, year=year, state=name, version=version
+                    ).reset_index()
+                )
+                df = gdf.join(df, "geoid", how='left')
+                df = df.mutate(year=year)
+                dfs.append(df)
             except ValueError:
                 warn(f"{name.upper()} {year} not found!", stacklevel=2)
                 pass
-            with contextlib.suppress(ValueError):
-                dfs.append(pd.concat(merged_year))
-    out = pd.concat(dfs, sort=True)
-    out = out.groupby(["geoid", "year"]).first().reset_index()
-    out.crs = 4326
-    return out
+            # with contextlib.suppress(ValueError):
+            #   dfs.append(df)
+    out = ibis.union(*dfs, distinct=True)
+    out = out.distinct(on=["geoid", "year"])
+    return out.to_pandas().set_crs(4326)
 
 
 def _msa_to_county(datastore, msa_fips):
