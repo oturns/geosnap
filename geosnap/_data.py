@@ -287,7 +287,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
 
         return t
 
-    def nces(self, year=1516, dataset="sabs"):
+    def nces(self, year=1516, dataset="sabs", execute=True):
         """National Center for Education Statistics (NCES) Data.
 
         Parameters
@@ -311,6 +311,8 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         # t = t.reset_index().rename(columns={"GEOID": "geoid"})
 
         t = t.mutate(year=year)
+        if execute:
+            t = t.to_pandas()
         return t
 
     def ejscreen(self, year=2018, states=None, execute=True):

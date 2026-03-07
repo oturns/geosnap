@@ -1,12 +1,9 @@
-import contextlib
 from warnings import warn
 
 import geopandas as gpd
 import ibis
-import pandas as pd
-import ibis.selectors as s
 
-from .storage import _fips_filter, _fipstable, _from_db, adjust_inflation
+from .storage import _fips_filter, _fipstable, _from_db
 from .util import _get_inflate_coef, get_lehd
 
 __all__ = [
@@ -48,10 +45,10 @@ def get_nces(datastore, years="1516", dataset="sabs"):
 
     dflist = []
     for year in years:
-        df = datastore.nces(year=year, dataset=dataset)
+        df = datastore.nces(year=year, dataset=dataset, execute=False)
         dflist.append(df)
-    gdf = pd.concat(dflist)
-    return gdf.reset_index(drop=True)
+    gdf = ibis.union(*dflist, distinct=True)
+    return gdf.to_pandas().set_crs(4326)
 
 
 def get_ejscreen(
@@ -115,6 +112,8 @@ def get_ejscreen(
         )
         dflist.append(df)
     gdf = ibis.union(*dflist, distinct=True)
+    gdf = gdf.distinct(on=["geoid", "year"])
+
     return gdf.to_pandas()
 
 
@@ -196,6 +195,7 @@ def get_acs(
 
     states, allfips = _fips_to_states(state_fips, county_fips, msa_counties, fips)
 
+    common_cols = []
     dflist = []
     for year in years:
         df = datastore.acs(level=level, states=states, year=year, execute=False)
@@ -209,13 +209,20 @@ def get_acs(
         if constant_dollars:
             coef = _get_inflate_coef(year, currency_year)
             for col in inflate_cols:
-                newcol = (df[col] * coef).round(0).cast("float64")
-                df = df.mutate(newcol.name(col))
-
+                if col in df.columns:
+                    newcol = (df[col] * coef).round(0).cast("float64")
+                    df = df.mutate(newcol.name(col))
+            else:
+                warn(f"Currency column {col} not present in dataframe", stacklevel=2)
+        common_cols.append(set(df.columns))
         dflist.append(df)
-    gdf = ibis.union(*dflist, distinct=True)
 
-    return gdf.to_pandas()
+    common_cols = set.intersection(*common_cols)
+    dflist = [df.select(common_cols) for df in dflist]
+    gdf = ibis.union(*dflist, distinct=True)
+    gdf = gdf.distinct(on=["geoid", "year"])
+
+    return gdf.to_pandas().set_crs(4326)
 
 
 def get_ltdb(
@@ -499,6 +506,7 @@ def get_census(
                     )
         if len(newtracts) > 0:
             gdf = ibis.union(*newtracts, distinct=True)
+    gdf = gdf.distinct(on=["geoid", "year"])
 
     return gdf.to_pandas().set_crs(4326)
 
