@@ -2,7 +2,7 @@ import os
 import shutil
 
 import numpy
-#import proplot
+# import proplot
 import pytest
 import matplotlib
 from geosnap import DataStore
@@ -36,7 +36,6 @@ dc_df, region_mod = regionalize(dc_df, columns=columns, method='ward_spatial', r
 dc_df = dc_df.dropna(subset=['ward'])
 
 
-
 def test_cont_timeseries_pooled():
     p = plot_timeseries(dc_df, column='median_household_income', temporal_index='year', time_subset=[2010], dpi=50)
     assert isinstance(p[0], matplotlib.axes.SubplotBase)
@@ -65,7 +64,10 @@ def test_heatmaps_no_model():
 
 @pytest.mark.skipif(NOGRAPHVIZ, reason="pygraphviz couldn't be imported.")
 def test_graphs():
-    os.mkdir('geosnap/tests/images')
+    try:
+        os.mkdir('geosnap/tests/images')
+    except FileExistsError:
+        pass
     plot_transition_graphs(gdf=dc_df, output_dir='geosnap/tests/images', cluster_col='ward')
     assert len(os.listdir('geosnap/tests/images')) == 6
 
