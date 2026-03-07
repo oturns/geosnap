@@ -12,7 +12,7 @@ import pandas as pd
 import quilt3
 from platformdirs import user_data_dir
 
-from .util import adjust_inflation
+from .util import _get_inflate_coef, adjust_inflation
 
 script_dir = os.path.dirname(__file__)
 
@@ -626,9 +626,10 @@ def _fips_filter(
         fips_list += msa_definitions[msa_definitions["CBSA Code"] == msa_fips][
             "stcofips"
         ].tolist()
+    if len(fips_list)==0:
+        raise ValueError('Must pass FIPS values of some kind')
 
-    df = ibis.union(
-        *[data.filter(data["geoid"].startswith(fips)) for fips in tuple(fips_list)],
+    df = ibis.union(*[data.filter(data["geoid"].startswith(fips)) for fips in tuple(fips_list)],
         distinct=True,
     )
 

@@ -6,7 +6,7 @@ import ibis
 import pandas as pd
 
 from .storage import _fips_filter, _fipstable, _from_db, adjust_inflation
-from .util import get_lehd
+from .util import _get_inflate_coef, get_lehd
 
 __all__ = [
     "get_acs",
@@ -104,11 +104,7 @@ def get_ejscreen(
 
     dflist = []
     for year in years:
-        df = datastore.ejscreen(
-            states=states,
-            year=year,
-            execute=False
-        )
+        df = datastore.ejscreen(states=states, year=year, execute=False)
         df = _fips_filter(
             state_fips=state_fips,
             county_fips=county_fips,
@@ -118,7 +114,7 @@ def get_ejscreen(
         )
         dflist.append(df)
     gdf = ibis.union(*dflist, distinct=True)
-    return gdf
+    return gdf.to_pandas()
 
 
 def get_acs(
@@ -201,12 +197,7 @@ def get_acs(
 
     dflist = []
     for year in years:
-        df = datastore.acs(
-            level=level,
-            states=states,
-            year=year,
-            execute=False
-        )
+        df = datastore.acs(level=level, states=states, year=year, execute=False)
         df = _fips_filter(
             state_fips=state_fips,
             county_fips=county_fips,
@@ -215,15 +206,13 @@ def get_acs(
             data=df,
         )
         if constant_dollars:
-            try:
-                df = adjust_inflation(df, inflate_cols, year, currency_year)
-            except:
-                warn(
-                    "Currency columns unavailable at this resolution; not adjusting for inflation"
-                )
+            coef = _get_inflate_coef(year, currency_year)
+            for col in inflate_cols:
+                newcol = (df[col] * coef).round(0)
+                df = df.mutate(newcol.name(col))
+
         dflist.append(df)
-    gdf = ibis.union(*dflist, distinct=True
-    )
+    gdf = ibis.union(*dflist, distinct=True)
 
     return gdf.to_pandas()
 
@@ -461,8 +450,8 @@ def get_census(
 
     tracts = []
     for year in years:
-        tracts.append(df_dict[year](states=states))
-    tracts = pd.concat(tracts, sort=False)
+        tracts.append(df_dict[year](states=states, execute=False))
+    tracts = ibis.union(*tracts, distinct=True)
 
     if isinstance(boundary, gpd.GeoDataFrame):
         if not boundary.crs.equals(4326):
@@ -488,14 +477,16 @@ def get_census(
             "per_capita_income",
             "median_household_income",
         ]
-
         for year in years:
-            df = gdf[gdf.year == year]
-            df = adjust_inflation(df, inflate_cols, year, currency_year)
-            newtracts.append(df)
-        gdf = pd.concat(newtracts)
+            df = gdf.select(gdf.year == year)
+            coef = _get_inflate_coef(year, currency_year)
+            for col in inflate_cols:
+                newcol = (df[col] * coef).round(0)
+                df = df.mutate(newcol.name(col))
+                newtracts.append(df)
+        gdf = ibis.union(*newtracts, distinct=True)
 
-    return gdf.reset_index(drop=True)
+    return gdf
 
 
 def get_lodes(
@@ -597,7 +588,6 @@ def get_lodes(
     dfs = []
     for year in years:
         for name in names:
-            merged_year = []
             if name == "PR":
                 raise ValueError("LODES does not yet include data for Puerto Rico")
             try:
@@ -606,7 +596,7 @@ def get_lodes(
                         dataset=dataset, year=year, state=name, version=version
                     ).reset_index()
                 )
-                df = gdf.join(df, "geoid", how='left')
+                df = gdf.join(df, "geoid", how="left")
                 df = df.mutate(year=year)
                 dfs.append(df)
             except ValueError:
