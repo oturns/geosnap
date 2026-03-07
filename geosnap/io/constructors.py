@@ -4,6 +4,7 @@ from warnings import warn
 import geopandas as gpd
 import ibis
 import pandas as pd
+import ibis.selectors as s
 
 from .storage import _fips_filter, _fipstable, _from_db, adjust_inflation
 from .util import _get_inflate_coef, get_lehd
@@ -208,7 +209,7 @@ def get_acs(
         if constant_dollars:
             coef = _get_inflate_coef(year, currency_year)
             for col in inflate_cols:
-                newcol = (df[col] * coef).round(0)
+                newcol = (df[col] * coef).round(0).cast('float64')
                 df = df.mutate(newcol.name(col))
 
         dflist.append(df)
@@ -477,16 +478,24 @@ def get_census(
             "per_capita_income",
             "median_household_income",
         ]
-        for year in years:
-            df = gdf.select(gdf.year == year)
-            coef = _get_inflate_coef(year, currency_year)
-            for col in inflate_cols:
-                newcol = (df[col] * coef).round(0)
-                df = df.mutate(newcol.name(col))
-                newtracts.append(df)
-        gdf = ibis.union(*newtracts, distinct=True)
+        coef = _get_inflate_coef(year, currency_year)
 
-    return gdf
+        for year in years:
+            df = gdf.filter(gdf.year == year)
+            for col in inflate_cols:
+                if col in df.columns:
+                    newcol = (df[col]* coef)
+                    newcol = newcol.round(0).cast("float64")
+                    df = df.mutate(newcol.name(col))
+                    newtracts.append(df)
+                else:
+                    warn(
+                        f"Currency column {col} not present in dataframe", stacklevel=2
+                    )
+        if len(newtracts) > 0:
+            gdf = ibis.union(*newtracts, distinct=True)
+
+    return gdf.to_pandas().set_crs(4326)
 
 
 def get_lodes(
@@ -596,7 +605,7 @@ def get_lodes(
                         dataset=dataset, year=year, state=name, version=version
                     ).reset_index()
                 )
-                df = gdf.join(df, "geoid", how="left").drop('geoid_right')
+                df = gdf.join(df, "geoid", how="left").drop("geoid_right")
                 df = df.mutate(year=year)
                 dfs.append(df)
             except ValueError:
