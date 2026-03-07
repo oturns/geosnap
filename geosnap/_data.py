@@ -70,11 +70,14 @@ class DataStore:
                 "The end-user is responsible for any and all analyses or applications created with the package."
             )
         if inmemory:
-            self._con = ibis.duckdb.connect(extensions=["spatial"])
+            self._con = ibis.duckdb.connect()
+
         else:
             self._con = ibis.duckdb.connect(
-                pathlib.Path(self.data_dir, "geosnap_data.ddb"), extensions=["spatial"]
+                pathlib.Path(self.data_dir, "geosnap_data.ddb"),
             )
+        self._con.raw_sql("INSTALL spatial;")
+        self._con.raw_sql("LOAD spatial;")
 
     def __dir__(self):
         atts = [
