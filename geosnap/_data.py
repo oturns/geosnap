@@ -307,10 +307,10 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         local_path = pathlib.Path(self.data_dir, "nces", f"{dataset}_{year}.parquet")
         remote_path = f"s3://spatial-ucr/nces/{selector}/{dataset}_{year}.parquet"
         msg = "Streaming data from S3. Use `geosnap.io.store_nces()` to store the data locally for better performance"
-        t = _fetcher(local_path, remote_path, msg)
+        t = _fetcher(local_path, remote_path, msg, self._con)
         # t = t.reset_index().rename(columns={"GEOID": "geoid"})
 
-        t["year"] = year
+        t = t.mutate(year=year)
         return t
 
     def ejscreen(self, year=2018, states=None, execute=True):
@@ -514,7 +514,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
         local = pathlib.Path(self.data_dir, "tracts_1990_500k.parquet")
         remote = "s3://spatial-ucr/census/tracts_cartographic/tracts_1990_500k.parquet"
-        t = _fetcher(local, remote, msg)
+        t = _fetcher(local, remote, msg, self._con)
         if states:
             t = t.filter(t.geoid.substr(0, 2).isin(states))
         t = t.mutate(year=1990)
@@ -540,7 +540,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         local = pathlib.Path(self.data_dir, "tracts_2000_500k.parquet")
         remote = "s3://spatial-ucr/census/tracts_cartographic/tracts_2000_500k.parquet"
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
-        t = _fetcher(local, remote, msg, self._col)
+        t = _fetcher(local, remote, msg, self._con)
         if states:
             t = t.filter(t.geoid.substr(0, 2).isin(states))
         t = t.mutate(year=2000)
@@ -569,7 +569,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
         local = pathlib.Path(self.data_dir, "tracts_2010_500k.parquet")
         remote = "s3://spatial-ucr/census/tracts_cartographic/tracts_2010_500k.parquet"
-        t = _fetcher(local, remote, msg, self._col)
+        t = _fetcher(local, remote, msg, self._con)
 
         if states:
             t = t.filter(t.geoid.substr(0, 2).isin(states))
@@ -599,7 +599,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
         local = pathlib.Path(self.data_dir, "tracts_2020_500k.parquet")
         remote = "s3://spatial-ucr/census/tracts_cartographic/tracts_2020_500k.parquet"
-        t = _fetcher(local, remote, msg, self._col)
+        t = _fetcher(local, remote, msg, self._con)
 
         if states:
             t = t.filter(t.geoid.substr(0, 2).isin(states))
@@ -624,7 +624,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         local = pathlib.Path(self.data_dir, "msas.parquet")
         remote = "s3://spatial-ucr/census/administrative/msas.parquet"
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
-        t = _fetcher(local, remote, msg, self._col).to_pandas()
+        t = _fetcher(local, remote, msg, self._con).to_pandas()
         t = t.sort_values(by="name")
         return t
 
@@ -641,7 +641,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         remote = "s3://spatial-ucr/census/administrative/states.parquet"
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
 
-        t = _fetcher(local, remote, msg, self._col).to_pandas()
+        t = _fetcher(local, remote, msg, self._con).to_pandas()
         return t
 
     def counties(self):
@@ -656,7 +656,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         local = pathlib.Path(self.data_dir, "counties.parquet")
         remote = "s3://spatial-ucr/census/administrative/counties.parquet"
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
-        t = _fetcher(local, remote, msg, self._col).to_pandas()
+        t = _fetcher(local, remote, msg, self._con).to_pandas()
         return t
 
     def msa_definitions(self):

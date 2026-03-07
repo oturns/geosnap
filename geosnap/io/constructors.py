@@ -596,7 +596,7 @@ def get_lodes(
                         dataset=dataset, year=year, state=name, version=version
                     ).reset_index()
                 )
-                df = gdf.join(df, "geoid", how="left")
+                df = gdf.join(df, "geoid", how="left").drop('geoid_right')
                 df = df.mutate(year=year)
                 dfs.append(df)
             except ValueError:
