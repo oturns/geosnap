@@ -209,7 +209,7 @@ def get_acs(
         if constant_dollars:
             coef = _get_inflate_coef(year, currency_year)
             for col in inflate_cols:
-                newcol = (df[col] * coef).round(0).cast('float64')
+                newcol = (df[col] * coef).round(0).cast("float64")
                 df = df.mutate(newcol.name(col))
 
         dflist.append(df)
@@ -450,8 +450,13 @@ def get_census(
     }
 
     tracts = []
+    common_cols = []
     for year in years:
-        tracts.append(df_dict[year](states=states, execute=False))
+        d = df_dict[year](states=states, execute=False)
+        tracts.append(d)
+        common_cols.append(set(d.columns))
+    common_cols = set.intersection(*common_cols)
+    tracts = [df.select(common_cols) for df in tracts]
     tracts = ibis.union(*tracts, distinct=True)
 
     if isinstance(boundary, gpd.GeoDataFrame):
@@ -484,7 +489,7 @@ def get_census(
             df = gdf.filter(gdf.year == year)
             for col in inflate_cols:
                 if col in df.columns:
-                    newcol = (df[col]* coef)
+                    newcol = df[col] * coef
                     newcol = newcol.round(0).cast("float64")
                     df = df.mutate(newcol.name(col))
                     newtracts.append(df)
