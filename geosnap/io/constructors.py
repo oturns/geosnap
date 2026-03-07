@@ -127,6 +127,7 @@ def get_acs(
     years="all",
     constant_dollars=True,
     currency_year=None,
+    boundary=None,
 ):
     """Extract a subset of data from the American Community Survey (ACS).
 
@@ -158,6 +159,11 @@ def get_acs(
     currency_year : int, optional
         If adjusting for inflation, this parameter sets the year in which dollar values will
         be expressed
+    boundary : geopandas.GeoDataFrame
+        geodataframe that defines the total extent of the study area.
+        This will be used to clip tracts lazily by selecting all
+        `GeoDataFrame.centroid()`s that intersect the
+        boundary gdf
 
     Returns
     -------
@@ -199,13 +205,20 @@ def get_acs(
     dflist = []
     for year in years:
         df = datastore.acs(level=level, states=states, year=year, execute=False)
-        df = _fips_filter(
-            state_fips=state_fips,
-            county_fips=county_fips,
-            msa_fips=msa_fips,
-            fips=fips,
-            data=df,
-        )
+
+        if boundary is not None:
+            if not boundary.crs.equals(4326):
+                boundary = boundary.copy().to_crs(4326)
+            df = df.filter(df.geometry.centroid().intersects(boundary.union_all()))
+        else:
+            df = _fips_filter(
+                state_fips=state_fips,
+                county_fips=county_fips,
+                msa_fips=msa_fips,
+                fips=fips,
+                data=df,
+            )
+
         if constant_dollars:
             coef = _get_inflate_coef(year, currency_year)
             for col in inflate_cols:
@@ -466,11 +479,10 @@ def get_census(
     tracts = [df.select(common_cols) for df in tracts]
     tracts = ibis.union(*tracts, distinct=True)
 
-    if isinstance(boundary, gpd.GeoDataFrame):
+    if boundary is not None:
         if not boundary.crs.equals(4326):
             boundary = boundary.copy().to_crs(4326)
-        tracts = tracts[tracts.representative_point().intersects(boundary.union_all())]
-        gdf = tracts.copy()
+        gdf = tracts.filter(tracts.geometry.centroid().intersects(boundary.union_all()))
 
     else:
         gdf = _fips_filter(
@@ -572,8 +584,17 @@ def get_lodes(
     msa_counties = _msa_to_county(datastore, msa_fips)
 
     states, allfips = _fips_to_states(state_fips, county_fips, msa_counties, fips)
-    if boundary and not boundary.crs.equals(4326):
-        boundary = boundary.copy().to_crs(4326)
+
+    if boundary is not None:
+        if not boundary.crs.equals(4326):
+            boundary = boundary.copy().to_crs(4326)
+        if len(states) == 0:
+            states = datastore.states().geoid.values
+            warn(
+                "No state fips found; searching all states. When using a boundary "
+                + "in this function it is recommended to pass state FIPS if possible",
+                stacklevel=2,
+            )
     if version == 5:
         gdf = datastore.blocks_2000(states=states, fips=(tuple(allfips)), execute=False)
     elif version == 7:
@@ -582,21 +603,20 @@ def get_lodes(
         gdf = datastore.blocks_2020(states=states, fips=(tuple(allfips)), execute=False)
 
     gdf = gdf.drop("year")
-    gdf = _fips_filter(
-        state_fips=state_fips,
-        county_fips=county_fips,
-        msa_fips=msa_fips,
-        fips=allfips,
-        data=gdf,
-    )
+
     if isinstance(boundary, gpd.GeoDataFrame):
-        if boundary.crs != gdf.crs:
-            warn(
-                "Unable to determine whether boundary CRS is WGS84 "
-                "if this produces unexpected results, try reprojecting",
-                stacklevel=2,
-            )
-        gdf = gdf[gdf.representative_point().intersects(boundary.union_all())]
+        if not boundary.crs.equals(4326):
+            boundary = boundary.copy().to_crs(4326)
+        gdf = gdf.filter(gdf.geometry.centroid().intersects(boundary.union_all()))
+        states = gdf.geoid.substr(0, 2).to_pandas().unique()
+    else:
+        gdf = _fips_filter(
+            state_fips=state_fips,
+            county_fips=county_fips,
+            msa_fips=msa_fips,
+            fips=fips,
+            data=gdf,
+        )
 
     # grab state abbreviations
     names = (
