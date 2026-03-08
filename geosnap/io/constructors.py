@@ -515,15 +515,15 @@ def get_census(
         for year in years:
             df = gdf.filter(gdf.year == year)
             for col in inflate_cols:
-                if col in df.columns:
+                if col not in df.columns:
+                    warn(
+                        f"Currency column {col} not present in dataframe", stacklevel=2
+                    )
+                else:
                     newcol = df[col] * coef
                     newcol = newcol.round(0).cast("float64")
                     df = df.mutate(newcol.name(col))
                     newtracts.append(df)
-                else:
-                    warn(
-                        f"Currency column {col} not present in dataframe", stacklevel=2
-                    )
         if len(newtracts) > 0:
             gdf = ibis.union(*newtracts, distinct=True)
     gdf = gdf.distinct(on=["geoid", "year"])
