@@ -170,17 +170,23 @@ def get_acs(
     geopandas.GeoDataFrame
         long-form geodataframe with 'year' column representing each time period
     """
+    _levs = ["bg", "tract"]
+    if level not in _levs:
+        raise ValueError(
+            f"the `level` parameter must be one of {_levs} but {level} was passed"
+        )
     inflate_cols = [
         "median_home_value",
         "median_contract_rent",
         "per_capita_income",
         "median_household_income",
     ]
-    _levs = ["bg", "tract"]
-    if level not in _levs:
-        raise ValueError(
-            f"the `level` parameter must be one of {_levs} but {level} was passed"
-        )
+    if level == "tract":
+        inflate_cols = inflate_cols + [
+            "median_income_whitehh",
+            "median_income_blackhh",
+            "median_income_hispanichh",
+        ]
     if years == "all":
         years = list(range(2012, 2022))
 
@@ -222,11 +228,13 @@ def get_acs(
         if constant_dollars:
             coef = _get_inflate_coef(year, currency_year)
             for col in inflate_cols:
-                if col in df.columns:
+                if col not in df.columns:
+                    warn(
+                        f"Currency column {col} not present in dataframe", stacklevel=2
+                    )
+                else:
                     newcol = (df[col] * coef).round(0).cast("float64")
                     df = df.mutate(newcol.name(col))
-            else:
-                warn(f"Currency column {col} not present in dataframe", stacklevel=2)
         common_cols.append(set(df.columns))
         dflist.append(df)
 

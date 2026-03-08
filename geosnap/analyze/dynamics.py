@@ -138,7 +138,6 @@ def transition(
         geoms = gdf_temp.groupby(unit_index).first()[gdf_temp.geometry.name]
         gdf_wide = df_wide.merge(geoms, left_index=True, right_index=True)
         w = _get_g(gpd.GeoDataFrame(gdf_wide), gname=w_type, g_kwargs=w_options)
-        w = w.transform("r")
         mar = Spatial_Markov(
             y, w.to_W(), permutations=permutations, discrete=True, variable_name=cluster_col
         )
