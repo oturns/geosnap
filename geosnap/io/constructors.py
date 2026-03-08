@@ -480,7 +480,11 @@ def get_census(
     tracts = []
     common_cols = []
     for year in years:
-        d = df_dict[year](states=states, execute=False)
+        print(year)
+        if year < 2020:
+            d = df_dict[year](states=states, execute=False)
+        else:
+            d = datastore.acs(year=2021, states=states, execute=False, level='tract')
         tracts.append(d)
         common_cols.append(set(d.columns))
     common_cols = set.intersection(*common_cols)
@@ -513,6 +517,8 @@ def get_census(
         coef = _get_inflate_coef(year, currency_year)
 
         for year in years:
+            if year ==2020:
+                year+=1
             df = gdf.filter(gdf.year == year)
             for col in inflate_cols:
                 if col not in df.columns:
