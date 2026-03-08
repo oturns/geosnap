@@ -25,3 +25,4 @@ dependencies:
   - pooch
   - pandarm
   - ibis-framework
+  - ultraplot

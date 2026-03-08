@@ -162,10 +162,9 @@ def plot_timeseries(
         whether to reproject the data into web mercator (epsg 3857)
     """
     try:
-        import proplot as plot
+        import ultraplot as plot
 
         HAS_PROPLOT = True
-        f, axs = plot.subplots(ncols=ncols, nrows=nrows, figsize=figsize, share=False)
 
     except ImportError:
         warn("`proplot` is not installed.  Falling back to matplotlib")
@@ -265,6 +264,7 @@ def plot_timeseries(
     if HAS_PROPLOT:
         if not title:  # only use title when passed
             axs.format(suptitle=column)
+            f.auto_layout()
         else:
             axs.format(suptitle=title)
     else:
@@ -287,6 +287,7 @@ def animate_timeseries(
     k=5,
     cmap=None,
     legend=True,
+    legend_kwds="default",
     alpha=0.6,
     categorical=False,
     dpi=200,
@@ -299,6 +300,7 @@ def animate_timeseries(
     ctxmap="default",
     plot_kwargs=None,
     color_col=None,
+    use_ultraplot=True,
 ):
     """Create an animated gif from a long-form geodataframe timeseries.
 
@@ -348,11 +350,21 @@ def animate_timeseries(
     color_col: str, optional
         A column on the geodataframe holding hex coodes used to color each
         observation. I.e. to create a categorical color-mapping manually
+    use_ultraplot: bool
+        if True, use ultraplot, else use matplotlib
     """
+    try:
+        import ultraplot as plot
+
+        HAS_PROPLOT = True
+    except ImportError:
+        HAS_PROPLOT = False
+
     classification_kwds = {}
     if plot_kwargs is None:
         plot_kwargs = dict()
-
+    if legend_kwds == "default":
+        legend_kwds = {"ncols": 1, "loc": "b"} if HAS_PROPLOT else None
     if ctxmap == "default":
         ctxmap = ctx.providers.CartoDB.Positron
 
@@ -372,7 +384,20 @@ def animate_timeseries(
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         for i, time in enumerate(time_periods):
-            fig, ax = plt.subplots(figsize=figsize)
+            if use_ultraplot:
+                if HAS_PROPLOT:
+
+                    fig, ax = plot.subplots(figsize=figsize)
+                else:
+                    warn(
+                        "ultraplot not installed; falling back to matplotlib",
+                        stacklevel=2,
+                    )
+
+                    fig, ax = plt.subplots(figsize=figsize)
+            else:
+                fig, ax = plt.subplots(figsize=figsize)
+
             outpath = PurePath(tmpdirname, f"file_{i}.png")
 
             temp = gdf[gdf[temporal_index] == time]
@@ -386,6 +411,7 @@ def animate_timeseries(
                     alpha=alpha,
                     legend=legend,
                     cmap=cmap,
+                    legend_kwds=legend_kwds,
                     **plot_kwargs,
                 )
             else:
@@ -411,6 +437,7 @@ def animate_timeseries(
                     ax=ax,
                     alpha=alpha,
                     legend=legend,
+                    legend_kwds=legend_kwds,
                     cmap=cmap,
                     color=colors,
                     **plot_kwargs,
@@ -419,8 +446,11 @@ def animate_timeseries(
             ax.axis("off")
             ax.set_title(f"{time}", fontsize=subtitle_fontsize, backgroundcolor="white")
             fig.suptitle(f"{title}", fontsize=title_fontsize)
+            if use_ultraplot:
+                fig.auto_layout()
+            else:
+                plt.tight_layout()
 
-            plt.tight_layout()
             plt.savefig(outpath, dpi=dpi)
             plt.clf()
 
