@@ -52,6 +52,7 @@ jobs:
           pytest --cov \
            -v \
            -r a \
+           -n auto \
            --color yes \
            --cov geosnap \
            --cov-append \
