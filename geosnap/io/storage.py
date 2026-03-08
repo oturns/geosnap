@@ -7,11 +7,12 @@ from pathlib import Path
 from warnings import warn
 
 import geopandas as gpd
+import ibis
 import pandas as pd
 import quilt3
 from platformdirs import user_data_dir
 
-from .util import adjust_inflation
+from .util import _get_inflate_coef, adjust_inflation
 
 script_dir = os.path.dirname(__file__)
 
@@ -63,9 +64,9 @@ Reardon, S. F., Ho, A. D., Shear, B. R., Fahle, E. M., Kalogrides, D., Jang, H.,
 Subject to your compliance with the terms and conditions set forth in this Agreement, Stanford grants you a revocable, non-exclusive, non-transferable right to access and make use of the Data Sets.
 
         """
-    assert accept_eula, (
-        f"You must accept the EULA by passing `accept_eula=True` \n{eula}"
-    )
+    assert (
+        accept_eula
+    ), f"You must accept the EULA by passing `accept_eula=True` \n{eula}"
     pth = pathlib.Path(_make_data_dir(data_dir), "seda")
     pathlib.Path(pth).mkdir(parents=True, exist_ok=True)
 
@@ -597,7 +598,6 @@ def store_ncdb(filepath, data_dir="auto"):
 def _fips_filter(
     state_fips=None, county_fips=None, msa_fips=None, fips=None, data=None
 ):
-    data = data.copy()
     msa_definitions = pd.read_csv(
         Path(script_dir, "msa_definitions.csv"),
         converters={"stcofips": str, "CBSA Code": str},
@@ -626,8 +626,12 @@ def _fips_filter(
         fips_list += msa_definitions[msa_definitions["CBSA Code"] == msa_fips][
             "stcofips"
         ].tolist()
+    if len(fips_list)==0:
+        raise ValueError('Must pass FIPS values of some kind')
 
-    df = data[data.geoid.str.startswith(tuple(fips_list))]
+    df = ibis.union(*[data.filter(data["geoid"].startswith(fips)) for fips in tuple(fips_list)],
+        distinct=True,
+    )
 
     return df
 

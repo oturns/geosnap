@@ -42,13 +42,12 @@ dependencies = [
     "contextily",
     "tobler>=0.8.2",
     "spopt>=0.3.0",
-    "fsspec",
-    "s3fs",
     "segregation>=2.1",
     #"proplot>=0.9",
     "pyproj>=3",
     "pandarm",
-    "pooch"
+    "pooch",
+    "ibis-framework"
 ]
 
 [project.urls]

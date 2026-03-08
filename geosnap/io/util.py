@@ -127,7 +127,7 @@ def convert_census_gdb(
         import pyogrio as ogr
     except ImportError as e:
         raise Exception(
-            "This function requires the `pyogrio` package\n" "`conda install pyogrio`"
+            "This function requires the `pyogrio` package\n`conda install pyogrio`"
         ) from e
     import dask_geopandas as dgpd
 
@@ -188,6 +188,36 @@ def convert_census_gdb(
         )
 
 
+def adjust_inflation(df, columns, given_year, base_year):
+    """
+    Adjust currency data for inflation.
+
+    Parameters
+    ----------
+    df : DataFrame
+        Dataframe of historical data
+    columns : list-like
+        The columns of the dataframe with currency data
+    given_year: int
+        The year in which the data were collected; e.g. to convert data from
+        the 1990 census to 2015 dollars, this value should be 1990.
+    base_year: int, optional
+        Constant dollar year; e.g. to convert data from the 1990
+        census to constant 2015 dollars, this value should be 2015.
+        Default is 2015.
+
+    Returns
+    -------
+    type
+        DataFrame
+    """
+
+    coef = _get_inflate_coef(given_year, base_year)
+    for col in columns:
+        df[col] = df[col] * coef
+    return df
+
+
 def get_lehd(dataset="wac", state="dc", year=2015, version=8):
     """Grab data from the LODES FTP server as a pandas DataFrame.
 
@@ -234,16 +264,12 @@ def get_lehd(dataset="wac", state="dc", year=2015, version=8):
     return df
 
 
-def adjust_inflation(df, columns, given_year, base_year):
+def _get_inflate_coef(given_year, base_year):
     """
     Adjust currency data for inflation.
 
     Parameters
     ----------
-    df : DataFrame
-        Dataframe of historical data
-    columns : list-like
-        The columns of the dataframe with currency data
     given_year: int
         The year in which the data were collected; e.g. to convert data from
         the 1990 census to 2015 dollars, this value should be 1990.
@@ -255,48 +281,27 @@ def adjust_inflation(df, columns, given_year, base_year):
     Returns
     -------
     type
-        DataFrame
+        float
 
     """
-    # get inflation adjustment table from BLS
-    try:
-        inflation = pd.read_csv(
-            os.path.join(os.path.dirname(os.path.abspath(__file__)), "inflation.csv")
-        )
-    except FileNotFoundError:
-        warn("Unable to read local inflation adjustment file. Streaming from BLS")
-        inflation = pd.read_excel(
-            "https://www.bls.gov/cpi/research-series/allitems.xlsx", skiprows=5
-        )
 
-    if base_year not in inflation.YEAR.unique():
-        warn(
-            f"Unable to find local adjustment year for {base_year}. Attempting from online data"
-        )
-        try:
-            inflation = pd.read_excel(
-                "https://www.bls.gov/cpi/research-series/allitems.xlsx", skiprows=5
-            )
-
-            assert (
-                base_year in inflation.YEAR.unique()
-            ), f"Unable to find adjustment values for {base_year}"
-        except Exception as e:
-            raise ValueError(f"Unable to find adjustment values for {base_year}") from e
-
+    inflation = pd.read_csv(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "inflation.csv"),
+        skiprows=5,
+    )
     inflation.columns = inflation.columns.str.lower()
     inflation.columns = inflation.columns.str.strip(".")
     inflation = inflation.dropna(subset=["year"])
     inflator = inflation.groupby("year")["avg"].first().to_dict()
     inflator[1970] = 63.9
 
-    df = df.copy()
-    updated = df[columns].apply(
-        lambda x: x * (inflator[base_year] / inflator[given_year])
-    )
-    df.update(updated)
+    for year in [given_year, base_year]:
+        if not year in inflator:
+            raise ValueError(
+                f"{year} not available in inflation data. Check online at <https://www.bls.gov/cpi/research-series/r-cpi-u-rs-allitems.xlsx>"
+            )
 
-    return df
+    return inflator[base_year] / inflator[given_year]
 
 
 def process_acs(df):

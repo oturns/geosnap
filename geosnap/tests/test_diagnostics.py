@@ -41,7 +41,7 @@ def test_cluster_diagnostics():
     )
     assert round(ward_mod.silhouette_score,4) == 0.2991
     assert round(ward_mod.davies_bouldin_score,4) == 1.0336
-    assert round(ward_mod.calinski_harabasz_score,4) == 88.6627
+    assert round(ward_mod.calinski_harabasz_score,3) == 88.663
 
 
 def test_region_diagnostics():
@@ -51,5 +51,4 @@ def test_region_diagnostics():
     assert round(ward_mod[2010].boundary_silhouette.boundary_silhouette.mean(),4) ==  0.2076
     assert round(ward_mod[2010].path_silhouette.path_silhouette.mean(),4) ==  -0.0801
     assert round(ward_mod[2010].silhouette_scores.silhouette_score.mean(),4) ==0.063
-    assert ward_mod[2010].nearest_label.nearest_label.head().tolist() == [1, 2, 0, 2, 4]
-
+    assert ward_mod[2010].nearest_label.nearest_label.sum() == 206

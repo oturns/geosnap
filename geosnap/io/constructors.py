@@ -1,11 +1,10 @@
-import contextlib
 from warnings import warn
 
 import geopandas as gpd
-import pandas as pd
+import ibis
 
-from .storage import _fips_filter, _fipstable, _from_db, adjust_inflation
-from .util import get_lehd
+from .storage import _fips_filter, _fipstable, _from_db
+from .util import _get_inflate_coef, get_lehd
 
 __all__ = [
     "get_acs",
@@ -46,10 +45,10 @@ def get_nces(datastore, years="1516", dataset="sabs"):
 
     dflist = []
     for year in years:
-        df = datastore.nces(year=year, dataset=dataset)
+        df = datastore.nces(year=year, dataset=dataset, execute=False)
         dflist.append(df)
-    gdf = pd.concat(dflist)
-    return gdf.reset_index(drop=True)
+    gdf = ibis.union(*dflist, distinct=True)
+    return gdf.to_pandas().set_crs(4326)
 
 
 def get_ejscreen(
@@ -103,10 +102,7 @@ def get_ejscreen(
 
     dflist = []
     for year in years:
-        df = datastore.ejscreen(
-            states=states,
-            year=year,
-        )
+        df = datastore.ejscreen(states=states, year=year, execute=False)
         df = _fips_filter(
             state_fips=state_fips,
             county_fips=county_fips,
@@ -115,8 +111,10 @@ def get_ejscreen(
             data=df,
         )
         dflist.append(df)
-    gdf = pd.concat(dflist)
-    return gdf.reset_index(drop=True)
+    gdf = ibis.union(*dflist, distinct=True)
+    gdf = gdf.distinct(on=["geoid", "year"])
+
+    return gdf.to_pandas()
 
 
 def get_acs(
@@ -129,6 +127,7 @@ def get_acs(
     years="all",
     constant_dollars=True,
     currency_year=None,
+    boundary=None,
 ):
     """Extract a subset of data from the American Community Survey (ACS).
 
@@ -160,6 +159,11 @@ def get_acs(
     currency_year : int, optional
         If adjusting for inflation, this parameter sets the year in which dollar values will
         be expressed
+    boundary : geopandas.GeoDataFrame
+        geodataframe that defines the total extent of the study area.
+        This will be used to clip tracts lazily by selecting all
+        `GeoDataFrame.centroid()`s that intersect the
+        boundary gdf
 
     Returns
     -------
@@ -197,30 +201,41 @@ def get_acs(
 
     states, allfips = _fips_to_states(state_fips, county_fips, msa_counties, fips)
 
+    common_cols = []
     dflist = []
     for year in years:
-        df = datastore.acs(
-            level=level,
-            states=states,
-            year=year,
-        )
-        df = _fips_filter(
-            state_fips=state_fips,
-            county_fips=county_fips,
-            msa_fips=msa_fips,
-            fips=fips,
-            data=df,
-        )
+        df = datastore.acs(level=level, states=states, year=year, execute=False)
+
+        if boundary is not None:
+            if not boundary.crs.equals(4326):
+                boundary = boundary.copy().to_crs(4326)
+            df = df.filter(df.geometry.centroid().intersects(boundary.union_all()))
+        else:
+            df = _fips_filter(
+                state_fips=state_fips,
+                county_fips=county_fips,
+                msa_fips=msa_fips,
+                fips=fips,
+                data=df,
+            )
+
         if constant_dollars:
-            try:
-                df = adjust_inflation(df, inflate_cols, year, currency_year)
-            except:
-                warn(
-                    "Currency columns unavailable at this resolution; not adjusting for inflation"
-                )
+            coef = _get_inflate_coef(year, currency_year)
+            for col in inflate_cols:
+                if col in df.columns:
+                    newcol = (df[col] * coef).round(0).cast("float64")
+                    df = df.mutate(newcol.name(col))
+            else:
+                warn(f"Currency column {col} not present in dataframe", stacklevel=2)
+        common_cols.append(set(df.columns))
         dflist.append(df)
-    gdf = pd.concat(dflist)
-    return gdf.reset_index(drop=True)
+
+    common_cols = set.intersection(*common_cols)
+    dflist = [df.select(common_cols) for df in dflist]
+    gdf = ibis.union(*dflist, distinct=True)
+    gdf = gdf.distinct(on=["geoid", "year"])
+
+    return gdf.to_pandas().set_crs(4326)
 
 
 def get_ltdb(
@@ -455,15 +470,19 @@ def get_census(
     }
 
     tracts = []
+    common_cols = []
     for year in years:
-        tracts.append(df_dict[year](states=states))
-    tracts = pd.concat(tracts, sort=False)
+        d = df_dict[year](states=states, execute=False)
+        tracts.append(d)
+        common_cols.append(set(d.columns))
+    common_cols = set.intersection(*common_cols)
+    tracts = [df.select(common_cols) for df in tracts]
+    tracts = ibis.union(*tracts, distinct=True)
 
-    if isinstance(boundary, gpd.GeoDataFrame):
+    if boundary is not None:
         if not boundary.crs.equals(4326):
             boundary = boundary.copy().to_crs(4326)
-        tracts = tracts[tracts.representative_point().intersects(boundary.union_all())]
-        gdf = tracts.copy()
+        gdf = tracts.filter(tracts.geometry.centroid().intersects(boundary.union_all()))
 
     else:
         gdf = _fips_filter(
@@ -483,14 +502,25 @@ def get_census(
             "per_capita_income",
             "median_household_income",
         ]
+        coef = _get_inflate_coef(year, currency_year)
 
         for year in years:
-            df = gdf[gdf.year == year]
-            df = adjust_inflation(df, inflate_cols, year, currency_year)
-            newtracts.append(df)
-        gdf = pd.concat(newtracts)
+            df = gdf.filter(gdf.year == year)
+            for col in inflate_cols:
+                if col in df.columns:
+                    newcol = df[col] * coef
+                    newcol = newcol.round(0).cast("float64")
+                    df = df.mutate(newcol.name(col))
+                    newtracts.append(df)
+                else:
+                    warn(
+                        f"Currency column {col} not present in dataframe", stacklevel=2
+                    )
+        if len(newtracts) > 0:
+            gdf = ibis.union(*newtracts, distinct=True)
+    gdf = gdf.distinct(on=["geoid", "year"])
 
-    return gdf.reset_index(drop=True)
+    return gdf.to_pandas().set_crs(4326)
 
 
 def get_lodes(
@@ -554,31 +584,39 @@ def get_lodes(
     msa_counties = _msa_to_county(datastore, msa_fips)
 
     states, allfips = _fips_to_states(state_fips, county_fips, msa_counties, fips)
-    if boundary and not boundary.crs.equals(4326):
-        boundary = boundary.copy().to_crs(4326)
-    if version == 5:
-        gdf = datastore.blocks_2000(states=states, fips=(tuple(allfips)))
-    elif version == 7:
-        gdf = datastore.blocks_2010(states=states, fips=(tuple(allfips)))
-    elif version == 8:
-        gdf = datastore.blocks_2020(states=states, fips=(tuple(allfips)))
 
-    gdf = gdf.drop(columns=["year"])
-    gdf = _fips_filter(
-        state_fips=state_fips,
-        county_fips=county_fips,
-        msa_fips=msa_fips,
-        fips=allfips,
-        data=gdf,
-    )
-    if isinstance(boundary, gpd.GeoDataFrame):
-        if boundary.crs != gdf.crs:
+    if boundary is not None:
+        if not boundary.crs.equals(4326):
+            boundary = boundary.copy().to_crs(4326)
+        if len(states) == 0:
+            states = datastore.states().geoid.values
             warn(
-                "Unable to determine whether boundary CRS is WGS84 "
-                "if this produces unexpected results, try reprojecting",
+                "No state fips found; searching all states. When using a boundary "
+                + "in this function it is recommended to pass state FIPS if possible",
                 stacklevel=2,
             )
-        gdf = gdf[gdf.representative_point().intersects(boundary.union_all())]
+    if version == 5:
+        gdf = datastore.blocks_2000(states=states, fips=(tuple(allfips)), execute=False)
+    elif version == 7:
+        gdf = datastore.blocks_2010(states=states, fips=(tuple(allfips)), execute=False)
+    elif version == 8:
+        gdf = datastore.blocks_2020(states=states, fips=(tuple(allfips)), execute=False)
+
+    gdf = gdf.drop("year")
+
+    if isinstance(boundary, gpd.GeoDataFrame):
+        if not boundary.crs.equals(4326):
+            boundary = boundary.copy().to_crs(4326)
+        gdf = gdf.filter(gdf.geometry.centroid().intersects(boundary.union_all()))
+        states = gdf.geoid.substr(0, 2).to_pandas().unique()
+    else:
+        gdf = _fips_filter(
+            state_fips=state_fips,
+            county_fips=county_fips,
+            msa_fips=msa_fips,
+            fips=fips,
+            data=gdf,
+        )
 
     # grab state abbreviations
     names = (
@@ -592,23 +630,25 @@ def get_lodes(
     dfs = []
     for year in years:
         for name in names:
-            merged_year = []
             if name == "PR":
                 raise ValueError("LODES does not yet include data for Puerto Rico")
             try:
-                df = get_lehd(dataset=dataset, year=year, state=name, version=version)
-                df = gdf.merge(df, right_index=True, left_on="geoid", how="left")
-                df["year"] = year
-                merged_year.append(df)
+                df = ibis.memtable(
+                    get_lehd(
+                        dataset=dataset, year=year, state=name, version=version
+                    ).reset_index()
+                )
+                df = gdf.join(df, "geoid", how="left").drop("geoid_right")
+                df = df.mutate(year=year)
+                dfs.append(df)
             except ValueError:
                 warn(f"{name.upper()} {year} not found!", stacklevel=2)
                 pass
-            with contextlib.suppress(ValueError):
-                dfs.append(pd.concat(merged_year))
-    out = pd.concat(dfs, sort=True)
-    out = out.groupby(["geoid", "year"]).first().reset_index()
-    out.crs = 4326
-    return out
+            # with contextlib.suppress(ValueError):
+            #   dfs.append(df)
+    out = ibis.union(*dfs, distinct=True)
+    out = out.distinct(on=["geoid", "year"])
+    return out.to_pandas().set_crs(4326)
 
 
 def _msa_to_county(datastore, msa_fips):

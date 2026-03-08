@@ -8,21 +8,38 @@ import numpy as np
 import pandas as pd
 from giddy.markov import Markov, Spatial_Markov
 from giddy.sequence import Sequence
-from libpysal.weights import Voronoi, lag_categorical
-from libpysal.weights.contiguity import Queen, Rook
-from libpysal.weights.distance import KNN, DistanceBand, Kernel
+from libpysal.graph import Graph
+from libpysal.weights import lag_categorical
 from numpy.random import PCG64, SeedSequence, default_rng
 from sklearn.cluster import AgglomerativeClustering
 from tqdm.auto import tqdm
 
-Ws = {
-    "queen": Queen,
-    "rook": Rook,
-    "voronoi": Voronoi,
-    "knn": KNN,
-    "kernel": Kernel,
-    "distanceband": DistanceBand,
-}
+
+def _get_g(df, gname, g_kwargs):
+    if g_kwargs is None:
+        g_kwargs = {}
+    gname = gname.lower()
+    if gname in ["rook", "queen"]:
+        rook = gname != "queen"
+        g = Graph.build_contiguity(df, rook=rook, **g_kwargs)
+    elif gname == "voronoi":
+        g = Graph.build_triangulation(
+            df.set_geometry(df.representative_point()), **g_kwargs
+        )
+    elif gname == "knn":
+        g = Graph.build_knn(df.set_geometry(df.representative_point()), **g_kwargs)
+    elif gname == "distanceband":
+        g = Graph.build_distance_band(
+            df.set_geometry(df.representative_point()), **g_kwargs
+        )
+    elif gname == "kernel":
+        g = Graph.build_kernel(df.set_geometry(df.representative_point()), **g_kwargs)
+    else:
+        raise ValueError(
+            "Unknown `Graph`. Must be one of {'rook', 'queen', 'voronoi, 'distanceband', 'knn', 'kernel'}"
+        )
+
+    return g
 
 
 def transition(
@@ -120,10 +137,10 @@ def transition(
     else:
         geoms = gdf_temp.groupby(unit_index).first()[gdf_temp.geometry.name]
         gdf_wide = df_wide.merge(geoms, left_index=True, right_index=True)
-        w = Ws[w_type].from_dataframe(gpd.GeoDataFrame(gdf_wide), **w_options)
-        w.transform = "r"
+        w = _get_g(gpd.GeoDataFrame(gdf_wide), gname=w_type, g_kwargs=w_options)
+        w = w.transform("r")
         mar = Spatial_Markov(
-            y, w, permutations=permutations, discrete=True, variable_name=cluster_col
+            y, w.to_W(), permutations=permutations, discrete=True, variable_name=cluster_col
         )
     return mar
 
@@ -311,7 +328,8 @@ def predict_markov_labels(
 
     if time_steps == 1:
         gdf = gdf[gdf[temporal_index] == base_year].reset_index(drop=True)
-        w = Ws[w_type].from_dataframe(gdf, **w_options)
+        w = _get_g(gpd.GeoDataFrame(gdf), gname=w_type, g_kwargs=w_options)
+
         predicted = _draw_labels(w, gdf, cluster_col, t, unit_index, verbose)
         if new_colname:
             predicted = predicted.rename(columns={cluster_col: new_colname})
@@ -326,7 +344,7 @@ def predict_markov_labels(
         gdf = gdf[[unit_index, cluster_col, temporal_index, gdf.geometry.name]]
         current_time = base_year + increment
         gdf = gdf.dropna(subset=[cluster_col]).reset_index(drop=True)
-        w = Ws[w_type].from_dataframe(gdf, **w_options)
+        w = _get_g(gpd.GeoDataFrame(gdf), gname=w_type, g_kwargs=w_options)
         predictions.append(gdf)
 
         for step in range(1, time_steps + 1):
@@ -366,7 +384,7 @@ def _draw_labels(w, gdf, cluster_col, markov, unit_index, verbose):
     """
     gdf = gdf.copy()
     gdf = gdf.dropna(subset=[cluster_col])
-    lags = lag_categorical(w, gdf[cluster_col].values)
+    lags = w.lag(gdf[cluster_col].values, categorical=True, ties='tryself')
     clusters = gdf.reset_index()[cluster_col].values
     classes = markov.classes
     cluster_idx = dict(zip(classes, list(range(len(classes)))))

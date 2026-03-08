@@ -5,16 +5,17 @@ import pathlib
 from warnings import warn
 
 import geopandas as gpd
+import ibis
 import pandas as pd
 from platformdirs import user_data_dir
 
 
-def _fetcher(local_path, remote_path, warning_msg):
-    try:
-        t = gpd.read_parquet(local_path)
-    except FileNotFoundError:
+def _fetcher(local_path, remote_path, warning_msg, con):
+    if not os.path.exists(local_path):
         warn(warning_msg)
-        t = gpd.read_parquet(remote_path, storage_options={"anon": True})
+        t = con.read_parquet(remote_path)
+    else:
+        t = con.read_parquet(local_path)
 
     return t
 
@@ -54,7 +55,7 @@ class _Map(dict):
 class DataStore:
     """Storage for geosnap data. Currently supports data from several U.S. federal agencies and national research centers."""
 
-    def __init__(self, data_dir="auto", disclaimer=False):
+    def __init__(self, data_dir="auto", disclaimer=False, inmemory=True):
         appname = "geosnap"
         appauthor = "geosnap"
 
@@ -67,6 +68,12 @@ class DataStore:
                 "The geosnap data storage class is provided for convenience only. The geosnap developers make no promises "
                 "regarding data quality, consistency, or availability, nor are they responsible for any use/misuse of the data. "
                 "The end-user is responsible for any and all analyses or applications created with the package."
+            )
+        if inmemory:
+            self._con = ibis.duckdb.connect(extensions=["spatial"])
+        else:
+            self._con = ibis.duckdb.connect(
+                pathlib.Path(self.data_dir, "geosnap_data.ddb"), extensions=["spatial"]
             )
 
     def __dir__(self):
@@ -138,7 +145,7 @@ class DataStore:
             converters={"stfips": str},
         )
 
-    def acs(self, year=2018, level="tract", states=None):
+    def acs(self, year=2018, level="tract", states=None, execute=True):
         """American Community Survey Data (5-year estimates).
 
         Parameters
@@ -158,12 +165,15 @@ class DataStore:
         local_path = pathlib.Path(self.data_dir, "acs", f"acs_{year}_{level}.parquet")
         remote_path = f"s3://spatial-ucr/census/acs/acs_{year}_{level}.parquet"
         msg = "Streaming data from S3. Use `geosnap.io.store_acs()` to store the data locally for better performance"
-        t = _fetcher(local_path, remote_path, msg)
-        t = t.reset_index().rename(columns={"GEOID": "geoid"})
+        t = _fetcher(local_path, remote_path, msg, self._con)
+        t = t.rename(geoid="GEOID")
 
         if states:
-            t = t[t.geoid.str[:2].isin(states)]
-        t["year"] = year
+            t = t.filter(t.geoid.substr(0, 2).isin(states))
+
+        t = t.mutate(year=year)
+        if execute:
+            t = t.to_pandas()
         return t
 
     def seda(
@@ -277,7 +287,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
 
         return t
 
-    def nces(self, year=1516, dataset="sabs"):
+    def nces(self, year=1516, dataset="sabs", execute=True):
         """National Center for Education Statistics (NCES) Data.
 
         Parameters
@@ -297,13 +307,15 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         local_path = pathlib.Path(self.data_dir, "nces", f"{dataset}_{year}.parquet")
         remote_path = f"s3://spatial-ucr/nces/{selector}/{dataset}_{year}.parquet"
         msg = "Streaming data from S3. Use `geosnap.io.store_nces()` to store the data locally for better performance"
-        t = _fetcher(local_path, remote_path, msg)
+        t = _fetcher(local_path, remote_path, msg, self._con)
         # t = t.reset_index().rename(columns={"GEOID": "geoid"})
 
-        t["year"] = year
+        t = t.mutate(year=year)
+        if execute:
+            t = t.to_pandas()
         return t
 
-    def ejscreen(self, year=2018, states=None):
+    def ejscreen(self, year=2018, states=None, execute=True):
         """EPA EJScreen Data <https://www.epa.gov/ejscreen>.
 
         Parameters
@@ -321,12 +333,15 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         local_path = pathlib.Path(self.data_dir, "epa", f"ejscreen_{year}.parquet")
         remote_path = f"s3://spatial-ucr/epa/ejscreen/ejscreen_{year}.parquet"
         msg = "Streaming data from S3. Use `geosnap.io.store_ejscreen()` to store the data locally for better performance"
-        t = _fetcher(local_path, remote_path, msg)
-        t = t.rename(columns={"ID": "geoid"})
+        t = _fetcher(local_path, remote_path, msg, self._con)
+        t = t.rename(geoid="ID")
 
         if states:
-            t = t[t.geoid.str[:2].isin(states)]
-        t["year"] = year
+            t = t.filter(t.geoid.substr(0, 2).isin(states))
+        t = t.mutate(year=year)
+
+        if execute:
+            t = t.to_pandas()
         return t
 
     def ejscreen_codebook(self):
@@ -344,7 +359,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
             )
         )
 
-    def blocks_2000(self, states=None, fips=None):
+    def blocks_2000(self, states=None, fips=None, execute=True):
         """Census blocks for 2000.
 
         Parameters
@@ -371,18 +386,26 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         for state in states:
             local = pathlib.Path(self.data_dir, "blocks_2000", f"{state}.parquet")
             remote = f"s3://spatial-ucr/census/blocks_2000/{state}.parquet"
-            blks[state] = _fetcher(local, remote, msg)
+            blks[state] = _fetcher(local, remote, msg, self._con)
 
             if fips:
-                blks[state] = blks[state][blks[state]["geoid"].str.startswith(fips)]
-
-            blks[state]["year"] = 2000
+                blks[state] = ibis.union(
+                    *[
+                        blks[state].filter(blks[state]["geoid"].startswith(fips))
+                        for fips in fips
+                    ],
+                    distinct=True,
+                )
+            blks[state] = blks[state].mutate(year=2000)
         blocks = list(blks.values())
-        blocks = gpd.GeoDataFrame(pd.concat(blocks, sort=True))
+
+        blocks = ibis.union(*blocks, distinct=True)
+        if execute:
+            blocks = blocks.to_pandas()
 
         return blocks
 
-    def blocks_2010(self, states=None, fips=None):
+    def blocks_2010(self, states=None, fips=None, execute=True):
         """Census blocks for 2010.
 
         Parameters
@@ -409,18 +432,26 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         for state in states:
             local = pathlib.Path(self.data_dir, "blocks_2010", f"{state}.parquet")
             remote = f"s3://spatial-ucr/census/blocks_2010/{state}.parquet"
-            blks[state] = _fetcher(local, remote, msg)
+            blks[state] = _fetcher(local, remote, msg, self._con)
 
             if fips:
-                blks[state] = blks[state][blks[state]["geoid"].str.startswith(fips)]
-
-            blks[state]["year"] = 2010
+                blks[state] = ibis.union(
+                    *[
+                        blks[state].filter(blks[state]["geoid"].startswith(fips))
+                        for fips in fips
+                    ],
+                    distinct=True,
+                )
+            blks[state] = blks[state].mutate(year=2010)
         blocks = list(blks.values())
-        blocks = gpd.GeoDataFrame(pd.concat(blocks, sort=True))
+
+        blocks = ibis.union(*blocks, distinct=True)
+        if execute:
+            blocks = blocks.to_pandas()
 
         return blocks
 
-    def blocks_2020(self, states=None, fips=None):
+    def blocks_2020(self, states=None, fips=None, execute=True):
         """Census blocks for 2020.
 
         Parameters
@@ -447,18 +478,27 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         for state in states:
             local = pathlib.Path(self.data_dir, "blocks_2020", f"{state}.parquet")
             remote = f"s3://spatial-ucr/census/blocks_2020/{state}.parquet"
-            blks[state] = _fetcher(local, remote, msg)
+            blks[state] = _fetcher(local, remote, msg, self._con)
 
             if fips:
-                blks[state] = blks[state][blks[state]["geoid"].str.startswith(fips)]
+                blks[state] = ibis.union(
+                    *[
+                        blks[state].filter(blks[state]["geoid"].startswith(fips))
+                        for fips in fips
+                    ],
+                    distinct=True,
+                )
 
-            blks[state]["year"] = 2020
+            blks[state] = blks[state].mutate(year=2020)
         blocks = list(blks.values())
-        blocks = gpd.GeoDataFrame(pd.concat(blocks, sort=True))
+
+        blocks = ibis.union(*blocks, distinct=True)
+        if execute:
+            blocks = blocks.to_pandas()
 
         return blocks
 
-    def tracts_1990(self, states=None):
+    def tracts_1990(self, states=None, execute=True):
         """Nationwide Census Tracts as drawn in 1990 (cartographic 500k).
 
         Parameters
@@ -476,14 +516,16 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
         local = pathlib.Path(self.data_dir, "tracts_1990_500k.parquet")
         remote = "s3://spatial-ucr/census/tracts_cartographic/tracts_1990_500k.parquet"
-        t = _fetcher(local, remote, msg)
+        t = _fetcher(local, remote, msg, self._con)
         if states:
-            t = t[t.geoid.str[:2].isin(states)]
-        t["year"] = 1990
+            t = t.filter(t.geoid.substr(0, 2).isin(states))
+        t = t.mutate(year=1990)
+        if execute:
+            t = t.to_pandas()
 
         return t
 
-    def tracts_2000(self, states=None):
+    def tracts_2000(self, states=None, execute=True):
         """Nationwide Census Tracts as drawn in 2000 (cartographic 500k).
 
         Parameters
@@ -500,16 +542,18 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         local = pathlib.Path(self.data_dir, "tracts_2000_500k.parquet")
         remote = "s3://spatial-ucr/census/tracts_cartographic/tracts_2000_500k.parquet"
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
-        t = _fetcher(local, remote, msg)
+        t = _fetcher(local, remote, msg, self._con)
         if states:
-            t = t[t.geoid.str[:2].isin(states)]
-        t["year"] = 2000
-
+            t = t.filter(t.geoid.substr(0, 2).isin(states))
+        t = t.mutate(year=2000)
+        if execute:
+            t = t.to_pandas()
         return t
 
     def tracts_2010(
         self,
         states=None,
+        execute=True
     ):
         """Nationwide Census Tracts as drawn in 2010 (cartographic 500k).
 
@@ -527,16 +571,19 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
         local = pathlib.Path(self.data_dir, "tracts_2010_500k.parquet")
         remote = "s3://spatial-ucr/census/tracts_cartographic/tracts_2010_500k.parquet"
-        t = _fetcher(local, remote, msg)
+        t = _fetcher(local, remote, msg, self._con)
 
         if states:
-            t = t[t.geoid.str[:2].isin(states)]
-        t["year"] = 2010
+            t = t.filter(t.geoid.substr(0, 2).isin(states))
+        t = t.mutate(year=2010)
+        if execute:
+            t = t.to_pandas()
         return t
 
     def tracts_2020(
         self,
         states=None,
+        execute=True
     ):
         """Nationwide Census Tracts as drawn in 2020 (cartographic 500k).
 
@@ -554,11 +601,13 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
         local = pathlib.Path(self.data_dir, "tracts_2020_500k.parquet")
         remote = "s3://spatial-ucr/census/tracts_cartographic/tracts_2020_500k.parquet"
-        t = _fetcher(local, remote, msg)
+        t = _fetcher(local, remote, msg, self._con)
 
         if states:
-            t = t[t.geoid.str[:2].isin(states)]
-        t["year"] = 2020
+            t = t.filter(t.geoid.substr(0, 2).isin(states))
+        t = t.mutate(year=2020)
+        if execute:
+            t = t.to_pandas()
         return t
 
     def msas(self):
@@ -577,7 +626,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         local = pathlib.Path(self.data_dir, "msas.parquet")
         remote = "s3://spatial-ucr/census/administrative/msas.parquet"
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
-        t = _fetcher(local, remote, msg)
+        t = _fetcher(local, remote, msg, self._con).to_pandas()
         t = t.sort_values(by="name")
         return t
 
@@ -594,7 +643,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         remote = "s3://spatial-ucr/census/administrative/states.parquet"
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
 
-        t = _fetcher(local, remote, msg)
+        t = _fetcher(local, remote, msg, self._con).to_pandas()
         return t
 
     def counties(self):
@@ -609,7 +658,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         local = pathlib.Path(self.data_dir, "counties.parquet")
         remote = "s3://spatial-ucr/census/administrative/counties.parquet"
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
-        t = _fetcher(local, remote, msg)
+        t = _fetcher(local, remote, msg, self._con).to_pandas()
         return t
 
     def msa_definitions(self):

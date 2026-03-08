@@ -19,14 +19,13 @@ dependencies:
   - xlrd
   - tobler >=0.8.2
   - spopt >=0.3.0
-  - fsspec
-  - s3fs
   - segregation >=2.0
   - pyproj >=3
   - pandarm
   - pooch
   - osmnx
   - pygraphviz
+  - ibis-framework
 
   # testing
   - jupyter
