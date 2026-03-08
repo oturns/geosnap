@@ -480,7 +480,6 @@ def get_census(
     tracts = []
     common_cols = []
     for year in years:
-        print(year)
         if year < 2020:
             d = df_dict[year](states=states, execute=False)
         else:
