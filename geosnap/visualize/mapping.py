@@ -446,7 +446,7 @@ def animate_timeseries(
             ax.axis("off")
             ax.set_title(f"{time}", fontsize=subtitle_fontsize, backgroundcolor="white")
             fig.suptitle(f"{title}", fontsize=title_fontsize)
-            if use_ultraplot:
+            if use_ultraplot and HAS_PROPLOT:
                 fig.auto_layout()
             else:
                 plt.tight_layout()
