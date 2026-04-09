@@ -26,3 +26,5 @@ dependencies:
   - pandarm
   - ibis-framework
   - ultraplot
+  - pyogrio
+  - dask-geopandas
