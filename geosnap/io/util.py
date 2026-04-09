@@ -163,17 +163,38 @@ def convert_census_gdb(
                     )  # remove prefix for bgs
                 tables.append(df)
         else:
-            df = (
-                dgpd.read_file(gdb_path, layer=i, npartitions=npartitions)
-                .compute()
-                .set_index("GEOID")
-            )
+            raw = dgpd.read_file(gdb_path, layer=i, npartitions=npartitions).compute()
+
+            if "GEOID" in raw.columns:
+                geoid_col = "GEOID"
+            elif "GEOIDFQ" in raw.columns:
+                geoid_col = "GEOIDFQ"
+            elif "GEOID_Data" in raw.columns:
+                geoid_col = "GEOID_Data"
+            else:
+                raise KeyError(
+                    f"No GEOID-like column found in layer {i}. Columns are: {list(raw.columns)}"
+                )
+
+            df = raw.set_index(geoid_col)
+
             if "ACS_" not in i:  # only the geoms have the ACS prefix
-                df = df[df.columns[df.columns.str.contains("e")]]
-                df.columns = pd.Series(df.columns).apply(reformat_acs_vars)
+                # newer vintages already use normalized names like B02001_E001.
+                # older vintages may still use names like B02001e1.
+                uppercase_estimates = df.columns[df.columns.str.contains("_E", regex=False)]
+                lowercase_estimates = df.columns[df.columns.str.contains("e", regex=False)]
+
+                if len(uppercase_estimates) > 0:
+                    df = df[uppercase_estimates]
+                else:
+                    df = df[lowercase_estimates]
+                    df.columns = pd.Series(df.columns).apply(reformat_acs_vars)
+
             df = df.dropna(axis=1, how="all")
-            df.index = df.index.str.replace("14000US", "")  # remove prefix for tracts
-            df.index = df.index.str.replace("15000US", "")  # remove prefix for bgs
+            df.index = df.index.astype(str)
+            df.index = df.index.str.replace("14000US", "", regex=False)
+            df.index = df.index.str.replace("15000US", "", regex=False)
+
             if combine:
                 tables.append(df)
             if save_intermediate:

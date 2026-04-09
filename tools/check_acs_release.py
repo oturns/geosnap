@@ -132,19 +132,34 @@ def open_issue(year: int, body: str) -> None:
 def ensure_workdir() -> None:
     WORKDIR.mkdir(parents=True, exist_ok=True)
 
-
+    
 def download_raw_gdb(year: int) -> Path:
     ensure_workdir()
+    filename = expected_file(year)
     get_census_gdb(
         years=[year],
         geom_level=GEOM_LEVEL,
         output_dir=str(WORKDIR),
         protocol="https",
     )
-    return WORKDIR / expected_file(year)
+    matches = [p.resolve() for p in WORKDIR.rglob(filename) if p.is_file()]
+    if not matches:
+        raise FileNotFoundError(
+            f"Could not find downloaded file {filename} under {WORKDIR.resolve()}"
+        )
+
+    if len(matches) > 1:
+        print("Multiple file matches found:", file=sys.stderr)
+        for match in matches:
+            print(f"  {match}", file=sys.stderr)
+    chosen = matches[0]
+    print(f"Using downloaded zip file: {chosen}", file=sys.stderr)
+    return chosen
 
 
 def convert_raw_gdb(year: int, gdb_path: Path) -> Path:
+    gdb_path = gdb_path.resolve()
+
     convert_census_gdb(
         year=str(year),
         level=LEVEL_CODE,
@@ -198,7 +213,7 @@ def main() -> int:
 
         return 0
 
-        except Exception as exc:
+    except Exception as exc:
         msg = (
             f"Detected Census ACS release for {year}, but automated processing failed.\n\n"
             f"Checked directory: {census_year_url(year)}\n"
