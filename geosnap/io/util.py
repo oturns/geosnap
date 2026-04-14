@@ -213,7 +213,7 @@ def convert_census_gdb(
             if layer != meta_str and not layer.endswith("_METADATA")
         ]
         
-   tables = list()
+    tables = list()
     existing_files = os.listdir(output_dir)
     for i in tqdm(layers):
         print(i)
@@ -244,14 +244,14 @@ def convert_census_gdb(
             
             df = raw.set_index(geoid_col)
 
-           if "ACS_" not in i:  # only the geoms have the ACS prefix
-               candidate_cols = df.columns[
-                   df.columns.str.contains("_E", regex=False)
-                   | df.columns.str.contains("_M", regex=False)
-                   | df.columns.str.contains("e", regex=False)
-               ]
-               df = df[candidate_cols]
-               df.columns = pd.Index([normalize_acs_vars(col) for col in df.columns])
+            if "ACS_" not in i:  # only the geoms have the ACS prefix
+                candidate_cols = df.columns[
+                    df.columns.str.match(r"^[A-Za-z0-9]+e\d+$", na=False)           # old style: B02001e1
+                    | df.columns.str.match(r"^[A-Za-z0-9]+_[EM]\d{3}$", na=False)   # new style: B02001_E001 / B02001_M001
+                    | df.columns.str.match(r"^[A-Za-z0-9]+_\d{3}[EM]$", na=False)   # canonical: B02001_001E / B02001_001M
+                ]
+                df = df[candidate_cols]
+                df.columns = pd.Index([normalize_acs_vars(col) for col in df.columns])
 
             df = df.dropna(axis=1, how="all")
             df.index = df.index.astype(str)
