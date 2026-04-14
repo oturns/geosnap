@@ -204,7 +204,7 @@ def convert_census_gdb(
     if gdb_path is None:
         warn("No `gdb_path` given. Data will be pulled from the Census server")
         gdb_path = f"https://www2.census.gov/geo/tiger/TIGER_DP/{year}ACS/ACS_{year}_5YR_{level.upper()}.gdb.zip"
-    if layers is None:  # grab them all except the metadata
+    if layers is None:  # grab them all except metadata layers
         year_suffix = year[-2:]
         meta_str = f"{level.upper()}_METADATA_20{year_suffix}"
         layers = [layer[0] for layer in ogr.list_layers(gdb_path)]
@@ -212,8 +212,8 @@ def convert_census_gdb(
             layer for layer in layers
             if layer != meta_str and not layer.endswith("_METADATA")
         ]
-
-    tables = list()
+        
+   tables = list()
     existing_files = os.listdir(output_dir)
     for i in tqdm(layers):
         print(i)
