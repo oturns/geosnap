@@ -1,0 +1,35 @@
+name: Check for new ACS TIGER_DP release
+
+on:
+  schedule:
+    - cron: "0 15 1 * *"
+  workflow_dispatch:
+
+jobs:
+  check-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: geosnap
+          environment-file: environment.yml
+          python-version: "3.11"
+          auto-activate-base: false
+
+      - name: Install package and extra dependencies
+        shell: bash -l {0}
+        run: |
+          pip install -e .
+          pip install PyGithub
+
+      - name: Check Census release and process if available
+        shell: bash -l {0}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python tools/check_acs_release.py

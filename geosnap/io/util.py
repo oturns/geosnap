@@ -7,6 +7,7 @@ import geopandas as gpd
 import pandas as pd
 import pooch
 from tqdm.auto import tqdm
+import re
 
 
 def get_census_gdb(years=None, geom_level="blockgroup", output_dir=".", protocol="ftp"):
@@ -54,25 +55,94 @@ def get_census_gdb(years=None, geom_level="blockgroup", output_dir=".", protocol
         pooch.retrieve(urls[protocol], None, progressbar=True, fname=fn, path=pth)
 
 
-def reformat_acs_vars(col):
-    """Convert variable names to the same format used by the Census Detailed Tables API.
-
+def normalize_acs_vars(col):
+    """Normalize ACS variable names to the canonical Census API format.
+    
     See <https://api.census.gov/data/2019/acs/acs5/variables.html> for variable descriptions
 
+    Supported conversions
+    ----------------
+    Old-style TIGER_DP names:
+        B02001e1   -> B02001_001E
+        B19013e1   -> B19013_001E
+
+    Newer TIGER_DP names:
+        B02001_E001 -> B02001_001E
+        B02001_M001 -> B02001_001M
+
+    Already-canonical names:
+        B02001_001E -> B02001_001E
+        B02001_001M -> B02001_001M
+
+    GEOID-like columns are returned unchanged.
 
     Parameters
     ----------
     col : str
-        column name to adjust
+        Column name to adjust.
 
     Returns
     -------
     str
-        reformatted column name
+        Normalized ACS-style column name.
     """
-    pieces = col.split("e")
-    formatted = pieces[0] + "_" + pieces[1].rjust(3, "0") + "E"
-    return formatted
+    col = str(col).strip()
+    if col in {"GEOID", "GEOIDFQ", "GEOID_Data", "geometry"}:
+        return col
+    
+    # Older style: B02001e1 -> B02001_001E
+    old_style = re.match(r"^([A-Za-z0-9]+)e(\d+)$", col)
+    if old_style:
+        stem, num = old_style.groups()
+        return f"{stem.upper()}_{num.rjust(3, '0')}E"
+
+    # 2022 style: B02001_E001 -> B02001_001E
+    new_style = re.match(r"^([A-Za-z0-9]+)_([EM])(\d{3})$", col, flags=re.IGNORECASE)
+    if new_style:
+        stem, suffix, num = new_style.groups()
+        return f"{stem.upper()}_{num}{suffix.upper()}"
+
+    canonical = re.match(r"^([A-Za-z0-9]+)_(\d{3})([EM])$", col, flags=re.IGNORECASE)
+    if canonical:
+        stem, num, suffix = canonical.groups()
+        return f"{stem.upper()}_{num}{suffix.upper()}"
+
+    return col
+
+
+def find_geoid_column(columns):
+    """Identify the GEOID-like column in a set of column names.
+
+    Supports naming conventions used across Census vintages, e.g.:
+        GEOID
+        GEOIDFQ
+        GEOID_Data
+        GEOID20, GEOID10, etc.
+
+    Parameters
+    ----------
+    columns : iterable
+        Collection of column names (DataFrame.columns)
+
+    Returns
+    -------
+    str or None
+    Name of the detected GEOID-like column, or None if not found
+       """
+    # Preferred explicit matches first (most stable)
+    priority = ["GEOID", "GEOIDFQ", "GEOID_Data"]
+    for candidate in priority:
+        if candidate in columns:
+            return candidate
+
+    # Fallback: regex match for any GEOID-like column
+    for col in columns:
+        if re.match(r"^GEOID", str(col), flags=re.IGNORECASE):
+            return col
+
+    # If no GEOID column found, warn    
+    warn(f"No GEOID-like column found. Columns are: {list(columns)}")
+    return None
 
 
 def convert_census_gdb(
@@ -134,13 +204,15 @@ def convert_census_gdb(
     if gdb_path is None:
         warn("No `gdb_path` given. Data will be pulled from the Census server")
         gdb_path = f"https://www2.census.gov/geo/tiger/TIGER_DP/{year}ACS/ACS_{year}_5YR_{level.upper()}.gdb.zip"
-    if layers is None:  # grab them all except the metadata
+    if layers is None:  # grab them all except metadata layers
         year_suffix = year[-2:]
         meta_str = f"{level.upper()}_METADATA_20{year_suffix}"
         layers = [layer[0] for layer in ogr.list_layers(gdb_path)]
-        if meta_str in layers:
-            layers.remove(meta_str)
-
+        layers = [
+            layer for layer in layers
+            if layer != meta_str and not layer.endswith("_METADATA")
+        ]
+        
     tables = list()
     existing_files = os.listdir(output_dir)
     for i in tqdm(layers):
@@ -163,17 +235,29 @@ def convert_census_gdb(
                     )  # remove prefix for bgs
                 tables.append(df)
         else:
-            df = (
-                dgpd.read_file(gdb_path, layer=i, npartitions=npartitions)
-                .compute()
-                .set_index("GEOID")
-            )
+            raw = dgpd.read_file(gdb_path, layer=i, npartitions=npartitions).compute()
+
+            geoid_col = find_geoid_column(raw.columns)
+            if geoid_col is None:
+                warn(f"Skipping layer {i} because no GEOID column was found")
+                continue
+            
+            df = raw.set_index(geoid_col)
+
             if "ACS_" not in i:  # only the geoms have the ACS prefix
-                df = df[df.columns[df.columns.str.contains("e")]]
-                df.columns = pd.Series(df.columns).apply(reformat_acs_vars)
+                candidate_cols = df.columns[
+                    df.columns.str.match(r"^[A-Za-z0-9]+e\d+$", na=False)           # old style: B02001e1
+                    | df.columns.str.match(r"^[A-Za-z0-9]+_[EM]\d{3}$", na=False)   # new style: B02001_E001 / B02001_M001
+                    | df.columns.str.match(r"^[A-Za-z0-9]+_\d{3}[EM]$", na=False)   # canonical: B02001_001E / B02001_001M
+                ]
+                df = df[candidate_cols]
+                df.columns = pd.Index([normalize_acs_vars(col) for col in df.columns])
+
             df = df.dropna(axis=1, how="all")
-            df.index = df.index.str.replace("14000US", "")  # remove prefix for tracts
-            df.index = df.index.str.replace("15000US", "")  # remove prefix for bgs
+            df.index = df.index.astype(str)
+            df.index = df.index.str.replace("14000US", "", regex=False)
+            df.index = df.index.str.replace("15000US", "", regex=False)
+
             if combine:
                 tables.append(df)
             if save_intermediate:
