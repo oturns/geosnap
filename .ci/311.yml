@@ -26,6 +26,7 @@ dependencies:
   - osmnx
   - pygraphviz
   - ibis-framework
+  - python-duckdb<1.5
 
   # testing
   - jupyter
