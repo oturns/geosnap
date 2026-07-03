@@ -46,6 +46,19 @@ def test_msas():
     assert df.shape == (939, 4)
 
 
+def test_admin_tables_lazy():
+    msas = datasets.msas(execute=False)
+    states = datasets.states(execute=False)
+    counties = datasets.counties(execute=False)
+
+    assert hasattr(msas, "to_pandas")
+    assert hasattr(states, "to_pandas")
+    assert hasattr(counties, "to_pandas")
+    assert "name" in msas.columns
+    assert "geoid" in states.columns
+    assert "geoid" in counties.columns
+
+
 def test_msa_defs():
     df = datasets.msa_definitions()
     assert df.shape == (1916, 13)

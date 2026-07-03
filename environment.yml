@@ -25,4 +25,5 @@ dependencies:
   - pooch
   - pandarm
   - ibis-framework
+  - python-duckdb<1.5
   - ultraplot
