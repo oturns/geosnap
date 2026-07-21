@@ -10,12 +10,42 @@ import pandas as pd
 from platformdirs import user_data_dir
 
 
-def _fetcher(local_path, remote_path, warning_msg, con):
+def _fetcher(local_path, remote_path, warning_msg, con, table_name=None):
+    """Read a parquet file from local path or S3, with table registration caching.
+
+    If table_name is provided and the table is already registered in the DuckDB
+    connection, return the cached table instead of re-reading the file. This avoids
+    redundant S3 downloads when the same dataset is accessed multiple times.
+    """
+    # Check if table is already registered (avoids re-reading from S3/disk)
+    if table_name and table_name in con.list_tables():
+        return con.table(table_name)
+
     if not os.path.exists(local_path):
-        warn(warning_msg)
-        t = con.read_parquet(remote_path)
+        warn(warning_msg, stacklevel=2)
+        path = remote_path
     else:
-        t = con.read_parquet(local_path)
+        path = str(local_path)
+
+    try:
+        if table_name:
+            t = con.read_parquet(path, table_name=table_name)
+        else:
+            t = con.read_parquet(path)
+    except Exception as exc:
+        if path == remote_path:
+            raise
+        if "Geoparquet metadata does not have a version" not in str(exc):
+            raise
+        warn(
+            "Local parquet cache is incompatible with DuckDB; falling back to "
+            "the remote source.",
+            stacklevel=2,
+        )
+        if table_name:
+            t = con.read_parquet(remote_path, table_name=table_name)
+        else:
+            t = con.read_parquet(remote_path)
 
     return t
 
@@ -70,11 +100,18 @@ class DataStore:
                 "The end-user is responsible for any and all analyses or applications created with the package."
             )
         if inmemory:
-            self._con = ibis.duckdb.connect(extensions=["spatial"])
+            self._con = ibis.duckdb.connect(extensions=["spatial", "httpfs"])
         else:
             self._con = ibis.duckdb.connect(
-                pathlib.Path(self.data_dir, "geosnap_data.ddb"), extensions=["spatial"]
+                pathlib.Path(self.data_dir, "geosnap_data.ddb"),
+                extensions=["spatial", "httpfs"],
             )
+
+        # Optimize DuckDB for S3 parquet reads
+        self._con.raw_sql("SET s3_region='us-east-1'")
+        self._con.raw_sql("SET parquet_metadata_cache=true")
+        self._con.raw_sql("SET enable_http_metadata_cache=true")
+        self._con.raw_sql("SET http_timeout=300")
 
     def __dir__(self):
         atts = [
@@ -165,7 +202,7 @@ class DataStore:
         local_path = pathlib.Path(self.data_dir, "acs", f"acs_{year}_{level}.parquet")
         remote_path = f"s3://spatial-ucr/census/acs/acs_{year}_{level}.parquet"
         msg = "Streaming data from S3. Use `geosnap.io.store_acs()` to store the data locally for better performance"
-        t = _fetcher(local_path, remote_path, msg, self._con)
+        t = _fetcher(local_path, remote_path, msg, self._con, table_name=f"acs_{year}_{level}")
         t = t.rename(geoid="GEOID")
 
         if states:
@@ -307,7 +344,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         local_path = pathlib.Path(self.data_dir, "nces", f"{dataset}_{year}.parquet")
         remote_path = f"s3://spatial-ucr/nces/{selector}/{dataset}_{year}.parquet"
         msg = "Streaming data from S3. Use `geosnap.io.store_nces()` to store the data locally for better performance"
-        t = _fetcher(local_path, remote_path, msg, self._con)
+        t = _fetcher(local_path, remote_path, msg, self._con, table_name=f"nces_{selector}_{year}")
         # t = t.reset_index().rename(columns={"GEOID": "geoid"})
 
         t = t.mutate(year=year)
@@ -333,7 +370,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         local_path = pathlib.Path(self.data_dir, "epa", f"ejscreen_{year}.parquet")
         remote_path = f"s3://spatial-ucr/epa/ejscreen/ejscreen_{year}.parquet"
         msg = "Streaming data from S3. Use `geosnap.io.store_ejscreen()` to store the data locally for better performance"
-        t = _fetcher(local_path, remote_path, msg, self._con)
+        t = _fetcher(local_path, remote_path, msg, self._con, table_name=f"ejscreen_{year}")
         t = t.rename(geoid="ID")
 
         if states:
@@ -386,7 +423,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         for state in states:
             local = pathlib.Path(self.data_dir, "blocks_2000", f"{state}.parquet")
             remote = f"s3://spatial-ucr/census/blocks_2000/{state}.parquet"
-            blks[state] = _fetcher(local, remote, msg, self._con)
+            blks[state] = _fetcher(local, remote, msg, self._con, table_name=f"blocks_2000_{state}")
 
             if fips:
                 blks[state] = ibis.union(
@@ -432,7 +469,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         for state in states:
             local = pathlib.Path(self.data_dir, "blocks_2010", f"{state}.parquet")
             remote = f"s3://spatial-ucr/census/blocks_2010/{state}.parquet"
-            blks[state] = _fetcher(local, remote, msg, self._con)
+            blks[state] = _fetcher(local, remote, msg, self._con, table_name=f"blocks_2010_{state}")
 
             if fips:
                 blks[state] = ibis.union(
@@ -478,7 +515,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         for state in states:
             local = pathlib.Path(self.data_dir, "blocks_2020", f"{state}.parquet")
             remote = f"s3://spatial-ucr/census/blocks_2020/{state}.parquet"
-            blks[state] = _fetcher(local, remote, msg, self._con)
+            blks[state] = _fetcher(local, remote, msg, self._con, table_name=f"blocks_2020_{state}")
 
             if fips:
                 blks[state] = ibis.union(
@@ -516,7 +553,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
         local = pathlib.Path(self.data_dir, "tracts_1990_500k.parquet")
         remote = "s3://spatial-ucr/census/tracts_cartographic/tracts_1990_500k.parquet"
-        t = _fetcher(local, remote, msg, self._con)
+        t = _fetcher(local, remote, msg, self._con, table_name="tracts_1990_500k")
         if states:
             t = t.filter(t.geoid.substr(0, 2).isin(states))
         t = t.mutate(year=1990)
@@ -542,7 +579,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         local = pathlib.Path(self.data_dir, "tracts_2000_500k.parquet")
         remote = "s3://spatial-ucr/census/tracts_cartographic/tracts_2000_500k.parquet"
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
-        t = _fetcher(local, remote, msg, self._con)
+        t = _fetcher(local, remote, msg, self._con, table_name="tracts_2000_500k")
         if states:
             t = t.filter(t.geoid.substr(0, 2).isin(states))
         t = t.mutate(year=2000)
@@ -571,7 +608,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
         local = pathlib.Path(self.data_dir, "tracts_2010_500k.parquet")
         remote = "s3://spatial-ucr/census/tracts_cartographic/tracts_2010_500k.parquet"
-        t = _fetcher(local, remote, msg, self._con)
+        t = _fetcher(local, remote, msg, self._con, table_name="tracts_2010_500k")
 
         if states:
             t = t.filter(t.geoid.substr(0, 2).isin(states))
@@ -601,7 +638,7 @@ Subject to your compliance with the terms and conditions set forth in this Agree
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
         local = pathlib.Path(self.data_dir, "tracts_2020_500k.parquet")
         remote = "s3://spatial-ucr/census/tracts_cartographic/tracts_2020_500k.parquet"
-        t = _fetcher(local, remote, msg, self._con)
+        t = _fetcher(local, remote, msg, self._con, table_name="tracts_2020_500k")
 
         if states:
             t = t.filter(t.geoid.substr(0, 2).isin(states))
@@ -610,55 +647,79 @@ Subject to your compliance with the terms and conditions set forth in this Agree
             t = t.to_pandas()
         return t
 
-    def msas(self):
+    def msas(self, execute=True):
         """Metropolitan Statistical Areas as drawn in 2020.
 
         Data come from the U.S. Census Bureau's most recent TIGER/LINE files
         https://www.census.gov/cgi-bin/geo/shapefiles/index.php?year=2020&layergroup=Core+Based+Statistical+Areas
 
 
+        Parameters
+        ----------
+        execute : bool, optional
+            if True, materialize to a geopandas.GeoDataFrame. If False,
+            return an ibis table for further lazy composition.
+
         Returns
         -------
-        geopandas.GeoDataFrame
-            2010 MSAs as a geodataframe
+        geopandas.GeoDataFrame or ibis.expr.types.Table
+            2020 MSAs as a geodataframe or lazy table
 
         """
         local = pathlib.Path(self.data_dir, "msas.parquet")
         remote = "s3://spatial-ucr/census/administrative/msas.parquet"
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
-        t = _fetcher(local, remote, msg, self._con).to_pandas()
-        t = t.sort_values(by="name")
+        t = _fetcher(local, remote, msg, self._con, table_name="msas")
+        t = t.order_by("name")
+        if execute:
+            t = t.to_pandas()
         return t
 
-    def states(self):
+    def states(self, execute=True):
         """States.
+
+        Parameters
+        ----------
+        execute : bool, optional
+            if True, materialize to a geopandas.GeoDataFrame. If False,
+            return an ibis table for further lazy composition.
 
         Returns
         -------
-        geopandas.GeoDataFrame
-            US States as a geodataframe
+        geopandas.GeoDataFrame or ibis.expr.types.Table
+            US States as a geodataframe or lazy table
 
         """
         local = pathlib.Path(self.data_dir, "states.parquet")
         remote = "s3://spatial-ucr/census/administrative/states.parquet"
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
 
-        t = _fetcher(local, remote, msg, self._con).to_pandas()
+        t = _fetcher(local, remote, msg, self._con, table_name="states")
+        if execute:
+            t = t.to_pandas()
         return t
 
-    def counties(self):
+    def counties(self, execute=True):
         """Nationwide counties as drawn in 2010.
+
+        Parameters
+        ----------
+        execute : bool, optional
+            if True, materialize to a geopandas.GeoDataFrame. If False,
+            return an ibis table for further lazy composition.
 
         Returns
         -------
-        geopandas.GeoDataFrame
-            2010 counties as a geodataframe.
+        geopandas.GeoDataFrame or ibis.expr.types.Table
+            2010 counties as a geodataframe or lazy table.
 
         """
         local = pathlib.Path(self.data_dir, "counties.parquet")
         remote = "s3://spatial-ucr/census/administrative/counties.parquet"
         msg = "Streaming data from S3. Use `geosnap.io.store_census() to store the data locally for better performance"
-        t = _fetcher(local, remote, msg, self._con).to_pandas()
+        t = _fetcher(local, remote, msg, self._con, table_name="counties")
+        if execute:
+            t = t.to_pandas()
         return t
 
     def msa_definitions(self):

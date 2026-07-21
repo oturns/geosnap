@@ -43,11 +43,11 @@ dependencies = [
     "tobler>=0.8.2",
     "spopt>=0.3.0",
     "segregation>=2.1",
-    #"proplot>=0.9",
     "pyproj>=3",
     "pandarm",
     "pooch",
-    "ibis-framework"
+    "ibis-framework >=0.12",
+    "duckdb"
 ]
 
 [project.urls]

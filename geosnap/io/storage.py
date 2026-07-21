@@ -122,7 +122,7 @@ def store_census(data_dir="auto", verbose=True):
         print(f"Data stored in {_make_data_dir(data_dir)}")
 
 
-def store_blocks_2000(data_dir="auto"):
+def store_blocks_2000(data_dir="auto", states='all'):
     """Save census 2000 census block data to the local quilt package storage.
 
     Returns
@@ -134,10 +134,22 @@ def store_blocks_2000(data_dir="auto"):
     """
     pth = pathlib.Path(_make_data_dir(data_dir), "blocks_2000")
     pathlib.Path(pth).mkdir(parents=True, exist_ok=True)
-    quilt3.Package.install("census/blocks_2000", "s3://spatial-ucr", dest=pth)
+    pkg = "census/blocks_2000"
 
+    if states == "all":
+        quilt3.Package.install(pkg, "s3://spatial-ucr", dest=pth)
 
-def store_blocks_2010(data_dir="auto"):
+    else:
+        if isinstance(states, (str, int)):
+            states = [states]
+        p = quilt3.Package.browse(pkg, "s3://spatial-ucr")
+        for state in states:
+            fn = f"{state}.parquet"
+            p[fn].fetch(
+                dest=pathlib.Path(pth, fn)
+            )
+
+def store_blocks_2010(data_dir="auto", states='all'):
     """Save census 2010 census block data to the local quilt package storage.
 
     Returns
@@ -149,10 +161,20 @@ def store_blocks_2010(data_dir="auto"):
     """
     pth = pathlib.Path(_make_data_dir(data_dir), "blocks_2010")
     pathlib.Path(pth).mkdir(parents=True, exist_ok=True)
-    quilt3.Package.install("census/blocks_2010", "s3://spatial-ucr", dest=pth)
+    pkg = "census/blocks_2010"
 
+    if states == "all":
+        quilt3.Package.install(pkg, "s3://spatial-ucr", dest=pth)
 
-def store_blocks_2020(data_dir="auto"):
+    else:
+        if isinstance(states, (str, int)):
+            states = [states]
+        p = quilt3.Package.browse(pkg, "s3://spatial-ucr")
+        for state in states:
+            fn = f"{state}.parquet"
+            p[fn].fetch(dest=pathlib.Path(pth, fn))
+
+def store_blocks_2020(data_dir="auto", states='all'):
     """Save census 2020 census block data to the local quilt package storage.
 
     Returns
@@ -164,7 +186,18 @@ def store_blocks_2020(data_dir="auto"):
     """
     pth = pathlib.Path(_make_data_dir(data_dir), "blocks_2020")
     pathlib.Path(pth).mkdir(parents=True, exist_ok=True)
-    quilt3.Package.install("census/blocks_2020", "s3://spatial-ucr", dest=pth)
+    pkg = "census/blocks_2020"
+
+    if states == "all":
+        quilt3.Package.install(pkg, "s3://spatial-ucr", dest=pth)
+
+    else:
+        if isinstance(states, (str, int)):
+            states = [states]
+        p = quilt3.Package.browse(pkg, "s3://spatial-ucr")
+        for state in states:
+            fn = f"{state}.parquet"
+            p[fn].fetch(dest=pathlib.Path(pth, fn))
 
 
 def store_ejscreen(years="all", data_dir="auto"):
@@ -191,7 +224,7 @@ def store_ejscreen(years="all", data_dir="auto"):
         quilt3.Package.install("epa/ejscreen", "s3://spatial-ucr", dest=pth)
 
     else:
-        if isinstance("years", (str, int)):
+        if isinstance(years, (str, int)):
             years = [years]
         p = quilt3.Package.browse("epa/ejscreen", "s3://spatial-ucr")
         for year in years:
@@ -229,7 +262,7 @@ def store_nces(years="all", dataset="all", data_dir="auto"):
             quilt3.Package.install(f"nces/{d}", "s3://spatial-ucr", dest=pth)
 
         else:
-            if isinstance("years", (str, int)):
+            if isinstance(years, (str, int)):
                 years = [years]
             if d == "districts":
                 p = quilt3.Package.browse(f"nces/{d}", "s3://spatial-ucr")
@@ -629,9 +662,24 @@ def _fips_filter(
     if len(fips_list)==0:
         raise ValueError('Must pass FIPS values of some kind')
 
-    df = ibis.union(*[data.filter(data["geoid"].startswith(fips)) for fips in tuple(fips_list)],
-        distinct=True,
-    )
+    # Use substr+isin for efficient filtering on cached DuckDB data.
+    # Group FIPS codes by prefix length to handle mixed-length codes
+    # (e.g., 2-digit state FIPS vs 5-digit county FIPS).
+    # For same-length prefixes, a single substr+isin is optimal.
+    # For mixed-length prefixes, fall back to union-of-startswith.
+    unique_fips = list(dict.fromkeys(fips_list))  # deduplicate, preserve order
+    prefix_lengths = set(len(f) for f in unique_fips)
+
+    if len(prefix_lengths) == 1:
+        # All FIPS codes have the same length — use efficient substr+isin
+        plen = len(unique_fips[0])
+        df = data.filter(data["geoid"].substr(0, plen).isin(unique_fips))
+    else:
+        # Mixed-length FIPS codes — fall back to union-of-startswith
+        df = ibis.union(
+            *[data.filter(data["geoid"].startswith(fips)) for fips in unique_fips],
+            distinct=True,
+        )
 
     return df
 
