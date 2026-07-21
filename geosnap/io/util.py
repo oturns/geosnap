@@ -1,6 +1,7 @@
 import json
 import os
 import pathlib
+import shutil
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -202,6 +203,35 @@ def convert_census_gdb(
         )
 
 
+# Status codes worth retrying: rate limiting and transient server errors.
+# Everything else (400 bad request, 404, 414 URI-too-long, ...) is a client
+# error that will not resolve on retry and must be surfaced immediately.
+_RETRIABLE_STATUS = frozenset({429, 500, 502, 503, 504})
+
+
+def _redact_key(url):
+    """Strip the ``key=`` query parameter so the API key never lands in logs."""
+    import re
+
+    return re.sub(r"([?&]key=)[^&]*", r"\1***", url)
+
+
+class Acs5RequestError(RuntimeError):
+    """An ACS5 HTTP request returned an error response.
+
+    Carries the HTTP status ``code`` and response ``body`` so callers can
+    distinguish, e.g., a "group does not exist" 400 (skip the group) from a
+    "request-uri too long" 414 (retry at a finer geography) without re-parsing
+    opaque exception strings.
+    """
+
+    def __init__(self, message, code=None, body="", url=None):
+        super().__init__(message)
+        self.code = code
+        self.body = body or ""
+        self.url = url
+
+
 def _acs5_request(year, params, session=None, timeout=60, max_retries=6, backoff=1.0, api_key=None):
     """Issue a resilient ACS5 request and return parsed JSON content.
 
@@ -209,6 +239,12 @@ def _acs5_request(year, params, session=None, timeout=60, max_retries=6, backoff
     ``session`` is provided, which significantly reduces per-request
     overhead during large batch downloads.
     Always includes the API key if provided or available in the environment.
+
+    Transient failures (network errors and the status codes in
+    ``_RETRIABLE_STATUS``) are retried with exponential backoff. Non-retriable
+    HTTP errors are raised immediately as :class:`Acs5RequestError` carrying the
+    status code and body, so a single unavailable table does not burn six
+    backoff cycles before failing.
     """
     # Always add API key if provided or available in env
     if api_key is None:
@@ -222,26 +258,39 @@ def _acs5_request(year, params, session=None, timeout=60, max_retries=6, backoff
 
     last_error = None
     for attempt in range(max_retries):
+        code = None
+        body = ""
         try:
             if session is not None:
                 resp = session.get(url, timeout=timeout)
-                resp.raise_for_status()
-                return resp.json()
+                if resp.status_code == 200:
+                    return resp.json()
+                code, body = resp.status_code, resp.text
             else:
-                with urlopen(url, timeout=timeout) as resp:
-                    payload = resp.read().decode("utf-8")
-                return json.loads(payload)
-        except HTTPError as err:
+                try:
+                    with urlopen(url, timeout=timeout) as resp:
+                        return json.loads(resp.read().decode("utf-8"))
+                except HTTPError as err:
+                    code = err.code
+                    body = err.read().decode("utf-8", "ignore")
+        except Exception as err:  # network/timeout/JSON-decode: retriable
             last_error = err
-            if err.code not in (429, 500, 502, 503, 504):
-                raise
-        except Exception as err:  # pragma: no cover
+        else:
+            # We have an HTTP error status (code is set).
+            err = Acs5RequestError(
+                f"HTTP {code} for {_redact_key(url)}", code=code, body=body, url=url
+            )
+            if code not in _RETRIABLE_STATUS:
+                raise err
             last_error = err
-        sleep_for = backoff * (2**attempt)
-        time.sleep(sleep_for)
 
-    raise RuntimeError(
-        f"ACS5 request failed after {max_retries} attempts: {url}"
+        time.sleep(backoff * (2**attempt))
+
+    raise Acs5RequestError(
+        f"ACS5 request failed after {max_retries} attempts: {_redact_key(url)}",
+        code=getattr(last_error, "code", None),
+        body=getattr(last_error, "body", ""),
+        url=url,
     ) from last_error
 
 
@@ -359,6 +408,31 @@ class StateLevelTooLargeError(Exception):
     """Raised when a state-level ACS5 request fails due to size/row limits."""
     pass
 
+
+class GroupUnavailableError(Exception):
+    """Raised when a variable group is not tabulated for a given geography/year.
+
+    Not all detailed tables are published at every geographic level (many
+    tract-level tables are absent at the block-group level). The API reports
+    these with an HTTP 400 "group does not exist" response; treating them as
+    skippable rather than fatal lets a national build finish with the tables
+    that *are* available.
+    """
+    pass
+
+
+def _is_estimate_column(col):
+    """Return True if ``col`` is an ACS detailed-table estimate variable.
+
+    Estimate variables end in ``E`` preceded by the (numeric) line number,
+    e.g. ``B19013_001E``. This excludes margins (``...M``), annotation columns
+    (``...EA``/``...MA``) and the ``NAME``/``GEO_ID`` geography identifiers that
+    a ``group()`` query returns alongside the estimates. The published
+    ``demographic_profile`` tables are estimates only, so those are all we keep.
+    """
+    return len(col) > 1 and col.endswith("E") and col[-2].isdigit()
+
+
 def _download_acs5_chunk(
     year,
     level,
@@ -373,28 +447,42 @@ def _download_acs5_chunk(
     backoff=1.0,
     state_level=False,
 ):
-    """Download one county/group chunk and write a parquet file.
+    """Download one state/county group chunk and write a lean parquet file.
+
+    The chunk holds only the ``geoid`` and the estimate columns for ``group``.
+    ``NAME``, ``GEO_ID``, margins and annotation columns returned by the
+    ``group()`` macro are dropped here so the assembled table matches the
+    estimates-only ``demographic_profile`` format and chunks never collide on
+    shared identifier columns during assembly.
 
     When ``state_level=True`` the request is issued at the state level
-    (e.g. ``for=tract:*&in=state:06``) instead of county level.  This
-    reduces the total number of API calls by roughly 60×, but may hit
-    Census row limits for large states or wide variable groups.
+    (e.g. ``for=tract:*&in=state:06``) instead of county level. This reduces the
+    total number of API calls by roughly 60×, but may hit Census size limits for
+    large states or wide variable groups, in which case
+    :class:`StateLevelTooLargeError` is raised so the caller can retry at county
+    level.
     """
-    params = {
-        "get": f"NAME,group({group})",
-    }
+    # NOTE: do *not* prepend "NAME," to the get list. The group() macro already
+    # returns NAME; adding it again yields a duplicate column (NAME / NAME_1).
+    params = {"get": f"group({group})"}
     if level == "tract":
         params["for"] = "tract:*"
-        if state_level:
-            params["in"] = f"state:{state}"
-        else:
-            params["in"] = f"state:{state} county:{county}"
+        # Tracts support a state-scoped query; block groups do not.
+        params["in"] = (
+            f"state:{state}"
+            if state_level
+            else f"state:{state} county:{county}"
+        )
     elif level == "blockgroup":
         params["for"] = "block group:*"
-        if state_level:
-            params["in"] = f"state:{state}"
-        else:
-            params["in"] = f"state:{state} county:{county}"
+        # The API rejects "state:XX" alone for block groups ("unknown/unsupported
+        # geography hierarchy"); a county is required. Use the county wildcard to
+        # still fetch a whole state in one request when state_level is set.
+        params["in"] = (
+            f"state:{state} county:*"
+            if state_level
+            else f"state:{state} county:{county}"
+        )
     else:
         raise ValueError("level must be 'tract' or 'blockgroup'")
 
@@ -411,17 +499,22 @@ def _download_acs5_chunk(
             backoff=backoff,
             api_key=api_key,
         )
-    except Exception as err:
-        # Detect likely state-level size/row limit errors
-        if state_level and (
-            "too many rows" in str(err).lower()
-            or "413" in str(err)
-            or "414" in str(err)
-            or "request entity too large" in str(err).lower()
-            or "request-uri too long" in str(err).lower()
-        ):
+    except Acs5RequestError as err:
+        body = (err.body or "").lower()
+        if err.code == 400 and "does not exist" in body:
+            raise GroupUnavailableError(
+                f"group {group} not available at {level} level for {year}"
+            ) from err
+        # A single state's response can be too big (URI too long / payload too
+        # large / row cap). Retrying the same request will not help, but
+        # splitting it into county-level requests will.
+        too_large = err.code in (413, 414) or any(
+            marker in body
+            for marker in ("too large", "too many rows", "request-uri too long")
+        )
+        if state_level and too_large:
             raise StateLevelTooLargeError(
-                f"State-level request failed for {level}|{state}|{group}: {err}"
+                f"state-level request too large for {level}|{state}|{group}"
             ) from err
         raise
 
@@ -435,13 +528,137 @@ def _download_acs5_chunk(
     else:
         df["geoid"] = df["state"] + df["county"] + df["tract"] + df["block group"]
 
+    keep = ["geoid"] + [c for c in df.columns if _is_estimate_column(c)]
+    df = df[keep]
+
     out_path.parent.mkdir(parents=True, exist_ok=True)
     df.to_parquet(out_path)
     return len(df)
 
 
-def _assemble_acs5_chunks(level, year, chunk_dir, output_dir):
-    """Assemble county/group chunks into one national wide table."""
+def _download_file(url, dest, timeout=120, max_retries=4, backoff=1.0):
+    """Stream ``url`` to ``dest`` atomically, retrying transient failures.
+
+    A 404 (the file does not exist, e.g. a territory with no TIGER coverage) is
+    raised immediately so the caller can skip it rather than retrying.
+    """
+    dest = pathlib.Path(dest)
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    tmp = dest.with_suffix(dest.suffix + ".part")
+    last_error = None
+    for attempt in range(max_retries):
+        try:
+            with urlopen(url, timeout=timeout) as resp, open(tmp, "wb") as fh:
+                shutil.copyfileobj(resp, fh)
+            os.replace(tmp, dest)
+            return dest
+        except HTTPError as err:
+            if err.code == 404:
+                raise
+            last_error = err
+        except Exception as err:
+            last_error = err
+        time.sleep(backoff * (2**attempt))
+    raise RuntimeError(f"failed to download {url}") from last_error
+
+
+# Detailed TIGER/Line attribute columns to carry alongside geometry. Block group
+# files omit NAME; tract files include it. Missing columns are simply skipped.
+_TIGER_GEOM_COLS = [
+    "GEOID", "STATEFP", "COUNTYFP", "TRACTCE", "BLKGRPCE",
+    "NAME", "NAMELSAD", "MTFCC", "FUNCSTAT", "ALAND", "AWATER",
+    "INTPTLAT", "INTPTLON", "geometry",
+]
+
+
+def _load_tiger_geometry(
+    year, level, states, cache_dir, workers=8, overwrite=False, timeout=120
+):
+    """Return national TIGER/Line geometry for tracts or block groups.
+
+    The published ``demographic_profile`` tables carry the *detailed* (not
+    generalized) TIGER/Line boundaries for each vintage, so this downloads the
+    per-state ``tl_{year}_{state}_{tract|bg}.zip`` shapefiles for ``year``,
+    concatenates them into one GeoDataFrame keyed on ``GEOID``, and caches the
+    result. States without a TIGER file for the level (e.g. some territories)
+    are skipped with a warning.
+    """
+    try:
+        import pyogrio
+    except ImportError as e:
+        raise ImportError(
+            "building geometry requires the `pyogrio` package\n"
+            "`conda install pyogrio` or pass geometry=False"
+        ) from e
+
+    cache_dir = pathlib.Path(cache_dir)
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    token = {"tract": "tract", "blockgroup": "bg"}[level]
+    subdir = token.upper()
+
+    combined = cache_dir / f"tiger_{level}_{year}.parquet"
+    if combined.exists() and not overwrite:
+        return gpd.read_parquet(combined)
+
+    def _one(state):
+        url = (
+            f"https://www2.census.gov/geo/tiger/TIGER{year}/{subdir}/"
+            f"tl_{year}_{state}_{token}.zip"
+        )
+        zpath = cache_dir / f"tl_{year}_{state}_{token}.zip"
+        if overwrite or not zpath.exists():
+            try:
+                _download_file(url, zpath, timeout=timeout)
+            except HTTPError as err:
+                if err.code == 404:
+                    return None  # no TIGER file for this state/level
+                raise
+        return pyogrio.read_dataframe(f"/vsizip/{zpath}")
+
+    frames = []
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        futures = {pool.submit(_one, s): s for s in states}
+        for fut in tqdm(
+            as_completed(futures),
+            total=len(futures),
+            desc=f"TIGER {level} geometry {year}",
+        ):
+            state = futures[fut]
+            try:
+                gdf = fut.result()
+            except Exception as err:
+                warn(f"skipping geometry for state {state}: {err}", stacklevel=2)
+                continue
+            if gdf is not None and len(gdf):
+                frames.append(gdf)
+
+    if not frames:
+        raise RuntimeError(f"No TIGER {level} geometry could be downloaded for {year}")
+
+    crs = frames[0].crs
+    national = pd.concat(frames, ignore_index=True)
+    keep = [c for c in _TIGER_GEOM_COLS if c in national.columns]
+    national = gpd.GeoDataFrame(national[keep], geometry="geometry", crs=crs)
+    national = national.drop_duplicates(subset=["GEOID"])
+    national.to_parquet(combined)
+    return national
+
+
+def _assemble_acs5_chunks(level, year, chunk_dir, output_dir, geometry=None):
+    """Assemble per-state/county group chunks into one national wide table.
+
+    Each chunk is reduced to ``geoid`` plus its estimate columns (defensively,
+    so chunks written by older versions of :func:`_download_acs5_chunk` that
+    still carry ``NAME``/``GEO_ID``/margins are handled too). Because every group
+    contributes a disjoint set of estimate columns keyed on ``geoid``, the groups
+    are aligned with a single concat rather than a chain of outer joins, and
+    columns that are entirely null (tables not tabulated for this geography) are
+    dropped to mirror the published ``demographic_profile`` tables.
+
+    When a ``geometry`` GeoDataFrame is supplied (keyed on ``GEOID``) it is joined
+    onto the estimates so the output is a GeoDataFrame, matching the published
+    tables. Estimate rows without a matching boundary keep a null geometry.
+    """
     chunk_dir = pathlib.Path(chunk_dir)
     output_dir = pathlib.Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -452,37 +669,39 @@ def _assemble_acs5_chunks(level, year, chunk_dir, output_dir):
 
     grouped = {}
     for f in files:
-        # filename convention: level_state_county_group.parquet
-        stem = f.stem
-        grp = stem.split("_", 3)[-1]
+        # filename convention: {level}_{state}[_{county}]_{group}.parquet
+        grp = f.stem.split("_", 3)[-1]
         grouped.setdefault(grp, []).append(f)
 
-    merged = None
-    geom_cols = ["geoid", "NAME", "state", "county", "tract"]
-    if level == "blockgroup":
-        geom_cols.append("block group")
-
+    frames = []
     for _grp, grp_files in tqdm(
         sorted(grouped.items()),
         desc=f"Assembling {level} groups",
     ):
         tables = [pd.read_parquet(p) for p in grp_files]
         frame = pd.concat(tables, axis=0, ignore_index=True)
-        frame = frame.drop_duplicates(subset=["geoid"]).set_index("geoid")
-
-        for col in frame.columns:
-            if col in geom_cols:
-                continue
-            frame[col] = pd.to_numeric(frame[col], errors="coerce")
-
-        if merged is None:
-            merged = frame
+        est_cols = [c for c in frame.columns if _is_estimate_column(c)]
+        if not est_cols:
             continue
+        frame = (
+            frame[["geoid"] + est_cols]
+            .drop_duplicates(subset=["geoid"])
+            .set_index("geoid")
+        )
+        frames.append(frame.apply(pd.to_numeric, errors="coerce"))
 
-        keep = [c for c in frame.columns if c not in geom_cols or c == "geoid"]
-        merged = merged.join(frame[keep], how="outer")
+    if not frames:
+        raise RuntimeError("No estimate columns were found across chunks")
 
+    merged = pd.concat(frames, axis=1, join="outer")
+    merged = merged.dropna(axis=1, how="all")
     merged = merged.reset_index().rename(columns={"geoid": "GEOID"})
+
+    if geometry is not None:
+        # right-join keeps every estimate row and attaches its boundary
+        merged = geometry.merge(merged, on="GEOID", how="right")
+        merged = gpd.GeoDataFrame(merged, geometry="geometry", crs=geometry.crs)
+
     out = output_dir / f"acs_demographic_profile_{year}_{level}.parquet"
     merged.to_parquet(out)
     return out
@@ -500,6 +719,9 @@ def convert_census_acs5(
     max_retries=6,
     backoff=1.0,
     state_level=False,
+    geometry=True,
+    manifest_interval=50,
+    manifest_period=5.0,
 ):
     """Build a national ACS5 demographic profile table from ACS5 API detail tables only.
 
@@ -511,8 +733,14 @@ def convert_census_acs5(
         Geographic level: "tract" or "blockgroup".
     output_dir : str, optional
         Directory for cache artifacts and final parquet output.
+    geometry : bool, optional
+        If True (default), download the detailed TIGER/Line boundaries for the
+        matching vintage and join them onto the estimates so the output is a
+        GeoDataFrame, matching the published ``demographic_profile`` tables. If
+        False, the output is attribute-only, keyed on ``GEOID``.
     api_key : str, optional
-        Census API key. If None, unauthenticated requests are used.
+        Census API key. If None, falls back to the ``CENSUS`` environment
+        variable; if that is also unset, unauthenticated requests are used.
     workers : int, optional
         Number of concurrent county/group request workers.
     overwrite : bool, optional
@@ -529,6 +757,15 @@ def convert_census_acs5(
         If True, request data at the state level instead of county level.
         This reduces API calls by ~60× but may hit Census row limits for
         large states or wide variable groups. Default is False (county level).
+    manifest_interval : int, optional
+        Maximum number of chunk completions between manifest checkpoints.
+        Writing the manifest after every completion serializes workers on
+        the GIL (O(N²) total work); batching keeps the GIL free for I/O.
+        Default 50.
+    manifest_period : float, optional
+        Maximum number of seconds between manifest checkpoints. Combined
+        with ``manifest_interval`` (whichever triggers first) bounds the
+        amount of work lost on a hard crash. Default 5.0.
 
     Returns
     -------
@@ -557,6 +794,27 @@ def convert_census_acs5(
     groups = _load_acs5_variable_groups(year, metadata_dir, overwrite=overwrite)
     states = _load_states_fips()
 
+    # Enumerate counties for every state in parallel.  The previous code
+    # issued these ~50 requests serially before any chunk downloading
+    # could begin, adding ~50× request latency of startup time.
+    state_counties = {}
+    if not state_level:
+        enum_workers = min(8, max(1, len(states)))
+        with ThreadPoolExecutor(max_workers=enum_workers) as enum_pool:
+            future_to_state = {
+                enum_pool.submit(
+                    _load_state_counties,
+                    year,
+                    state,
+                    metadata_dir,
+                    api_key,
+                    overwrite,
+                ): state
+                for state in states
+            }
+            for fut in as_completed(future_to_state):
+                state_counties[future_to_state[fut]] = fut.result()
+
     tasks = []
     for state in states:
         if state_level:
@@ -566,14 +824,7 @@ def convert_census_acs5(
                 chunk_path = chunks_dir / chunk_name
                 tasks.append((tid, state, None, group, chunk_path))
         else:
-            counties = _load_state_counties(
-                year,
-                state,
-                metadata_dir,
-                api_key=api_key,
-                overwrite=overwrite,
-            )
-            for county in counties:
+            for county in state_counties.get(state, []):
                 for group in sorted(groups):
                     tid = _task_id(level, state, county, group)
                     chunk_name = f"{level}_{state}_{county}_{group}.parquet"
@@ -583,50 +834,53 @@ def convert_census_acs5(
     manifest_path = cache_root / "manifest.json"
     tmp_manifest_path = manifest_path.with_suffix(".json.tmp")
     completed = set()
+    # Groups that the API reports as unavailable for this geography/year. These
+    # are recorded so resumed runs don't re-probe them on every pass, but they
+    # are not treated as failures.
+    skipped = set()
     failed = {}
     if resume and not overwrite:
         # If a temp manifest exists from a previous interrupted run, recover it.
+        source = None
         if tmp_manifest_path.exists() and not manifest_path.exists():
-            try:
-                with tmp_manifest_path.open("r") as f:
-                    manifest = json.load(f)
-                completed = set(manifest.get("completed", []))
-                failed = manifest.get("failed", {})
-                warn(
-                    "Recovered manifest from interrupted run.",
-                    stacklevel=2,
-                )
-            except (json.JSONDecodeError, ValueError):
-                warn(
-                    "Temp manifest is corrupted; starting fresh.",
-                    stacklevel=2,
-                )
-                completed = set()
-                failed = {}
+            source = tmp_manifest_path
+            recovered_msg = "Recovered manifest from interrupted run."
         elif manifest_path.exists():
+            source = manifest_path
+            recovered_msg = None
+        if source is not None:
             try:
-                with manifest_path.open("r") as f:
+                with source.open("r") as f:
                     manifest = json.load(f)
                 completed = set(manifest.get("completed", []))
+                skipped = set(manifest.get("skipped", []))
                 failed = manifest.get("failed", {})
+                if recovered_msg:
+                    warn(recovered_msg, stacklevel=2)
             except (json.JSONDecodeError, ValueError):
                 warn(
-                    "Manifest file is corrupted; starting fresh.",
+                    f"{source.name} is corrupted; starting fresh.",
                     stacklevel=2,
                 )
-                completed = set()
-                failed = {}
+                completed, skipped, failed = set(), set(), {}
 
     pending = []
     for tid, state, county, group, chunk_path in tasks:
-        if not overwrite and resume and (tid in completed or chunk_path.exists()):
-            completed.add(tid)
+        if not overwrite and resume and (
+            tid in completed or tid in skipped or chunk_path.exists()
+        ):
+            if tid not in skipped:
+                completed.add(tid)
             continue
         pending.append((tid, state, county, group, chunk_path))
 
     _manifest_lock = threading.Lock()
 
     def _save_manifest():
+        # Compact JSON (no indent) and no per-write sort: the manifest is a
+        # resumability checkpoint, not a human-readable artifact.  Sorting a
+        # 50k–3M-entry set and pretty-printing it on every completion
+        # serialized the worker threads on the GIL and collapsed throughput.
         with _manifest_lock:
             tmp_path = manifest_path.with_suffix(".json.tmp")
             with tmp_path.open("w") as f:
@@ -635,11 +889,12 @@ def convert_census_acs5(
                         "year": year,
                         "level": level,
                         "tasks_total": len(tasks),
-                        "completed": sorted(completed),
+                        "completed": list(completed),
+                        "skipped": list(skipped),
                         "failed": failed,
                     },
                     f,
-                    indent=2,
+                    separators=(",", ":"),
                 )
             os.replace(tmp_path, manifest_path)
 
@@ -671,40 +926,69 @@ def convert_census_acs5(
                 )
             except StateLevelTooLargeError:
                 # Fallback: enqueue county-level tasks for this state/group
-                return "FALLBACK", state, group
+                return ("FALLBACK", state, group)
+            except GroupUnavailableError:
+                # Table is not tabulated for this geography; skip, don't fail.
+                return ("SKIP", state, group)
 
         # Track fallback tasks to enqueue
         fallback_tasks = []
 
-        with ThreadPoolExecutor(max_workers=workers) as pool:
-            futures = {}
-            for tid, state, county, group, chunk_path in pending:
-                fut = pool.submit(
-                    _worker, state, county, group, chunk_path, state_level
-                )
-                futures[fut] = (tid, state, county, group, chunk_path)
+        # Batched manifest writes: only checkpoint every ``manifest_interval``
+        # completions or every ``manifest_period`` seconds.  Writing on every
+        # completion re-sorts/re-serializes the whole manifest under the GIL
+        # and starves the worker threads.
+        completions_since_save = 0
+        last_save_time = time.time()
 
-            for fut in tqdm(
-                as_completed(futures),
-                total=len(futures),
-                desc=f"Downloading {level}",
-            ):
-                tid, state, county, group, chunk_path = futures[fut]
-                try:
-                    result = fut.result()
-                    if result == "FALLBACK":
-                        # Enqueue county-level tasks for this state/group
-                        fallback_tasks.append((state, group))
-                        failed[tid] = (
-                            "State-level request too large, will retry at county-level"
-                        )
-                    else:
-                        completed.add(tid)
-                        if tid in failed:
-                            del failed[tid]
-                except Exception as err:  # pragma: no cover
-                    failed[tid] = str(err)
-                _save_manifest()
+        try:
+            with ThreadPoolExecutor(max_workers=workers) as pool:
+                futures = {}
+                for tid, state, county, group, chunk_path in pending:
+                    fut = pool.submit(
+                        _worker, state, county, group, chunk_path, state_level
+                    )
+                    futures[fut] = (tid, state, county, group, chunk_path)
+
+                for fut in tqdm(
+                    as_completed(futures),
+                    total=len(futures),
+                    desc=f"Downloading {level}",
+                ):
+                    tid, state, county, group, chunk_path = futures[fut]
+                    try:
+                        result = fut.result()
+                        if isinstance(result, tuple) and result[0] == "FALLBACK":
+                            # Enqueue county-level tasks for this state/group
+                            fallback_tasks.append((state, group))
+                            failed[tid] = (
+                                "State-level request too large, "
+                                "will retry at county-level"
+                            )
+                        elif isinstance(result, tuple) and result[0] == "SKIP":
+                            skipped.add(tid)
+                            failed.pop(tid, None)
+                        else:
+                            completed.add(tid)
+                            failed.pop(tid, None)
+                    except Exception as err:  # pragma: no cover
+                        failed[tid] = str(err)
+
+                    completions_since_save += 1
+                    now = time.time()
+                    if (
+                        completions_since_save >= manifest_interval
+                        or now - last_save_time >= manifest_period
+                    ):
+                        _save_manifest()
+                        completions_since_save = 0
+                        last_save_time = now
+        except BaseException:
+            # Ensure a checkpoint exists before bubbling up (Ctrl-C, etc.).
+            _save_manifest()
+            raise
+        else:
+            _save_manifest()
 
         # Handle fallback tasks (county-level for failed state/group)
         if fallback_tasks:
@@ -739,35 +1023,82 @@ def convert_census_acs5(
                         continue
                     county_level_tasks.append((tid, state, county, group, chunk_path))
 
-            # Run county-level tasks
-            with ThreadPoolExecutor(max_workers=workers) as pool:
-                futures = {}
-                for tid, state, county, group, chunk_path in county_level_tasks:
-                    fut = pool.submit(_worker, state, county, group, chunk_path, False)
-                    futures[fut] = tid
+            # Run county-level tasks (batched manifest writes, same as above)
+            completions_since_save = 0
+            last_save_time = time.time()
+            try:
+                with ThreadPoolExecutor(max_workers=workers) as pool:
+                    futures = {}
+                    for tid, state, county, group, chunk_path in county_level_tasks:
+                        fut = pool.submit(
+                            _worker, state, county, group, chunk_path, False
+                        )
+                        futures[fut] = tid
 
-                for fut in tqdm(
-                    as_completed(futures),
-                    total=len(futures),
-                    desc=f"Fallback county-level {level}",
-                ):
-                    tid = futures[fut]
-                    try:
-                        fut.result()
-                        completed.add(tid)
-                        if tid in failed:
-                            del failed[tid]
-                    except Exception as err:
-                        failed[tid] = str(err)
-                    _save_manifest()
+                    for fut in tqdm(
+                        as_completed(futures),
+                        total=len(futures),
+                        desc=f"Fallback county-level {level}",
+                    ):
+                        tid = futures[fut]
+                        try:
+                            result = fut.result()
+                            if isinstance(result, tuple) and result[0] == "SKIP":
+                                skipped.add(tid)
+                                failed.pop(tid, None)
+                            else:
+                                completed.add(tid)
+                                failed.pop(tid, None)
+                        except Exception as err:
+                            failed[tid] = str(err)
 
+                        completions_since_save += 1
+                        now = time.time()
+                        if (
+                            completions_since_save >= manifest_interval
+                            or now - last_save_time >= manifest_period
+                        ):
+                            _save_manifest()
+                            completions_since_save = 0
+                            last_save_time = now
+            except BaseException:
+                _save_manifest()
+                raise
+            else:
+                _save_manifest()
+
+    # Assemble whatever completed rather than discarding a large national
+    # download because a handful of chunks failed. Genuinely-failed chunks are
+    # surfaced as a warning; re-running with resume=True retries only those.
     if failed:
-        raise RuntimeError(
-            f"{len(failed)} chunk downloads failed. "
-            "Re-run with resume=True to retry unfinished work."
+        warn(
+            f"{len(failed)} chunk download(s) failed and were omitted from the "
+            f"assembled table. Re-run with resume=True to retry them. "
+            f"First few: {list(failed)[:5]}",
+            stacklevel=2,
+        )
+    if skipped:
+        warn(
+            f"{len(skipped)} group/geography combination(s) were unavailable "
+            "from the API and skipped.",
+            stacklevel=2,
         )
 
-    return _assemble_acs5_chunks(level, year, chunks_dir, output_dir)
+    geom = None
+    if geometry:
+        geom = _load_tiger_geometry(
+            year,
+            level,
+            states,
+            cache_root / "geometry",
+            workers=workers,
+            overwrite=overwrite,
+            timeout=timeout,
+        )
+
+    return _assemble_acs5_chunks(
+        level, year, chunks_dir, output_dir, geometry=geom
+    )
 
 
 def adjust_inflation(df, columns, given_year, base_year):
